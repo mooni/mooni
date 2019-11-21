@@ -1,0 +1,20 @@
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-345.000000, -31.000000)" fill-rule="nonzero">
+            <g>
+                <g>
+                    <g transform="translate(345.000000, 29.000000)">
+                        <g transform="translate(0.000000, 2.000000)">
+                            <rect fill="#F3493C" x="0" y="0" width="20" height="20"></rect>
+                            <path d="M8.5,8.5 L8.5,5 L11.5,5 L11.5,8.5 L15,8.5 L15,11.5 L11.5,11.5 L11.5,15 L8.5,15 L8.5,11.5 L5,11.5 L5,8.5 L8.5,8.5 Z" fill="#FFFFFF"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
