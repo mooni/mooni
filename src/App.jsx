@@ -1,8 +1,7 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import { Container } from '@material-ui/core'
-import { Main, AppBar } from '@aragon/ui'
+import { Main, Header, Tag } from '@aragon/ui'
 
 import {
   Switch,
@@ -20,24 +19,24 @@ import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
 import Contacts from './pages/ContactsPage';
-import { isLogged } from './redux/eth/selectors';
 
 function App() {
   const location = useLocation();
   const history = useHistory();
-  const logged = useSelector(isLogged);
 
   const pageName = location.pathname && location.pathname !== '/' ? location.pathname.substring(1) : null;
 
   return (
     <Main>
-      <AppBar
-        title="Crypto Off-Ramp"
-        onTitleClick={() => history.push('/')}
-        endContent={<Account />}
-      >
-        {pageName}
-      </AppBar>
+      <Header
+        primary={
+          <>
+            <div onClick={() => history.push('/')} style={{cursor: 'pointer'}}>Crypto Off-Ramp</div>
+          {pageName && <Tag mode="identifier">{pageName}</Tag>}
+          </>
+        }
+        secondary={<Account />}
+      />
       <Container maxWidth="md">
         <Switch>
           <Route exact path="/">

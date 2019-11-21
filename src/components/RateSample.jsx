@@ -5,7 +5,7 @@ import { CircularProgress, Hidden, Paper, Grid, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 
-import { DropDown, Text, TextInput, Info } from '@aragon/ui'
+import { DropDown, TextInput, Info } from '@aragon/ui'
 
 import Bity from '../lib/bity';
 
@@ -89,15 +89,15 @@ function SimpleFiatForm() {
 
   if(!ready) {
     return (
-      <Box mx="auto">
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" p={2}>
+        <CircularProgress size={24} />
       </Box>
     );
   }
 
   return (
     <Box className={classes.root}>
-      <Grid container spacing={3} className={classes.form}>
+      <Grid container spacing={1} className={classes.form}>
         <Grid item xs={12} sm>
           <Paper className={classes.formRow}>
             <Grid container spacing={0}>
@@ -110,14 +110,14 @@ function SimpleFiatForm() {
                   className={classes.amountInput}
                   readOnly
                   disabled
-                  adornment={<Text>You send</Text>}
+                  adornment={<Box>You send</Box>}
                   adornmentSettings={{ width: 50 }}
                 />
               </Grid>
               <Grid item xs={4}>
                 <DropDown
                   items={inputCurrencies}
-                  active={inputCurrency}
+                  selected={inputCurrency}
                   onChange={setInputCurrency}
                   wide
                 />
@@ -128,7 +128,7 @@ function SimpleFiatForm() {
         <Hidden smDown>
           <Grid item sm={1} className={classes.exchangeIcon}>
             {rateLoading ?
-              <CircularProgress />
+              <CircularProgress  size={24} />
               :
               <ShuffleIcon/>
             }
@@ -145,14 +145,14 @@ function SimpleFiatForm() {
                   onChange={e => setOutputAmount(Number(e.target.value))}
                   wide
                   className={classes.amountInput}
-                  adornment={<Text>You get</Text>}
+                  adornment={<Box>You get</Box>}
                   adornmentSettings={{ width: 50 }}
                 />
               </Grid>
               <Grid item xs={4}>
                 <DropDown
                   items={outputCurrencies}
-                  active={outputCurrency}
+                  selected={outputCurrency}
                   onChange={setOutputCurrency}
                   wide
                 />
@@ -165,7 +165,7 @@ function SimpleFiatForm() {
       <Box py={2}>
         <Info>
           <Box display="flex" justifyContent="center">
-            <Text><b>Estimated exchange rate:</b> ~{rate} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Text>
+            <Box><b>Estimated exchange rate:</b> ~{rate} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Box>
           </Box>
         </Info>
       </Box>

@@ -18,14 +18,14 @@ function Account() {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Box display={{ xs: 'block', sm: 'none' }} mx="auto">
         <EthIdenticon address={address} scale={1.6}/>
       </Box>
       <Box display={{ xs: 'none', sm: 'block' }} width={200}>
         <AddressField address={address} />
       </Box>
-    </React.Fragment>
+    </>
   );
 }
 

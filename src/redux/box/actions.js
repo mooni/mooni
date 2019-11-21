@@ -1,6 +1,5 @@
 import BoxManager from '../../lib/box';
 import { getConnect } from '../eth/selectors';
-import { setMyAccount } from '../contacts/actions';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 

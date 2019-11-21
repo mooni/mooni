@@ -6,7 +6,7 @@ import IBAN from 'iban';
 import Divider from '@material-ui/core/Divider';
 import Box from '@material-ui/core/Box';
 
-import { Button, Field, DropDown, Text, TextInput, Info } from '@aragon/ui'
+import { Button, Field, DropDown, TextInput, Info } from '@aragon/ui'
 
 import Bity from '../lib/bity';
 
@@ -103,48 +103,48 @@ function SimpleFiatForm({ address, onComplete }) {
     <Box width={1}>
       <form onSubmit={onSubmit}>
         <Box>
-          <Text size="large" smallcaps>Recipient</Text>
+          <Box size="large" smallcaps>Recipient</Box>
           <Box>
             <Field label="IBAN">
               <TextInput wide name="iban" ref={register(fields.iban)} defaultValue={fields.iban.defaultValue} required/>
-              {errors.iban && <Text>Invalid IBAN</Text>}
+              {errors.iban && <Box>Invalid IBAN</Box>}
             </Field>
             <Field label="BIC/SWIFT">
               <TextInput wide name="bic_swift" ref={register(fields.bic_swift)} defaultValue={fields.bic_swift.defaultValue} required/>
-              {errors.bic_swift && <Text>Invalid BIC</Text>}
+              {errors.bic_swift && <Box>Invalid BIC</Box>}
             </Field>
             <Field label="Name">
               <TextInput wide name="owner.name" ref={register(fields.name)} defaultValue={fields.name.defaultValue} required/>
-              {errors['owner.name'] && <Text>Please enter your name</Text>}
+              {errors['owner.name'] && <Box>Please enter your name</Box>}
             </Field>
             <Field label="Address">
               <TextInput wide name="owner.address" ref={register(fields.address)} defaultValue={fields.address.defaultValue} required/>
-              {errors['owner.address'] && <Text>Invalid address</Text>}
+              {errors['owner.address'] && <Box>Invalid address</Box>}
             </Field>
             <Field label="Zip/Postal code">
               <TextInput wide name="owner.zip" ref={register(fields.zip)}  defaultValue={fields.zip.defaultValue} required/>
-              {errors['owner.zip'] && <Text>Invalid Zip/Code</Text>}
+              {errors['owner.zip'] && <Box>Invalid Zip/Code</Box>}
             </Field>
             <Field label="City">
               <TextInput wide name="owner.city" ref={register(fields.city)}  defaultValue={fields.city.defaultValue} required/>
-              {errors['owner.city'] && <Text>Invalid city</Text>}
+              {errors['owner.city'] && <Box>Invalid city</Box>}
             </Field>
             <Field label="Country">
               <TextInput wide name="owner.country" ref={register(fields.country)}  defaultValue={fields.country.defaultValue} required/>
-              {errors['owner.country'] && <Text>Invalid country</Text>}
+              {errors['owner.country'] && <Box>Invalid country</Box>}
             </Field>
           </Box>
         </Box>
         <Divider variant="middle" />
-        <Text size="large" smallcaps>Payment details</Text>
+        <Box size="large" smallcaps>Payment details</Box>
         <Box>
           <Field label="Amount">
             <TextInput.Number wide name="amount" defaultValue={fields.amount.defaultValue} ref={register(fields.amount)} onChange={estimateInput} required/>
-            {errors.amount && <Text>Invalid amount</Text>}
+            {errors.amount && <Box>Invalid amount</Box>}
           </Field>
           <Field label="Reference">
             <TextInput.Number wide name="reference" ref={register(fields.reference)} />
-            {errors.reference && <Text>Invalid reference, please only use regular letters and numbers</Text>}
+            {errors.reference && <Box>Invalid reference, please only use regular letters and numbers</Box>}
           </Field>
           <Field label="Currency">
             <DropDown
@@ -155,7 +155,7 @@ function SimpleFiatForm({ address, onComplete }) {
           </Field>
           {amountEstimation &&
           <Info title="Exchange rate">
-            <Text>{amountEstimation.inputAmount}ETH => {amountEstimation.outputAmount} {currencies[selectedCurrency]}</Text>
+            <Box>{amountEstimation.inputAmount}ETH => {amountEstimation.outputAmount} {currencies[selectedCurrency]}</Box>
           </Info>
           }
         </Box>
@@ -167,9 +167,9 @@ function SimpleFiatForm({ address, onComplete }) {
 }
 
 /*
-        <Text>
+        <Box>
           Send funds to
-        </Text>
+        </Box>
         <TabBar
           items={['Me', 'Existing contact', 'New contact']}
           selected={contactType}

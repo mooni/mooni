@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Text, Field, TextInput, Button } from '@aragon/ui'
+import { Field, TextInput, Button } from '@aragon/ui'
 import { Box, CircularProgress } from '@material-ui/core';
 
 import { getMyAccount } from '../redux/contacts/selectors';
@@ -40,13 +40,13 @@ function MyAccountPage() {
     );
   }
   return (
-    <Text>
+    <Box>
       My Account
       <Field label="Name">
         <TextInput wide ref={nameInput} defaultValue={myAccount.name} />
       </Field>
       <Button onClick={() => saveName()}>Save</Button>
-    </Text>
+    </Box>
   );
 }
 

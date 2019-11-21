@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Text } from '@aragon/ui'
+import { Box } from '@material-ui/core';
 
 function ContactsPage() {
   return (
-    <Text>
+    <Box>
       Contacts
-    </Text>
+    </Box>
   );
 }
 

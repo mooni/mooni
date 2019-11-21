@@ -1,15 +1,11 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import {
-  Link
-} from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Grid, Box } from '@material-ui/core';
 import { Button } from '@aragon/ui'
 
-import { isLogged } from '../redux/eth/selectors';
 import RateSample from '../components/RateSample';
 
 const useStyles = makeStyles(() => ({
@@ -23,8 +19,9 @@ const useStyles = makeStyles(() => ({
 
 function Welcome() {
   const classes = useStyles();
+  const history = useHistory();
 
-  const logged = useSelector(isLogged);
+  const go = path => () => history.push(path);
 
   return (
     <Box width={1} py={3}>
@@ -39,13 +36,13 @@ function Welcome() {
         <Box py={2}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
-              <Link to="/send"><Button mode="strong" wide>Send funds</Button></Link>
+              <Button mode="strong" onClick={go('/send')} wide>Send funds</Button>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Link to="/my-account"><Button mode="strong" wide>My Account</Button></Link>
+              <Button mode="strong" onClick={go('/send')} wide>My Account</Button>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Link to="/contacts"><Button mode="strong" wide>Contacts</Button></Link>
+              <Button mode="strong" onClick={go('/send')} wide>Contacts</Button>
             </Grid>
           </Grid>
         </Box>
