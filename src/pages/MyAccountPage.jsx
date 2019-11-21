@@ -4,16 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Text, Field, TextInput, Button } from '@aragon/ui'
 import { Box, CircularProgress } from '@material-ui/core';
 
-import BoxManager from '../lib/box';
-
-import { getConnect } from '../redux/eth/selectors';
 import { getMyAccount } from '../redux/contacts/selectors';
-import { setMyAccount } from '../redux/contacts/actions';
 import { getBoxManager } from '../redux/box/selectors';
-import { setBoxManager } from '../redux/box/actions';
+import { fetchMyAccount } from '../redux/contacts/actions';
 
 function MyAccountPage() {
-  const connect = useSelector(getConnect);
   const boxManager = useSelector(getBoxManager);
   const myAccount = useSelector(getMyAccount);
 
@@ -22,18 +17,10 @@ function MyAccountPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-      if(!connect) throw new Error('connect not ready');
-      BoxManager.init(connect).then(async (boxManager) => {
-        dispatch(setBoxManager(boxManager));
-
-        const name = await boxManager.getPrivate('name');
-        dispatch(setMyAccount({
-          name: name,
-        }));
-      });
-    },
-    [],
-  );
+    if (boxManager) {
+      dispatch(fetchMyAccount());
+    }
+  }, [boxManager]);
 
   async function saveName() {
     const name = nameInput.current.value;
@@ -41,16 +28,9 @@ function MyAccountPage() {
     if(!boxManager) throw new Error('boxManager not ready');
     await boxManager.setPrivate('name', name);
     console.log('set name');
+    dispatch(fetchMyAccount());
   }
 
-  if(!boxManager) {
-    return (
-      <Box mx="auto">
-        Loading 3box
-        <CircularProgress />
-      </Box>
-    );
-  }
   if(!myAccount) {
     return (
       <Box mx="auto">

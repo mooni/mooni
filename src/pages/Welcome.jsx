@@ -36,8 +36,6 @@ function Welcome() {
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
       <RateSample />
-      {
-        logged &&
         <Box py={2}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={4}>
@@ -51,7 +49,6 @@ function Welcome() {
             </Grid>
           </Grid>
         </Box>
-      }
     </Box>
   );
 }

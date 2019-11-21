@@ -13,7 +13,9 @@ import {
 } from 'react-router-dom';
 
 import './App.css'
+import RequireConnection from './components/RequireConnection';
 import Account from './components/Account';
+import Footer from './components/Footer';
 import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
@@ -37,35 +39,24 @@ function App() {
         {pageName}
       </AppBar>
       <Container maxWidth="md">
-          {
-            logged ?
-              <Switch>
-                <Route exact path="/">
-                  <Welcome />
-                </Route>
-                <Route path="/my-account">
-                  <MyAccountPage />
-                </Route>
-                <Route path="/send">
-                  <PaymentPage />
-                </Route>
-                <Route path="/contacts">
-                  <Contacts />
-                </Route>
-                <Route path="*">
-                  <Redirect to="/" />
-                </Route>
-              </Switch>
-              :
-              <Switch>
-                <Route exact path="/">
-                  <Welcome />
-                </Route>
-                <Route path="*">
-                  <Redirect to="/" />
-                </Route>
-              </Switch>
-          }
+        <Switch>
+          <Route exact path="/">
+            <Welcome />
+          </Route>
+          <Route path="/my-account">
+            <RequireConnection eth box><MyAccountPage /></RequireConnection>
+          </Route>
+          <Route path="/send">
+            <RequireConnection eth><PaymentPage /></RequireConnection>
+          </Route>
+          <Route path="/contacts">
+            <RequireConnection eth box><Contacts /></RequireConnection>
+          </Route>
+          <Route path="*">
+            <Redirect to="/" />
+          </Route>
+        </Switch>
+        <Footer />
       </Container>
     </Main>
   );

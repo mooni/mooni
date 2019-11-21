@@ -1,18 +1,19 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { EthIdenticon, AddressField } from '@aragon/ui'
+import { Button, EthIdenticon, AddressField } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import { getAddress } from '../redux/eth/selectors';
-import Login from '../components/Login';
+import { initConnect } from '../redux/eth/actions';
 
 function Account() {
   const address = useSelector(getAddress);
+  const dispatch = useDispatch();
 
   if(!address) {
     return (
-      <Login />
+      <Button onClick={() => dispatch(initConnect())} mode="strong">Login</Button>
     );
   }
 

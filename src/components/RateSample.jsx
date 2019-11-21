@@ -50,17 +50,6 @@ function SimpleFiatForm() {
   const [outputAmount, setOutputAmount] = useState(100);
   const [rate, setRate] = useState(null);
 
-  async function fetchCurrencies() {
-    const res = await Promise.all([
-      Bity.getCurrencies(['fiat']),
-      Bity.getCurrencies(['crypto', 'ethereum']),
-    ]);
-    setOutputCurrencies(res[0]);
-    setInputCurrencies(res[1]);
-    setInputCurrency(0);
-    setOutputCurrency(0);
-  }
-
   async function estimateInput(outputValue) {
     setRate(null);
     setInputAmount('');
@@ -78,17 +67,25 @@ function SimpleFiatForm() {
   const throttledEstimateInput = useMemo(() => debounce(estimateInput, 1000), [inputCurrency, outputCurrency]);
 
   useEffect(() => {
+    async function fetchCurrencies() {
+      const res = await Promise.all([
+        Bity.getCurrencies(['fiat']),
+        Bity.getCurrencies(['crypto', 'ethereum']),
+      ]);
+      setOutputCurrencies(res[0]);
+      setInputCurrencies(res[1]);
+      setInputCurrency(0);
+      setOutputCurrency(0);
+    }
     fetchCurrencies().then(() => setReady(true));
   }, []);
 
   useEffect(() => {
-    if(inputCurrency !== null && outputCurrency !== null && outputAmount !== null)
+    if(inputCurrency !== null && outputCurrency !== null && outputAmount !== null) {
       throttledEstimateInput(outputAmount);
+      return throttledEstimateInput.cancel;
+    }
   }, [inputCurrency, outputCurrency, outputAmount]);
-
-  useEffect(() => {
-    throttledEstimateInput.cancel();
-  }, []);
 
   if(!ready) {
     return (
