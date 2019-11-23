@@ -4,7 +4,7 @@ import IBAN from 'iban';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@material-ui/core/Box';
-import { Button, Field, TextInput } from '@aragon/ui'
+import { Button, Field } from '@aragon/ui'
 import { GroupLabel, WideInput } from './StyledComponents';
 
 import { setRecipient } from '../redux/payment/actions';
@@ -64,7 +64,6 @@ function StepRecipient({ onComplete }) {
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <GroupLabel>Recipient</GroupLabel>
         <Field label="IBAN">
           <WideInput name="iban" ref={register(fields.iban)} defaultValue={recipient.iban} required/>
           {errors.iban && <Box>Invalid IBAN</Box>}

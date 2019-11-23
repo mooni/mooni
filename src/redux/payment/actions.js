@@ -48,6 +48,8 @@ export const createOrder = () => async function (dispatch, getState)  {
   });
 
   dispatch(setOrder(orderDetail));
+
+  // TODO register delete order after price guaranteed timeout
 };
 
 export const sendPayment = () => async function (dispatch, getState)  {

@@ -6,7 +6,7 @@ import { Box, Paper, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Button, Field, DropDown, TextInput } from '@aragon/ui'
-import { GroupLabel } from './StyledComponents';
+import { GroupLabel, WideInput } from './StyledComponents';
 
 import { setPaymentDetail } from '../redux/payment/actions';
 import { getPaymentDetail } from '../redux/payment/selectors';
@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function StepPaymentDetail({ onComplete }) {
+function StepPaymentDetail({ onComplete, onBackRecipient }) {
   const classes = useStyles();
 
   const paymentDetails = useSelector(getPaymentDetail);
@@ -69,7 +69,6 @@ function StepPaymentDetail({ onComplete }) {
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <GroupLabel>Payment details</GroupLabel>
         <Paper className={classes.formRow}>
           <Grid container spacing={0}>
             <Grid item xs={8}>
@@ -96,11 +95,18 @@ function StepPaymentDetail({ onComplete }) {
         </Paper>
         <Box py={2}>
           <Field label="Reference">
-            <input name="reference" ref={register(fields.reference)} defaultValue={paymentDetails.reference} />
+            <WideInput name="reference" ref={register(fields.reference)} defaultValue={paymentDetails.reference} />
             {errors.reference && <Box>Invalid reference, please only use regular letters and numbers</Box>}
           </Field>
         </Box>
-        <Button mode="strong" onClick={onSubmit} wide>Save amount</Button>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Button mode="normal" onClick={onBackRecipient} wide>Edit recipient</Button>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button mode="strong" onClick={onSubmit} wide>Save amount</Button>
+          </Grid>
+        </Grid>
       </form>
     </Box>
   )

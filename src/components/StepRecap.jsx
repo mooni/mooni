@@ -6,9 +6,11 @@ import Box from '@material-ui/core/Box';
 import { Button, Countdown, Info, LoadingRing } from '@aragon/ui'
 import { getRecipient, getOrder } from '../redux/payment/selectors';
 
-function StepRecap({ onComplete }) {
+function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
   const recipient = useSelector(getRecipient);
   const order = useSelector(getOrder);
+
+  // TODO retry create order after countdown expired
 
   return (
     <Box width={1} py={3}>
@@ -19,6 +21,7 @@ function StepRecap({ onComplete }) {
         <Box><b>IBAN:</b> {recipient.iban}</Box>
         <Box><b>BIC:</b> {recipient.bic_swift}</Box>
       </Info>
+      <Button mode="normal" onClick={onBackRecipient} wide>Edit recipient</Button>
       {
         order ?
           <>
@@ -37,6 +40,7 @@ function StepRecap({ onComplete }) {
             <Box pt={2}>
               <Button mode="strong" onClick={onComplete} wide>Send payment</Button>
             </Box>
+            <Button mode="normal" onClick={onBackPaymentDetail} wide>Edit amount</Button>
           </>
           :
           <Box pt={2} display="flex" alignItems="center" justifyContent="center">
