@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import Box from '@material-ui/core/Box';
 
 import { Button, Countdown, Info, LoadingRing } from '@aragon/ui'
-import { GroupLabel } from './StyledComponents';
-
 import { getRecipient, getOrder } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete }) {
@@ -13,31 +11,35 @@ function StepRecap({ onComplete }) {
   const order = useSelector(getOrder);
 
   return (
-    <Box width={1}>
-      <GroupLabel>Recipient</GroupLabel>
-      <Info title={recipient.owner.name}>
+    <Box width={1} py={3}>
+      <Info title="Recipient">
+        <Box>{recipient.owner.name}</Box>
         <Box>{recipient.owner.address}</Box>
         <Box>{recipient.owner.zip} {recipient.owner.city} {recipient.owner.country}</Box>
-        <Box>IBAN: {recipient.iban}</Box>
-        <Box>BIC: {recipient.bic_swift}</Box>
+        <Box><b>IBAN:</b> {recipient.iban}</Box>
+        <Box><b>BIC:</b> {recipient.bic_swift}</Box>
       </Info>
-      <GroupLabel>Payment details</GroupLabel>
       {
         order ?
-          <Box>
-            <Info>
-              <Box>From: {order.input.amount} {order.input.currency}</Box>
-              <Box>To: {order.output.amount} {order.output.currency}</Box>
-              <Box>Fees: {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
-              <Box>
-                Price guaranteed until
+          <>
+            <Box pt={2}>
+              <Info title="Payment details" mode="info">
+                <Box><b>From:</b> {order.input.amount} {order.input.currency}</Box>
+                <Box><b>To:</b> {order.output.amount} {order.output.currency}</Box>
+                <Box><b>Fees:</b> {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
+              </Info>
+            </Box>
+            <Box pt={2}>
+              <Info title="Price guaranteed until" mode="warning">
                 <Countdown end={new Date(order.timestamp_price_guaranteed)} />
-              </Box>
-            </Info>
-            <Button mode="strong" onClick={onComplete} wide>Send payment</Button>
-          </Box>
+              </Info>
+            </Box>
+            <Box pt={2}>
+              <Button mode="strong" onClick={onComplete} wide>Send payment</Button>
+            </Box>
+          </>
           :
-          <Box display="flex" alignItems="center" justifyContent="center" py={2}>
+          <Box pt={2} display="flex" alignItems="center" justifyContent="center">
             <Box>Creating order ...</Box>
             <LoadingRing />
           </Box>
