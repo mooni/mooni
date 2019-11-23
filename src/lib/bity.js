@@ -28,12 +28,7 @@ const Bity = {
       params,
     });
 
-    const acceptedCurrencies = data.currencies.filter(currency => {
-      if (currency.tags.includes('erc20')) return false;
-      return true;
-    });
-
-    return acceptedCurrencies.map(currency => currency.code);
+    return data.currencies.map(currency => currency.code);
   },
 
   async estimate({ inputCurrency, outputCurrency, inputAmount = null, outputAmount = null }) {
@@ -64,20 +59,26 @@ const Bity = {
       outputCurrency,
     };
   },
-  async order(fromAddress, orderData) {
+  async order({ fromAddress, recipient, paymentDetail }) {
     const body = {
       input: {
         currency: "ETH",
         type: 'crypto_address',
+
         crypto_address: fromAddress,
       },
       output: {
         type: 'bank_account',
-        ...orderData,
+
+        owner: recipient.owner,
+        iban: recipient.iban,
+        bic_swift: recipient.bic_swift,
+
+        currency: paymentDetail.outputCurrency,
+        amount: String(paymentDetail.outputAmount),
+        reference: paymentDetail.reference,
       },
     };
-
-    console.log('order body', body);
 
     try {
       const { headers } = await instance({
@@ -86,8 +87,6 @@ const Bity = {
         data: body,
         withCredentials: true,
       });
-
-      // console.log('order response', data);
 
       const order = await Bity.getOrder(headers.location);
       return order;
@@ -104,25 +103,8 @@ const Bity = {
       url: orderLocation,
       withCredentials: true,
     });
-    console.log('get order response', data);
     return data;
   },
-  /* useEffect fn for polling
-  registerRequestUpdate(requestId, callback) {
-    Bity.getRequest(requestId).then(callback);
-
-    const intervalId = setInterval(() => {
-      Bity.getRequest(requestId).then(result => {
-        if(result.status === 'ENDED') {
-          clearInterval(intervalId);
-        }
-        callback(result);
-      });
-    }, 2000);
-
-    return () => clearInterval(intervalId);
-  }
-  */
 };
 
 export default Bity;

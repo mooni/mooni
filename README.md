@@ -10,8 +10,6 @@ In the project directory, you can run:
 ```
 # Install dependencies
 yarn
-# Install aragon-ui assets
-yarn prepare
 ```
 ### `yarn start`
 

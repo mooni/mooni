@@ -7,6 +7,7 @@ import { Grid, Box } from '@material-ui/core';
 import { Button } from '@aragon/ui'
 
 import RateSample from '../components/RateSample';
+import Footer from '../components/Footer';
 
 const useStyles = makeStyles(() => ({
    logo: {
@@ -46,6 +47,7 @@ function Welcome() {
             </Grid>
           </Grid>
         </Box>
+      <Footer />
     </Box>
   );
 }

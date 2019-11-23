@@ -5,7 +5,7 @@ import { Grid, Box } from '@material-ui/core';
 
 function Footer() {
   return (
-    <Box>
+    <Box pt={4}>
       <Info mode="warning">
         This is experimental software provided as an alpha version and is in active development. Please use with care.
       </Info>
@@ -39,7 +39,7 @@ function Footer() {
           spacing={2}
         >
           <Grid item>
-            <a class="github-button" href="https://github.com/pakokrew/crypto-off-ramp" data-color-scheme="no-preference: dark; light: light; dark: dark;" aria-label="Find code on GitHub">Code</a>
+            <a className="github-button" href="https://github.com/pakokrew/crypto-off-ramp" data-color-scheme="no-preference: dark; light: light; dark: dark;" aria-label="Find code on GitHub">Code</a>
           </Grid>
         </Grid>
       </Box>

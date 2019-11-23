@@ -1,27 +1,58 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
-import { Box } from '@material-ui/core';
-import SimpleFiatForm from '../components/SimpleFiatForm';
-import { getAddress, getConnect } from '../redux/eth/selectors';
+import Box from '@material-ui/core/Box';
+import { Button, Box as ABox } from '@aragon/ui'
+
+import StepRecipient from '../components/StepRecipient';
+import StepPaymentDetail from '../components/StepPaymentDetail';
+import StepRecap from '../components/StepRecap';
+
+import { createOrder, sendPayment } from '../redux/payment/actions';
 
 function PaymentPage() {
-  const address = useSelector(getAddress);
-  const connect = useSelector(getConnect);
+  const [step, setStep] = useState(1);
 
-  async function onComplete(orderDetail) {
-    console.log(orderDetail);
-    const { input: { amount }, payment_details: { crypto_address } } = orderDetail;
-    await connect.send(crypto_address, amount);
+  const dispatch = useDispatch();
+
+  function onFinish() {
+    dispatch(sendPayment());
+    setStep(4);
+  }
+
+  function onPrepareRecap() {
+    dispatch(createOrder());
+    setStep(3);
   }
 
   return (
-    <Box width={1} py={3}>
-      <Box textAlign="center" width={1}>
-        Please enter details about your payment
-      </Box>
-      <SimpleFiatForm address={address} onComplete={onComplete}/>
-    </Box>
+    <ABox width={1} py={3}>
+      <Box>Step: {step}</Box>
+      {
+        step !== 1 && step < 4 &&
+        <Button onClick={() => setStep(step-1)} wide>Back</Button>
+      }
+      {
+        step === 1 &&
+        <StepRecipient onComplete={() => setStep(2)}/>
+      }
+      {
+        step === 2 &&
+        <StepPaymentDetail onComplete={onPrepareRecap}/>
+      }
+      {
+        step === 3 &&
+        <StepRecap onComplete={onFinish} />
+      }
+      {
+        step === 4 &&
+        <Box>Success</Box>
+      }
+      {
+        step === 5 &&
+        <Box>Error</Box>
+      }
+    </ABox>
   );
 }
 

@@ -23,7 +23,7 @@ function Account() {
         <EthIdenticon address={address} scale={1.6}/>
       </Box>
       <Box display={{ xs: 'none', sm: 'block' }} width={200}>
-        <AddressField address={address} />
+        <AddressField address={address} autofocus={false} />
       </Box>
     </>
   );

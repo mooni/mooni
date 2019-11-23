@@ -14,7 +14,6 @@ import {
 import './App.css'
 import RequireConnection from './components/RequireConnection';
 import Account from './components/Account';
-import Footer from './components/Footer';
 import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
@@ -55,7 +54,6 @@ function App() {
             <Redirect to="/" />
           </Route>
         </Switch>
-        <Footer />
       </Container>
     </Main>
   );

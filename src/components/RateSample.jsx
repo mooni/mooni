@@ -9,6 +9,11 @@ import { DropDown, TextInput, Info } from '@aragon/ui'
 
 import Bity from '../lib/bity';
 
+import {
+  INPUT_CURRENCIES as inputCurrencies,
+  OUTPUT_CURRENCIES as outputCurrencies,
+} from '../lib/currencies';
+
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
@@ -38,14 +43,9 @@ const useStyles = makeStyles(theme => ({
 function SimpleFiatForm() {
   const classes = useStyles();
 
-  const [ready, setReady] = useState(false);
-
-  const [inputCurrencies, setInputCurrencies] = useState([]);
-  const [outputCurrencies, setOutputCurrencies] = useState([]);
-
   const [rateLoading, setRateLoading] = useState(true);
-  const [inputCurrency, setInputCurrency] = useState(null);
-  const [outputCurrency, setOutputCurrency] = useState(null);
+  const [inputCurrency, setInputCurrency] = useState(0);
+  const [outputCurrency, setOutputCurrency] = useState(0);
   const [inputAmount, setInputAmount] = useState('-');
   const [outputAmount, setOutputAmount] = useState(100);
   const [rate, setRate] = useState(null);
@@ -67,33 +67,11 @@ function SimpleFiatForm() {
   const throttledEstimateInput = useMemo(() => debounce(estimateInput, 1000), [inputCurrency, outputCurrency]);
 
   useEffect(() => {
-    async function fetchCurrencies() {
-      const res = await Promise.all([
-        Bity.getCurrencies(['fiat']),
-        Bity.getCurrencies(['crypto', 'ethereum']),
-      ]);
-      setOutputCurrencies(res[0]);
-      setInputCurrencies(res[1]);
-      setInputCurrency(0);
-      setOutputCurrency(0);
-    }
-    fetchCurrencies().then(() => setReady(true));
-  }, []);
-
-  useEffect(() => {
     if(inputCurrency !== null && outputCurrency !== null && outputAmount !== null) {
       throttledEstimateInput(outputAmount);
       return throttledEstimateInput.cancel;
     }
   }, [inputCurrency, outputCurrency, outputAmount]);
-
-  if(!ready) {
-    return (
-      <Box display="flex" justifyContent="center" p={2}>
-        <CircularProgress size={24} />
-      </Box>
-    );
-  }
 
   return (
     <Box className={classes.root}>
