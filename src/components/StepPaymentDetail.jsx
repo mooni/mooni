@@ -94,10 +94,12 @@ function StepPaymentDetail({ onComplete }) {
             </Grid>
           </Grid>
         </Paper>
-        <Field label="Reference">
-          <input name="reference" ref={register(fields.reference)} defaultValue={paymentDetails.reference} />
-          {errors.reference && <Box>Invalid reference, please only use regular letters and numbers</Box>}
-        </Field>
+        <Box py={2}>
+          <Field label="Reference">
+            <input name="reference" ref={register(fields.reference)} defaultValue={paymentDetails.reference} />
+            {errors.reference && <Box>Invalid reference, please only use regular letters and numbers</Box>}
+          </Field>
+        </Box>
         <Button mode="strong" onClick={onSubmit} wide>Save amount</Button>
       </form>
     </Box>

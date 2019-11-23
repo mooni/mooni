@@ -4,8 +4,8 @@ import IBAN from 'iban';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@material-ui/core/Box';
-import { Button, Field } from '@aragon/ui'
-import { GroupLabel } from './StyledComponents';
+import { Button, Field, TextInput } from '@aragon/ui'
+import { GroupLabel, WideInput } from './StyledComponents';
 
 import { setRecipient } from '../redux/payment/actions';
 import { getRecipient } from '../redux/payment/selectors';
@@ -66,31 +66,31 @@ function StepRecipient({ onComplete }) {
       <form onSubmit={onSubmit}>
         <GroupLabel>Recipient</GroupLabel>
         <Field label="IBAN">
-          <input name="iban" ref={register(fields.iban)} defaultValue={recipient.iban} required/>
+          <WideInput name="iban" ref={register(fields.iban)} defaultValue={recipient.iban} required/>
           {errors.iban && <Box>Invalid IBAN</Box>}
         </Field>
         <Field label="BIC/SWIFT">
-          <input name="bic_swift" ref={register(fields.bic_swift)} defaultValue={recipient.bic_swift} required/>
+          <WideInput name="bic_swift" ref={register(fields.bic_swift)} defaultValue={recipient.bic_swift} required/>
           {errors.bic_swift && <Box>Invalid BIC</Box>}
         </Field>
         <Field label="Name">
-          <input name="owner.name" ref={register(fields.name)} defaultValue={recipient.owner.name} required/>
+          <WideInput name="owner.name" ref={register(fields.name)} defaultValue={recipient.owner.name} required/>
           {errors['owner.name'] && <Box>Please enter your name</Box>}
         </Field>
         <Field label="Address">
-          <input name="owner.address" ref={register(fields.address)} defaultValue={recipient.owner.address} required/>
+          <WideInput name="owner.address" ref={register(fields.address)} defaultValue={recipient.owner.address} required/>
           {errors['owner.address'] && <Box>Invalid address</Box>}
         </Field>
         <Field label="Zip/Postal code">
-          <input name="owner.zip" ref={register(fields.zip)}  defaultValue={recipient.owner.zip} required/>
+          <WideInput name="owner.zip" ref={register(fields.zip)}  defaultValue={recipient.owner.zip} required/>
           {errors['owner.zip'] && <Box>Invalid Zip/Code</Box>}
         </Field>
         <Field label="City">
-          <input name="owner.city" ref={register(fields.city)}  defaultValue={recipient.owner.city} required/>
+          <WideInput name="owner.city" ref={register(fields.city)}  defaultValue={recipient.owner.city} required/>
           {errors['owner.city'] && <Box>Invalid city</Box>}
         </Field>
         <Field label="Country">
-          <input name="owner.country" ref={register(fields.country)}  defaultValue={recipient.owner.country} required/>
+          <WideInput name="owner.country" ref={register(fields.country)}  defaultValue={recipient.owner.country} required/>
           {errors['owner.country'] && <Box>Invalid country</Box>}
         </Field>
         <Button mode="strong" onClick={onSubmit} wide>Save recipient</Button>
