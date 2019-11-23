@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, EthIdenticon, AddressField } from '@aragon/ui'
+import { Button, EthIdenticon, AddressField, IconWallet } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import { getAddress } from '../redux/eth/selectors';
@@ -13,7 +13,7 @@ function Account() {
 
   if(!address) {
     return (
-      <Button onClick={() => dispatch(initConnect())} mode="strong">Login</Button>
+      <Button onClick={() => dispatch(initConnect())} mode="strong" wide icon={<IconWallet/>} display="all" label="Login" />
     );
   }
 

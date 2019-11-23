@@ -5,8 +5,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Box, Paper, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Button, Field, DropDown, TextInput } from '@aragon/ui'
-import { GroupLabel, WideInput } from './StyledComponents';
+import { Button, Field, DropDown, TextInput, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { WideInput } from './StyledComponents';
 
 import { setPaymentDetail } from '../redux/payment/actions';
 import { getPaymentDetail } from '../redux/payment/selectors';
@@ -101,10 +101,10 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Button mode="normal" onClick={onBackRecipient} wide>Edit recipient</Button>
+            <Button mode="normal" onClick={onBackRecipient} wide icon={<IconArrowLeft/>} label="Edit recipient" />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={onSubmit} wide>Save amount</Button>
+            <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" />
           </Grid>
         </Grid>
       </form>

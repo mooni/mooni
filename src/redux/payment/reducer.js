@@ -21,6 +21,7 @@ const initialState = {
     bic_swift: 'BNPAFRPP',
   },
   order: null,
+  orderError: null,
 };
 
 export default function(state = initialState, action) {
@@ -51,6 +52,20 @@ export default function(state = initialState, action) {
       return {
         ...state,
         order,
+      };
+    }
+    case actions.SET_ORDER_ERROR: {
+      const { orderError } = action.payload;
+      return {
+        ...state,
+        orderError,
+      };
+    }
+    case actions.RESET_ORDER: {
+      return {
+        ...state,
+        order: null,
+        orderError: null,
       };
     }
     default:

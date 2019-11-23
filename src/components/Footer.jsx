@@ -1,4 +1,5 @@
 import React from 'react';
+import GitHubButton from 'react-github-btn';
 
 import { Link, Info } from '@aragon/ui'
 import { Grid, Box } from '@material-ui/core';
@@ -15,20 +16,27 @@ function Footer() {
         </Box>
       </Box>
       <Grid container justify="center" alignItems="center" spacing={2}>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm>
           <Box display="flex" justifyContent="center" alignItems="center">
             <Link href="https://bity.com" external>
               <img src="images/bity_logo_blue.svg" alt="bity.com" height={50} />
             </Link>
           </Box>
         </Grid>
-        {/*<Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm>
           <Box display="flex" justifyContent="center" alignItems="center">
             <Link href="https://dex.ag" external>
               <img src="images/dexag.svg" alt="dex.ag" height={50} />
             </Link>
           </Box>
-        </Grid>*/}
+        </Grid>
+        <Grid item xs={12} sm>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Link href="https://3box.io" external>
+              <img src="images/3box.svg" alt="3box.io" height={50} />
+            </Link>
+          </Box>
+        </Grid>
       </Grid>
       <Box py={2}>
         <Grid
@@ -39,7 +47,7 @@ function Footer() {
           spacing={2}
         >
           <Grid item>
-            <a className="github-button" href="https://github.com/pakokrew/crypto-off-ramp" data-color-scheme="no-preference: dark; light: light; dark: dark;" aria-label="Find code on GitHub">Code</a>
+            <GitHubButton href="https://github.com/pakokrew/crypto-off-ramp" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
           </Grid>
         </Grid>
       </Box>

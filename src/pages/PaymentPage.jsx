@@ -10,7 +10,7 @@ import StepRecap from '../components/StepRecap';
 import { CustomStepConnector, CustomStepIcon } from '../components/StepComponents';
 
 
-import { createOrder, sendPayment } from '../redux/payment/actions';
+import { createOrder, sendPayment, resetOrder } from '../redux/payment/actions';
 
 function PaymentPage() {
   const [activeStep, setActiveStep] = useState(0);
@@ -21,9 +21,11 @@ function PaymentPage() {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   }
   function onBackRecipient() {
+    dispatch(resetOrder());
     setActiveStep(0);
   }
   function onBackPaymentDetail() {
+    dispatch(resetOrder());
     setActiveStep(1);
   }
   function onFinish() {

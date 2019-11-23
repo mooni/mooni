@@ -3,14 +3,30 @@ import { useSelector } from 'react-redux';
 
 import Box from '@material-ui/core/Box';
 
-import { Button, Countdown, Info, LoadingRing } from '@aragon/ui'
-import { getRecipient, getOrder } from '../redux/payment/selectors';
+import { Button, Countdown, Info, LoadingRing, IconArrowLeft, IconCoin } from '@aragon/ui'
+import { getRecipient, getOrder, getOrderError } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
   const recipient = useSelector(getRecipient);
   const order = useSelector(getOrder);
+  const orderError = useSelector(getOrderError);
 
   // TODO retry create order after countdown expired
+
+  if(orderError) {
+    return (
+      <Box width={1} py={3}>
+        <Info title="Order error" mode="error">
+          {orderError.map(error => (
+            <Box key={error.code}><b>{error.code}</b> {error.message}</Box>
+          ))}
+        </Info>
+        <Box pt={2}>
+          <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Go back" />
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box width={1} py={3}>
@@ -21,7 +37,6 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
         <Box><b>IBAN:</b> {recipient.iban}</Box>
         <Box><b>BIC:</b> {recipient.bic_swift}</Box>
       </Info>
-      <Button mode="normal" onClick={onBackRecipient} wide>Edit recipient</Button>
       {
         order ?
           <>
@@ -38,9 +53,9 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
               </Info>
             </Box>
             <Box pt={2}>
-              <Button mode="strong" onClick={onComplete} wide>Send payment</Button>
+              <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} label="Send payment" />
             </Box>
-            <Button mode="normal" onClick={onBackPaymentDetail} wide>Edit amount</Button>
+            <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Edit details" />
           </>
           :
           <Box pt={2} display="flex" alignItems="center" justifyContent="center">

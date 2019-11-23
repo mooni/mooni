@@ -6,3 +6,4 @@ export const getInputCurrency = selectProperty([STATE_NAME, 'inputCurrency']);
 export const getPaymentDetail = selectProperty([STATE_NAME, 'paymentDetail']);
 export const getRecipient = selectProperty([STATE_NAME, 'recipient']);
 export const getOrder = selectProperty([STATE_NAME, 'order']);
+export const getOrderError = selectProperty([STATE_NAME, 'orderError']);

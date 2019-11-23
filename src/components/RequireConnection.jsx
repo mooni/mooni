@@ -17,13 +17,13 @@ function RequireConnection({ children, eth, box }) {
     if (eth && !connect) {
       dispatch(initConnect());
     }
-  }, [eth, connect]);
+  }, [eth, connect, dispatch]);
 
   useEffect(() => {
     if (eth && box && connect && !boxManager) {
       dispatch(initBox());
     }
-  }, [eth, box, connect, boxManager]);
+  }, [eth, box, connect, boxManager, dispatch]);
 
   if(eth && !connect) {
     return (

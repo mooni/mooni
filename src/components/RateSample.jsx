@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { debounce } from 'lodash';
+import BN from 'bignumber.js';
 
 import { CircularProgress, Hidden, Paper, Grid, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -50,7 +51,7 @@ function SimpleFiatForm() {
   const [outputAmount, setOutputAmount] = useState(100);
   const [rate, setRate] = useState(null);
 
-  async function estimateInput(outputValue) {
+  const estimateInput = useCallback(async outputValue => {
     setRate(null);
     setInputAmount('');
     setRateLoading(true);
@@ -61,10 +62,11 @@ function SimpleFiatForm() {
     });
     setInputAmount(String(res.inputAmount).substring(0,10));
     setRateLoading(false);
-    setRate(outputValue / res.inputAmount);
-  }
+    const rate = BN(outputValue).div(res.inputAmount).dp(3).toString();
+    setRate(rate);
+  }, [inputCurrency, outputCurrency]);
 
-  const throttledEstimateInput = useMemo(() => debounce(estimateInput, 1000), [inputCurrency, outputCurrency]);
+  const throttledEstimateInput = useMemo(() => debounce(estimateInput, 1000), [estimateInput]);
 
   useEffect(() => {
     if(inputCurrency !== null && outputCurrency !== null && outputAmount !== null) {
@@ -139,15 +141,11 @@ function SimpleFiatForm() {
           </Paper>
         </Grid>
       </Grid>
-      {!!rate &&
-      <Box py={2}>
-        <Info>
-          <Box display="flex" justifyContent="center">
-            <Box><b>Estimated exchange rate:</b> ~{rate} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Box>
-          </Box>
+      <Box py={2} width={200} mx="auto">
+        <Info title="Estimated exchange rate">
+            <Box>~{rate || '-'} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Box>
         </Info>
       </Box>
-      }
     </Box>
   );
 }

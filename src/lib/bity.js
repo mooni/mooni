@@ -7,15 +7,6 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-class CustomError extends Error {
-  constructor(message, details = {}, code = null) {
-    super(message);
-    this.details = details;
-    this.code = code || null;
-    //console.error(this.message, this.details, this.code);
-  }
-}
-
 const Bity = {
   async getCurrencies(tags = []) {
     const params = {
@@ -91,10 +82,7 @@ const Bity = {
       const order = await Bity.getOrder(headers.location);
       return order;
     } catch(error) {
-      if(error.response) {
-        throw new CustomError('create order error', error.response.data.errors, error.response.status);
-      }
-      throw error;
+      throw error.response.data.errors;
     }
   },
   async getOrder(orderLocation) {

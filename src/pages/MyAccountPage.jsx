@@ -20,7 +20,7 @@ function MyAccountPage() {
     if (boxManager) {
       dispatch(fetchMyAccount());
     }
-  }, [boxManager]);
+  }, [boxManager, dispatch]);
 
   async function saveName() {
     const name = nameInput.current.value;

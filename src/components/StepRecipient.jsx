@@ -4,8 +4,8 @@ import IBAN from 'iban';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@material-ui/core/Box';
-import { Button, Field } from '@aragon/ui'
-import { GroupLabel, WideInput } from './StyledComponents';
+import { Button, Field, IconArrowRight } from '@aragon/ui'
+import { WideInput } from './StyledComponents';
 
 import { setRecipient } from '../redux/payment/actions';
 import { getRecipient } from '../redux/payment/selectors';
@@ -92,7 +92,7 @@ function StepRecipient({ onComplete }) {
           <WideInput name="owner.country" ref={register(fields.country)}  defaultValue={recipient.owner.country} required/>
           {errors['owner.country'] && <Box>Invalid country</Box>}
         </Field>
-        <Button mode="strong" onClick={onSubmit} wide>Save recipient</Button>
+        <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save recipient" />
       </form>
     </Box>
   )

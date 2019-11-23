@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container } from '@material-ui/core'
+import { Box, Container } from '@material-ui/core'
 import { Main, Header, Tag } from '@aragon/ui'
 
 import {
@@ -30,8 +30,12 @@ function App() {
       <Header
         primary={
           <>
-            <div onClick={() => history.push('/')} style={{cursor: 'pointer'}}>Crypto Off-Ramp</div>
-          {pageName && <Tag mode="identifier">{pageName}</Tag>}
+            <Box onClick={() => history.push('/')} style={{cursor: 'pointer'}}>
+              Crypto Off-Ramp
+            </Box>
+            <Box ml={1}>
+              {pageName && <Tag mode="identifier">{pageName}</Tag>}
+            </Box>
           </>
         }
         secondary={<Account />}
