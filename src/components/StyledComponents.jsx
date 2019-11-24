@@ -1,11 +1,27 @@
+import React from 'react';
+
 import styled from 'styled-components';
-import {textStyle} from '@aragon/ui/dist/index.cjs';
+import {textStyle, useTheme} from '@aragon/ui';
 
 export const GroupLabel = styled.div`
   ${textStyle('label1')};
   margin-top: 10px;
   margin-bottom: 10px;
 `;
+
+export function FieldError({ text, children }) {
+  const theme = useTheme();
+  return (
+    <p style={{
+      color: theme.negative,
+      fontSize: '10pt',
+      marginTop: '5px',
+      marginLeft: '13px',
+    }}>
+      {text || children}
+    </p>
+  )
+}
 
 // TODO replace with Aragon's TextInput when form ref fixed
 export const WideInput = styled.input`

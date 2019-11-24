@@ -3,8 +3,8 @@ import useForm from 'react-hook-form';
 import IBAN from 'iban';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Button, Field, IconArrowRight, useTheme } from '@aragon/ui'
-import { WideInput } from './StyledComponents';
+import { Button, Field, IconArrowRight } from '@aragon/ui'
+import { WideInput, FieldError } from './StyledComponents';
 
 const useStyles = makeStyles(() => ({
   fieldRow: {
@@ -12,19 +12,6 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function FieldError({ text, children }) {
-  const theme = useTheme();
-  return (
-    <p style={{
-      color: theme.negative,
-      fontSize: '10pt',
-      marginTop: '5px',
-      marginLeft: '13px',
-    }}>
-      {text || children}
-    </p>
-  )
-}
 function RecipientForm({ initialRecipient, onSubmit }) {
   const classes = useStyles();
 
@@ -72,7 +59,7 @@ function RecipientForm({ initialRecipient, onSubmit }) {
       required: true,
       minLength: 8,
       maxLength: 11,
-      pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}/,
+      pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
     },
   };
 

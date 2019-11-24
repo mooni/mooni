@@ -5,8 +5,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Box, Paper, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Button, Field, DropDown, TextInput, IconArrowLeft, IconArrowRight } from '@aragon/ui'
-import { WideInput } from './StyledComponents';
+import { Button, Field, DropDown, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { WideInput, FieldError } from './StyledComponents';
 
 import { setPaymentDetail } from '../redux/payment/actions';
 import { getPaymentDetail } from '../redux/payment/selectors';
@@ -25,6 +25,7 @@ const useStyles = makeStyles(theme => ({
   amountLabel: {
     display: 'flex',
     alignItems: 'center',
+    padding: 6,
   },
   exchangeIcon: {
     display: 'flex',
@@ -39,14 +40,16 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
   const paymentDetails = useSelector(getPaymentDetail);
   const dispatch = useDispatch();
 
-  const [outputAmount, setOutputAmount] = useState(paymentDetails.outputAmount);
   const [selectedCurrency, setSelectedCurrency] = useState(OUTPUT_CURRENCIES.indexOf(paymentDetails.outputCurrency));
 
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, errors } = useForm({
+    mode: 'onChange',
+    defaultValues: paymentDetails || undefined,
+  });
 
   const onSubmit = handleSubmit(async data => {
     dispatch(setPaymentDetail({
-      outputAmount,
+      outputAmount: data.amount,
       outputCurrency: OUTPUT_CURRENCIES[selectedCurrency],
       reference: data.reference,
     }));
@@ -62,7 +65,7 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
       validate: value => Number(value) > 0,
     },
     reference: {
-      pattern: /[0-9A-Za-z ]*/,
+      pattern: /^[0-9A-Za-z ]*$/,
     },
   };
 
@@ -72,16 +75,21 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
         <Paper className={classes.formRow}>
           <Grid container spacing={0}>
             <Grid item xs={8}>
-              <TextInput
-                type="number"
-                min={0}
-                value={outputAmount}
-                onChange={e => setOutputAmount(Number(e.target.value))}
-                wide
-                className={classes.amountInput}
-                adornment={<Box>Amount</Box>}
-                adornmentSettings={{ width: 50 }}
-              />
+              <Box display="flex" flexDirection="row">
+                <Box className={classes.amountLabel}>
+                  Amount
+                </Box>
+                <WideInput
+                  type="number"
+                  name="amount"
+                  min={0}
+                  ref={register(fields.amount)}
+                  className={classes.amountInput}
+                  adornment={<Box>Amount</Box>}
+                  adornmentSettings={{ width: 50 }}
+                  placeholder="100"
+                />
+              </Box>
             </Grid>
             <Grid item xs={4}>
               <DropDown
@@ -92,11 +100,16 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
               />
             </Grid>
           </Grid>
+          {errors.amount && <FieldError>Invalid amount</FieldError>}
         </Paper>
         <Box py={2}>
           <Field label="Reference">
-            <WideInput name="reference" ref={register(fields.reference)} defaultValue={paymentDetails.reference} />
-            {errors.reference && <Box>Invalid reference, please only use regular letters and numbers</Box>}
+            <WideInput
+              name="reference"
+              ref={register(fields.reference)}
+              placeholder="Bill A2313"
+            />
+            {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>
         </Box>
         <Grid container spacing={2}>

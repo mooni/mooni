@@ -1,25 +1,37 @@
+import { OUTPUT_CURRENCIES } from '../../lib/currencies';
+
 import * as actions from "./actions";
 
 export const STATE_NAME = 'PAYMENT';
 
+/*
+const exampleRecipient = {
+  owner: {
+    name: 'Alice Martin',
+    address: '5 Rue de Rivoli',
+    zip: '75001',
+    city: 'Paris',
+    country: 'FR',
+  },
+  iban: 'FR7630004000031234567890143',
+  bic_swift: 'BNPAFRPP',
+};
+const examplePaymentDetail = {
+  outputCurrency: 'EUR',
+  outputAmount: 100,
+  reference: 'Bill 123',
+};
+*/
+
 const initialState = {
   inputCurrency: null,
   paymentDetail: {
-    outputCurrency: 'EUR',
-    outputAmount: 100,
-    reference: 'Bill 123',
+    outputCurrency: OUTPUT_CURRENCIES[0],
+    outputAmount: 0,
+    reference: '',
   },
-  recipient: {
-    owner: {
-      name: 'Alice Martin',
-      address: '5 Rue de Rivoli',
-      zip: '75001',
-      city: 'Paris',
-      country: 'FR',
-    },
-    iban: 'FR7630004000031234567890143',
-    bic_swift: 'BNPAFRPP',
-  },
+  //recipient: exampleRecipient,
+  recipient: null,
   order: null,
   orderError: null,
 };
