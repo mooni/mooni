@@ -82,7 +82,12 @@ const Bity = {
       const order = await Bity.getOrder(headers.location);
       return order;
     } catch(error) {
-      throw error.response.data.errors;
+      if(error && error.response && error.response.data && error.response.data.errors) {
+        throw error.response.data.errors;
+      } else {
+        console.error(error);
+        throw [{code: 'unknown', message: 'unknown error'}];
+      }
     }
   },
   async getOrder(orderLocation) {

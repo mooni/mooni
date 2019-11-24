@@ -5,7 +5,7 @@ export const STATE_NAME = 'CONTACTS';
 export const defaultAccount = { owner: {} };
 
 const initialState = {
-  myAccount: { ...defaultAccount },
+  myAccount: null,
   myAccountLoading: false,
 };
 
@@ -15,7 +15,7 @@ export default function(state = initialState, action) {
       const { myAccount } = action.payload;
       return {
         ...state,
-        myAccount: myAccount || defaultAccount,
+        myAccount,
       };
     }
     case actions.SET_MY_ACCOUNT_LOADING: {

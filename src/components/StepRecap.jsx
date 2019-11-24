@@ -5,6 +5,7 @@ import { Box, Grid } from '@material-ui/core';
 import { Button, Countdown, Info, IconArrowLeft, IconCoin } from '@aragon/ui'
 
 import Loader from '../components/Loader';
+import RecipientInfo from '../components/RecipientInfo';
 
 import { getRecipient, getOrder, getOrderError } from '../redux/payment/selectors';
 
@@ -32,13 +33,7 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
 
   return (
     <Box width={1} py={3}>
-      <Info title="Recipient">
-        <Box>{recipient.owner.name}</Box>
-        <Box>{recipient.owner.address}</Box>
-        <Box>{recipient.owner.zip} {recipient.owner.city} {recipient.owner.country}</Box>
-        <Box><b>IBAN:</b> {recipient.iban}</Box>
-        <Box><b>BIC:</b> {recipient.bic_swift}</Box>
-      </Info>
+      <RecipientInfo recipient={recipient} />
       {
         order ?
           <>

@@ -30,7 +30,7 @@ function RecipientForm({ initialRecipient, onSubmit }) {
 
   const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
-    defaultValues: initialRecipient,
+    defaultValues: initialRecipient || undefined,
   });
 
   const submit = handleSubmit(onSubmit);
