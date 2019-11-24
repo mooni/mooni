@@ -11,26 +11,28 @@ class BoxManager {
 
     const box = await Box.openBox(address, provider);
     console.log('box opened');
-    // await BoxManager.box.syncDone;
-    // console.log('box synced');
+    await box.syncDone;
+    console.log('box synced');
 
     const space = await box.openSpace('crypto-off-ramp');
     console.log('space opened');
-    //await BoxManager.space.syncDone
-    // console.log('space synced');
+    await space.syncDone;
+    console.log('space synced');
 
-    const boxManager = new BoxManager({
+    return new BoxManager({
       box,
       space
     });
-    return boxManager;
   }
 
   async getPrivate(key) {
-    return this.space.private.get(key)
+    const data = await this.space.private.get(key);
+    if(!data) return null;
+    return JSON.parse(data);
   }
   async setPrivate(key, value) {
-    return this.space.private.set(key, value)
+    const serialized = JSON.stringify(value);
+    return this.space.private.set(key, serialized);
   }
 }
 

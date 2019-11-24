@@ -1,9 +1,11 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import Box from '@material-ui/core/Box';
+import { Box, Grid } from '@material-ui/core';
+import { Button, Countdown, Info, IconArrowLeft, IconCoin } from '@aragon/ui'
 
-import { Button, Countdown, Info, LoadingRing, IconArrowLeft, IconCoin } from '@aragon/ui'
+import Loader from '../components/Loader';
+
 import { getRecipient, getOrder, getOrderError } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
@@ -47,21 +49,22 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
                 <Box><b>Fees:</b> {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
               </Info>
             </Box>
-            <Box pt={2}>
+            <Box py={2}>
               <Info title="Price guaranteed until" mode="warning">
                 <Countdown end={new Date(order.timestamp_price_guaranteed)} />
               </Info>
             </Box>
-            <Box pt={2}>
-              <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} label="Send payment" />
-            </Box>
-            <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Edit details" />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Go back" />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} label="Send payment" />
+              </Grid>
+            </Grid>
           </>
           :
-          <Box pt={2} display="flex" alignItems="center" justifyContent="center">
-            <Box>Creating order ...</Box>
-            <LoadingRing />
-          </Box>
+          <Loader text="Creating order ..." />
       }
     </Box>
   )

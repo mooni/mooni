@@ -2,11 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { debounce } from 'lodash';
 import BN from 'bignumber.js';
 
-import { CircularProgress, Hidden, Paper, Grid, Box } from '@material-ui/core';
+import { Hidden, Paper, Grid, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 
-import { DropDown, TextInput, Info } from '@aragon/ui'
+import { DropDown, TextInput, Info, LoadingRing } from '@aragon/ui'
 
 import Bity from '../lib/bity';
 
@@ -108,7 +108,7 @@ function SimpleFiatForm() {
         <Hidden smDown>
           <Grid item sm={1} className={classes.exchangeIcon}>
             {rateLoading ?
-              <CircularProgress  size={24} />
+              <LoadingRing size={24} />
               :
               <ShuffleIcon/>
             }

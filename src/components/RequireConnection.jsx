@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Box, CircularProgress } from '@material-ui/core';
+import Loader from '../components/Loader';
 
 import { getConnect } from '../redux/eth/selectors';
 import { getBoxManager } from '../redux/box/selectors';
@@ -26,20 +26,10 @@ function RequireConnection({ children, eth, box }) {
   }, [eth, box, connect, boxManager, dispatch]);
 
   if(eth && !connect) {
-    return (
-      <Box mx="auto">
-        Loading eth provider
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader text="Loading eth provider" />;
   }
   if(box && !boxManager) {
-    return (
-      <Box mx="auto">
-        Loading 3box
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader text="Loading 3box" />;
   }
   return children;
 }

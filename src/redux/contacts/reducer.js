@@ -2,8 +2,11 @@ import * as actions from "./actions";
 
 export const STATE_NAME = 'CONTACTS';
 
+export const defaultAccount = { owner: {} };
+
 const initialState = {
-  myAccount: null,
+  myAccount: { ...defaultAccount },
+  myAccountLoading: false,
 };
 
 export default function(state = initialState, action) {
@@ -12,7 +15,14 @@ export default function(state = initialState, action) {
       const { myAccount } = action.payload;
       return {
         ...state,
-        myAccount,
+        myAccount: myAccount || defaultAccount,
+      };
+    }
+    case actions.SET_MY_ACCOUNT_LOADING: {
+      const { myAccountLoading } = action.payload;
+      return {
+        ...state,
+        myAccountLoading,
       };
     }
     default:

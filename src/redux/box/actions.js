@@ -10,15 +10,16 @@ export const setBoxManager = (boxManager) => ({
   }
 });
 
-export const initBox = () => function (dispatch, getState)  {
+export const initBox = () => async function (dispatch, getState)  {
   const connect = getConnect(getState());
 
-  BoxManager.init(connect).then(async (boxManager) => {
+  try {
+    const boxManager = await BoxManager.init(connect);
     dispatch(setBoxManager(boxManager));
-  }).catch(error => {
+  } catch(error) {
     console.error('Unable to connect to 3box', error);
     dispatch(resetBox());
-  });
+  }
 };
 
 export const resetBox = () => function (dispatch)  {

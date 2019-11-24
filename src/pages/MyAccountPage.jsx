@@ -1,18 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Field, TextInput, Button } from '@aragon/ui'
-import { Box, CircularProgress } from '@material-ui/core';
+import { Box as ABox } from '@aragon/ui'
 
-import { getMyAccount } from '../redux/contacts/selectors';
+import Loader from '../components/Loader';
+import RecipientForm from '../components/RecipientForm';
+
+import { getMyAccount, getMyAccountLoading } from '../redux/contacts/selectors';
 import { getBoxManager } from '../redux/box/selectors';
-import { fetchMyAccount } from '../redux/contacts/actions';
+import { fetchMyAccount, updateMyAccount } from '../redux/contacts/actions';
 
 function MyAccountPage() {
   const boxManager = useSelector(getBoxManager);
   const myAccount = useSelector(getMyAccount);
+  const myAccountLoading = useSelector(getMyAccountLoading);
 
-  const nameInput = useRef(null);
+  const [saving, setSaving] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -22,31 +25,23 @@ function MyAccountPage() {
     }
   }, [boxManager, dispatch]);
 
-  async function saveName() {
-    const name = nameInput.current.value;
-    console.log(name);
+  async function saveMyAccount(myAccount) {
+    setSaving(true);
     if(!boxManager) throw new Error('boxManager not ready');
-    await boxManager.setPrivate('name', name);
-    console.log('set name');
-    dispatch(fetchMyAccount());
+    dispatch(updateMyAccount(myAccount));
+    setSaving(false);
   }
 
-  if(!myAccount) {
-    return (
-      <Box mx="auto">
-        Loading account
-        <CircularProgress />
-      </Box>
-    );
+  if(myAccountLoading) {
+    return <Loader text="Loading account..." />;
   }
+
   return (
-    <Box>
+    <ABox>
       My Account
-      <Field label="Name">
-        <TextInput wide ref={nameInput} defaultValue={myAccount.name} />
-      </Field>
-      <Button onClick={() => saveName()}>Save</Button>
-    </Box>
+      <RecipientForm initialRecipient={myAccount} onSubmit={saveMyAccount}/>
+      {saving && 'Saving ...'}
+    </ABox>
   );
 }
 
