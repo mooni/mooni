@@ -26,13 +26,10 @@ class BoxManager {
   }
 
   async getPrivate(key) {
-    const data = await this.space.private.get(key);
-    if(!data) return null;
-    return JSON.parse(data);
+    return this.space.private.get(key);
   }
   async setPrivate(key, value) {
-    const serialized = JSON.stringify(value);
-    return this.space.private.set(key, serialized);
+    return this.space.private.set(key, value);
   }
 }
 

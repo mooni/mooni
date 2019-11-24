@@ -21,6 +21,7 @@ export const fetchMyAccount = () => async function (dispatch, getState)  {
 
   const boxManager = getBoxManager(getState());
   const myAccount = await boxManager.getPrivate('myAccount');
+
   dispatch(setMyAccount(myAccount));
   dispatch(setMyAccountLoading(false));
 };
@@ -29,5 +30,6 @@ export const updateMyAccount = (myAccount) => async function (dispatch, getState
   const boxManager = getBoxManager(getState());
 
   await boxManager.setPrivate('myAccount', myAccount);
+
   dispatch(setMyAccount(myAccount));
 };

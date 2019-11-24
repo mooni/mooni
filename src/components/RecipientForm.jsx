@@ -1,20 +1,37 @@
 import React from 'react';
 import useForm from 'react-hook-form';
 import IBAN from 'iban';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { Button, Field, IconArrowRight, useTheme } from '@aragon/ui'
 import { WideInput } from './StyledComponents';
 
+const useStyles = makeStyles(() => ({
+  fieldRow: {
+    marginBottom: '15px',
+  },
+}));
+
 function FieldError({ text, children }) {
   const theme = useTheme();
   return (
-    <p style={{color: theme.negative}}>
+    <p style={{
+      color: theme.negative,
+      fontSize: '10pt',
+      marginTop: '5px',
+      marginLeft: '13px',
+    }}>
       {text || children}
     </p>
   )
 }
 function RecipientForm({ initialRecipient, onSubmit }) {
-  const { register, handleSubmit, errors } = useForm();
+  const classes = useStyles();
+
+  const { register, handleSubmit, errors } = useForm({
+    mode: 'onChange',
+    defaultValues: initialRecipient,
+  });
 
   const submit = handleSubmit(onSubmit);
 
@@ -53,38 +70,40 @@ function RecipientForm({ initialRecipient, onSubmit }) {
     },
     bic_swift: {
       required: true,
+      minLength: 8,
+      maxLength: 11,
       pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}/,
     },
   };
 
   return (
     <form onSubmit={submit}>
-      <Field label="IBAN">
-        <WideInput name="iban" ref={register(fields.iban)} defaultValue={initialRecipient.iban} required/>
+      <Field label="IBAN" className={classes.fieldRow}>
+        <WideInput name="iban" ref={register(fields.iban)} required/>
         {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
-      <Field label="BIC/SWIFT">
-        <WideInput name="bic_swift" ref={register(fields.bic_swift)} defaultValue={initialRecipient.bic_swift} required/>
+      <Field label="BIC/SWIFT" className={classes.fieldRow}>
+        <WideInput name="bic_swift" ref={register(fields.bic_swift)} required/>
         {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
       </Field>
-      <Field label="Name">
-        <WideInput name="owner.name" ref={register(fields.name)} defaultValue={initialRecipient.owner.name} required/>
+      <Field label="Name" className={classes.fieldRow}>
+        <WideInput name="owner.name" ref={register(fields.name)} required/>
         {errors['owner.name'] && <FieldError>Please enter your name</FieldError>}
       </Field>
-      <Field label="Address">
-        <WideInput name="owner.address" ref={register(fields.address)} defaultValue={initialRecipient.owner.address} required/>
+      <Field label="Address" className={classes.fieldRow}>
+        <WideInput name="owner.address" ref={register(fields.address)} required/>
         {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
       </Field>
-      <Field label="Zip/Postal code">
-        <WideInput name="owner.zip" ref={register(fields.zip)}  defaultValue={initialRecipient.owner.zip} required/>
+      <Field label="Zip/Postal code" className={classes.fieldRow}>
+        <WideInput name="owner.zip" ref={register(fields.zip)} required/>
         {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
       </Field>
-      <Field label="City">
-        <WideInput name="owner.city" ref={register(fields.city)}  defaultValue={initialRecipient.owner.city} required/>
+      <Field label="City" className={classes.fieldRow}>
+        <WideInput name="owner.city" ref={register(fields.city)} required/>
         {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
       </Field>
-      <Field label="Country">
-        <WideInput name="owner.country" ref={register(fields.country)}  defaultValue={initialRecipient.owner.country} required/>
+      <Field label="Country" className={classes.fieldRow}>
+        <WideInput name="owner.country" ref={register(fields.country)} required/>
         {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
       </Field>
       <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" />
