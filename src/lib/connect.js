@@ -36,8 +36,8 @@ class Connect {
   }
 
   async send(to, amount) {
-    const gasLimit = 40000;
-    const gasPrice = 2;
+    const gasLimit = 40000; // TODO
+    const gasPrice = 2; // TODO
 
     const params = [{
       from: this.accounts[0],

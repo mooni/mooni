@@ -33,7 +33,6 @@ The build is minified and the filenames include the hashes.<br />
 ## TODO
 
 - reset order after exceed time guaranteed time
-- Contact step (email for update)
-- Success step
-- Use 3box for recipients
-- dex.ag
+- Update status from bity
+- Support major wallet providers
+- dex to accept any input token

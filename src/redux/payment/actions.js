@@ -9,6 +9,7 @@ export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_ORDER = 'SET_ORDER';
 export const SET_ORDER_ERROR = 'SET_ORDER_ERROR';
 export const RESET_ORDER = 'RESET_ORDER';
+export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 
 export const setInputCurrency = (inputCurrency) => ({
   type: SET_INPUT_CURRENCY,
@@ -54,6 +55,13 @@ export const resetOrder = () => ({
   type: RESET_ORDER,
 });
 
+export const setPaymentStatus = (paymentStatus) => ({
+  type: SET_PAYMENT_STATUS,
+  payload: {
+    paymentStatus,
+  }
+});
+
 export const createOrder = () => async function (dispatch, getState)  {
   const state = getState();
   const fromAddress = getAddress(state);
@@ -77,7 +85,6 @@ export const createOrder = () => async function (dispatch, getState)  {
     dispatch(setOrder(null));
     dispatch(setOrderError(error));
   }
-
 };
 
 export const sendPayment = () => async function (dispatch, getState)  {
@@ -87,5 +94,14 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   const { input: { amount }, payment_details: { crypto_address } } = order;
 
-  await connect.send(crypto_address, amount);
+  dispatch(setPaymentStatus('approval'));
+  try {
+    const tx = await connect.send(crypto_address, amount);
+    dispatch(setPaymentStatus('pending'));
+    await connect.provider.waitForTransaction(tx.result);
+    dispatch(setPaymentStatus('mined'));
+  } catch(error) {
+    console.error(error);
+    dispatch(setPaymentStatus('error'));
+  }
 };

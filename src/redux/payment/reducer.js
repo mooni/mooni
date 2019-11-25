@@ -24,14 +24,16 @@ const initialState = {
   inputCurrency: null,
   paymentDetail: {
     outputCurrency: OUTPUT_CURRENCIES[0],
-    outputAmount: 0,
+    outputAmount: 100,
     reference: '',
   },
   //recipient: exampleRecipient,
   recipient: null,
   contactPerson: null,
   order: null,
+  //order: exampleOrder,
   orderError: null,
+  paymentStatus: null,
 };
 
 export default function(state = initialState, action) {
@@ -83,6 +85,13 @@ export default function(state = initialState, action) {
         ...state,
         order: null,
         orderError: null,
+      };
+    }
+    case actions.SET_PAYMENT_STATUS: {
+      const { paymentStatus } = action.payload;
+      return {
+        ...state,
+        paymentStatus,
       };
     }
     default:
