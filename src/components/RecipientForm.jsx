@@ -51,8 +51,8 @@ function RecipientForm({ initialRecipient, onSubmit }) {
     },
     iban: {
       required: true,
-      minLength: 27,
-      maxLength: 27,
+      minLength: 14,
+      maxLength: 34,
       validate: IBAN.isValid,
     },
     bic_swift: {

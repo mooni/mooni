@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function StepPaymentDetail({ onComplete, onBackRecipient }) {
+function StepPaymentDetail({ onComplete, onBack }) {
   const classes = useStyles();
 
   const paymentDetails = useSelector(getPaymentDetail);
@@ -44,7 +44,10 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
 
   const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
-    defaultValues: paymentDetails || undefined,
+    defaultValues: paymentDetails ? {
+      amount: paymentDetails.outputAmount,
+      reference: paymentDetails.reference,
+    } : undefined,
   });
 
   const onSubmit = handleSubmit(async data => {
@@ -114,7 +117,7 @@ function StepPaymentDetail({ onComplete, onBackRecipient }) {
         </Box>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Button mode="normal" onClick={onBackRecipient} wide icon={<IconArrowLeft/>} label="Edit recipient" />
+            <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
           </Grid>
           <Grid item xs={12} sm={6}>
             <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" />

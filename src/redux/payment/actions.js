@@ -1,10 +1,11 @@
 import Bity from '../../lib/bity';
-import { getRecipient, getPaymentDetail, getOrder } from '../payment/selectors';
+import { getRecipient, getPaymentDetail, getOrder, getContactPerson } from '../payment/selectors';
 import { getAddress, getConnect } from '../eth/selectors';
 
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
 export const SET_PAYMENT_DETAIL = 'SET_PAYMENT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
+export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_ORDER = 'SET_ORDER';
 export const SET_ORDER_ERROR = 'SET_ORDER_ERROR';
 export const RESET_ORDER = 'RESET_ORDER';
@@ -27,6 +28,12 @@ export const setRecipient = (recipient) => ({
   type: SET_RECIPIENT,
   payload: {
     recipient,
+  }
+});
+export const setContactPerson = (contactPerson) => ({
+  type: SET_CONTACT_PERSON,
+  payload: {
+    contactPerson,
   }
 });
 
@@ -52,12 +59,14 @@ export const createOrder = () => async function (dispatch, getState)  {
   const fromAddress = getAddress(state);
   const recipient = getRecipient(state);
   const paymentDetail = getPaymentDetail(state);
+  const contactPerson = getContactPerson(state);
 
   try {
     const orderDetail = await Bity.order({
       fromAddress,
       recipient,
       paymentDetail,
+      contactPerson,
     });
 
     dispatch(setOrder(orderDetail));

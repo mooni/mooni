@@ -50,7 +50,7 @@ const Bity = {
       outputCurrency,
     };
   },
-  async order({ fromAddress, recipient, paymentDetail }) {
+  async order({ fromAddress, recipient, paymentDetail, contactPerson }) {
     const body = {
       input: {
         currency: "ETH",
@@ -70,6 +70,12 @@ const Bity = {
         reference: paymentDetail.reference,
       },
     };
+
+    if(contactPerson) {
+      body.contact_person = {
+        email: contactPerson.email,
+      };
+    }
 
     try {
       const { headers } = await instance({

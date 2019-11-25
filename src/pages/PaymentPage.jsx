@@ -6,9 +6,9 @@ import { Box as ABox } from '@aragon/ui'
 
 import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
+import StepContact from '../components/StepContact';
 import StepRecap from '../components/StepRecap';
 import { CustomStepConnector, CustomStepIcon } from '../components/StepComponents';
-
 
 import { createOrder, sendPayment, resetOrder } from '../redux/payment/actions';
 
@@ -20,15 +20,14 @@ function PaymentPage() {
   function handleNext() {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   }
-  function onBackRecipient() {
-    dispatch(resetOrder());
-    setActiveStep(0);
+  function handleBack() {
+    setActiveStep(prevActiveStep => prevActiveStep - 1);
   }
-  function onBackPaymentDetail() {
+  function onEditRecap() {
     dispatch(resetOrder());
     setActiveStep(1);
   }
-  function onFinish() {
+  function onSend() {
     dispatch(sendPayment());
     handleNext();
   }
@@ -37,11 +36,12 @@ function PaymentPage() {
     handleNext();
   }
 
-  const steps = ['Recipient', 'Payment Detail', 'Recap'];
+  const steps = ['Recipient', 'Payment Detail', 'Contact', 'Recap', 'Status'];
   const stepElements = [
     <StepRecipient onComplete={handleNext} />,
-    <StepPaymentDetail onComplete={onPrepareRecap} onBackRecipient={onBackRecipient} />,
-    <StepRecap onComplete={onFinish} onBackRecipient={onBackRecipient} onBackPaymentDetail={onBackPaymentDetail} />,
+    <StepPaymentDetail onComplete={handleNext} onBack={handleBack} />,
+    <StepContact onComplete={onPrepareRecap} onBack={handleBack} />,
+    <StepRecap onComplete={onSend} onBack={onEditRecap} />,
   ];
 
   return (

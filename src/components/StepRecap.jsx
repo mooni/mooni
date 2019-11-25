@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box, Grid } from '@material-ui/core';
-import { Button, Countdown, Info, IconArrowLeft, IconCoin } from '@aragon/ui'
+import { Button, Countdown, Info, IconArrowLeft, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
 
+import Terms from '../components/Terms';
 import Loader from '../components/Loader';
 import RecipientInfo from '../components/RecipientInfo';
 
 import { getRecipient, getOrder, getOrderError } from '../redux/payment/selectors';
 
-function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
+function StepRecap({ onComplete, onBack }) {
   const recipient = useSelector(getRecipient);
   const order = useSelector(getOrder);
   const orderError = useSelector(getOrderError);
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsOpened, setTermsOpened] = useState(false);
 
   // TODO retry create order after countdown expired
 
@@ -25,7 +29,7 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
           ))}
         </Info>
         <Box pt={2}>
-          <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Go back" />
+          <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
         </Box>
       </Box>
     );
@@ -44,17 +48,31 @@ function StepRecap({ onComplete, onBackRecipient, onBackPaymentDetail }) {
                 <Box><b>Fees:</b> {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
               </Info>
             </Box>
-            <Box py={2}>
+            <Box pt={2}>
               <Info title="Price guaranteed until" mode="warning">
                 <Countdown end={new Date(order.timestamp_price_guaranteed)} />
               </Info>
             </Box>
+            <Box py={2} display="flex" justifyContent="center">
+              <label>
+                <Checkbox
+                  checked={termsAccepted}
+                  onChange={setTermsAccepted}
+                />
+                I agree with the <Link onClick={() => setTermsOpened(true)}>terms of service</Link>
+              </label>
+              <Modal visible={termsOpened} onClose={() => setTermsOpened(false)}>
+                <Box>
+                  <Terms />
+                </Box>
+              </Modal>
+            </Box>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <Button mode="normal" onClick={onBackPaymentDetail} wide icon={<IconArrowLeft/>} label="Go back" />
+                <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} label="Send payment" />
+                <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
               </Grid>
             </Grid>
           </>
