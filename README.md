@@ -1,6 +1,26 @@
 # crypto-off-ramp
 
-> This is experimental software
+> This is experimental software under active development.
+
+## Presentation
+
+This web app allows to easily transfer money from your crypto wallet to your bank account. 
+
+This is just a UI that connect different providers, we do not have any backend or smart contract. 
+
+### Features
+- Login with any web3-compatible wallet *(Metamask, Coinbase Wallet, Trust Wallet, ...)*
+- Store your account information encrypted in IPFS (thanks to [3Box](https://3box.io))
+- Pay with ETH or any ERC20 token (thanks to [DEX.AG](https://dex.ag))
+- Send to your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+
+
+*This project is in early stage and not all features are developed yet.*
+
+### Use cases
+- I am a end user and I want to withdraw some crypto on my bank account
+- I am a dApp developer and I want to allow my users to withdraw funds to their bank account (such as decentralized marketplaces, via a widget or iFrame)
+- I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
 
 ## Available Scripts
 
