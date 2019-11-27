@@ -10,11 +10,11 @@ import RateSample from '../components/RateSample';
 import Footer from '../components/Footer';
 
 const useStyles = makeStyles(() => ({
-   logo: {
-     width: 100,
-     height: 100,
-     color: 'blue',
-     margin: 10,
+  logo: {
+    width: 100,
+    height: 100,
+    color: 'blue',
+    margin: 10,
   },
 }));
 
@@ -34,19 +34,25 @@ function Welcome() {
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
       <RateSample />
-        <Box py={2}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Button mode="strong" onClick={go('/send')} wide label="Send funds" icon={<IconCoin/>} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Button mode="strong" onClick={go('/my-account')} wide label="My Account" icon={<IconUser/>} />
-            </Grid>
-            {/*<Grid item xs={12} sm={4}>
+      <Box py={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <Button mode="strong" onClick={go('/send')} wide label="Send funds" icon={<IconCoin/>} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button mode="strong" onClick={go('/my-account')} wide label="My Account" icon={<IconUser/>} />
+          </Grid>
+          {/*<Grid item xs={12} sm={4}>
               <Button mode="strong" onClick={go('/contacts')} wide label="Contacts" icon={<IconGroup/>} />
             </Grid>*/}
-          </Grid>
-        </Box>
+        </Grid>
+      </Box>
+      <Box>
+        ethereum: { window.ethereum ? 'yes' : 'no' }<br/>
+        enable: { window.ethereum && window.ethereum.enable ? 'yes' : 'no' }<br/>
+        on: { window.ethereum && window.ethereum.on ? 'yes' : 'no' }<br/>
+        isMetaMask: { window.ethereum && window.ethereum.isMetaMask ? 'yes' : 'no' }<br/>
+      </Box>
       <Footer />
     </Box>
   );
