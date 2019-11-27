@@ -1,15 +1,13 @@
 import Box from '3box';
 
 class BoxManager {
-  constructor(obj) {
-    Object.assign(this, obj);
+  constructor({ box, space }) {
+    this.box = box;
+    this.space = space;
   }
 
-  static async init(connect) {
-    const provider = connect.ethereum;
-    const address = connect.accounts[0];
-
-    const box = await Box.openBox(address, provider);
+  static async init(ethManager) {
+    const box = await Box.openBox(ethManager.getAddress(), ethManager.ethereum);
     console.log('box opened');
     await box.syncDone;
     console.log('box synced');

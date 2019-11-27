@@ -1,26 +1,30 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Grid, Box } from '@material-ui/core';
-import { Button, IconUser, IconCoin, IconGroup } from '@aragon/ui'
+import { Button, IconUser, IconCoin } from '@aragon/ui'
 
 import RateSample from '../components/RateSample';
 import Footer from '../components/Footer';
 
+// import { getDebug } from '../redux/eth/selectors';
+
 const useStyles = makeStyles(() => ({
-   logo: {
-     width: 100,
-     height: 100,
-     color: 'blue',
-     margin: 10,
+  logo: {
+    width: 100,
+    height: 100,
+    color: 'blue',
+    margin: 10,
   },
 }));
 
 function Welcome() {
   const classes = useStyles();
   const history = useHistory();
+  // const debug = useSelector(getDebug);
 
   const go = path => () => history.push(path);
 
@@ -34,19 +38,22 @@ function Welcome() {
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
       <RateSample />
-        <Box py={2}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={4}>
-              <Button mode="strong" onClick={go('/send')} wide label="Send funds" icon={<IconCoin/>} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button mode="strong" onClick={go('/my-account')} wide label="My Account" icon={<IconUser/>} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button mode="strong" onClick={go('/contacts')} wide label="Contacts" icon={<IconGroup/>} />
-            </Grid>
+      <Box py={2}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <Button mode="strong" onClick={go('/send')} wide label="Send funds" icon={<IconCoin/>} />
           </Grid>
-        </Box>
+          <Grid item xs={12} sm={6}>
+            <Button mode="strong" onClick={go('/my-account')} wide label="My Account" icon={<IconUser/>} />
+          </Grid>
+          {/*<Grid item xs={12} sm={4}>
+              <Button mode="strong" onClick={go('/contacts')} wide label="Contacts" icon={<IconGroup/>} />
+            </Grid>*/}
+        </Grid>
+      </Box>
+      {/*<Box>
+        {JSON.stringify(debug, null, 2)}
+      </Box>*/}
       <Footer />
     </Box>
   );
