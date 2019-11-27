@@ -4,6 +4,7 @@ import { getETHManager } from './selectors';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ADDRESS = 'SET_ADDRESS';
+export const SET_DEBUG = 'SET_DEBUG';
 
 export const setETHManager = (ethManager) => ({
   type: SET_ETH_MANAGER,
@@ -16,6 +17,12 @@ export const setAddress = (address) => ({
   type: SET_ADDRESS,
   payload: {
     address,
+  }
+});
+export const setDebug = (debug) => ({
+  type: SET_DEBUG,
+  payload: {
+    debug,
   }
 });
 
@@ -38,5 +45,6 @@ export const initETH = () => function (dispatch)  {
   }).catch(error => {
     console.error('Unable to connect to ethereum', error);
     dispatch(resetETHManager());
+    dispatch(setDebug(error.message));
   });
 };

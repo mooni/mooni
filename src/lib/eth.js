@@ -1,10 +1,9 @@
 import EventEmitter from 'events';
 import { ethers } from 'ethers';
 
-export const MAINNET_NETWORK_ID = 1;
+// export const MAINNET_NETWORK_ID = 1;
 
 function reloadPage() {
-  console.log('fezfez');
   window.location.reload()
 }
 
@@ -16,13 +15,6 @@ class ETHManager extends EventEmitter {
 
   async init() {
     this.accounts = await this.ethereum.enable();
-
-    //this.accounts = (await this.ethereum.send('eth_accounts')).result;
-    this.netVersion = Number((await this.ethereum.send('net_version')).result);
-
-    if(this.netVersion !== MAINNET_NETWORK_ID) {
-      throw new Error('provider_not_mainnet')
-    }
 
     if(this.ethereum.on) {
       this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
@@ -55,7 +47,7 @@ class ETHManager extends EventEmitter {
         return ethManager;
       } catch (error) {
         console.error(error);
-        throw new Error('unable to open eth account');
+        throw error;
       }
     } else {
       console.log('no ethereum');

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -8,6 +9,8 @@ import { Button, IconUser, IconCoin } from '@aragon/ui'
 
 import RateSample from '../components/RateSample';
 import Footer from '../components/Footer';
+
+// import { getDebug } from '../redux/eth/selectors';
 
 const useStyles = makeStyles(() => ({
   logo: {
@@ -21,6 +24,7 @@ const useStyles = makeStyles(() => ({
 function Welcome() {
   const classes = useStyles();
   const history = useHistory();
+  // const debug = useSelector(getDebug);
 
   const go = path => () => history.push(path);
 
@@ -47,6 +51,9 @@ function Welcome() {
             </Grid>*/}
         </Grid>
       </Box>
+      {/*<Box>
+        {JSON.stringify(debug, null, 2)}
+      </Box>*/}
       <Footer />
     </Box>
   );
