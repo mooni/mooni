@@ -3,27 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import Box from '@material-ui/core/Box';
-import { Tabs, EmptyStateCard, Button, IconArrowRight } from '@aragon/ui'
+import { Tabs, EmptyStateCard, Button, IconArrowRight, IconUser } from '@aragon/ui'
 
 import { setRecipient } from '../redux/payment/actions';
 import { getMyAccount } from '../redux/contacts/selectors';
 import { getRecipient } from '../redux/payment/selectors';
-import { getBoxManager } from '../redux/box/selectors';
-import { initBox } from '../redux/box/actions';
-import { fetchMyAccount } from '../redux/contacts/actions';
 
 import RecipientForm from './RecipientForm';
 import RecipientInfo from '../components/RecipientInfo';
+import RequireConnection from './RequireConnection';
 
 function StepRecipient({ onComplete }) {
   const myAccount = useSelector(getMyAccount);
   const recipient = useSelector(getRecipient);
-  const boxManager = useSelector(getBoxManager);
   const dispatch = useDispatch();
   const history = useHistory();
 
   const [contactType, setContactType] = useState(0);
-  const [connecting, setConnecting] = useState(false);
 
   const goToAccountPage = () => history.push('/my-account');
 
@@ -34,13 +30,6 @@ function StepRecipient({ onComplete }) {
   function onSendToMe() {
     dispatch(setRecipient(myAccount));
     onComplete();
-  }
-
-  async function login3box() {
-    setConnecting(true);
-    await dispatch(initBox());
-    await dispatch(fetchMyAccount());
-    setConnecting(false);
   }
 
   return (
@@ -57,37 +46,30 @@ function StepRecipient({ onComplete }) {
         <RecipientForm initialRecipient={recipient} onSubmit={onSubmit}/>
       }
       {
-        contactType === 1 && !boxManager &&
-        <Box display="flex" justifyContent="center">
-          <EmptyStateCard
-            text="Please connect to 3box to access your contacts"
-            action={
-              connecting ?
-                <Button disabled>Connecting...</Button>
-                :
-                <Button onClick={login3box}>Connect</Button>
-            }
-          />
-        </Box>
-      }
-      {
-        contactType === 1 && boxManager &&
-        (
-          myAccount ?
-            <>
-              <RecipientInfo recipient={myAccount} />
-              <Box pt={2}>
-                <Button mode="strong" onClick={onSendToMe} wide icon={<IconArrowRight/>} label="Send to my account" />
+        contactType === 1 &&
+        <RequireConnection eth box>
+          {
+            myAccount ?
+              <>
+                <RecipientInfo recipient={myAccount}/>
+                <Box py={2}>
+                  <Button mode="normal" onClick={goToAccountPage} wide icon={<IconUser/>}
+                          label="Edit my account"/>
+                </Box>
+                <Box>
+                  <Button mode="strong" onClick={onSendToMe} wide icon={<IconArrowRight/>}
+                          label="Send to my account"/>
+                </Box>
+              </>
+              :
+              <Box display="flex" justifyContent="center">
+                <EmptyStateCard
+                  text="You don't have set your account yet."
+                  action={<Button onClick={goToAccountPage}>Set my account</Button>}
+                />
               </Box>
-            </>
-            :
-            <Box display="flex" justifyContent="center">
-              <EmptyStateCard
-                text="You don't have set your account yet."
-                action={<Button onClick={goToAccountPage}>Set my account</Button>}
-              />
-            </Box>
-        )
+          }
+        </RequireConnection>
       }
       {/*
         contactType === 1 &&

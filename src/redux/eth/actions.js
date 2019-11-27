@@ -1,12 +1,15 @@
-import Connect from '../../lib/connect';
+import ETHManager from '../../lib/eth';
 
-export const SET_CONNECT = 'SET_CONNECT';
+import { getETHManager } from './selectors';
+
+export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ADDRESS = 'SET_ADDRESS';
+export const SET_DEBUG = 'SET_DEBUG';
 
-export const setConnect = (connect) => ({
-  type: SET_CONNECT,
+export const setETHManager = (ethManager) => ({
+  type: SET_ETH_MANAGER,
   payload: {
-    connect,
+    ethManager,
   }
 });
 
@@ -16,18 +19,32 @@ export const setAddress = (address) => ({
     address,
   }
 });
+export const setDebug = (debug) => ({
+  type: SET_DEBUG,
+  payload: {
+    debug,
+  }
+});
 
-export const initConnect = () => function (dispatch)  {
-  Connect.initWeb3().then(connect => {
-    dispatch(setConnect(connect));
-    dispatch(setAddress(connect.accounts[0]));
-  }).catch(error => {
-    console.error('Unable to connect to ethereum', error);
-    dispatch(resetConnect());
-  });
+export const resetETHManager = () => function (dispatch, getState) {
+  const ethManager = getETHManager(getState());
+  if(ethManager) {
+    ethManager.close();
+  }
+  dispatch(setETHManager(null));
+  dispatch(setAddress(null));
 };
 
-export const resetConnect = () => function (dispatch)  {
-  dispatch(setConnect(null));
-  dispatch(setAddress(null));
+export const initETH = () => function (dispatch)  {
+  ETHManager.initWeb3().then(ethManager => {
+    dispatch(setETHManager(ethManager));
+    ethManager.on('accountsChanged', () => {
+      dispatch(setAddress(ethManager.getAddress()));
+    });
+    dispatch(setAddress(ethManager.getAddress()));
+  }).catch(error => {
+    console.error('Unable to connect to ethereum', error);
+    dispatch(resetETHManager());
+    dispatch(setDebug(error.message));
+  });
 };
