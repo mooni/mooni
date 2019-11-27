@@ -1,8 +1,9 @@
 import Box from '3box';
 
 class BoxManager {
-  constructor(obj) {
-    Object.assign(this, obj);
+  constructor({ box, space }) {
+    this.box = box;
+    this.space = space;
   }
 
   static async init(ethManager) {

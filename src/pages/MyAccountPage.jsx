@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box as ABox } from '@aragon/ui'
@@ -8,7 +8,7 @@ import RecipientForm from '../components/RecipientForm';
 
 import { getMyAccount, getMyAccountLoading } from '../redux/contacts/selectors';
 import { getBoxManager } from '../redux/box/selectors';
-import { fetchMyAccount, updateMyAccount } from '../redux/contacts/actions';
+import { updateMyAccount } from '../redux/contacts/actions';
 
 function MyAccountPage() {
   const boxManager = useSelector(getBoxManager);
@@ -18,12 +18,6 @@ function MyAccountPage() {
   const [saving, setSaving] = useState(false);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (boxManager) {
-      dispatch(fetchMyAccount());
-    }
-  }, [boxManager, dispatch]);
 
   async function saveMyAccount(myAccount) {
     setSaving(true);

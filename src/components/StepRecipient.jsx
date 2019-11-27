@@ -3,14 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import Box from '@material-ui/core/Box';
-import { Tabs, EmptyStateCard, Button, IconArrowRight } from '@aragon/ui'
+import { Tabs, EmptyStateCard, Button, IconArrowRight, IconUser } from '@aragon/ui'
 
 import { setRecipient } from '../redux/payment/actions';
 import { getMyAccount } from '../redux/contacts/selectors';
 import { getRecipient } from '../redux/payment/selectors';
-import { getBoxManager } from '../redux/box/selectors';
-import { initBox } from '../redux/box/actions';
-import { fetchMyAccount } from '../redux/contacts/actions';
 
 import RecipientForm from './RecipientForm';
 import RecipientInfo from '../components/RecipientInfo';
@@ -19,12 +16,10 @@ import RequireConnection from './RequireConnection';
 function StepRecipient({ onComplete }) {
   const myAccount = useSelector(getMyAccount);
   const recipient = useSelector(getRecipient);
-  const boxManager = useSelector(getBoxManager);
   const dispatch = useDispatch();
   const history = useHistory();
 
   const [contactType, setContactType] = useState(0);
-  const [connecting, setConnecting] = useState(false);
 
   const goToAccountPage = () => history.push('/my-account');
 
@@ -35,13 +30,6 @@ function StepRecipient({ onComplete }) {
   function onSendToMe() {
     dispatch(setRecipient(myAccount));
     onComplete();
-  }
-
-  async function login3box() {
-    setConnecting(true);
-    await dispatch(initBox());
-    await dispatch(fetchMyAccount());
-    setConnecting(false);
   }
 
   return (
@@ -64,7 +52,11 @@ function StepRecipient({ onComplete }) {
             myAccount ?
               <>
                 <RecipientInfo recipient={myAccount}/>
-                <Box pt={2}>
+                <Box py={2}>
+                  <Button mode="normal" onClick={goToAccountPage} wide icon={<IconUser/>}
+                          label="Edit my account"/>
+                </Box>
+                <Box>
                   <Button mode="strong" onClick={onSendToMe} wide icon={<IconArrowRight/>}
                           label="Send to my account"/>
                 </Box>

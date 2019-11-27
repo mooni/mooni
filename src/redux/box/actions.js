@@ -1,5 +1,6 @@
 import BoxManager from '../../lib/box';
 import { getETHManager } from '../eth/selectors';
+import { fetchMyAccount } from '../contacts/actions';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 
@@ -16,6 +17,7 @@ export const initBox = () => async function (dispatch, getState)  {
   try {
     const boxManager = await BoxManager.init(ethManager);
     dispatch(setBoxManager(boxManager));
+    dispatch(fetchMyAccount());
   } catch(error) {
     console.error('Unable to connect to 3box', error);
     dispatch(resetBox());
