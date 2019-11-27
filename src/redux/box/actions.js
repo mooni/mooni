@@ -1,5 +1,5 @@
 import BoxManager from '../../lib/box';
-import { getConnect } from '../eth/selectors';
+import { getETHManager } from '../eth/selectors';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 
@@ -11,10 +11,10 @@ export const setBoxManager = (boxManager) => ({
 });
 
 export const initBox = () => async function (dispatch, getState)  {
-  const connect = getConnect(getState());
+  const ethManager = getETHManager(getState());
 
   try {
-    const boxManager = await BoxManager.init(connect);
+    const boxManager = await BoxManager.init(ethManager);
     dispatch(setBoxManager(boxManager));
   } catch(error) {
     console.error('Unable to connect to 3box', error);

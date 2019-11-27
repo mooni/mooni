@@ -1,6 +1,6 @@
 import Bity from '../../lib/bity';
 import { getRecipient, getPaymentDetail, getOrder, getContactPerson } from '../payment/selectors';
-import { getAddress, getConnect } from '../eth/selectors';
+import { getAddress, getETHManager } from '../eth/selectors';
 
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
 export const SET_PAYMENT_DETAIL = 'SET_PAYMENT_DETAIL';
@@ -90,15 +90,15 @@ export const createOrder = () => async function (dispatch, getState)  {
 export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
   const order = getOrder(state);
-  const connect = getConnect(getState());
+  const ethManager = getETHManager(getState());
 
   const { input: { amount }, payment_details: { crypto_address } } = order;
 
   dispatch(setPaymentStatus('approval'));
   try {
-    const tx = await connect.send(crypto_address, amount);
+    const tx = await ethManager.send(crypto_address, amount);
     dispatch(setPaymentStatus('pending'));
-    await connect.provider.waitForTransaction(tx.result);
+    await ethManager.provider.waitForTransaction(tx.result);
     dispatch(setPaymentStatus('mined'));
   } catch(error) {
     console.error(error);

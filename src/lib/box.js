@@ -5,11 +5,8 @@ class BoxManager {
     Object.assign(this, obj);
   }
 
-  static async init(connect) {
-    const provider = connect.ethereum;
-    const address = connect.accounts[0];
-
-    const box = await Box.openBox(address, provider);
+  static async init(ethManager) {
+    const box = await Box.openBox(ethManager.getAddress(), ethManager.ethereum);
     console.log('box opened');
     await box.syncDone;
     console.log('box synced');

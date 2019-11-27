@@ -3,17 +3,17 @@ import * as actions from "./actions";
 export const STATE_NAME = 'ETH';
 
 const initialState = {
-  connect: null,
+  ethManager: null,
   address: null,
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case actions.SET_CONNECT: {
-      const { connect } = action.payload;
+    case actions.SET_ETH_MANAGER: {
+      const { ethManager } = action.payload;
       return {
         ...state,
-        connect,
+        ethManager,
       };
     }
     case actions.SET_ADDRESS: {

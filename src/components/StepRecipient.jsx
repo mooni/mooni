@@ -14,6 +14,7 @@ import { fetchMyAccount } from '../redux/contacts/actions';
 
 import RecipientForm from './RecipientForm';
 import RecipientInfo from '../components/RecipientInfo';
+import RequireConnection from './RequireConnection';
 
 function StepRecipient({ onComplete }) {
   const myAccount = useSelector(getMyAccount);
@@ -57,37 +58,26 @@ function StepRecipient({ onComplete }) {
         <RecipientForm initialRecipient={recipient} onSubmit={onSubmit}/>
       }
       {
-        contactType === 1 && !boxManager &&
-        <Box display="flex" justifyContent="center">
-          <EmptyStateCard
-            text="Please connect to 3box to access your contacts"
-            action={
-              connecting ?
-                <Button disabled>Connecting...</Button>
-                :
-                <Button onClick={login3box}>Connect</Button>
-            }
-          />
-        </Box>
-      }
-      {
-        contactType === 1 && boxManager &&
-        (
-          myAccount ?
-            <>
-              <RecipientInfo recipient={myAccount} />
-              <Box pt={2}>
-                <Button mode="strong" onClick={onSendToMe} wide icon={<IconArrowRight/>} label="Send to my account" />
+        contactType === 1 &&
+        <RequireConnection eth box>
+          {
+            myAccount ?
+              <>
+                <RecipientInfo recipient={myAccount}/>
+                <Box pt={2}>
+                  <Button mode="strong" onClick={onSendToMe} wide icon={<IconArrowRight/>}
+                          label="Send to my account"/>
+                </Box>
+              </>
+              :
+              <Box display="flex" justifyContent="center">
+                <EmptyStateCard
+                  text="You don't have set your account yet."
+                  action={<Button onClick={goToAccountPage}>Set my account</Button>}
+                />
               </Box>
-            </>
-            :
-            <Box display="flex" justifyContent="center">
-              <EmptyStateCard
-                text="You don't have set your account yet."
-                action={<Button onClick={goToAccountPage}>Set my account</Button>}
-              />
-            </Box>
-        )
+          }
+        </RequireConnection>
       }
       {/*
         contactType === 1 &&

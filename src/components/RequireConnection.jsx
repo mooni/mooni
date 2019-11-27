@@ -1,36 +1,61 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loader from '../components/Loader';
+import Box from '@material-ui/core/Box';
+import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getConnect } from '../redux/eth/selectors';
+import { getETHManager } from '../redux/eth/selectors';
 import { getBoxManager } from '../redux/box/selectors';
-import { initConnect } from '../redux/eth/actions';
+import { initETH } from '../redux/eth/actions';
 import { initBox } from '../redux/box/actions';
 
 function RequireConnection({ children, eth, box }) {
   const boxManager = useSelector(getBoxManager);
-  const connect = useSelector(getConnect);
+  const ethManager = useSelector(getETHManager);
   const dispatch = useDispatch();
+  const [connecting, setConnecting] = useState(false);
 
-  useEffect(() => {
-    if (eth && !connect) {
-      dispatch(initConnect());
-    }
-  }, [eth, connect, dispatch]);
-
-  useEffect(() => {
-    if (eth && box && connect && !boxManager) {
-      dispatch(initBox());
-    }
-  }, [eth, box, connect, boxManager, dispatch]);
-
-  if(eth && !connect) {
-    return <Loader text="Loading eth provider" />;
+  async function connectETH() {
+    setConnecting(true);
+    await dispatch(initETH());
+    setConnecting(false);
   }
+
+  async function connectBox() {
+    setConnecting(true);
+    await dispatch(initBox());
+    setConnecting(false);
+  }
+
+  if(eth && !ethManager) {
+    if(connecting)
+      return <Loader text="Loading eth provider" />;
+
+    return (
+      <Box display="flex" justifyContent="center">
+        <EmptyStateCard
+          text="Please connect your Ethereum wallet"
+          action={<Button onClick={connectETH}>Connect</Button>}
+        />
+      </Box>
+    );
+  }
+
   if(box && !boxManager) {
-    return <Loader text="Loading 3box" />;
+    if(connecting)
+      return <Loader text="Loading 3box" />;
+
+    return (
+      <Box display="flex" justifyContent="center">
+        <EmptyStateCard
+          text="Please connect to 3box to access your contacts"
+          action={<Button onClick={connectBox}>Connect</Button>}
+        />
+      </Box>
+    );
   }
+
   return children;
 }
 
