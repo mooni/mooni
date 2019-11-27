@@ -15,19 +15,22 @@ class ETHManager extends EventEmitter {
   }
 
   async init() {
-    this.ethers = new ethers.providers.Web3Provider(this.ethereum);
+    await this.ethereum.enable();
 
     this.accounts = (await this.ethereum.send('eth_accounts')).result;
     this.netVersion = Number((await this.ethereum.send('net_version')).result);
 
-    console.log(this);
     if(this.netVersion !== MAINNET_NETWORK_ID) {
       throw new Error('provider_not_mainnet')
     }
 
-    this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
-    this.ethereum.on('networkChanged', reloadPage);
-    this.ethereum.on('chainChanged', reloadPage);
+    if(this.ethereum.on) {
+      this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
+      this.ethereum.on('networkChanged', reloadPage);
+      this.ethereum.on('chainChanged', reloadPage);
+    }
+
+    this.ethers = new ethers.providers.Web3Provider(this.ethereum);
   }
 
   updateAccounts(accounts) {
@@ -36,7 +39,9 @@ class ETHManager extends EventEmitter {
   }
 
   close() {
-    this.ethereum.removeAllListeners();
+    if(this.ethereum.on) {
+      this.ethereum.removeAllListeners();
+    }
     this.removeAllListeners();
   }
 
@@ -45,7 +50,6 @@ class ETHManager extends EventEmitter {
 
     if (ethereum) {
       try {
-        await ethereum.enable();
         const ethManager = new ETHManager(ethereum);
         await ethManager.init();
         return ethManager;

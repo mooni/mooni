@@ -47,12 +47,6 @@ function Welcome() {
             </Grid>*/}
         </Grid>
       </Box>
-      <Box>
-        ethereum: { window.ethereum ? 'yes' : 'no' }<br/>
-        enable: { window.ethereum && window.ethereum.enable ? 'yes' : 'no' }<br/>
-        on: { window.ethereum && window.ethereum.on ? 'yes' : 'no' }<br/>
-        isMetaMask: { window.ethereum && window.ethereum.isMetaMask ? 'yes' : 'no' }<br/>
-      </Box>
       <Footer />
     </Box>
   );
