@@ -22,7 +22,8 @@ class ETHManager extends EventEmitter {
       this.ethereum.on('chainChanged', reloadPage);
     }
 
-    // this.ethers = new ethers.providers.Web3Provider(this.ethereum);
+    this.provider = new ethers.providers.Web3Provider(this.ethereum);
+    this.signer = this.provider.getSigner();
   }
 
   updateAccounts(accounts) {
@@ -37,7 +38,7 @@ class ETHManager extends EventEmitter {
     this.removeAllListeners();
   }
 
-  static async initWeb3() {
+  static async createETHManager() {
     const { ethereum } = window;
 
     if (ethereum) {
@@ -59,25 +60,15 @@ class ETHManager extends EventEmitter {
     const gasLimit = 40000; // TODO
     const gasPrice = 2; // TODO
 
-    const params = [{
-      from: this.accounts[0],
+    const transactionRequest = {
       to,
-      gas: ethers.utils.hexlify(gasLimit),
-      gasPrice: ethers.utils.hexlify(ethers.utils.parseUnits(String(gasPrice), 'gwei')),
-      value: ethers.utils.hexlify(ethers.utils.parseEther(amount)),
-    }];
+      gasLimit,
+      gasPrice: ethers.utils.parseUnits(String(gasPrice), 'gwei'),
+      value: ethers.utils.parseEther(amount),
+    };
+    const transactionResponse = await this.signer.sendTransaction(transactionRequest);
 
-    console.log(params);
-
-    return new Promise((resolve, reject) => {
-      this.ethereum.sendAsync({
-        method: 'eth_sendTransaction',
-        params: params,
-      }, (err, result) => {
-        if(err) return reject(err);
-        resolve(result);
-      })
-    });
+    return transactionResponse;
   }
 
   getAddress() {

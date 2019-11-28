@@ -36,7 +36,7 @@ export const resetETHManager = () => function (dispatch, getState) {
 };
 
 export const initETH = () => function (dispatch)  {
-  ETHManager.initWeb3().then(ethManager => {
+  ETHManager.createETHManager().then(ethManager => {
     dispatch(setETHManager(ethManager));
     ethManager.on('accountsChanged', () => {
       dispatch(setAddress(ethManager.getAddress()));

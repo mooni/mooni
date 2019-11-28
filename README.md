@@ -55,4 +55,5 @@ The build is minified and the filenames include the hashes.<br />
 - reset order after exceed time guaranteed time
 - Update status from bity
 - dex to accept any input token
+- support not-injected eth providers
 - bity cookies doesnt work on coinbase wallet and trust wallet

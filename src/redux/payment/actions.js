@@ -98,7 +98,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   try {
     const tx = await ethManager.send(crypto_address, amount);
     dispatch(setPaymentStatus('pending'));
-    await ethManager.provider.waitForTransaction(tx.result);
+    await ethManager.provider.waitForTransaction(tx.hash);
     dispatch(setPaymentStatus('mined'));
   } catch(error) {
     console.error(error);
