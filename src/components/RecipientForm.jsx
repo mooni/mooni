@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useForm from 'react-hook-form';
 import IBAN from 'iban';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { Button, Field, IconArrowRight } from '@aragon/ui'
+import { COUNTRIES } from '../lib/countries';
+
+import { Button, Field, IconArrowRight, DropDown } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 
 const useStyles = makeStyles(() => ({
@@ -12,56 +14,69 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const fields = {
+  name: {
+    required: true,
+    minLength: 2,
+    maxLength: 50,
+  },
+  address: {
+    required: true,
+    minLength: 2,
+    maxLength: 50,
+  },
+  zip: {
+    required: true,
+    minLength: 2,
+    maxLength: 10,
+  },
+  city: {
+    required: true,
+    minLength: 2,
+    maxLength: 10,
+  },
+  country: {
+    required: true,
+    minLength: 2,
+    maxLength: 2,
+    pattern: /^[A-Z]{2}$/,
+  },
+  iban: {
+    required: true,
+    minLength: 14,
+    maxLength: 34,
+    validate: IBAN.isValid,
+  },
+  bic_swift: {
+    required: true,
+    minLength: 8,
+    maxLength: 11,
+    pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
+  },
+};
+
+const countriesList = Object.keys(COUNTRIES);
+
 function RecipientForm({ initialRecipient, onSubmit }) {
   const classes = useStyles();
 
-  const { register, handleSubmit, errors } = useForm({
+  const { register, handleSubmit, errors, setValue } = useForm({
     mode: 'onChange',
     defaultValues: initialRecipient || undefined,
   });
-
+  const [selectedCountry, setSelectedCountry] = useState(
+    initialRecipient ? countriesList.indexOf(initialRecipient.owner.country) : null
+  );
   const submit = handleSubmit(onSubmit);
 
-  const fields = {
-    name: {
-      required: true,
-      minLength: 2,
-      maxLength: 50,
-    },
-    address: {
-      required: true,
-      minLength: 2,
-      maxLength: 50,
-    },
-    zip: {
-      required: true,
-      minLength: 2,
-      maxLength: 10,
-    },
-    city: {
-      required: true,
-      minLength: 2,
-      maxLength: 10,
-    },
-    country: {
-      required: true,
-      minLength: 2,
-      maxLength: 2,
-      pattern: /^[A-Z]{2}$/,
-    },
-    iban: {
-      required: true,
-      minLength: 14,
-      maxLength: 34,
-      validate: IBAN.isValid,
-    },
-    bic_swift: {
-      required: true,
-      minLength: 8,
-      maxLength: 11,
-      pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
-    },
-  };
+  function setCountry(index) {
+    setSelectedCountry(index);
+    setValue('owner.country', countriesList[index]);
+  }
+
+  useEffect(() => {
+    register({ name: 'owner.country' }, fields.country);
+  }, []);
 
   return (
     <form onSubmit={submit}>
@@ -89,8 +104,14 @@ function RecipientForm({ initialRecipient, onSubmit }) {
         <WideInput name="owner.city" ref={register(fields.city)} required/>
         {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
       </Field>
-      <Field label="Country" className={classes.fieldRow}>
-        <WideInput name="owner.country" ref={register(fields.country)} required/>
+      <Field label="Country" className={classes.fieldRow} required>
+        <DropDown
+          items={countriesList}
+          selected={selectedCountry}
+          onChange={setCountry}
+          placeholder="Please select a country"
+          wide
+        />
         {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
       </Field>
       <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" />

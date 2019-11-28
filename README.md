@@ -52,7 +52,6 @@ The build is minified and the filenames include the hashes.<br />
 
 ## TODO
 
-- country dropdown
 - bug wait for transaction on deployed
 - reset order after exceed time guaranteed time
 - Update status from bity
