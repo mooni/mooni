@@ -8,23 +8,23 @@ import Terms from '../components/Terms';
 import Loader from '../components/Loader';
 import RecipientInfo from '../components/RecipientInfo';
 
-import { getRecipient, getOrder, getOrderError } from '../redux/payment/selectors';
+import { getRecipient, getOrder, getOrderErrors } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete, onBack }) {
   const recipient = useSelector(getRecipient);
   const order = useSelector(getOrder);
-  const orderError = useSelector(getOrderError);
+  const orderErrors = useSelector(getOrderErrors);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsOpened, setTermsOpened] = useState(false);
 
   // TODO retry create order after countdown expired
 
-  if(orderError) {
+  if(orderErrors) {
     return (
       <Box width={1} py={3}>
         <Info title="Order error" mode="error">
-          {orderError.map(error => (
+          {orderErrors.map(error => (
             <Box key={error.code}><b>{error.code}</b> {error.message}</Box>
           ))}
         </Info>

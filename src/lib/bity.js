@@ -89,10 +89,11 @@ const Bity = {
       return order;
     } catch(error) {
       if(error && error.response && error.response.data && error.response.data.errors) {
-        throw error.response.data.errors;
+        const apiError = new Error('api_error');
+        apiError.errors = error.response.data.errors;
+        throw apiError;
       } else {
-        console.error(error);
-        throw [{code: 'unknown', message: 'unknown error'}];
+        throw error;
       }
     }
   },

@@ -7,7 +7,7 @@ export const SET_PAYMENT_DETAIL = 'SET_PAYMENT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_ORDER = 'SET_ORDER';
-export const SET_ORDER_ERROR = 'SET_ORDER_ERROR';
+export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 
@@ -44,10 +44,10 @@ export const setOrder = (order) => ({
     order,
   }
 });
-export const setOrderError = (error) => ({
-  type: SET_ORDER_ERROR,
+export const setOrderErrors = (errors) => ({
+  type: SET_ORDER_ERRORS,
   payload: {
-    orderError: error,
+    orderErrors: errors,
   }
 });
 
@@ -77,13 +77,24 @@ export const createOrder = () => async function (dispatch, getState)  {
       contactPerson,
     });
 
+    if(!orderDetail.input) {
+      const cookieError = new Error('api_error');
+      cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
+      throw cookieError;
+    }
     dispatch(setOrder(orderDetail));
-    dispatch(setOrderError(null));
+    dispatch(setOrderErrors(null));
 
     // TODO register delete order after price guaranteed timeout
   } catch(error) {
     dispatch(setOrder(null));
-    dispatch(setOrderError(error));
+
+    if(error.message === 'api_error') {
+      dispatch(setOrderErrors(error.errors));
+    } else {
+      console.error(error);
+      dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
+    }
   }
 };
 
