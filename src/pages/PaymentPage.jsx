@@ -50,7 +50,7 @@ function PaymentPage() {
     <StepPaymentDetail onComplete={handleNext} onBack={handleBack} />,
     <StepContact onComplete={onPrepareRecap} onBack={handleBack} />,
     <StepRecap onComplete={onSend} onBack={onEditRecap} />,
-    <StepStatus onExit={onExit} onBack={onPrepareRecap} />,
+    <StepStatus onExit={onExit} onBack={onEditRecap} />,
   ];
 
   return (

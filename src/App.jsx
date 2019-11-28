@@ -19,9 +19,13 @@ import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
 import Contacts from './pages/ContactsPage';
 
+import { useSelector } from 'react-redux';
+import { getDebug } from './redux/eth/selectors';
+
 function App() {
   const location = useLocation();
   const history = useHistory();
+  const debug = useSelector(getDebug);
 
   const pageName = location.pathname && location.pathname !== '/' ? location.pathname.substring(1) : null;
 
@@ -58,6 +62,14 @@ function App() {
             <Redirect to="/" />
           </Route>
         </Switch>
+        {debug &&
+        <Box>
+          <Box>Debug:</Box>
+          <Box>
+            {JSON.stringify(debug, null, 2)}
+          </Box>
+        </Box>
+        }
       </Container>
     </Main>
   );

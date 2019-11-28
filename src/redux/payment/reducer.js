@@ -73,11 +73,11 @@ export default function(state = initialState, action) {
         order,
       };
     }
-    case actions.SET_ORDER_ERROR: {
-      const { orderError } = action.payload;
+    case actions.SET_ORDER_ERRORS: {
+      const { orderErrors } = action.payload;
       return {
         ...state,
-        orderError,
+        orderErrors,
       };
     }
     case actions.RESET_ORDER: {
