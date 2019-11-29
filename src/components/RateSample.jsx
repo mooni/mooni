@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
 import BN from 'bignumber.js';
 
@@ -44,6 +44,7 @@ const useStyles = makeStyles(theme => ({
 function SimpleFiatForm() {
   const classes = useStyles();
 
+  const [exited, setExited] = useState(false);
   const [rateLoading, setRateLoading] = useState(true);
   const [inputCurrency, setInputCurrency] = useState(0);
   const [outputCurrency, setOutputCurrency] = useState(0);
@@ -51,29 +52,33 @@ function SimpleFiatForm() {
   const [outputAmount, setOutputAmount] = useState(100);
   const [rate, setRate] = useState(null);
 
-  const estimateInput = useCallback(async outputValue => {
-    setRate(null);
-    setInputAmount('');
-    setRateLoading(true);
-    const res = await Bity.estimate({
-      inputCurrency: inputCurrencies[inputCurrency],
-      outputCurrency: outputCurrencies[outputCurrency],
-      outputAmount: outputValue,
-    });
-    setInputAmount(String(res.inputAmount).substring(0,10));
-    setRateLoading(false);
-    const rate = BN(outputValue).div(res.inputAmount).dp(3).toString();
-    setRate(rate);
-  }, [inputCurrency, outputCurrency]);
+  const estimateInput = useCallback(debounce(async outputValue => {
+      setRate(null);
+      setInputAmount('');
+      setRateLoading(true);
+      const res = await Bity.estimate({
+        inputCurrency: inputCurrencies[inputCurrency],
+        outputCurrency: outputCurrencies[outputCurrency],
+        outputAmount: outputValue,
+      });
+      if(exited) return;
 
-  const throttledEstimateInput = useMemo(() => debounce(estimateInput, 1000), [estimateInput]);
+      setInputAmount(String(res.inputAmount).substring(0,10));
+      setRateLoading(false);
+      const rate = BN(outputValue).div(res.inputAmount).dp(3).toString();
+      setRate(rate);
+    }, 1000),
+    [inputCurrency, outputCurrency]
+  );
 
   useEffect(() => {
     if(inputCurrency !== null && outputCurrency !== null && outputAmount !== null) {
-      throttledEstimateInput(outputAmount);
-      return throttledEstimateInput.cancel;
+      estimateInput(outputAmount);
+      return estimateInput.cancel;
     }
-  }, [inputCurrency, outputCurrency, outputAmount]);
+
+    return () => setExited(true);
+  }, [inputCurrency, outputCurrency, outputAmount, estimateInput]);
 
   return (
     <Box className={classes.root}>
@@ -143,7 +148,7 @@ function SimpleFiatForm() {
       </Grid>
       <Box py={2} width={200} mx="auto">
         <Info title="Estimated exchange rate">
-            <Box>~{rate || '-'} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Box>
+          <Box>~{rate || '-'} {outputCurrencies[outputCurrency]}/{inputCurrencies[inputCurrency]}</Box>
         </Info>
       </Box>
     </Box>

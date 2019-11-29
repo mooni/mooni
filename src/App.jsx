@@ -63,12 +63,12 @@ function App() {
           </Route>
         </Switch>
         {debug &&
-        <Box>
+        {/*<Box>
           <Box>Debug:</Box>
           <Box>
             {JSON.stringify(debug, null, 2)}
           </Box>
-        </Box>
+        </Box>*/}
         }
       </Container>
     </Main>

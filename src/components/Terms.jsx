@@ -1,8 +1,7 @@
 import React from 'react';
-import GitHubButton from 'react-github-btn';
 
-import { Link, Info } from '@aragon/ui'
-import { Grid, Box } from '@material-ui/core';
+import { Info } from '@aragon/ui'
+import { Box } from '@material-ui/core';
 
 function Terms() {
   return (

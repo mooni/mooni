@@ -65,7 +65,7 @@ function RecipientForm({ initialRecipient, onSubmit }) {
     defaultValues: initialRecipient || undefined,
   });
   const [selectedCountry, setSelectedCountry] = useState(
-    initialRecipient ? countriesList.indexOf(initialRecipient.owner.country) : null
+    initialRecipient ? countriesList.indexOf(initialRecipient.owner.country) : undefined
   );
   const submit = handleSubmit(onSubmit);
 
@@ -76,7 +76,7 @@ function RecipientForm({ initialRecipient, onSubmit }) {
 
   useEffect(() => {
     register({ name: 'owner.country' }, fields.country);
-  }, []);
+  }, [register]);
 
   return (
     <form onSubmit={submit}>

@@ -52,9 +52,8 @@ The build is minified and the filenames include the hashes.<br />
 
 ## TODO
 
-- bug wait for transaction on deployed
 - reset order after exceed time guaranteed time
-- Update status from bity
+- Update status from bity after payment on an /order/{orderId} page
 - dex to accept any input token
 - support not-injected eth providers
-- bity cookies doesnt work on coinbase wallet and trust wallet
+- bity cookies doesnt work on Safari
