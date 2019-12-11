@@ -1,0 +1,29 @@
+{
+  "name": "widget-host",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-scripts": "3.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "prepare": "cd node_modules && rm -f mooni-widget && ln -s ../../../build-widget/ ./mooni-widget && cd ../public && ln -s ../../../public/mooni-ui/ ./mooni-ui && ln -s ../../../public/aragon-ui/ ./aragon-ui"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -22,7 +22,7 @@ import Contacts from './pages/ContactsPage';
 import { useSelector } from 'react-redux';
 import { getDebug } from './redux/eth/selectors';
 
-function App() {
+function App({ widget }) {
   const location = useLocation();
   const history = useHistory();
   const debug = useSelector(getDebug);

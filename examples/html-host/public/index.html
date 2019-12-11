@@ -1,0 +1,33 @@
+<html lang="en">
+  <head>
+    <script src="./widget/index.js"></script>
+
+    <title>Some marketplace</title>
+  </head>
+
+  <body>
+    <div id="header">My marketplace</div>
+    <div id="container"></div>
+    <script>
+      MooniWidget.mount(document.getElementById('container'));
+    </script>
+    <style>
+      body {
+        background-color: grey;
+      }
+      #header {
+        border: 1px solid black;
+        margin: 50px auto;
+        width: 200px;
+      }
+      #container {
+        background-color: white;
+        border: 1px solid black;
+        margin: 50px auto;
+        width: 375px;
+        height: 700px;
+        overflow: scroll;
+      }
+    </style>
+  </body>
+</html>

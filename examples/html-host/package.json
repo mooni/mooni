@@ -1,0 +1,13 @@
+{
+  "name": "host-html",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "serve": "serve -s public",
+    "prepare": "cd public && rm -f widget && ln -s ../../../build-widget/ ./widget && ln -s ../../../public/mooni-ui/ ./mooni-ui && ln -s ../../../public/aragon-ui/ ./aragon-ui"
+  },
+  "dependencies": {
+    "serve": "^11.2.0"
+  }
+}
