@@ -40,7 +40,7 @@ function Footer() {
       </Grid>
       <Box py={3}>
         <Box display="flex" justifyContent="center">
-          <GitHubButton href="https://github.com/pakokrew/crypto-off-ramp" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
+          <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
         </Box>
       </Box>
     </Box>

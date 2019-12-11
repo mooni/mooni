@@ -12,7 +12,7 @@ class BoxManager {
     await box.syncDone;
     console.log('box synced');
 
-    const space = await box.openSpace('crypto-off-ramp');
+    const space = await box.openSpace('mooni');
     console.log('space opened');
     await space.syncDone;
     console.log('space synced');
