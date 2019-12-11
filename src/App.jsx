@@ -35,7 +35,7 @@ function App() {
         primary={
           <>
             <Box onClick={() => history.push('/')} style={{cursor: 'pointer'}}>
-              Crypto Off-Ramp
+              Mooni
             </Box>
             <Box ml={1}>
               {pageName && <Tag mode="identifier">{pageName}</Tag>}

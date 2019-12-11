@@ -26,7 +26,6 @@ function Welcome() {
   return (
     <Box width={1} py={3}>
       <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-        {/*<Box fontFamily="'Audiowide', cursive" fontSize="h6.fontSize">Crypto off ramp</Box>*/}
         <img src="logo512.png" alt="logo" className={classes.logo} />
       </Box>
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
