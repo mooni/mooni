@@ -10,6 +10,8 @@ import { getBoxManager, getBoxLoading } from '../redux/box/selectors';
 import { initETH } from '../redux/eth/actions';
 import { initBox } from '../redux/box/actions';
 
+const AUTO_CONNECT = false;
+
 function RequireConnection({ children, eth, box }) {
   const boxManager = useSelector(getBoxManager);
   const ethManager = useSelector(getETHManager);
@@ -25,14 +27,12 @@ function RequireConnection({ children, eth, box }) {
     await dispatch(initBox());
   }
 
-  /*
   // Automatic connect ?
   useEffect(() => {
-    if(eth && !ethManager) {
+    if(AUTO_CONNECT && eth && !ethManager) {
       connectETH().catch(console.error);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  */
 
 
   if(ethManagerLoading)
