@@ -2,7 +2,23 @@ import React from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Check from '@material-ui/icons/Check';
 
-import { StepConnector } from '@material-ui/core'
+import { MobileStepper, StepLabel, Stepper, StepConnector } from '@material-ui/core';
+
+export const CustomStepper = withStyles({
+})(Stepper);
+
+export const CustomLabel = withStyles({
+})(StepLabel);
+
+export const CustomMobileStepper = withStyles({
+  root: {
+    padding: '9px',
+    background: 'none',
+  },
+  dotActive: {
+    backgroundColor: '#784af4',
+  },
+})(MobileStepper);
 
 export const CustomStepConnector = withStyles({
   alternativeLabel: {
