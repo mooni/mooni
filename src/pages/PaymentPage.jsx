@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { Stepper, Step, StepLabel } from '@material-ui/core'
 import { Box as ABox } from '@aragon/ui'
@@ -16,19 +16,29 @@ import { CustomStepConnector, CustomStepIcon } from '../components/StepComponent
 import { createOrder, sendPayment, resetOrder } from '../redux/payment/actions';
 
 function PaymentPage() {
-  const [activeStep, setActiveStep] = useState(0);
   const history = useHistory();
+  let { stepId } = useParams();
+  const stepIdn = Number(stepId);
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if(stepIdn !== 0) {
+      history.push(`/send/0`);
+    }
+  }, []);
+
+  function setActiveStep(step) {
+    history.push(`/send/${step}`);
+  }
   function onExit() {
     history.push('/');
   }
   function handleNext() {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
+    setActiveStep(stepIdn + 1);
   }
   function handleBack() {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
+    setActiveStep(stepIdn - 1);
   }
   function onEditRecap() {
     dispatch(resetOrder());
@@ -55,14 +65,14 @@ function PaymentPage() {
 
   return (
     <ABox width={1} py={3}>
-      <Stepper alternativeLabel activeStep={activeStep} connector={<CustomStepConnector />}>
+      <Stepper alternativeLabel activeStep={stepIdn} connector={<CustomStepConnector />}>
         {steps.map(label => (
           <Step key={label}>
             <StepLabel StepIconComponent={CustomStepIcon}>{label}</StepLabel>
           </Step>
         ))}
       </Stepper>
-      {stepElements[activeStep]}
+      {stepElements[stepIdn]}
     </ABox>
   );
 }
