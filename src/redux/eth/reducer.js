@@ -17,6 +17,13 @@ export default function(state = initialState, action) {
         ethManager,
       };
     }
+    case actions.SET_ETH_MANAGER_LOADING: {
+      const { ethManagerLoading } = action.payload;
+      return {
+        ...state,
+        ethManagerLoading,
+      };
+    }
     case actions.SET_ADDRESS: {
       const { address } = action.payload;
       return {
