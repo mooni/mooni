@@ -7,8 +7,7 @@ import {
   Switch,
   Route,
   Redirect,
-  useLocation,
-  useHistory
+  useHistory,
 } from 'react-router-dom';
 
 import './App.css'
@@ -17,17 +16,14 @@ import Account from './components/Account';
 import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
-import Contacts from './pages/ContactsPage';
+// import Contacts from './pages/ContactsPage';
 
 import { useSelector } from 'react-redux';
 import { getDebug } from './redux/eth/selectors';
 
-function App({ widget }) {
-  const location = useLocation();
+function App() {
   const history = useHistory();
   const debug = useSelector(getDebug);
-
-  const pageName = location.pathname && location.pathname !== '/' ? location.pathname.substring(1) : null;
 
   return (
     <Main>
@@ -38,7 +34,12 @@ function App({ widget }) {
               Mooni
             </Box>
             <Box ml={1}>
-              {pageName && <Tag mode="identifier">{pageName}</Tag>}
+              <Route path="/my-account">
+                <Tag mode="identifier">My Account</Tag>
+              </Route>
+              <Route path="/send">
+                <Tag mode="identifier">Send</Tag>
+              </Route>
             </Box>
           </>
         }
@@ -52,12 +53,15 @@ function App({ widget }) {
           <Route path="/my-account">
             <RequireConnection eth box><MyAccountPage /></RequireConnection>
           </Route>
-          <Route path="/send">
+          <Route path="/send/:stepId">
             <RequireConnection eth><PaymentPage /></RequireConnection>
           </Route>
-          <Route path="/contacts">
-            <RequireConnection eth box><Contacts /></RequireConnection>
+          <Route path="/send">
+            <Redirect to="/send/0" />
           </Route>
+          {/*<Route path="/contacts">
+            <RequireConnection eth box><Contacts /></RequireConnection>
+          </Route>*/}
           <Route path="*">
             <Redirect to="/" />
           </Route>
