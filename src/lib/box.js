@@ -6,6 +6,10 @@ class BoxManager {
     this.space = space;
   }
 
+  static hasAlreadyOpened(address) {
+    return Box.isLoggedIn(address);
+  }
+
   static async init(ethManager) {
     const box = await Box.openBox(ethManager.getAddress(), ethManager.ethereum);
     console.log('box opened');

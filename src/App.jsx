@@ -26,7 +26,7 @@ function App() {
   const debug = useSelector(getDebug);
 
   return (
-    <Main>
+    <Main assetsUrl={'/aragon-ui'}>
       <Header
         primary={
           <>

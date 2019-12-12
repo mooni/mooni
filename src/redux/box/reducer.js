@@ -4,6 +4,7 @@ export const STATE_NAME = 'BOX';
 
 const initialState = {
   boxManager: null,
+  boxLoading: false,
 };
 
 export default function(state = initialState, action) {
@@ -13,6 +14,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         boxManager,
+      };
+    }
+    case actions.SET_BOX_LOADING: {
+      const { boxLoading } = action.payload;
+      return {
+        ...state,
+        boxLoading,
       };
     }
     default:

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loader from '../components/Loader';
@@ -6,13 +6,14 @@ import Box from '@material-ui/core/Box';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
 import { getETHManager } from '../redux/eth/selectors';
-import { getBoxManager } from '../redux/box/selectors';
+import { getBoxManager, getBoxLoading } from '../redux/box/selectors';
 import { initETH } from '../redux/eth/actions';
 import { initBox } from '../redux/box/actions';
 
 function RequireConnection({ children, eth, box }) {
   const boxManager = useSelector(getBoxManager);
   const ethManager = useSelector(getETHManager);
+  const boxLoading = useSelector(getBoxLoading);
   const dispatch = useDispatch();
   const [connecting, setConnecting] = useState(false);
 
@@ -22,10 +23,15 @@ function RequireConnection({ children, eth, box }) {
     setConnecting(false);
   }
 
+  // Automatic connect ?
+  useEffect(() => {
+    if(eth && !ethManager) {
+      connectETH().catch(console.error);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function connectBox() {
-    setConnecting(true);
     await dispatch(initBox());
-    setConnecting(false);
   }
 
   if(eth && !ethManager) {
@@ -43,7 +49,7 @@ function RequireConnection({ children, eth, box }) {
   }
 
   if(box && !boxManager) {
-    if(connecting)
+    if(boxLoading)
       return <Loader text="Loading 3box" />;
 
     return (
