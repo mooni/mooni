@@ -35,10 +35,10 @@ function RequireConnection({ children, eth, box }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
-  if(ethManagerLoading)
+  if(eth && ethManagerLoading)
     return <Loader text="Loading eth provider" />;
 
-  if(boxLoading)
+  if(box && boxLoading)
     return <Loader text="Loading 3box" />;
 
   if(eth && !ethManager) {

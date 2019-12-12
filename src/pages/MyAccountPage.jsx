@@ -19,10 +19,10 @@ function MyAccountPage() {
 
   const dispatch = useDispatch();
 
-  async function saveMyAccount(myAccount) {
+  async function saveMyAccount(formData) {
     setSaving(true);
     if(!boxManager) throw new Error('boxManager not ready');
-    dispatch(updateMyAccount(myAccount));
+    await dispatch(updateMyAccount(formData));
     setSaving(false);
   }
 
