@@ -26,7 +26,7 @@ function PaymentPage() {
     if(stepIdn !== 0) {
       history.push(`/send/0`);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function setActiveStep(step) {
     history.push(`/send/${step}`);

@@ -1,4 +1,3 @@
-// import { createSelector } from 'reselect';
 import { selectProperty } from '../helpers';
 import { STATE_NAME } from './reducer';
 
