@@ -5,11 +5,15 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { COUNTRIES } from '../lib/countries';
 
-import { Button, Field, IconArrowRight, DropDown } from '@aragon/ui'
+import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 
 const useStyles = makeStyles(() => ({
   fieldRow: {
+    marginBottom: '15px',
+  },
+  showMore: {
+    marginLeft: '5px',
     marginBottom: '15px',
   },
 }));
@@ -20,35 +24,30 @@ const fields = {
     minLength: 2,
     maxLength: 50,
   },
-  address: {
-    required: true,
-    minLength: 2,
-    maxLength: 50,
-  },
-  zip: {
-    required: true,
-    minLength: 2,
-    maxLength: 10,
-  },
-  city: {
-    required: true,
-    minLength: 2,
-    maxLength: 10,
-  },
-  country: {
-    required: true,
-    minLength: 2,
-    maxLength: 2,
-    pattern: /^[A-Z]{2}$/,
-  },
   iban: {
     required: true,
     minLength: 14,
     maxLength: 34,
     validate: IBAN.isValid,
   },
+  address: {
+    minLength: 2,
+    maxLength: 50,
+  },
+  zip: {
+    minLength: 2,
+    maxLength: 10,
+  },
+  city: {
+    minLength: 2,
+    maxLength: 10,
+  },
+  country: {
+    minLength: 2,
+    maxLength: 2,
+    pattern: /^[A-Z]{2}$/,
+  },
   bic_swift: {
-    required: true,
     minLength: 8,
     maxLength: 11,
     pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
@@ -59,13 +58,16 @@ const countriesList = Object.keys(COUNTRIES);
 
 function RecipientForm({ initialRecipient, onSubmit }) {
   const classes = useStyles();
+  const [more, setMore] = useState(false);
 
   const { register, handleSubmit, errors, setValue } = useForm({
     mode: 'onChange',
     defaultValues: initialRecipient || undefined,
   });
   const [selectedCountry, setSelectedCountry] = useState(
-    initialRecipient ? countriesList.indexOf(initialRecipient.owner.country) : undefined
+    initialRecipient?.owner?.country ?
+      countriesList.indexOf(initialRecipient.owner.country)
+      : undefined
   );
   const submit = handleSubmit(onSubmit);
 
@@ -76,47 +78,58 @@ function RecipientForm({ initialRecipient, onSubmit }) {
 
   useEffect(() => {
     register({ name: 'owner.country' }, fields.country);
-  }, [register]);
+    setValue('owner.country', initialRecipient?.owner?.country || '');
+  }, [register, initialRecipient, setValue]);
+
+  const hasErrors = Object.keys(errors).length !== 0;
 
   return (
     <form onSubmit={submit}>
-      <Field label="IBAN" className={classes.fieldRow}>
-        <WideInput name="iban" ref={register(fields.iban)} required/>
-        {errors.iban && <FieldError>Invalid IBAN</FieldError>}
-      </Field>
-      <Field label="BIC/SWIFT" className={classes.fieldRow}>
-        <WideInput name="bic_swift" ref={register(fields.bic_swift)} required/>
-        {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
-      </Field>
       <Field label="Name" className={classes.fieldRow}>
         <WideInput name="owner.name" ref={register(fields.name)} required/>
         {errors['owner.name'] && <FieldError>Please enter your name</FieldError>}
       </Field>
-      <Field label="Address" className={classes.fieldRow}>
-        <WideInput name="owner.address" ref={register(fields.address)} required/>
-        {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
+      <Field label="IBAN" className={classes.fieldRow}>
+        <WideInput name="iban" ref={register(fields.iban)} required/>
+        {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
-      <Field label="Zip/Postal code" className={classes.fieldRow}>
-        <WideInput name="owner.zip" ref={register(fields.zip)} required/>
-        {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
-      </Field>
-      <Field label="City" className={classes.fieldRow}>
-        <WideInput name="owner.city" ref={register(fields.city)} required/>
-        {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
-      </Field>
-      <Field label="Country" className={classes.fieldRow} required>
-        <DropDown
-          items={countriesList}
-          selected={selectedCountry}
-          onChange={setCountry}
-          placeholder="Please select a country"
-          wide
-        />
-        {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
-      </Field>
-      <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" />
+      <Link onClick={() => setMore(!more)} className={classes.showMore}>
+        {more && 'Show less △'}
+        {!more && 'Show more ▽'}
+      </Link>
+      {more &&
+      <>
+        <Field label="BIC/SWIFT" className={classes.fieldRow}>
+          <WideInput name="bic_swift" ref={register(fields.bic_swift)}/>
+          {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
+        </Field>
+        <Field label="Address" className={classes.fieldRow}>
+          <WideInput name="owner.address" ref={register(fields.address)}/>
+          {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
+        </Field>
+        <Field label="Zip/Postal code" className={classes.fieldRow}>
+          <WideInput name="owner.zip" ref={register(fields.zip)}/>
+          {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
+        </Field>
+        <Field label="City" className={classes.fieldRow}>
+          <WideInput name="owner.city" ref={register(fields.city)}/>
+          {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
+        </Field>
+        <Field label="Country" className={classes.fieldRow}>
+          <DropDown
+            items={countriesList}
+            selected={selectedCountry}
+            onChange={setCountry}
+            placeholder="Please select a country"
+            wide
+          />
+          {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
+        </Field>
+      </>}
+      <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
     </form>
   )
 }
 
 export default RecipientForm;
+

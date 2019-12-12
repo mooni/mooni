@@ -72,6 +72,8 @@ function StepPaymentDetail({ onComplete, onBack }) {
     },
   };
 
+  const hasErrors = Object.keys(errors).length !== 0;
+
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
@@ -120,7 +122,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
             <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" />
+            <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={hasErrors} />
           </Grid>
         </Grid>
       </form>

@@ -7,6 +7,16 @@ const instance = axios.create({
   timeout: 5000,
 });
 
+function removeEmptyStrings(data) {
+  return Object.keys(data).reduce((acc, prop) => {
+      if(data[prop] !== '' && data[prop] !== undefined) {
+        return Object.assign(acc, { [prop]: data[prop] });
+      }
+      return acc;
+    },
+    {});
+}
+
 const Bity = {
   async getCurrencies(tags = []) {
     const params = {
@@ -61,7 +71,7 @@ const Bity = {
       output: {
         type: 'bank_account',
 
-        owner: recipient.owner,
+        owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
         bic_swift: recipient.bic_swift,
 
