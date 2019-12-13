@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, IconArrowLeft, IconHome, IconCheck } from '@aragon/ui'
+import { Button, IconArrowLeft, IconHome, IconCheck, IconCaution } from '@aragon/ui'
 
 import Loader from '../components/Loader';
 
@@ -35,7 +35,10 @@ function StepStatus({ onBack, onExit }) {
       }
       { paymentStatus ===  'error' &&
       <Box>
-        <Box py={2} textAlign="center" color="secondary.main">
+        <Box display="flex" justifyContent="center" alignItems="center" color="error.main">
+          <IconCaution size="large" />
+        </Box>
+        <Box py={2} textAlign="center" color="text.primary">
           An error occurred while trying to send the transaction. Please retry later.
         </Box>
         <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />

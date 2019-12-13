@@ -108,7 +108,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
           {errors.amount && <FieldError>Invalid amount</FieldError>}
         </Paper>
         <Box py={2}>
-          <Field label="Reference">
+          <Field label="Reference (optional)">
             <WideInput
               name="reference"
               ref={register(fields.reference)}

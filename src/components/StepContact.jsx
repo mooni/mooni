@@ -39,7 +39,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
           <Box mb={1}>
             Please provide an email address to get notified about the status of your transaction.
           </Box>
-          <Field label="Email">
+          <Field label="Email (optional)">
             <WideInput
               name="email"
               ref={register(fields.email)}
