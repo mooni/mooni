@@ -39,7 +39,7 @@ To include Mooni, just add an iframe element within your website code and link t
 
 This solution is quick and will be always up-to-date with the latest versions.
 
-You can check an example of such integration in the file [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html)
+You can [check an example](https://mooni-host-iframe.now.sh/) of such integration, with the source code at [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html).
 
 ```html
 <iframe
