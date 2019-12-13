@@ -42,16 +42,10 @@ class ETHManager extends EventEmitter {
     const { ethereum } = window;
 
     if (ethereum) {
-      try {
-        const ethManager = new ETHManager(ethereum);
-        await ethManager.init();
-        return ethManager;
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
+      const ethManager = new ETHManager(ethereum);
+      await ethManager.init();
+      return ethManager;
     } else {
-      console.log('no ethereum');
       throw new Error('no ethereum injected');
     }
   }

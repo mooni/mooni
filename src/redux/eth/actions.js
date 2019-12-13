@@ -58,9 +58,9 @@ export const initETH = () => async function (dispatch)  {
 
     await dispatch(initBoxIfLoggedIn());
   } catch(error) {
+    dispatch(resetETHManager());
     dispatch(setETHManagerLoading(false));
     console.error('Unable to connect to ethereum', error);
-    dispatch(resetETHManager());
-    dispatch(setDebug(error.message));
+    //dispatch(setDebug(error.message));
   }
 };

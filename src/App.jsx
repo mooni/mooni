@@ -16,14 +16,9 @@ import Account from './components/Account';
 import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
-// import Contacts from './pages/ContactsPage';
-
-import { useSelector } from 'react-redux';
-import { getDebug } from './redux/eth/selectors';
 
 function App() {
   const history = useHistory();
-  const debug = useSelector(getDebug);
 
   return (
     <Main assetsUrl={'/aragon-ui'}>
@@ -59,21 +54,10 @@ function App() {
           <Route path="/send">
             <Redirect to="/send/0" />
           </Route>
-          {/*<Route path="/contacts">
-            <RequireConnection eth box><Contacts /></RequireConnection>
-          </Route>*/}
           <Route path="*">
             <Redirect to="/" />
           </Route>
         </Switch>
-        {debug &&
-        {/*<Box>
-          <Box>Debug:</Box>
-          <Box>
-            {JSON.stringify(debug, null, 2)}
-          </Box>
-        </Box>*/}
-        }
       </Container>
     </Main>
   );
