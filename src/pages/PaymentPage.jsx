@@ -111,7 +111,6 @@ function PaymentPage() {
         }
         {stepElements[stepIdn]}
       </ABox>
-      <Footer />
     </>
   );
 }
