@@ -81,3 +81,6 @@ yarn build
 - Add liquidity provider to accept any ERC20 token
 - Add support for not injected wallet providers (WalletConnect, Ledger, Portis...)
 - bity cookies not supported on Safari
+- add link to transaction while waiting mined and mined
+- assert wallet on mainnet
+- compute gas price and gas limit

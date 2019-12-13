@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, IconArrowLeft, IconHome } from '@aragon/ui'
+import { Button, IconArrowLeft, IconHome, IconCheck } from '@aragon/ui'
 
 import Loader from '../components/Loader';
 
@@ -22,8 +22,13 @@ function StepStatus({ onBack, onExit }) {
       }
       { paymentStatus ===  'mined' &&
       <Box>
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <IconCheck size="large" style={{ color: '#1fbf1f' }} />
+        </Box>
         <Box py={2} textAlign="center">
-          Your ETH transaction has been mined. Please be patient, bank transfer may take days to arrive.
+          Transaction sent! <br/>
+          The exchange is done and the wire transfer has been initiated. <br/>
+          Bank transfers can take several days to arrive, please be patient.
         </Box>
         <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
       </Box>
