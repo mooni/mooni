@@ -38,11 +38,27 @@ function Footer() {
           </Box>
         </Grid>
       </Grid>
-      <Box py={3}>
-        <Box display="flex" justifyContent="center">
-          <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
-        </Box>
-      </Box>
+      <Grid container justify="center" alignItems="center" spacing={4} py={2}>
+        <Grid item>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Link href="https://mooni.launchaco.com" external style={{ textDecoration: 'none' }}>
+              About
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Link href="mailto:usemooni@gmail.com" external style={{ textDecoration: 'none' }}>
+              Contact
+            </Link>
+          </Box>
+        </Grid>
+        <Grid item>
+          <Box display="flex" justifyContent="center">
+            <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
