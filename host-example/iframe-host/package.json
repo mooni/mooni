@@ -1,0 +1,12 @@
+{
+  "name": "host-html",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "serve": "serve -s public"
+  },
+  "dependencies": {
+    "serve": "^11.2.0"
+  }
+}
