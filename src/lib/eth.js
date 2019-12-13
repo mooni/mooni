@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { ethers } from 'ethers';
 
-// export const MAINNET_NETWORK_ID = 1;
+export const MAINNET_NETWORK_ID = 1;
 
 function reloadPage() {
   window.location.reload()
@@ -16,7 +16,7 @@ class ETHManager extends EventEmitter {
   async init() {
     this.accounts = await this.ethereum.enable();
 
-    if(this.ethereum.on) {
+    if (this.ethereum.on) {
       this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
       this.ethereum.on('networkChanged', reloadPage);
       this.ethereum.on('chainChanged', reloadPage);
@@ -24,6 +24,11 @@ class ETHManager extends EventEmitter {
 
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
     this.signer = this.provider.getSigner();
+
+    // TODO add error message in UI
+    // if(await this.getNetworkId() !== MAINNET_NETWORK_ID) {
+    //   throw new Error('not_on_mainnet');
+    // }
   }
 
   updateAccounts(accounts) {
@@ -62,6 +67,17 @@ class ETHManager extends EventEmitter {
 
   getAddress() {
     return this.accounts[0];
+  }
+
+  async getNetworkId() {
+    return new Promise((res, rej) => {
+      this.ethereum.sendAsync({
+        method: 'net_version'
+      }, (error, data) => {
+        if (error) return rej(error);
+        res(Number(data.result));
+      });
+    });
   }
 }
 
