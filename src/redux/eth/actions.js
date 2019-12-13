@@ -44,13 +44,16 @@ export const resetETHManager = () => function (dispatch, getState) {
   dispatch(setAddress(null));
 };
 
-export const initETH = () => async function (dispatch)  {
+export const initETH = (walletType) => async function (dispatch)  {
   dispatch(setETHManagerLoading(true));
   try {
-    const ethManager = await ETHManager.createETHManager();
+    const ethManager = await ETHManager.createETHManager(walletType);
     dispatch(setETHManager(ethManager));
     ethManager.on('accountsChanged', () => {
       dispatch(setAddress(ethManager.getAddress()));
+    });
+    ethManager.on('stop', () => {
+      dispatch(resetETHManager());
     });
     dispatch(setAddress(ethManager.getAddress()));
 
