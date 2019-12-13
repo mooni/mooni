@@ -24,7 +24,6 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "styled-components": "^4.4.1",
-    "web3": "^1.2.4",
     "yarn": "^1.19.1"
   },
   "scripts": {

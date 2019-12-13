@@ -51,13 +51,8 @@ class ETHManager extends EventEmitter {
   }
 
   async send(to, amount) {
-    const gasLimit = 40000; // TODO
-    const gasPrice = 2; // TODO
-
     const transactionRequest = {
       to,
-      gasLimit,
-      gasPrice: ethers.utils.parseUnits(String(gasPrice), 'gwei'),
       value: ethers.utils.parseEther(amount),
     };
     const transactionResponse = await this.signer.sendTransaction(transactionRequest);

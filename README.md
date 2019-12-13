@@ -83,4 +83,3 @@ yarn build
 - bity cookies not supported on Safari
 - add link to transaction while waiting mined and mined
 - assert wallet on mainnet
-- compute gas price and gas limit
