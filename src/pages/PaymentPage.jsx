@@ -11,6 +11,7 @@ import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepContact from '../components/StepContact';
 import StepRecap from '../components/StepRecap';
 import StepStatus from '../components/StepStatus';
+import Footer from '../components/Footer';
 
 import { CustomStepper, CustomStepConnector, CustomStepIcon, CustomLabel, CustomMobileStepper } from '../components/StepComponents';
 
@@ -81,34 +82,37 @@ function PaymentPage() {
   ];
 
   return (
-    <ABox width={1} py={3}>
-      { below('medium') &&
-      <>
-        <CustomMobileStepper
-          activeStep={stepIdn}
-          steps={stepElements.length}
-          variant="dots"
-          position="static"
-          className={classes.mobileStepperRoot}
-          nextButton={<div></div>}
-          backButton={<div></div>}
-        />
-        <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-          {steps[stepIdn]}
-        </Box>
-      </>
-      }
-      { above('medium') &&
-      <CustomStepper alternativeLabel activeStep={stepIdn} connector={<CustomStepConnector />}>
-        {steps.map(label => (
-          <Step key={label}>
-            <CustomLabel StepIconComponent={CustomStepIcon}>{label}</CustomLabel>
-          </Step>
-        ))}
-      </CustomStepper>
-      }
-      {stepElements[stepIdn]}
-    </ABox>
+    <>
+      <ABox width={1} py={3}>
+        { below('medium') &&
+        <>
+          <CustomMobileStepper
+            activeStep={stepIdn}
+            steps={stepElements.length}
+            variant="dots"
+            position="static"
+            className={classes.mobileStepperRoot}
+            nextButton={<div></div>}
+            backButton={<div></div>}
+          />
+          <Box textAlign="center" className={classes.mobileStepperStepLabel}>
+            {steps[stepIdn]}
+          </Box>
+        </>
+        }
+        { above('medium') &&
+        <CustomStepper alternativeLabel activeStep={stepIdn} connector={<CustomStepConnector />}>
+          {steps.map(label => (
+            <Step key={label}>
+              <CustomLabel StepIconComponent={CustomStepIcon}>{label}</CustomLabel>
+            </Step>
+          ))}
+        </CustomStepper>
+        }
+        {stepElements[stepIdn]}
+      </ABox>
+      <Footer />
+    </>
   );
 }
 
