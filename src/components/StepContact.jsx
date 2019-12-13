@@ -45,7 +45,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
               ref={register(fields.email)}
               placeholder="elon@musk.io"
             />
-            {errors.email && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
+            {errors.email && <FieldError>Invalid email</FieldError>}
           </Field>
         </Box>
         <Grid container spacing={2}>
