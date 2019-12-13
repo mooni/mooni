@@ -4,9 +4,9 @@
 
 ## Presentation
 
-This web app allows to easily transfer money from your crypto wallet to your bank account. 
+This web app allows to easily transfer money from your crypto wallet to your bank account.
 
-This is just a UI that connect different providers, we do not have any backend or smart contract. 
+This is just a UI that connect different providers, we do not have any backend or smart contract.
 
 ### Features
 - Login with any web3-compatible wallet *(Metamask, Coinbase Wallet, Trust Wallet, ...)*
@@ -22,36 +22,53 @@ This is just a UI that connect different providers, we do not have any backend o
 - I am a dApp developer and I want to allow my users to withdraw funds to their bank account (such as decentralized marketplaces, via a widget or iFrame)
 - I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
 
-## Available Scripts
+## Add to your app
 
-In the project directory, you can run:
-### Install
+You can easily integrate Mooni into your web application and quickly enable your users to cash out their crypto !
+
+### With iFrame
+
+To include Mooni, just add an iframe element within your website code and link to the Mooni Send page.
+
+This solution is quick and will be always up-to-date with the latest versions.
+
+You can check an example of such integration in the file [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html)
+
+```html
+<iframe
+  src="https://mooni.now.sh/send"
+  height="660px"
+  width="100%"
+  style="
+    border: 0;
+    margin: 0 auto;
+    display: block;
+    border-radius: 10px;
+    max-width: 600px;
+    min-width: 300px;
+  "
+></iframe>
+```
+
+## Development
+
+### Start tooling
 
 ```
 # Install dependencies
 yarn
+
+# Start dev server
+yarn start
+
+# Build production bundle
+yarn build
 ```
-### `yarn start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br />
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
 
 ## TODO
 
+- Integrate in any React app as component (with injected provider)
+- Integrate in any app as React app (with injected provider)
 - reset order after exceed time guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - dex to accept any input token
