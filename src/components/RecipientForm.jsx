@@ -7,13 +7,11 @@ import { COUNTRIES } from '../lib/countries';
 
 import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
+import { getMyAccount } from '../redux/contacts/selectors';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(() => ({
   fieldRow: {
-    marginBottom: '15px',
-  },
-  showMore: {
-    marginLeft: '5px',
     marginBottom: '15px',
   },
 }));
@@ -56,11 +54,16 @@ const fields = {
 
 const countriesList = Object.keys(COUNTRIES);
 
-function RecipientForm({ initialRecipient, onSubmit }) {
+const defaultEndComponent = ({ submit, hasErrors }) => (
+  <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
+);
+
+function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndComponent, allowFill }) {
   const classes = useStyles();
   const [more, setMore] = useState(false);
+  const myAccount = useSelector(getMyAccount);
 
-  const { register, handleSubmit, errors, setValue } = useForm({
+  const { register, handleSubmit, errors, setValue, reset, formState } = useForm({
     mode: 'onChange',
     defaultValues: initialRecipient || undefined,
   });
@@ -74,6 +77,10 @@ function RecipientForm({ initialRecipient, onSubmit }) {
   function setCountry(index) {
     setSelectedCountry(index);
     setValue('owner.country', countriesList[index]);
+  }
+
+  function resetWithMyAccount() {
+    reset(myAccount);
   }
 
   useEffect(() => {
@@ -93,10 +100,12 @@ function RecipientForm({ initialRecipient, onSubmit }) {
         <WideInput name="iban" ref={register(fields.iban)} required/>
         {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
-      <Link onClick={() => setMore(!more)} className={classes.showMore}>
-        {more && 'Show less △'}
-        {!more && 'Show more ▽'}
-      </Link>
+      <Field className={classes.fieldRow}>
+        <Link onClick={() => setMore(!more)}>
+          {more && 'Show less'}
+          {!more && 'Show more'}
+        </Link>
+      </Field>
       {more &&
       <>
         <Field label="BIC/SWIFT" className={classes.fieldRow}>
@@ -126,7 +135,12 @@ function RecipientForm({ initialRecipient, onSubmit }) {
           {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
         </Field>
       </>}
-      <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
+      {myAccount && allowFill &&
+      <Button wide size="small" disabled={!formState.dirty} onClick={resetWithMyAccount}>
+        Fill with my account
+      </Button>
+      }
+      {endComponent({ submit, hasErrors })}
     </form>
   )
 }
