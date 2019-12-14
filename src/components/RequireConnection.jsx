@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loader from '../components/Loader';
-import Box from '@material-ui/core/Box';
+import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 import { getBoxManager, getBoxLoading } from '../redux/box/selectors';
-import { initETH } from '../redux/eth/actions';
+import { openLoginModal } from '../redux/eth/actions';
 import { initBox } from '../redux/box/actions';
-
-const AUTO_CONNECT = false;
 
 function RequireConnection({ children, eth, box }) {
   const boxManager = useSelector(getBoxManager);
@@ -19,21 +17,18 @@ function RequireConnection({ children, eth, box }) {
   const ethManagerLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
 
-  async function connectETH() {
-    await dispatch(initETH());
+  function login() {
+    dispatch(openLoginModal());
   }
 
   async function connectBox() {
     await dispatch(initBox());
   }
 
-  // Automatic connect ?
-  useEffect(() => {
-    if(AUTO_CONNECT && eth && !ethManager) {
-      connectETH().catch(console.error);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+  if(
+    (eth ? !!ethManager : true) &&
+    (box ? !!boxManager : true)
+  ) return children;
 
   if(eth && ethManagerLoading)
     return <Loader text="Loading eth provider" />;
@@ -46,7 +41,7 @@ function RequireConnection({ children, eth, box }) {
       <Box display="flex" justifyContent="center">
         <EmptyStateCard
           text="Please connect your Ethereum wallet"
-          action={<Button onClick={connectETH}>Connect</Button>}
+          action={<Button onClick={login}>Connect</Button>}
         />
       </Box>
     );

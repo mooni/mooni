@@ -5,6 +5,7 @@ import { initBoxIfLoggedIn } from '../box/actions';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
+export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
 export const SET_ADDRESS = 'SET_ADDRESS';
 export const SET_DEBUG = 'SET_DEBUG';
 
@@ -19,6 +20,13 @@ export const setETHManagerLoading = (ethManagerLoading) => ({
   type: SET_ETH_MANAGER_LOADING,
   payload: {
     ethManagerLoading,
+  }
+});
+
+export const openLoginModal = (loginModalOpen = true) => ({
+  type: OPEN_LOGIN_MODAL,
+  payload: {
+    loginModalOpen,
   }
 });
 

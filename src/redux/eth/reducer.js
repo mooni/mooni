@@ -5,6 +5,7 @@ export const STATE_NAME = 'ETH';
 const initialState = {
   ethManager: null,
   address: null,
+  loginModalOpen: false,
   debug: null,
 };
 
@@ -22,6 +23,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         ethManagerLoading,
+      };
+    }
+    case actions.OPEN_LOGIN_MODAL: {
+      const { loginModalOpen } = action.payload;
+      return {
+        ...state,
+        loginModalOpen,
       };
     }
     case actions.SET_ADDRESS: {

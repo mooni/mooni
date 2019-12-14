@@ -5,15 +5,20 @@ import { Button, EthIdenticon, AddressField, IconWallet } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import { getAddress } from '../redux/eth/selectors';
-import { initETH } from '../redux/eth/actions';
+import { openLoginModal } from '../redux/eth/actions';
+
 
 function Account() {
   const address = useSelector(getAddress);
   const dispatch = useDispatch();
 
+  function login() {
+    dispatch(openLoginModal());
+  }
+
   if(!address) {
     return (
-      <Button onClick={() => dispatch(initETH())} mode="strong" wide icon={<IconWallet/>} display="all" label="Login" />
+      <Button onClick={login} mode="strong" wide icon={<IconWallet/>} display="all" label="Login" />
     );
   }
 

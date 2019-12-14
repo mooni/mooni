@@ -13,6 +13,7 @@ import {
 import './App.css'
 import RequireConnection from './components/RequireConnection';
 import Account from './components/Account';
+import Login from './components/Login';
 import MyAccountPage from './pages/MyAccountPage';
 import PaymentPage from './pages/PaymentPage';
 import Welcome from './pages/Welcome';
@@ -22,6 +23,7 @@ function App() {
 
   return (
     <Main assetsUrl={'/aragon-ui'}>
+      <Login />
       <Header
         primary={
           <>
