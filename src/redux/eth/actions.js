@@ -1,13 +1,12 @@
 import ETHManager from '../../lib/eth';
 
 import { getETHManager } from './selectors';
-import { initBoxIfLoggedIn } from '../box/actions';
+import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
 export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
 export const SET_ADDRESS = 'SET_ADDRESS';
-export const SET_DEBUG = 'SET_DEBUG';
 
 export const setETHManager = (ethManager) => ({
   type: SET_ETH_MANAGER,
@@ -36,12 +35,6 @@ export const setAddress = (address) => ({
     address,
   }
 });
-export const setDebug = (debug) => ({
-  type: SET_DEBUG,
-  payload: {
-    debug,
-  }
-});
 
 export const resetETHManager = () => function (dispatch, getState) {
   const ethManager = getETHManager(getState());
@@ -50,6 +43,7 @@ export const resetETHManager = () => function (dispatch, getState) {
   }
   dispatch(setETHManager(null));
   dispatch(setAddress(null));
+  dispatch(setETHManagerLoading(false));
 };
 
 export const initETH = (walletType) => async function (dispatch)  {
@@ -72,6 +66,10 @@ export const initETH = (walletType) => async function (dispatch)  {
     dispatch(resetETHManager());
     dispatch(setETHManagerLoading(false));
     console.error('Unable to connect to ethereum', error);
-    //dispatch(setDebug(error.message));
   }
+};
+
+export const logout = () => (dispatch) => {
+  dispatch(resetETHManager());
+  dispatch(resetBox());
 };

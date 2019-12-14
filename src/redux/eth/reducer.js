@@ -6,7 +6,6 @@ const initialState = {
   ethManager: null,
   address: null,
   loginModalOpen: false,
-  debug: null,
 };
 
 export default function(state = initialState, action) {
@@ -37,13 +36,6 @@ export default function(state = initialState, action) {
       return {
         ...state,
         address,
-      };
-    }
-    case actions.SET_DEBUG: {
-      const { debug } = action.payload;
-      return {
-        ...state,
-        debug,
       };
     }
     default:

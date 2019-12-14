@@ -1,6 +1,6 @@
 import BoxManager from '../../lib/box';
 import { getETHManager } from '../eth/selectors';
-import { fetchMyAccount } from '../contacts/actions';
+import { fetchMyAccount, resetContacts } from '../contacts/actions';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 export const SET_BOX_LOADING = 'SET_BOX_LOADING';
@@ -24,6 +24,9 @@ export const initBox = () => async function (dispatch, getState)  {
 
   try {
     const boxManager = await BoxManager.init(ethManager);
+    if(!getETHManager(getState())) { // User disconnected while fetching box
+      return;
+    }
     dispatch(setBoxManager(boxManager));
     await dispatch(fetchMyAccount());
   } catch(error) {
@@ -44,5 +47,6 @@ export const initBoxIfLoggedIn = () => async function (dispatch, getState)  {
 
 export const resetBox = () => function (dispatch)  {
   dispatch(setBoxManager(null));
-  // TODO reset contacts
+  dispatch(setBoxLoading(false));
+  dispatch(resetContacts());
 };
