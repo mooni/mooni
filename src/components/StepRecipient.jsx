@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Box from '@material-ui/core/Box';
-import { Checkbox, Field, Button, IconArrowRight } from '@aragon/ui'
+import { Checkbox, Button, IconArrowRight, Help } from '@aragon/ui'
 
 import { setRecipient } from '../redux/payment/actions';
 import { getMyAccount } from '../redux/contacts/selectors';
@@ -17,8 +17,10 @@ import RecipientForm from './RecipientForm';
 import RequireConnection from './RequireConnection';
 
 const useStyles = makeStyles(() => ({
-  fieldRow: {
+  saveInfoRow: {
     marginBottom: '15px',
+    display: 'flex',
+    alignItems: 'center',
   },
 }));
 
@@ -70,13 +72,17 @@ function StepRecipient({ onComplete }) {
         onSubmit={onSubmit}
         endComponent={({ submit, hasErrors }) => (
           <>
-            <Field className={classes.fieldRow}>
+            <label className={classes.saveInfoRow}>
               <Checkbox
                 checked={saveAccountInfo}
                 onChange={setSaveAccountInfo}
               />
-              Save my account information
-            </Field>
+              <Box mx={1}>Save my account information</Box>
+              <Help hint="What does this mean ?">
+                Your bank account information can be stored so you don't have to type them again if you come back here.
+                The data is stored encrypted in a decentralized storage, so only you have access to.
+              </Help>
+            </label>
             <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
           </>
         )}

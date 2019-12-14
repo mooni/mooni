@@ -5,7 +5,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { COUNTRIES } from '../lib/countries';
 
-import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui'
+import { Box } from '@material-ui/core';
+import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui';
+
 import { WideInput, FieldError } from './StyledComponents';
 import { getMyAccount } from '../redux/contacts/selectors';
 import { useSelector } from 'react-redux';
@@ -100,12 +102,11 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         <WideInput name="iban" ref={register(fields.iban)} required/>
         {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
-      <Field className={classes.fieldRow}>
+      <Box className={classes.fieldRow}>
         <Link onClick={() => setMore(!more)}>
-          {more && 'Show less'}
-          {!more && 'Show more'}
+          {more ? 'Show less' : 'Show more'}
         </Link>
-      </Field>
+      </Box>
       {more &&
       <>
         <Field label="BIC/SWIFT" className={classes.fieldRow}>
