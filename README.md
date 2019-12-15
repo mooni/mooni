@@ -8,7 +8,6 @@ Easily transfer funds from your crypto wallet to your bank account.
 
 [🔮 Frontend integration](https://mooni.now.sh)
 
-
 > This is experimental software under active development.
 
 ## 📃 Presentation
