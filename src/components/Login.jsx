@@ -25,6 +25,11 @@ const walletProviders = [
     icon: <img src="/images/wallets/walletConnectIcon.svg" width="18" alt="walletconnect-icon"/>,
   },
   {
+    name: 'Portis',
+    type: 'Portis',
+    icon: <img src="/images/wallets/portis_icon.svg" width="16" alt="portis-icon"/>,
+  },
+  {
     name: 'Ledger',
     type: 'Ledger',
     icon: <img src="/images/wallets/ledger.png" width="16" alt="ledger-icon"/>,
