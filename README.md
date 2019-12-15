@@ -48,7 +48,7 @@ MooniWidget.open();
 
 You can check [the package](packages/widget) to get full documentation.
 
-We provided some [example applications](host-examples) that includes Mooni widget.
+We provided some [example applications](host-example) that includes Mooni widget.
 
 ## Development
 

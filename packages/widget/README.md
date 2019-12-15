@@ -20,6 +20,10 @@ import MooniWidget from '@mooni/widget';
 MooniWidget.open();
 ```
 
+### Example apps
+
+We provided some [example applications](../../host-example) that includes Mooni widget.
+
 ## Reference
 
 `MooniWidget.open()`
