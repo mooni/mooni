@@ -31,31 +31,24 @@ You can easily integrate Mooni into your web application and quickly enable your
 
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
 
-The integration is easy as adding a button on any website which will open Mooni app.
 
-### With iFrame
+### Quick start
 
-To include Mooni, just add an iframe element within your website code and link to the Mooni Send page.
+- Install package
 
-This solution is quick and will be always up-to-date with the latest versions.
+`yarn add @mooni/widget`
+ 
+- import and open widget
 
-You can [check an example](https://mooni-host-iframe.now.sh/) of such integration, with the source code at [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html).
+```js
+import MooniWidget from '@mooni/widget';
 
-```html
-<iframe
-  src="https://mooni.now.sh/send"
-  height="660px"
-  width="100%"
-  style="
-    border: 0;
-    margin: 0 auto;
-    display: block;
-    border-radius: 10px;
-    max-width: 600px;
-    min-width: 300px;
-  "
-></iframe>
+MooniWidget.open();
 ```
+
+You can check [the package](packages/widget) to get full documentation.
+
+We provided some [example applications](host-examples) that includes Mooni widget.
 
 ## Development
 
