@@ -31,7 +31,7 @@ function RequireConnection({ children, eth, box }) {
   ) return children;
 
   if(eth && ethManagerLoading)
-    return <Loader text="Loading eth provider" />;
+    return <Loader text="Loading Ethereum provider" />;
 
   if(box && boxLoading)
     return <Loader text="Loading 3box" />;

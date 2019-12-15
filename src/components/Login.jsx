@@ -12,17 +12,22 @@ const walletProviders = [
   {
     name: 'Metamask',
     type: 'injected',
-    icon: <img src="/images/wallets/metamask-fox.svg" alt="metamask-wallet-icon"/>,
+    icon: <img src="/images/wallets/metamask-fox.svg" width="18" alt="metamask-wallet-icon"/>,
   },
   {
     name: 'Coinbase Wallet',
     type: 'injected',
-    icon: <img src="/images/wallets/coinbaseWalletIcon.svg" alt="coinbase-wallet-icon"/>,
+    icon: <img src="/images/wallets/coinbaseWalletIcon.svg" width="18" alt="coinbase-wallet-icon"/>,
   },
   {
     name: 'WalletConnect',
     type: 'WalletConnect',
-    icon: <img src="/images/wallets/walletConnectIcon.svg" alt="walletconnect-icon"/>,
+    icon: <img src="/images/wallets/walletConnectIcon.svg" width="18" alt="walletconnect-icon"/>,
+  },
+  {
+    name: 'Ledger',
+    type: 'Ledger',
+    icon: <img src="/images/wallets/ledger.png" width="16" alt="ledger-icon"/>,
   },
 ];
 

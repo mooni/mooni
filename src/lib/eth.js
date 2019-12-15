@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import { ethers } from 'ethers';
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import createLedgerProvider from './providers/ledger';
 
 const infuraId = process.env.REACT_APP_INFURA_ID || 'd118ed6a19594e16893c0c29d09a2536';
 
@@ -91,6 +92,11 @@ class ETHManager extends EventEmitter {
       }
       case 'WalletConnect': {
         return new WalletConnectProvider({
+          infuraId,
+        });
+      }
+      case 'Ledger': {
+        return createLedgerProvider({
           infuraId,
         });
       }

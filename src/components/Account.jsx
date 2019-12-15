@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, useViewport } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress } from '../redux/eth/selectors';
+import { getAddress, getETHManagerLoading } from '../redux/eth/selectors';
 import { openLoginModal, logout } from '../redux/eth/actions';
 
 
 function Account() {
   const address = useSelector(getAddress);
+  const ethManagerLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
   const { below } = useViewport();
 
@@ -19,6 +20,11 @@ function Account() {
   function onLogout() {
     dispatch(logout());
   }
+
+  if(ethManagerLoading)
+    return (
+      <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
+    );
 
   if(!address) {
     return (
