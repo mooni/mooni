@@ -31,31 +31,26 @@ You can easily integrate Mooni into your web application and quickly enable your
 
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
 
-The integration is easy as adding a button on any website which will open Mooni app.
 
-### With iFrame
+### Quick start
 
-To include Mooni, just add an iframe element within your website code and link to the Mooni Send page.
+- Install package
 
-This solution is quick and will be always up-to-date with the latest versions.
+`yarn add @mooni/widget`
+ 
+- import and open widget
 
-You can [check an example](https://mooni-host-iframe.now.sh/) of such integration, with the source code at [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html).
+```js
+import MooniWidget from '@mooni/widget';
 
-```html
-<iframe
-  src="https://mooni.now.sh/send"
-  height="660px"
-  width="100%"
-  style="
-    border: 0;
-    margin: 0 auto;
-    display: block;
-    border-radius: 10px;
-    max-width: 600px;
-    min-width: 300px;
-  "
-></iframe>
+MooniWidget.open();
 ```
+
+An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
+
+We also provided some [code examples](host-example) that includes Mooni widget.
+
+You can check [the package](packages/widget) to get full documentation.
 
 ## Development
 
@@ -74,12 +69,11 @@ yarn build
 
 ## TODO
 
-- Integrate in any React app as component (with injected provider)
-- Integrate in any app as React app (with injected provider)
-- Reset order after exceed time guaranteed time
+- Reset order after exceed guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - Add liquidity provider to accept any ERC20 token
 - Support more wallet providers (Ledger, Fortmatic)
 - bity cookies not supported on Safari
 - add link to transaction while waiting mined and mined
 - assert wallet on mainnet
+- Try to pass web3 provider through iframe
