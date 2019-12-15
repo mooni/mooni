@@ -72,7 +72,7 @@ yarn build
 - Reset order after exceed guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - Add liquidity provider to accept any ERC20 token
-- Add support for not injected wallet providers (WalletConnect, Ledger, Portis...)
+- Support more wallet providers (Ledger, Fortmatic)
 - bity cookies not supported on Safari
 - add link to transaction while waiting mined and mined
 - assert wallet on mainnet

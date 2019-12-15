@@ -33,3 +33,9 @@ export const updateMyAccount = (myAccount) => async function (dispatch, getState
 
   dispatch(setMyAccount(myAccount));
 };
+
+
+export const resetContacts = () => function (dispatch)  {
+  dispatch(setMyAccount(null));
+  dispatch(setMyAccountLoading(false));
+};

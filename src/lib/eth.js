@@ -1,10 +1,36 @@
 import EventEmitter from 'events';
 import { ethers } from 'ethers';
 
-export const MAINNET_NETWORK_ID = 1;
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import Portis from '@portis/web3';
+import ProviderEngine from 'web3-provider-engine';
+import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
+import TransporWebUSB from "@ledgerhq/hw-transport-webusb";
+import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
+
+const infuraId = process.env.REACT_APP_INFURA_ID || 'd118ed6a19594e16893c0c29d09a2536';
+const portisAppId = process.env.REACT_APP_PORTIS_APP_ID || 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2';
+
+// export const MAINNET_NETWORK_ID = 1;
 
 function reloadPage() {
   window.location.reload()
+}
+
+function getInfuraUrl(infuraId) {
+  return `https://mainnet.infura.io/v3/${infuraId}`;
+}
+
+function defaultProviderEnable(engine) {
+  return () => new Promise((resolve, reject) => {
+    engine.sendAsync({ method: 'eth_accounts' }, (error, response) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(response.result)
+      }
+    });
+  });
 }
 
 class ETHManager extends EventEmitter {
@@ -20,6 +46,7 @@ class ETHManager extends EventEmitter {
       this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
       this.ethereum.on('networkChanged', reloadPage);
       this.ethereum.on('chainChanged', reloadPage);
+      this.ethereum.on('stop', () => this.emit('stop'));
     }
 
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
@@ -41,18 +68,6 @@ class ETHManager extends EventEmitter {
       this.ethereum.removeAllListeners();
     }
     this.removeAllListeners();
-  }
-
-  static async createETHManager() {
-    const { ethereum } = window;
-
-    if (ethereum) {
-      const ethManager = new ETHManager(ethereum);
-      await ethManager.init();
-      return ethManager;
-    } else {
-      throw new Error('no ethereum injected');
-    }
   }
 
   async send(to, amount) {
@@ -78,6 +93,51 @@ class ETHManager extends EventEmitter {
         res(Number(data.result));
       });
     });
+  }
+
+  static async createETHManager(walletType = 'injected') {
+    const ethereum = await ETHManager.getWalletProvider(walletType);
+
+    if (ethereum) {
+      const ethManager = new ETHManager(ethereum);
+      await ethManager.init();
+      return ethManager;
+    } else {
+      throw new Error('no-ethereum-provider');
+    }
+  }
+
+  static async getWalletProvider(walletType) {
+    switch(walletType) {
+      case 'injected': {
+        return window.ethereum;
+      }
+      case 'WalletConnect': {
+        return new WalletConnectProvider({
+          infuraId,
+        });
+      }
+      case 'Ledger': {
+        const engine = new ProviderEngine();
+        const getTransport = () => TransporWebUSB.create();
+        const ledger = createLedgerSubprovider(getTransport);
+
+        engine.addProvider(ledger);
+        engine.addProvider(new RpcSubprovider({ rpcUrl: getInfuraUrl(infuraId) }));
+        engine.enable = defaultProviderEnable(engine);
+        engine.start();
+
+        return engine;
+      }
+      case 'Portis': {
+        const portis = new Portis(portisAppId, 'mainnet');
+        portis.provider.enable = defaultProviderEnable(portis.provider);
+        return portis.provider;
+      }
+      default: {
+        throw new Error('wallet-provider-not-supported')
+      }
+    }
   }
 }
 
