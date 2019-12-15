@@ -1,38 +1,33 @@
-# Mooni Widget
+# 🌚 Mooni Widget
 
 ![npm (scoped)](https://img.shields.io/npm/v/@mooni/widget)
 
 Mooni widget allows to quickly add Mooni into any web app in minutes.
 
-## Quick start
-
-- Install package
+## 🎁 Quick start
+#### Install
 
 `yarn add @mooni/widget`
-
-or
-
-`npm install --save @mooni/widget`
  
-- import and open widget
+#### Start widget
 
 ```js
+// Import package
 import MooniWidget from '@mooni/widget';
 
+// Open the widget when you want to show Mooni
 MooniWidget.open();
 ```
 
-### Example apps
+### 📺 Example apps
 
 An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
 
 We also provided some [code examples](../../host-example) that includes Mooni widget.
 
-## Reference
+## 🎛 Reference
 
-`MooniWidget.open()`
-
-Open the Mooni widget, and returns a method to close it.
+- `MooniWidget.open() : Function`  Open the Mooni widget, and returns a method to close it.
 
 ## Additional information
 
@@ -50,7 +45,7 @@ Open the Mooni widget, and returns a method to close it.
 
 `<script src="https://unpkg.com/@mooni/widget"></script>`;
 
-## Development
+## 💻 Development
 
 ```
 # Install dependencies
