@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "license": "GPL-3.0",
   "private": true,
+  "engines": {
+    "node": "12.x"
+  },
   "dependencies": {
     "3box": "^1.13.2",
     "@aragon/ui": "^1.0.0",
