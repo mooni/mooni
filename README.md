@@ -1,48 +1,56 @@
-# Mooni
+# 🌚 Mooni
 
 Easily transfer funds from your crypto wallet to your bank account.
 
-[Landing page](https://mooni.launchaco.com)
+[🖼 Landing page](https://mooni.launchaco.com)
 
-[Web Application](https://mooni.now.sh)
+[🚀 Web Application](https://mooni.now.sh)
+
+[🔮 Frontend integration](https://mooni.now.sh)
+
 
 > This is experimental software under active development.
 
-## Presentation
+## 📃 Presentation
 
 Mooni provides a simple solution for end-users, marketplaces or DAOs to cash out their crypto in fiat directly to a bank account.
 
 ### Features
-- Login with any web3-compatible wallet *(Metamask, Coinbase Wallet, Trust Wallet, ...)*
-- Store your account information encrypted in IPFS (thanks to [3Box](https://3box.io))
-- Send to your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+- **Web wallets** Login with any web3-compatible wallet *(Metamask, Portis, WalletConnect, Ledger, mobile wallets)*
+- **Private storage** Store your bank account information securely encrypted in IPFS (thanks to [3Box](https://3box.io))
+- **Bank transfer** Receive funds in your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+- **No account** Withdraw up to 5000€ per year without KYC
+- **Decentralized** All in browser
 
+[🚀 Use Mooni now](https://mooni.now.sh)
 
 *This project is in early stage and shall be used with care.*
 
 ### Use cases
-- I am a end user and I want to withdraw some crypto on my bank account
-- I am a dApp developer and I want to allow my users to withdraw funds to their bank account (such as decentralized marketplaces, via a widget or iFrame)
-- I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
+- **Crypto owner** I am an end user and I want to withdraw some crypto to my bank account
+- **dApp developer** I am a dApp developer and I want to allow my users to withdraw funds to their bank account (games, decentralized marketplaces, via a widget)
+- **DAOs** I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
 
-## Add to your app
+## 🔮 Frontend integration
 
 You can easily integrate Mooni into your web application and quickly enable your users to cash out their crypto.
 
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
 
 
-### Quick start
+### 🎁 Quick start
 
-- Install package
+#### Install
 
 `yarn add @mooni/widget`
  
-- import and open widget
+#### Start widget
 
 ```js
+// Import package
 import MooniWidget from '@mooni/widget';
 
+// Open the widget when you want to show Mooni
 MooniWidget.open();
 ```
 
@@ -52,7 +60,7 @@ We also provided some [code examples](host-example) that includes Mooni widget.
 
 You can check [the package](packages/widget) to get full documentation.
 
-## Development
+## 💻 Development
 
 ### Start tooling
 
@@ -67,8 +75,12 @@ yarn start
 yarn build
 ```
 
-## TODO
+## 💭 TODO
 
+Here's a list of what to come next
+
+- Add login without wallet, display deposit address
+- Fix Steps UX on mobile
 - Reset order after exceed guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - Add liquidity provider to accept any ERC20 token
