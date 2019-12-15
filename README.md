@@ -69,12 +69,11 @@ yarn build
 
 ## TODO
 
-- Integrate in any React app as component (with injected provider)
-- Integrate in any app as React app (with injected provider)
-- Reset order after exceed time guaranteed time
+- Reset order after exceed guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - Add liquidity provider to accept any ERC20 token
 - Add support for not injected wallet providers (WalletConnect, Ledger, Portis...)
 - bity cookies not supported on Safari
 - add link to transaction while waiting mined and mined
 - assert wallet on mainnet
+- Try to pass web3 provider through iframe
