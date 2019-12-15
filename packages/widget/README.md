@@ -43,7 +43,12 @@ We also provided some [code examples](../../host-example) that includes Mooni wi
 
 - UMD
 
-`<script src="https://unpkg.com/@mooni/widget"></script>`;
+```
+<script src="https://unpkg.com/@mooni/widget"></script>
+<script> 
+  MooniWidget.open()
+</script>
+```
 
 ## 💻 Development
 
