@@ -22,7 +22,9 @@ MooniWidget.open();
 
 ### Example apps
 
-We provided some [example applications](../../host-example) that includes Mooni widget.
+An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
+
+We also provided some [code examples](host-example) that includes Mooni widget.
 
 ## Reference
 

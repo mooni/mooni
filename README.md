@@ -46,9 +46,11 @@ import MooniWidget from '@mooni/widget';
 MooniWidget.open();
 ```
 
-You can check [the package](packages/widget) to get full documentation.
+An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
 
-We provided some [example applications](host-example) that includes Mooni widget.
+We also provided some [code examples](host-example) that includes Mooni widget.
+
+You can check [the package](packages/widget) to get full documentation.
 
 ## Development
 
