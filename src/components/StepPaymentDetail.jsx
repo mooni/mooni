@@ -40,14 +40,17 @@ function StepPaymentDetail({ onComplete, onBack }) {
   const paymentDetails = useSelector(getPaymentDetail);
   const dispatch = useDispatch();
 
-  const [selectedCurrency, setSelectedCurrency] = useState(OUTPUT_CURRENCIES.indexOf(paymentDetails.outputCurrency));
+  const [selectedCurrency, setSelectedCurrency] = useState(Math.max(OUTPUT_CURRENCIES.indexOf(paymentDetails.outputCurrency), 0));
 
   const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
     defaultValues: paymentDetails ? {
-      amount: paymentDetails.outputAmount,
-      reference: paymentDetails.reference,
-    } : undefined,
+      amount: paymentDetails.outputAmount ?? 100,
+      reference: paymentDetails.reference ?? '',
+    } : {
+      amount: 100,
+      reference: '',
+    },
   });
 
   const onSubmit = handleSubmit(async data => {
@@ -92,7 +95,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
                   className={classes.amountInput}
                   adornment={<Box>Amount</Box>}
                   adornmentSettings={{ width: 50 }}
-                  placeholder="100"
+                  placeholder="10"
                 />
               </Box>
             </Grid>

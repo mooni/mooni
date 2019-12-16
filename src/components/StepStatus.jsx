@@ -2,14 +2,15 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, IconArrowLeft, IconHome, IconCheck, IconCaution } from '@aragon/ui'
+import { Button, IconArrowLeft, IconHome, IconCheck, IconCaution, IconExternal } from '@aragon/ui'
 
 import Loader from '../components/Loader';
 
-import { getPaymentStatus } from '../redux/payment/selectors';
+import { getOrder, getPaymentStatus } from '../redux/payment/selectors';
 
 function StepStatus({ onBack, onExit }) {
   const paymentStatus = useSelector(getPaymentStatus);
+  const order = useSelector(getOrder);
 
   // TODO update bity order
   return (
@@ -29,6 +30,9 @@ function StepStatus({ onBack, onExit }) {
           Transaction sent! <br/>
           The exchange is done and the wire transfer has been initiated. <br/>
           Bank transfers can take several days to arrive, please be patient.
+        </Box>
+        <Box py={1}>
+        <Button href={`https://go.bity.com/order-status?id=${order.id}`} wide icon={<IconExternal/>} label="Open bity order"/>
         </Box>
         <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
       </Box>
