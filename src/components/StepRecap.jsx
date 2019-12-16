@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import BN from 'bignumber.js';
 
 import { Box, Grid } from '@material-ui/core';
 import { Button, Countdown, Info, IconArrowLeft, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
@@ -44,6 +45,7 @@ function StepRecap({ onComplete, onBack }) {
             <Box pt={2}>
               <Info title="Payment details" mode="info">
                 <Box><b>From:</b> {order.input.amount} {order.input.currency}</Box>
+                <Box><b>Rate:</b> ~{BN(order.output.amount).div(order.input.amount).dp(3).toString()} {order.output.currency}/{order.input.currency} </Box>
                 <Box><b>To:</b> {order.output.amount} {order.output.currency}</Box>
                 <Box><b>Fees:</b> {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
               </Info>

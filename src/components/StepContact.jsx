@@ -39,13 +39,13 @@ function StepPaymentDetail({ onComplete, onBack }) {
           <Box mb={1}>
             Please provide an email address to get notified about the status of your transaction.
           </Box>
-          <Field label="Email">
+          <Field label="Email (optional)">
             <WideInput
               name="email"
               ref={register(fields.email)}
               placeholder="elon@musk.io"
             />
-            {errors.email && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
+            {errors.email && <FieldError>Invalid email</FieldError>}
           </Field>
         </Box>
         <Grid container spacing={2}>

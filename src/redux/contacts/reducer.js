@@ -2,8 +2,6 @@ import * as actions from "./actions";
 
 export const STATE_NAME = 'CONTACTS';
 
-export const defaultAccount = { owner: {} };
-
 const initialState = {
   myAccount: null,
   myAccountLoading: false,

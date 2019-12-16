@@ -1,48 +1,51 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
-import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Box } from '@material-ui/core';
 import { Link, Button, IconUser, IconCoin } from '@aragon/ui'
 
 import RateSample from '../components/RateSample';
 import Footer from '../components/Footer';
+import { setPaymentDetail } from '../redux/payment/actions';
 
-const useStyles = makeStyles(() => ({
-  logo: {
-    width: 100,
-    height: 100,
-    color: 'blue',
-    margin: 10,
-  },
-}));
+const logoStyle = {
+  fontSize: '5rem',
+  cursor: 'default',
+};
 
 function Welcome() {
-  const classes = useStyles();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const [rateValues, setRatesValues] = useState(null);
 
-  const go = path => () => history.push(path);
+  const onGoToSend = useCallback(() => {
+    if(rateValues) {
+      dispatch(setPaymentDetail({
+        outputAmount: rateValues.outputAmount,
+        outputCurrency: rateValues.outputCurrency,
+      }));
+    }
+    history.push('/send');
+  }, [history, dispatch, rateValues]);
 
   return (
-    <Box width={1} py={3}>
-      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-        <img src="logo512.png" alt="logo" className={classes.logo} />
+    <Box width={1} py={2}>
+      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" style={logoStyle} className="noselect">
+        🌚
       </Box>
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
-      <RateSample />
+      <RateSample onChangeValues={setRatesValues}/>
       <Box pt={2}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={go('/send')} wide label="Send funds" icon={<IconCoin/>} />
+            <Button mode="strong" onClick={onGoToSend} wide label="Send funds" icon={<IconCoin/>} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={go('/my-account')} wide label="My Account" icon={<IconUser/>} />
+            <Button mode="strong" onClick={() => history.push('/my-account')} wide label="My Account" icon={<IconUser/>} />
           </Grid>
-          {/*<Grid item xs={12} sm={4}>
-              <Button mode="strong" onClick={go('/contacts')} wide label="Contacts" icon={<IconGroup/>} />
-            </Grid>*/}
         </Grid>
       </Box>
       <Box textAlign="center" py={2}>

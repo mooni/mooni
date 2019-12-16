@@ -1,63 +1,65 @@
-# Mooni
+# 🌚 Mooni
 
 Easily transfer funds from your crypto wallet to your bank account.
 
-[Landing page](https://mooni.launchaco.com)
+[🖼 Landing page](https://mooni.launchaco.com)
 
-[Web Application](https://mooni.now.sh)
+[🚀 Web Application](https://mooni.now.sh)
+
+[🔮 Frontend integration](#-Frontend-integration)
 
 > This is experimental software under active development.
 
-## Presentation
+## 📃 Presentation
 
-Mooni provides a simple solution for end-users, marketplaces or DAOs to cash out their crypto in fiat directly to a bank account.
+Mooni is a simple solution for end-users, marketplaces or DAOs to cash out cryptos in fiat directly to a bank account.
 
 ### Features
-- Login with any web3-compatible wallet *(Metamask, Coinbase Wallet, Trust Wallet, ...)*
-- Store your account information encrypted in IPFS (thanks to [3Box](https://3box.io))
-- Send to your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+- **Web wallets** Login with any web3-compatible wallet *(Metamask, Portis, WalletConnect, Ledger, mobile wallets)*
+- **Bank transfer** Receive funds in your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+- **Private storage** Store your bank account information securely encrypted in IPFS (thanks to [3Box](https://3box.io))
+- **No account** Withdraw up to 5000€ per year without KYC
+- **Decentralized** All in browser
 
+[🚀 Use Mooni now](https://mooni.now.sh)
 
 *This project is in early stage and shall be used with care.*
 
 ### Use cases
-- I am a end user and I want to withdraw some crypto on my bank account
-- I am a dApp developer and I want to allow my users to withdraw funds to their bank account (such as decentralized marketplaces, via a widget or iFrame)
-- I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
+- **Crypto owner** I am an end user and I want to withdraw some crypto to my bank account
+- **dApp developer** I am a dApp developer and I want to allow my users to withdraw funds to their bank account (games, decentralized marketplaces, via a widget)
+- **DAOs** I have a DAO (Aragon) and I want to be able to pay a bill in fiat with Vault funds
 
-## Add to your app
+## 🔮 Frontend integration
 
 You can easily integrate Mooni into your web application and quickly enable your users to cash out their crypto.
 
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
 
-The integration is easy as adding a button on any website which will open Mooni app.
 
-### With iFrame
+### 🎁 Quick start
 
-To include Mooni, just add an iframe element within your website code and link to the Mooni Send page.
+#### Install
 
-This solution is quick and will be always up-to-date with the latest versions.
+`yarn add @mooni/widget`
+ 
+#### Start widget
 
-You can check an example of such integration in the file [host-examples/iframe-host/public/index.html](host-examples/iframe-host/public/index.html)
+```js
+// Import package
+import MooniWidget from '@mooni/widget';
 
-```html
-<iframe
-  src="https://mooni.now.sh/send"
-  height="660px"
-  width="100%"
-  style="
-    border: 0;
-    margin: 0 auto;
-    display: block;
-    border-radius: 10px;
-    max-width: 600px;
-    min-width: 300px;
-  "
-></iframe>
+// Open the widget when you want to show Mooni
+MooniWidget.open();
 ```
 
-## Development
+An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
+
+We also provided some [code examples](host-example) that includes Mooni widget.
+
+You can check [the package](packages/widget) to get full documentation.
+
+## 💻 Development
 
 ### Start tooling
 
@@ -72,12 +74,17 @@ yarn start
 yarn build
 ```
 
-## TODO
+## 💭 TODO
 
-- Integrate in any React app as component (with injected provider)
-- Integrate in any app as React app (with injected provider)
-- Reset order after exceed time guaranteed time
+Here's a list of what to come next
+
+- Add login without wallet, display deposit address
+- Fix Steps UX on mobile
+- Reset order after exceed guaranteed time
 - Update status from bity after payment on an /order/{orderId} page
 - Add liquidity provider to accept any ERC20 token
-- Add support for not injected wallet providers (WalletConnect, Ledger, Portis...)
+- Support more wallet providers (Ledger, Fortmatic)
 - bity cookies not supported on Safari
+- add link to transaction while waiting mined and mined
+- assert wallet on mainnet
+- Try to pass web3 provider through iframe

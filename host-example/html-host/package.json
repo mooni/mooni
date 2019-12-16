@@ -1,8 +1,7 @@
 {
-  "name": "host-html",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "name": "mooni-widget-html-host",
+  "version": "0.1.0",
+  "main": "public/index.html",
   "scripts": {
     "serve": "serve -s public"
   },
