@@ -54,8 +54,8 @@ const Bity = {
     });
 
     return {
-      inputAmount: inputAmount || data.input.amount,
-      outputAmount: outputAmount || data.output.amount,
+      inputAmount: data.input.amount,
+      outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
     };

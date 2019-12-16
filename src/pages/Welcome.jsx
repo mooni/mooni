@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { Grid, Box } from '@material-ui/core';
 import { Link, Button, IconUser, IconCoin } from '@aragon/ui'
 
-import RateSample from '../components/RateSample';
+import RateForm from '../components/RateForm';
 import Footer from '../components/Footer';
 import { setPaymentDetail } from '../redux/payment/actions';
 
@@ -17,17 +17,18 @@ const logoStyle = {
 function Welcome() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [rateValues, setRatesValues] = useState(null);
+  const [rateDetails, setRateDetails] = useState(null);
 
   const onGoToSend = useCallback(() => {
-    if(rateValues) {
-      dispatch(setPaymentDetail({
-        outputAmount: rateValues.outputAmount,
-        outputCurrency: rateValues.outputCurrency,
-      }));
-    }
+    // TODO
+    // if(rateDetails) {
+    //   dispatch(setPaymentDetail({
+    //     outputAmount: rateDetails.outputAmount,
+    //     outputCurrency: rateDetails.outputCurrency,
+    //   }));
+    // }
     history.push('/send');
-  }, [history, dispatch, rateValues]);
+  }, [history, dispatch, rateDetails]);
 
   return (
     <Box width={1} py={2}>
@@ -37,7 +38,7 @@ function Welcome() {
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
-      <RateSample onChangeValues={setRatesValues}/>
+      <RateForm onChange={setRateDetails}/>
       <Box pt={2}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
