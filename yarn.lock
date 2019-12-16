@@ -2705,6 +2705,15 @@
     semver "^6.3.0"
     tsutils "^3.17.1"
 
+"@uniswap/sdk@^1.0.0-beta.4":
+  version "1.0.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@uniswap/sdk/-/sdk-1.0.0-beta.4.tgz#d14a0ddc15e8de9173f3d97075e7ebbaa2570f1a"
+  integrity sha512-a2GnlZrmg0Qxr4HFIBPCKygLFxu5f/hhIOKYVm12hG8vzsCVh72DEqZkpaOSFH3o6LDez4p2KnPvmwZkWVUnRg==
+  dependencies:
+    bignumber.js "^9.0.0"
+    ethers "^4.0.28"
+    lodash.clonedeepwith "^4.5.0"
+
 "@walletconnect/browser@^1.0.0-beta.39":
   version "1.0.0-beta.39"
   resolved "https://registry.yarnpkg.com/@walletconnect/browser/-/browser-1.0.0-beta.39.tgz#db46d57e78d7a5e0be75c349821ef7c873e87b61"
@@ -11524,6 +11533,11 @@ lodash.clonedeep@^4.5.0, lodash.clonedeep@~4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
   integrity sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
+
+lodash.clonedeepwith@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clonedeepwith/-/lodash.clonedeepwith-4.5.0.tgz#6ee30573a03a1a60d670a62ef33c10cf1afdbdd4"
+  integrity sha1-buMFc6A6GmDWcKYu8zwQzxr9vdQ=
 
 lodash.filter@^4.6.0:
   version "4.6.0"

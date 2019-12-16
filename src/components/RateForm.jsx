@@ -7,8 +7,8 @@ import ShuffleIcon from '@material-ui/icons/Shuffle';
 
 import { DropDown, TextInput, Info, LoadingRing } from '@aragon/ui'
 
-import Bity from '../lib/bity';
 import { useDebounce } from '../lib/hooks';
+import { getRate } from '../lib/exchange';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
@@ -75,23 +75,9 @@ function RateForm({ onChange }) {
 
       setRateLoading(true);
 
-      const req = {
-        inputCurrency: debouncedRateRequest.inputCurrency,
-        outputCurrency: debouncedRateRequest.outputCurrency,
-      };
-      if(debouncedRateRequest.rateDirection === 'input') {
-        req.inputAmount = debouncedRateRequest.inputAmount;
-      }
-      if(debouncedRateRequest.rateDirection === 'output') {
-        req.outputAmount = debouncedRateRequest.outputAmount;
-      }
-      const res = await Bity.estimate(req);
+      const res = await getRate(rateRequest);
 
-      setRateDetails({
-        ...debouncedRateRequest,
-        inputAmount:  BN(res.inputAmount).dp(3).toString(),
-        outputAmount: BN(res.outputAmount).dp(3).toString(),
-      });
+      setRateDetails(res);
 
       setRateRequest(null);
       setRateLoading(false);
@@ -150,7 +136,7 @@ function RateForm({ onChange }) {
                 <TextInput
                   type="number"
                   min={0}
-                  value={String(rateDetails.inputAmount ?? '-')}
+                  value={rateDetails.inputAmount ? BN(rateDetails.inputAmount).dp(3).toString() :  '-'}
                   wide
                   adornment={<Box>You send</Box>}
                   className={classes.amountInput}
@@ -171,7 +157,7 @@ function RateForm({ onChange }) {
         </Grid>
         <Hidden smDown>
           <Grid item sm={1} className={classes.exchangeIcon}>
-            {rateLoading ?
+            {(rateLoading || rateRequest) ?
               <LoadingRing size={24} />
               :
               <ShuffleIcon/>
@@ -185,7 +171,7 @@ function RateForm({ onChange }) {
                 <TextInput
                   type="number"
                   min={0}
-                  value={String(rateDetails.outputAmount ?? '-')}
+                  value={rateDetails.outputAmount ? BN(rateDetails.outputAmount).dp(3).toString() :  '-'}
                   onChange={onChangeOutputValue}
                   wide
                   className={classes.amountInput}
