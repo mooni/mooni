@@ -32,7 +32,7 @@ function Welcome() {
   return (
     <Box width={1} py={2}>
       <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" style={logoStyle} className="noselect">
-        🌚
+        <span role="img" aria-label="mooni-logo">🌚</span>
       </Box>
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.

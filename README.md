@@ -53,7 +53,7 @@ import MooniWidget from '@mooni/widget';
 MooniWidget.open();
 ```
 
-An [example app](https://mooni-host-iframe.now.sh/) including Mooni widget have been published to let you try it.
+An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it.
 
 We also provided some [code examples](host-example) that includes Mooni widget.
 
