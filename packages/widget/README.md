@@ -1,6 +1,6 @@
 # 🌚 Mooni Widget
 
-![npm (scoped)](https://img.shields.io/npm/v/@mooni/widget)
+[![npm (scoped)](https://img.shields.io/npm/v/@mooni/widget)](https://www.npmjs.com/package/@mooni/widget)
 
 Mooni widget allows to quickly add Mooni into any web app in minutes.
 

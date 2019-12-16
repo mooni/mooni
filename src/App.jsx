@@ -22,7 +22,7 @@ function App() {
   const history = useHistory();
 
   return (
-    <Main assetsUrl={'/aragon-ui'}>
+    <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}>
       <Login />
       <Header
         primary={
