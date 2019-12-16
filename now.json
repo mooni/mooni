@@ -1,9 +1,4 @@
 {
   "name": "mooni",
-  "version": 2,
-  "build": {
-    "env": {
-      "PUBLIC_URL": "https://mooni.now.sh"
-    }
-  }
+  "version": 2
 }
