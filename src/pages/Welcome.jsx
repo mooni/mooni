@@ -1,32 +1,26 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Box } from '@material-ui/core';
 import { Link, Button, IconUser, IconCoin } from '@aragon/ui'
 
 import RateSample from '../components/RateSample';
 import Footer from '../components/Footer';
 
-const useStyles = makeStyles(() => ({
-  logo: {
-    width: 100,
-    height: 100,
-    color: 'blue',
-    margin: 10,
-  },
-}));
+const logoStyle = {
+  fontSize: '5rem',
+  cursor: 'default',
+};
 
 function Welcome() {
-  const classes = useStyles();
   const history = useHistory();
 
   const go = path => () => history.push(path);
 
   return (
-    <Box width={1} py={3}>
-      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-        <img src="logo512.png" alt="logo" className={classes.logo} />
+    <Box width={1} py={2}>
+      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" style={logoStyle} className="noselect">
+        🌚
       </Box>
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.
