@@ -12,12 +12,12 @@ Easily transfer funds from your crypto wallet to your bank account.
 
 ## 📃 Presentation
 
-Mooni provides a simple solution for end-users, marketplaces or DAOs to cash out their crypto in fiat directly to a bank account.
+Mooni is a simple solution for end-users, marketplaces or DAOs to cash out cryptos in fiat directly to a bank account.
 
 ### Features
 - **Web wallets** Login with any web3-compatible wallet *(Metamask, Portis, WalletConnect, Ledger, mobile wallets)*
-- **Private storage** Store your bank account information securely encrypted in IPFS (thanks to [3Box](https://3box.io))
 - **Bank transfer** Receive funds in your bank account in EUR/CHF (thanks to [Bity](https://bity.com))
+- **Private storage** Store your bank account information securely encrypted in IPFS (thanks to [3Box](https://3box.io))
 - **No account** Withdraw up to 5000€ per year without KYC
 - **Decentralized** All in browser
 
