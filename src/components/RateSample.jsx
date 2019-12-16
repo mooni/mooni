@@ -15,6 +15,9 @@ import {
   OUTPUT_CURRENCIES as outputCurrencies,
 } from '../lib/currencies';
 
+import { getPaymentDetail } from '../redux/payment/selectors';
+import { useSelector } from 'react-redux';
+
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
@@ -41,15 +44,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function SimpleFiatForm() {
+function SimpleFiatForm({ onChangeValues }) {
   const classes = useStyles();
 
+  const paymentDetails = useSelector(getPaymentDetail);
   const [exited, setExited] = useState(false);
   const [rateLoading, setRateLoading] = useState(true);
   const [inputCurrency, setInputCurrency] = useState(0);
-  const [outputCurrency, setOutputCurrency] = useState(0);
+  const [outputCurrency, setOutputCurrency] = useState(Math.max(outputCurrencies.indexOf(paymentDetails.outputCurrency), 0));
   const [inputAmount, setInputAmount] = useState('-');
-  const [outputAmount, setOutputAmount] = useState(100);
+  const [outputAmount, setOutputAmount] = useState(paymentDetails.outputAmount ?? 100);
   const [rate, setRate] = useState(null);
 
   const estimateInput = useCallback(debounce(async outputValue => {
@@ -79,6 +83,13 @@ function SimpleFiatForm() {
 
     return () => setExited(true);
   }, [inputCurrency, outputCurrency, outputAmount, estimateInput]);
+
+  useEffect(() => {
+    onChangeValues({
+      outputAmount,
+      outputCurrency: outputCurrencies[outputCurrency],
+    });
+  }, [onChangeValues, outputAmount, outputCurrency]);
 
   return (
     <Box className={classes.root}>
