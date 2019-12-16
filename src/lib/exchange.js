@@ -59,16 +59,15 @@ export async function getRate(rateRequest) {
 export async function rateTokenForExactETH(symbol, ethAmount) {
   const { tokenAddress } = TOKEN_DATA[symbol];
   const exactETHAmount = ethers.utils.parseEther(ethAmount);
-  console.log(exactETHAmount);
 
   const res = await tradeTokensForExactEth(tokenAddress, exactETHAmount);
   const serializedResponse = stringifyObj(res);
 
-  console.log(serializedResponse);
-
   return {
     inputAmount: res.inputAmount.amount.div(10 ** res.inputAmount.token.decimals).toString(),
     outputAmount: res.outputAmount.amount.div(10 ** res.outputAmount.token.decimals).toString(),
+    inputCurrency: symbol,
+    outputCurrency: 'ETH',
     rate: serializedResponse.executionRate.rate,
     invertedRate: serializedResponse.executionRate.rateInverted,
   }
@@ -85,6 +84,8 @@ export async function rateExactTokenForETH(symbol, tokenAmount) {
   return {
     inputAmount: res.inputAmount.amount.div(10 ** res.inputAmount.token.decimals).toString(),
     outputAmount: res.outputAmount.amount.div(10 ** res.outputAmount.token.decimals).toString(),
+    inputCurrency: symbol,
+    outputCurrency: 'ETH',
     rate: serializedResponse.executionRate.rate,
     invertedRate: serializedResponse.executionRate.rateInverted,
   }

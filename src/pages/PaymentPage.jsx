@@ -62,13 +62,13 @@ function PaymentPage() {
     dispatch(resetOrder());
     setActiveStep(2);
   }
-  function onSend() {
-    dispatch(sendPayment());
-    handleNext();
-  }
   function onPrepareRecap() {
     dispatch(resetOrder());
     dispatch(createOrder());
+    handleNext();
+  }
+  function onSend() {
+    dispatch(sendPayment());
     handleNext();
   }
 

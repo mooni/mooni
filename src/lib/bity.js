@@ -63,18 +63,15 @@ const Bity = {
   async order({ fromAddress, recipient, paymentDetail, contactPerson }) {
     const body = {
       input: {
-        currency: "ETH",
+        currency: paymentDetail.inputCurrency,
         type: 'crypto_address',
-
         crypto_address: fromAddress,
       },
       output: {
         type: 'bank_account',
-
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
         bic_swift: recipient.bic_swift,
-
         currency: paymentDetail.outputCurrency,
         amount: String(paymentDetail.outputAmount),
         reference: paymentDetail.reference,

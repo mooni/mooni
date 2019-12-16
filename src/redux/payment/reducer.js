@@ -1,9 +1,8 @@
-import { OUTPUT_CURRENCIES } from '../../lib/currencies';
+import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
 
 import * as actions from "./actions";
 
 export const STATE_NAME = 'PAYMENT';
-
 /*
 const exampleRecipient = {
   owner: {
@@ -27,10 +26,10 @@ const exampleOrder = {"input": {"amount": "0.742746699517954364", "currency": "E
 */
 
 const initialState = {
-  inputCurrency: null,
   paymentDetail: {
+    inputCurrency: INPUT_CURRENCIES[0],
     outputCurrency: OUTPUT_CURRENCIES[0],
-    outputAmount: 100,
+    outputAmount: 10,
     reference: '',
   },
   recipient: null,
@@ -38,20 +37,24 @@ const initialState = {
   // recipient: exampleRecipientOnlyNameAndIban,
   contactPerson: null,
   order: null,
-  //order: exampleOrder,
+  // order: exampleOrder,
   orderError: null,
+  tokenExchange: null,
+  // tokenExchange: {
+  //   tokenRate: {
+  //     inputAmount: '110',
+  //     outputAmount: '100',
+  //     inputCurrency: 'DAI',
+  //     outputCurrency: 'EUR',
+  //     rate: '1.1',
+  //     invertedRate: '0.9',
+  //   },
+  // },
   paymentStatus: null,
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case actions.SET_INPUT_CURRENCY: {
-      const { inputCurrency } = action.payload;
-      return {
-        ...state,
-        inputCurrency,
-      };
-    }
     case actions.SET_PAYMENT_DETAIL: {
       const { paymentDetail } = action.payload;
       return {
@@ -85,6 +88,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         orderErrors,
+      };
+    }
+    case actions.SET_TOKEN_EXCHANGE: {
+      const { tokenExchange } = action.payload;
+      return {
+        ...state,
+        tokenExchange,
       };
     }
     case actions.RESET_ORDER: {

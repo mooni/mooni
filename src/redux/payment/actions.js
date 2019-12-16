@@ -1,22 +1,16 @@
 import Bity from '../../lib/bity';
 import { getRecipient, getPaymentDetail, getOrder, getContactPerson } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
+import { rateTokenForExactETH } from '../../lib/exchange';
 
-export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
 export const SET_PAYMENT_DETAIL = 'SET_PAYMENT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_ORDER = 'SET_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
+export const SET_TOKEN_EXCHANGE = 'SET_TOKEN_EXCHANGE';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
-
-export const setInputCurrency = (inputCurrency) => ({
-  type: SET_INPUT_CURRENCY,
-  payload: {
-    inputCurrency,
-  }
-});
 
 export const setPaymentDetail = (paymentDetail) => ({
   type: SET_PAYMENT_DETAIL,
@@ -51,6 +45,13 @@ export const setOrderErrors = (errors) => ({
   }
 });
 
+export const setTokenExchange = (tokenExchange) => ({
+  type: SET_TOKEN_EXCHANGE,
+  payload: {
+    tokenExchange,
+  }
+});
+
 export const resetOrder = () => ({
   type: RESET_ORDER,
 });
@@ -73,7 +74,11 @@ export const createOrder = () => async function (dispatch, getState)  {
     const orderDetail = await Bity.order({
       fromAddress,
       recipient,
-      paymentDetail,
+      paymentDetail: {
+        inputCurrency: 'ETH',
+        outputAmount: paymentDetail.outputAmount,
+        outputCurrency: paymentDetail.outputCurrency,
+      },
       contactPerson,
     });
 
@@ -82,12 +87,21 @@ export const createOrder = () => async function (dispatch, getState)  {
       cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
       throw cookieError;
     }
+
     dispatch(setOrder(orderDetail));
+
+    if(paymentDetail.inputCurrency !== 'ETH') {
+      const tokenRate = await rateTokenForExactETH(paymentDetail.inputCurrency, orderDetail.input.amount);
+
+      dispatch(setTokenExchange({ tokenRate }));
+    }
+
     dispatch(setOrderErrors(null));
 
     // TODO register delete order after price guaranteed timeout
   } catch(error) {
     dispatch(setOrder(null));
+    dispatch(setTokenExchange(null));
 
     if(error.message === 'api_error') {
       dispatch(setOrderErrors(error.errors));

@@ -16,10 +16,6 @@ import {
   OUTPUT_CURRENCIES as outputCurrencies,
 } from '../lib/currencies';
 
-// TODO
-// import { getPaymentDetail } from '../redux/payment/selectors';
-// import { useSelector } from 'react-redux';
-
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
@@ -46,16 +42,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function RateForm({ onChange, invalid }) {
+function RateForm({ onChange, invalid, defaultValues }) {
   const classes = useStyles();
 
   const [rateDetails, setRateDetails] = useState({
-    inputCurrencyId: 0,
-    inputCurrency: inputCurrencies[0],
-    outputCurrencyId: 0,
-    outputCurrency: outputCurrencies[0], // Math.max(outputCurrencies.indexOf(paymentDetails.outputCurrency), 0)
+    inputCurrencyId: Math.max(inputCurrencies.indexOf(defaultValues?.inputCurrency), 0),
+    inputCurrency: defaultValues?.inputCurrency || inputCurrencies[0],
+    outputCurrencyId: Math.max(outputCurrencies.indexOf(defaultValues?.outputCurrency), 0),
+    outputCurrency: outputCurrencies[0],
     inputAmount: null,
-    outputAmount: 100, // paymentDetails.outputAmount ?? 100
+    outputAmount: defaultValues?.outputAmount || 100,
     rateDirection: 'output',
   });
 
