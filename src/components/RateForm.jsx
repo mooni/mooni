@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 
 import { DropDown, TextInput, Info, LoadingRing } from '@aragon/ui'
+import { FieldError } from './StyledComponents';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
@@ -45,7 +46,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function RateForm({ onChange }) {
+function RateForm({ onChange, invalid }) {
   const classes = useStyles();
 
   const [rateDetails, setRateDetails] = useState({
@@ -71,11 +72,11 @@ function RateForm({ onChange }) {
 
   useEffect(() => {
     (async () => {
-      if (!debouncedRateRequest) return;
+      if (!debouncedRateRequest || debouncedRateRequest.inputAmount === 0 || debouncedRateRequest.outputAmount === 0) return;
 
       setRateLoading(true);
 
-      const res = await getRate(rateRequest);
+      const res = await getRate(debouncedRateRequest);
 
       setRateDetails(res);
 
@@ -102,6 +103,7 @@ function RateForm({ onChange }) {
     setRateDetails(newRateDetails);
     setRateRequest(newRateDetails);
   }
+  /*
   function onChangeInputValue(e) {
     const value = Number(e.target.value);
     const newRateDetails = {
@@ -113,6 +115,7 @@ function RateForm({ onChange }) {
     setRateDetails(newRateDetails);
     setRateRequest(newRateDetails);
   }
+  */
 
   function onChangeOutputValue(e) {
     const value = Number(e.target.value);
@@ -136,11 +139,12 @@ function RateForm({ onChange }) {
                 <TextInput
                   type="number"
                   min={0}
-                  value={rateDetails.inputAmount ? BN(rateDetails.inputAmount).dp(3).toString() :  '-'}
+                  value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
+                  disabled
+                  readOnly
                   wide
                   adornment={<Box>You send</Box>}
                   className={classes.amountInput}
-                  onChange={onChangeInputValue}
                   adornmentSettings={{ width: 50 }}
                 />
               </Grid>
@@ -171,7 +175,7 @@ function RateForm({ onChange }) {
                 <TextInput
                   type="number"
                   min={0}
-                  value={rateDetails.outputAmount ? BN(rateDetails.outputAmount).dp(3).toString() :  '-'}
+                  value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
                   onChange={onChangeOutputValue}
                   wide
                   className={classes.amountInput}
@@ -191,12 +195,20 @@ function RateForm({ onChange }) {
           </Paper>
         </Grid>
       </Grid>
-      <Box py={2} width={200} height={111} mx="auto">
-        {rate &&
+      <Box py={2} height={111} mx="auto">
         <Info title="Estimated exchange rate">
-          <Box>~{rate || '-'} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}</Box>
+          {invalid &&
+          <Box display="flex" justifyContent="center">
+            <FieldError>Invalid amount</FieldError>
+          </Box>
+          }
+          {!invalid && rate &&
+          <Box textAlign="center" width={1}>~{rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}</Box>
+          }
+          {!invalid && !rate &&
+          <Box display="flex" justifyContent="center"><LoadingRing size={12} /></Box>
+          }
         </Info>
-        }
       </Box>
     </Box>
   );
