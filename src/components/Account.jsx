@@ -7,8 +7,8 @@ import { Box } from '@material-ui/core';
 import { getAddress, getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 import { initETH, openLoginModal, logout } from '../redux/eth/actions';
 
-const AUTO_CONNECT = false; // TODO remember
-// const AUTO_CONNECT = true;
+// const AUTO_CONNECT = false; // TODO remember
+const AUTO_CONNECT = true;
 
 function Account() {
   const address = useSelector(getAddress);
@@ -49,7 +49,7 @@ function Account() {
   return (
     <Box display="flex">
       <Box mr={1}>{addressComponent}</Box>
-      <Button icon={<IconPower />} size="medium" onClick={onLogout} />
+      <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />
     </Box>
   );
 }

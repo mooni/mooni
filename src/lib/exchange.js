@@ -10,13 +10,12 @@ const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 // TODO slippage
 
 export async function getRate(rateRequest) {
-  if(rateRequest.rateDirection === 'input') {
+  if(rateRequest.tradeExact === 'INPUT') {
 
-    let ethInputAmount = rateRequest.inputAmount;
+    let ethInputAmount = rateRequest.amount;
 
     if(rateRequest.inputCurrency !== 'ETH') {
-      console.log(rateRequest);
-      const tokenRate = await rateExactTokenForETH(rateRequest.inputCurrency, rateRequest.inputAmount);
+      const tokenRate = await rateExactTokenForETH(rateRequest.inputCurrency, rateRequest.amount);
       ethInputAmount = tokenRate.outputAmount;
     }
 
@@ -27,18 +26,19 @@ export async function getRate(rateRequest) {
     });
 
     return {
-      ...rateRequest,
-      inputAmount:  BN(rateRequest.inputAmount).toString(),
+      inputCurrency: rateRequest.inputCurrency,
+      outputCurrency: rateRequest.outputCurrency,
+      inputAmount:  BN(rateRequest.amount).toString(),
       outputAmount: BN(bityRate.outputAmount).toString(),
     };
 
   }
-  else if(rateRequest.rateDirection === 'output') {
+  else if(rateRequest.tradeExact === 'OUTPUT') {
 
     const bityRate = await Bity.estimate({
       inputCurrency: 'ETH',
       outputCurrency: rateRequest.outputCurrency,
-      outputAmount: rateRequest.outputAmount,
+      outputAmount: rateRequest.amount,
     });
 
     let finalInputAmount = bityRate.inputAmount;
@@ -51,8 +51,10 @@ export async function getRate(rateRequest) {
     return {
       ...rateRequest,
       inputAmount:  BN(finalInputAmount).toString(),
-      outputAmount: BN(rateRequest.outputAmount).toString(),
+      outputAmount: BN(rateRequest.amount).toString(),
     }
+  } else {
+    throw new Error('invalid TRADE_EXACT')
   }
 }
 

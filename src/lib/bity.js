@@ -60,7 +60,7 @@ const Bity = {
       outputCurrency,
     };
   },
-  async order({ fromAddress, recipient, paymentDetail, contactPerson }) {
+  async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
     const body = {
       input: {
         currency: paymentDetail.inputCurrency,
@@ -74,7 +74,7 @@ const Bity = {
         bic_swift: recipient.bic_swift,
         currency: paymentDetail.outputCurrency,
         amount: String(paymentDetail.outputAmount),
-        reference: paymentDetail.reference,
+        reference: reference,
       },
     };
 

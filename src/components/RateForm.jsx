@@ -42,87 +42,141 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function RateForm({ onChange, invalid, defaultValues }) {
+function RateForm({ onChange, invalid, defaultRateRequest }) {
   const classes = useStyles();
 
   const [rateDetails, setRateDetails] = useState({
-    inputCurrencyId: Math.max(inputCurrencies.indexOf(defaultValues?.inputCurrency), 0),
-    inputCurrency: defaultValues?.inputCurrency || inputCurrencies[0],
-    outputCurrencyId: Math.max(outputCurrencies.indexOf(defaultValues?.outputCurrency), 0),
+    inputCurrencyId: 0,
+    inputCurrency: inputCurrencies[0],
+    outputCurrencyId: 0,
     outputCurrency: outputCurrencies[0],
     inputAmount: null,
-    outputAmount: defaultValues?.outputAmount || 100,
-    rateDirection: 'output',
+    outputAmount: 100,
+    tradeExact: 'OUTPUT',
   });
+  const [rateRequest, setRateRequest] = useState(null);
 
-  const [rateRequest, setRateRequest] = useState(rateDetails);
+  useEffect(() => {
+    if(defaultRateRequest) {
+      const newRateDetails = {
+        inputCurrencyId: inputCurrencies.indexOf(defaultRateRequest.inputCurrency),
+        inputCurrency: defaultRateRequest.inputCurrency,
+        outputCurrencyId: outputCurrencies.indexOf(defaultRateRequest.outputCurrency),
+        outputCurrency: defaultRateRequest.outputCurrency,
+        inputAmount: defaultRateRequest.tradeExact === 'INPUT' ? defaultRateRequest.amount : null,
+        outputAmount: defaultRateRequest.tradeExact === 'OUTPUT' ? defaultRateRequest.amount : null,
+        tradeExact: defaultRateRequest.tradeExact,
+      };
+      setRateDetails(newRateDetails);
+      setRateRequest({
+        inputCurrency: defaultRateRequest.inputCurrency,
+        outputCurrency: defaultRateRequest.outputCurrency,
+        amount: defaultRateRequest.amount,
+        tradeExact: defaultRateRequest.tradeExact,
+      });
+    } else {
+      setRateRequest({
+        inputCurrency: rateDetails.inputCurrency,
+        outputCurrency: rateDetails.outputCurrency,
+        amount: rateDetails.tradeExact === 'INPUT' ? rateDetails.inputAmount : rateDetails.outputAmount,
+        tradeExact: rateDetails.tradeExact,
+      });
+    }
+  }, [defaultRateRequest]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const debouncedRateRequest = useDebounce(rateRequest, 1000);
-
   const [rateLoading, setRateLoading] = useState(true);
-
-  const rate = (rateLoading || rateRequest) ? null : BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
-
-  useEffect(() => {
-    onChange(rateDetails);
-  }, [onChange, rateDetails]);
+  const rate = (rateLoading) ? null : BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
 
   useEffect(() => {
+    onChange(rateRequest);
+  }, [onChange, rateRequest]);
+
+  useEffect(() => {
+    let isMounted = true;
+
     (async () => {
-      if (!debouncedRateRequest || debouncedRateRequest.inputAmount === 0 || debouncedRateRequest.outputAmount === 0) return;
+
+      if (!debouncedRateRequest || debouncedRateRequest.amount === 0) return;
 
       setRateLoading(true);
 
       const res = await getRate(debouncedRateRequest);
 
-      setRateDetails(res);
+      if(!isMounted) return;
 
-      setRateRequest(null);
+      setRateDetails(r => ({
+        ...r,
+        inputAmount: res.inputAmount,
+        outputAmount: res.outputAmount,
+      }));
+
       setRateLoading(false);
     })();
+
+    return () => isMounted = false;
   }, [debouncedRateRequest]);
 
   function onChangeInputCurrency(currencyId) {
+    setRateLoading(true);
     const newRateDetails = {
       ...rateDetails,
       inputCurrency: inputCurrencies[currencyId],
       inputCurrencyId: currencyId,
     };
     setRateDetails(newRateDetails);
-    setRateRequest(newRateDetails);
+    setRateRequest({
+      ...rateRequest,
+      inputCurrency: newRateDetails.inputCurrency,
+    });
   }
   function onChangeOutputCurrency(currencyId) {
+    setRateLoading(true);
     const newRateDetails = {
       ...rateDetails,
       outputCurrency: outputCurrencies[currencyId],
       outputCurrencyId: currencyId,
     };
     setRateDetails(newRateDetails);
-    setRateRequest(newRateDetails);
+    setRateRequest({
+      ...rateRequest,
+      outputCurrency: newRateDetails.outputCurrency,
+    });
   }
   /*
   function onChangeInputValue(e) {
+    setRateLoading(true);
     const value = Number(e.target.value);
     const newRateDetails = {
       ...rateDetails,
       inputAmount: value,
       outputAmount: null,
-      rateDirection: 'input',
+      tradeExact: 'INPUT',
     };
     setRateDetails(newRateDetails);
-    setRateRequest(newRateDetails);
+    setRateRequest({
+      ...rateRequest,
+      amount: newRateDetails.inputAmount,
+      tradeExact: newRateDetails.tradeExact,
+    });
   }
   */
 
   function onChangeOutputValue(e) {
+    setRateLoading(true);
     const value = Number(e.target.value);
     const newRateDetails = {
       ...rateDetails,
       inputAmount: null,
       outputAmount: value,
-      rateDirection: 'output',
+      tradeExact: 'OUTPUT',
     };
     setRateDetails(newRateDetails);
-    setRateRequest(newRateDetails);
+    setRateRequest({
+      ...rateRequest,
+      amount: newRateDetails.outputAmount,
+      tradeExact: newRateDetails.tradeExact,
+    });
   }
 
   return (
@@ -157,7 +211,7 @@ function RateForm({ onChange, invalid, defaultValues }) {
         </Grid>
         <Hidden smDown>
           <Grid item sm={1} className={classes.exchangeIcon}>
-            {(rateLoading || rateRequest) ?
+            {(rateLoading) ?
               <LoadingRing size={24} />
               :
               <ShuffleIcon/>

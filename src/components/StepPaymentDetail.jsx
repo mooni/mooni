@@ -8,8 +8,8 @@ import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 import RateForm from '../components/RateForm';
 
-import { setPaymentDetail } from '../redux/payment/actions';
-import { getPaymentDetail } from '../redux/payment/selectors';
+import { setAmountDetail, setReference } from '../redux/payment/actions';
+import { getAmountDetail, getReference } from '../redux/payment/selectors';
 
 const fields = {
   outputAmount: {
@@ -24,35 +24,30 @@ const fields = {
 };
 
 function StepPaymentDetail({ onComplete, onBack }) {
-  const paymentDetails = useSelector(getPaymentDetail);
+  const amountDetails = useSelector(getAmountDetail);
+  const reference = useSelector(getReference);
   const dispatch = useDispatch();
-  const [rateDetails, setRateDetails] = useState(null);
+  const [rateRequest, setRateRequest] = useState(null);
 
   const { register, handleSubmit, errors, setValue } = useForm({
     mode: 'onChange',
-    defaultValues: paymentDetails ? {
-      reference: paymentDetails.reference ?? '',
-    } : {
-      reference: '',
+    defaultValues: {
+      reference: reference || '',
     },
   });
 
   useEffect(() => {
-    rateDetails && setValue('outputAmount', rateDetails.outputAmount, true);
-  }, [rateDetails, setValue]);
+    rateRequest && setValue('outputAmount', rateRequest.amount, true);
+  }, [rateRequest, setValue]);
 
   useEffect(() => {
     register({ name: 'outputAmount' }, fields.outputAmount);
-    setValue('outputAmount', paymentDetails.outputAmount, true);
-  }, [register]);
+    setValue('outputAmount', amountDetails.amount, true);
+  }, [register]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = handleSubmit(data => {
-    dispatch(setPaymentDetail({
-      inputCurrency: rateDetails.inputCurrency,
-      outputCurrency: rateDetails.outputCurrency,
-      outputAmount: rateDetails.outputAmount,
-      reference: data.reference,
-    }));
+    dispatch(setAmountDetail(rateRequest));
+    dispatch(setReference(data.reference));
 
     onComplete();
   });
@@ -62,7 +57,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <RateForm onChange={setRateDetails} invalid={!!errors.outputAmount} defaultValues={paymentDetails}/>
+        <RateForm onChange={setRateRequest} invalid={!!errors.outputAmount} defaultRateRequest={amountDetails}/>
         <Box py={2}>
           <Field label="Reference (optional)">
             <WideInput
