@@ -10,6 +10,7 @@ import { FieldError } from './StyledComponents';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
+import { getCurrencyLogoAddress, getFiatLogoAddress } from '../lib/currencies';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
@@ -41,6 +42,18 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
   },
 }));
+
+function CurrencyItem({ symbol, imageUrl }) {
+  return (
+    <Box display="flex" alignItems="center">
+      <img
+        src={imageUrl}
+        width={20}
+      />
+      <Box ml={1}>{symbol}</Box>
+    </Box>
+  );
+}
 
 function RateForm({ onChange, invalid, defaultRateRequest }) {
   const classes = useStyles();
@@ -200,7 +213,9 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
               </Grid>
               <Grid item xs={4}>
                 <DropDown
-                  items={inputCurrencies}
+                  items={inputCurrencies.map(symbol =>
+                    CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
+                  )}
                   selected={rateDetails.inputCurrencyId}
                   onChange={onChangeInputCurrency}
                   wide
@@ -235,7 +250,9 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
               </Grid>
               <Grid item xs={4}>
                 <DropDown
-                  items={outputCurrencies}
+                  items={outputCurrencies.map(symbol =>
+                    CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
+                  )}
                   selected={rateDetails.outputCurrencyId}
                   onChange={onChangeOutputCurrency}
                   wide
