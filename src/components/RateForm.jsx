@@ -24,13 +24,13 @@ const useStyles = makeStyles(theme => ({
   formRow: {
     padding: theme.spacing(1, 1),
   },
-  form: {
-    padding: theme.spacing(1, 1),
-  },
   amountInput: {
     textAlign: 'right',
     border: 'none',
     width: '100%',
+  },
+  selectedAmountInput: {
+    backgroundColor: '#ebfafd8a',
   },
   amountLabel: {
     display: 'flex',
@@ -193,76 +193,59 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
   }
 
   return (
-    <Box className={classes.root}>
-      <Grid container spacing={1} className={classes.form}>
-        <Grid item xs={12} sm>
-          <Paper className={classes.formRow}>
-            <Grid container spacing={0}>
-              <Grid item xs={8}>
-                <TextInput
-                  type="number"
-                  min={0}
-                  value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
-                  disabled
-                  readOnly
-                  wide
-                  adornment={<Box>You send</Box>}
-                  className={classes.amountInput}
-                  adornmentSettings={{ width: 50 }}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <DropDown
-                  items={inputCurrencies.map(symbol =>
-                    CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
-                  )}
-                  selected={rateDetails.inputCurrencyId}
-                  onChange={onChangeInputCurrency}
-                  wide
-                />
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        <Hidden smDown>
-          <Grid item sm={1} className={classes.exchangeIcon}>
-            {(rateLoading) ?
-              <LoadingRing size={24} />
-              :
-              <ShuffleIcon/>
-            }
+    <Box p={1} mt={3}>
+      <Paper className={classes.formRow}>
+        <Grid container spacing={1}>
+          <Grid item xs={8}>
+            <TextInput
+              type="number"
+              min={0}
+              value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
+              disabled
+              readOnly
+              wide
+              adornment={<Box>You send</Box>}
+              className={classes.amountInput}
+              adornmentSettings={{ width: 50 }}
+            />
           </Grid>
-        </Hidden>
-        <Grid item xs={12} sm>
-          <Paper className={classes.formRow}>
-            <Grid container spacing={0}>
-              <Grid item xs={8}>
-                <TextInput
-                  type="number"
-                  min={0}
-                  value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
-                  onChange={onChangeOutputValue}
-                  wide
-                  className={classes.amountInput}
-                  adornment={<Box>You get</Box>}
-                  adornmentSettings={{ width: 50 }}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <DropDown
-                  items={outputCurrencies.map(symbol =>
-                    CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
-                  )}
-                  selected={rateDetails.outputCurrencyId}
-                  onChange={onChangeOutputCurrency}
-                  wide
-                />
-              </Grid>
-            </Grid>
-          </Paper>
+          <Grid item xs={4}>
+            <DropDown
+              items={inputCurrencies.map(symbol =>
+                CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
+              )}
+              selected={rateDetails.inputCurrencyId}
+              onChange={onChangeInputCurrency}
+              wide
+            />
+          </Grid>
         </Grid>
-      </Grid>
-      <Box py={2} height={111} mx="auto">
+        <Box mt={1}/>
+        <Grid container spacing={1}>
+          <Grid item xs={8}>
+            <TextInput
+              type="number"
+              min={0}
+              value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
+              onChange={onChangeOutputValue}
+              wide
+              className={[classes.amountInput, classes.selectedAmountInput].join(' ')}
+              adornment={<Box>You get</Box>}
+              adornmentSettings={{ width: 50 }}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <DropDown
+              items={outputCurrencies.map(symbol =>
+                CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
+              )}
+              selected={rateDetails.outputCurrencyId}
+              onChange={onChangeOutputCurrency}
+              wide
+            />
+          </Grid>
+        </Grid>
+        <Box mt={1}/>
         <Info title="Estimated exchange rate">
           {invalid &&
           <Box display="flex" justifyContent="center">
@@ -276,7 +259,7 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
           <Box display="flex" justifyContent="center"><LoadingRing size={12} /></Box>
           }
         </Info>
-      </Box>
+      </Paper>
     </Box>
   );
 }
