@@ -10,6 +10,11 @@ const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
 // TODO slippage
 
+function calculatedGasMargin(gas) {
+  const offset = gas.mul(1000).div(10000);
+  return gas.add(offset);
+}
+
 export async function getRate(rateRequest) {
   if(rateRequest.tradeExact === 'INPUT') {
 
@@ -105,7 +110,17 @@ export async function checkTradeAllowance(tradeDetails, signer) {
   const allowance = await tokenContract.allowance(senderAddress, executionDetails.exchangeAddress);
 
   if(tradeDetails.inputAmount.amount.gt(allowance)) {
-    return tokenContract.approve(executionDetails.exchangeAddress, tradeDetails.inputAmount.amount.toString());
+    const allowanceAmount = tradeDetails.inputAmount.amount.toString();
+    const estimatedGas = await tokenContract.estimate.approve(executionDetails.exchangeAddress, allowanceAmount)
+    const gasLimit = calculatedGasMargin(estimatedGas);
+    console.log(estimatedGas.toString(), gasLimit.toString());
+    return tokenContract.approve(
+      executionDetails.exchangeAddress,
+      allowanceAmount,
+      {
+        gasLimit,
+      }
+    );
   }
   return null;
 }
@@ -120,10 +135,15 @@ export async function executeTrade(tradeDetails, recipient, signer) {
 
   const exchangeContract = new ethers.Contract(executionDetails.exchangeAddress, EXCHANGE_ABI, signer);
 
+  const tradeMethod = TRADE_METHODS[executionDetails.methodName];
+  const args = executionDetails.methodArguments.map(a => a.toString());
+
   const overrides = {
     value: ethers.utils.parseEther(executionDetails.value.toString()),
   };
-  const args = executionDetails.methodArguments.map(a => a.toString());
 
-  return exchangeContract.functions[TRADE_METHODS[executionDetails.methodName]](...args, overrides);
+  const estimatedGas = await exchangeContract.estimate[tradeMethod](...args, overrides);
+  overrides.gasLimit = calculatedGasMargin(estimatedGas);
+
+  return exchangeContract.functions[tradeMethod](...args, overrides);
 }
