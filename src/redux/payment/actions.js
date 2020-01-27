@@ -1,7 +1,7 @@
 import Bity from '../../lib/bity';
 import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
-import { rateTokenForExactETH } from '../../lib/exchange';
+import { rateTokenForExactETH, executeTrade, checkTradeAllowance } from '../../lib/exchange';
 
 export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
@@ -90,6 +90,7 @@ export const createOrder = () => async function (dispatch, getState)  {
     }
 
     const paymentOrder = {
+      paymentRequest,
       path: 'BITY',
       bityOrder: orderDetail,
     };
@@ -116,16 +117,46 @@ export const createOrder = () => async function (dispatch, getState)  {
 
 export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
-  const { bityOrder } = getPaymentOrder(state);
+  const paymentOrder = getPaymentOrder(state);
   const ethManager = getETHManager(getState());
 
-  const { input: { amount }, payment_details: { crypto_address } } = bityOrder;
+  if(paymentOrder.paymentRequest.amountDetail.tradeExact === 'INPUT') throw new Error('not implemented');
 
-  dispatch(setPaymentStatus('approval'));
+  const bityInputAmount = paymentOrder.bityOrder.input.amount;
+  const bityDepositAddress = paymentOrder.bityOrder.payment_details.crypto_address;
+
   try {
-    const tx = await ethManager.send(crypto_address, amount);
-    dispatch(setPaymentStatus('pending'));
-    await ethManager.provider.waitForTransaction(tx.hash);
+    if(paymentOrder.path === 'BITY') {
+
+      dispatch(setPaymentStatus('approval'));
+      const tx = await ethManager.send(bityDepositAddress, bityInputAmount);
+
+      dispatch(setPaymentStatus('mining-payment'));
+      await ethManager.waitForConfirmedTransaction(tx.hash);
+
+    } else if(paymentOrder.path === 'DEX_BITY') {
+      dispatch(setPaymentStatus('check-allowance'));
+      const approveTx = await checkTradeAllowance(paymentOrder.tokenRate.tradeDetails, ethManager.signer);
+
+      if(approveTx) {
+        dispatch(setPaymentStatus('mining-allowance'));
+        await ethManager.waitForConfirmedTransaction(approveTx.hash);
+      }
+
+      dispatch(setPaymentStatus('approval'));
+      const executeTx = await executeTrade(
+        paymentOrder.tokenRate.tradeDetails,
+        bityDepositAddress,
+        ethManager.signer,
+      );
+
+      dispatch(setPaymentStatus('mining-payment'));
+      await ethManager.waitForConfirmedTransaction(executeTx.hash);
+
+    } else {
+      throw new Error('invalid payment path');
+    }
+
     dispatch(setPaymentStatus('mined'));
   } catch(error) {
     console.error(error);

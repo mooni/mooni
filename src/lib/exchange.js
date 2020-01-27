@@ -1,5 +1,6 @@
 import BN from 'bignumber.js';
-import { tradeTokensForExactEth, tradeExactTokensForEth } from '@uniswap/sdk'
+import { tradeTokensForExactEth, tradeExactTokensForEth, getExecutionDetails, EXCHANGE_ABI, TRADE_METHODS } from '@uniswap/sdk'
+import ERC20_ABI from './abis/ERC20.json';
 import { ethers } from 'ethers';
 
 import { TOKEN_DATA } from './currencies';
@@ -62,16 +63,17 @@ export async function rateTokenForExactETH(symbol, ethAmount) {
   const { tokenAddress } = TOKEN_DATA[symbol];
   const exactETHAmount = ethers.utils.parseEther(ethAmount);
 
-  const res = await tradeTokensForExactEth(tokenAddress, exactETHAmount);
-  const serializedResponse = stringifyObj(res);
+  const tradeDetails = await tradeTokensForExactEth(tokenAddress, exactETHAmount);
+  const serializedResponse = stringifyObj(tradeDetails);
 
   return {
-    inputAmount: res.inputAmount.amount.div(10 ** res.inputAmount.token.decimals).toString(),
-    outputAmount: res.outputAmount.amount.div(10 ** res.outputAmount.token.decimals).toString(),
+    inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toString(),
+    outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toString(),
     inputCurrency: symbol,
     outputCurrency: 'ETH',
     rate: serializedResponse.executionRate.rate,
     invertedRate: serializedResponse.executionRate.rateInverted,
+    tradeDetails,
   }
 }
 
@@ -79,16 +81,49 @@ export async function rateExactTokenForETH(symbol, tokenAmount) {
   const { tokenAddress } = TOKEN_DATA[symbol];
  const exactTokenAmount = ethers.utils.parseEther(String(tokenAmount));
 
-  const res = await tradeExactTokensForEth(tokenAddress, exactTokenAmount);
-  const serializedResponse = stringifyObj(res);
+  const tradeDetails = await tradeExactTokensForEth(tokenAddress, exactTokenAmount);
+  const serializedResponse = stringifyObj(tradeDetails);
 
-  console.log(serializedResponse);
   return {
-    inputAmount: res.inputAmount.amount.div(10 ** res.inputAmount.token.decimals).toString(),
-    outputAmount: res.outputAmount.amount.div(10 ** res.outputAmount.token.decimals).toString(),
+    inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toString(),
+    outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toString(),
     inputCurrency: symbol,
     outputCurrency: 'ETH',
     rate: serializedResponse.executionRate.rate,
     invertedRate: serializedResponse.executionRate.rateInverted,
+    tradeDetails,
   }
+}
+
+export async function checkTradeAllowance(tradeDetails, signer) {
+  const executionDetails = getExecutionDetails(tradeDetails);
+
+  const tokenAddress = tradeDetails.inputAmount.token.address;
+  const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+
+  const senderAddress = await signer.getAddress();
+  const allowance = await tokenContract.allowance(senderAddress, executionDetails.exchangeAddress);
+
+  if(tradeDetails.inputAmount.amount.gt(allowance)) {
+    return tokenContract.approve(executionDetails.exchangeAddress, tradeDetails.inputAmount.amount.toString());
+  }
+  return null;
+}
+
+export async function executeTrade(tradeDetails, recipient, signer) {
+  const executionDetails = getExecutionDetails(
+    tradeDetails,
+    null, // max slippage, default 200 (2%)
+    null, // deadline, default 10 minutes
+    recipient,
+  );
+
+  const exchangeContract = new ethers.Contract(executionDetails.exchangeAddress, EXCHANGE_ABI, signer);
+
+  const overrides = {
+    value: ethers.utils.parseEther(executionDetails.value.toString()),
+  };
+  const args = executionDetails.methodArguments.map(a => a.toString());
+
+  return exchangeContract.functions[TRADE_METHODS[executionDetails.methodName]](...args, overrides);
 }

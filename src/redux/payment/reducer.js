@@ -22,7 +22,7 @@ const initialMockState = {
       email: 'cacao@live.fr',
     },
     amountDetail: {
-      inputCurrency: INPUT_CURRENCIES[0],
+      inputCurrency: INPUT_CURRENCIES[1],
       outputCurrency: OUTPUT_CURRENCIES[0],
       amount: 10,
       tradeExact: 'OUTPUT',

@@ -16,9 +16,15 @@ function StepStatus({ onBack, onExit }) {
   return (
     <Box width={1} py={3}>
       { paymentStatus ===  'approval' &&
-      <Loader text="Awaiting transaction approval..." />
+      <Loader text="Please approve transaction" />
       }
-      { paymentStatus ===  'pending' &&
+      { paymentStatus ===  'check-allowance' &&
+      <Loader text="Please approve Uniswap to spend your tokens" />
+      }
+      { paymentStatus ===  'mining-allowance' &&
+      <Loader text="Awaiting allowance mined..." />
+      }
+      { paymentStatus ===  'mining-payment' &&
       <Loader text="Awaiting transaction mined..." />
       }
       { paymentStatus ===  'mined' &&

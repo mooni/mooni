@@ -95,6 +95,13 @@ class ETHManager extends EventEmitter {
     });
   }
 
+  async waitForConfirmedTransaction(hash) {
+    const receipt = await this.provider.waitForTransaction(hash);
+    if(receipt.status === 0) {
+      throw new Error('transaction fail');
+    }
+  }
+
   static async createETHManager(walletType = 'injected') {
     const ethereum = await ETHManager.getWalletProvider(walletType);
 
