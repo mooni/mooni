@@ -1,5 +1,5 @@
 import BN from 'bignumber.js';
-import { tradeTokensForExactEth, tradeExactTokensForEth, getExecutionDetails, EXCHANGE_ABI, TRADE_METHODS } from '@uniswap/sdk'
+import { tradeTokensForExactEth, tradeExactTokensForEth, getExecutionDetails, getTokenReserves, EXCHANGE_ABI, TRADE_METHODS } from '@uniswap/sdk';
 import ERC20_ABI from './abis/ERC20.json';
 import { ethers } from 'ethers';
 
@@ -98,6 +98,12 @@ export async function rateExactTokenForETH(symbol, tokenAmount) {
     invertedRate: serializedResponse.executionRate.rateInverted,
     tradeDetails,
   }
+}
+
+export async function getExchangeAddress(symbol) {
+  const { tokenAddress } = TOKEN_DATA[symbol];
+  const tokenReserves = await getTokenReserves(tokenAddress);
+  return tokenReserves.exchange.address;
 }
 
 export async function checkTradeAllowance(tradeDetails, signer) {

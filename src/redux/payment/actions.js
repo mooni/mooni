@@ -1,7 +1,7 @@
 import Bity from '../../lib/bity';
 import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
-import { rateTokenForExactETH, executeTrade, checkTradeAllowance } from '../../lib/exchange';
+import { rateTokenForExactETH, executeTrade, checkTradeAllowance, getExchangeAddress } from '../../lib/exchange';
 
 export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
@@ -65,12 +65,18 @@ export const setPaymentStatus = (paymentStatus) => ({
 
 export const createOrder = () => async function (dispatch, getState)  {
   const state = getState();
-  const fromAddress = getAddress(state);
+  const walletAddress = getAddress(state);
   const paymentRequest = getPaymentRequest(state);
 
   if(paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   try {
+    let fromAddress = walletAddress;
+
+    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
+      fromAddress = await getExchangeAddress(paymentRequest.amountDetail.inputCurrency);
+    }
+
     const orderDetail = await Bity.order({
       fromAddress,
       recipient: paymentRequest.recipient,
