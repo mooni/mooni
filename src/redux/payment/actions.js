@@ -1,5 +1,5 @@
 import Bity from '../../lib/bity';
-import { getRecipient, getAmountDetail, getOrder, getContactPerson, getReference } from '../payment/selectors';
+import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
 import { rateTokenForExactETH } from '../../lib/exchange';
 
@@ -7,7 +7,7 @@ export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_REFERENCE = 'SET_REFERENCE';
-export const SET_ORDER = 'SET_ORDER';
+export const SET_PAYMENT_ORDER = 'SET_PAYMENT_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const SET_TOKEN_EXCHANGE = 'SET_TOKEN_EXCHANGE';
 export const RESET_ORDER = 'RESET_ORDER';
@@ -39,23 +39,16 @@ export const setContactPerson = (contactPerson) => ({
   }
 });
 
-export const setOrder = (order) => ({
-  type: SET_ORDER,
+export const setPaymentOrder = (paymentOrder) => ({
+  type: SET_PAYMENT_ORDER,
   payload: {
-    order,
+    paymentOrder,
   }
 });
 export const setOrderErrors = (errors) => ({
   type: SET_ORDER_ERRORS,
   payload: {
     orderErrors: errors,
-  }
-});
-
-export const setTokenExchange = (tokenExchange) => ({
-  type: SET_TOKEN_EXCHANGE,
-  payload: {
-    tokenExchange,
   }
 });
 
@@ -73,22 +66,21 @@ export const setPaymentStatus = (paymentStatus) => ({
 export const createOrder = () => async function (dispatch, getState)  {
   const state = getState();
   const fromAddress = getAddress(state);
-  const recipient = getRecipient(state);
-  const reference = getReference(state);
-  const paymentDetail = getAmountDetail(state);
-  const contactPerson = getContactPerson(state);
+  const paymentRequest = getPaymentRequest(state);
+
+  if(paymentRequest.amountDetail.tradeExact === 'INPUT') throw new Error('not implemented');
 
   try {
     const orderDetail = await Bity.order({
       fromAddress,
-      recipient,
+      recipient: paymentRequest.recipient,
       paymentDetail: {
         inputCurrency: 'ETH',
-        outputAmount: paymentDetail.amount,
-        outputCurrency: paymentDetail.outputCurrency,
+        outputAmount: paymentRequest.amountDetail.amount,
+        outputCurrency: paymentRequest.amountDetail.outputCurrency,
       },
-      reference,
-      contactPerson,
+      reference: paymentRequest.reference,
+      contactPerson: paymentRequest.contactPerson,
     });
 
     if(!orderDetail.input) {
@@ -97,20 +89,21 @@ export const createOrder = () => async function (dispatch, getState)  {
       throw cookieError;
     }
 
-    dispatch(setOrder(orderDetail));
+    const paymentOrder = {
+      path: 'BITY',
+      bityOrder: orderDetail,
+    };
 
-    if(paymentDetail.inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenForExactETH(paymentDetail.inputCurrency, orderDetail.input.amount);
-
-      dispatch(setTokenExchange({ tokenRate }));
+    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
+      paymentOrder.path = 'DEX_BITY';
+      paymentOrder.tokenRate = await rateTokenForExactETH(paymentRequest.amountDetail.inputCurrency, orderDetail.input.amount);
     }
 
-    dispatch(setOrderErrors(null));
+    dispatch(setPaymentOrder(paymentOrder));
 
     // TODO register delete order after price guaranteed timeout
   } catch(error) {
-    dispatch(setOrder(null));
-    dispatch(setTokenExchange(null));
+    dispatch(setPaymentOrder(null));
 
     if(error.message === 'api_error') {
       dispatch(setOrderErrors(error.errors));
@@ -123,10 +116,10 @@ export const createOrder = () => async function (dispatch, getState)  {
 
 export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
-  const order = getOrder(state);
+  const { bityOrder } = getPaymentOrder(state);
   const ethManager = getETHManager(getState());
 
-  const { input: { amount }, payment_details: { crypto_address } } = order;
+  const { input: { amount }, payment_details: { crypto_address } } = bityOrder;
 
   dispatch(setPaymentStatus('approval'));
   try {

@@ -6,11 +6,11 @@ import { Button, IconArrowLeft, IconHome, IconCheck, IconCaution, IconExternal }
 
 import Loader from '../components/Loader';
 
-import { getOrder, getPaymentStatus } from '../redux/payment/selectors';
+import { getPaymentOrder, getPaymentStatus } from '../redux/payment/selectors';
 
 function StepStatus({ onBack, onExit }) {
   const paymentStatus = useSelector(getPaymentStatus);
-  const order = useSelector(getOrder);
+  const paymentOrder = useSelector(getPaymentOrder);
 
   // TODO update bity order
   return (
@@ -32,7 +32,7 @@ function StepStatus({ onBack, onExit }) {
           Bank transfers can take several days to arrive, please be patient.
         </Box>
         <Box py={1}>
-        <Button href={`https://go.bity.com/order-status?id=${order.id}`} wide icon={<IconExternal/>} label="Open bity order"/>
+        <Button href={`https://go.bity.com/order-status?id=${paymentOrder.bityOrder.id}`} wide icon={<IconExternal/>} label="Open bity order"/>
         </Box>
         <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
       </Box>

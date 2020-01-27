@@ -59,7 +59,7 @@ const initialEmptyState = {
     },
     reference: '',
   },
-  order: null,
+  paymentOrder: null,
   orderError: null,
   tokenExchange: null,
   paymentStatus: null,
@@ -110,11 +110,11 @@ export default function(state = initialState, action) {
         },
       };
     }
-    case actions.SET_ORDER: {
-      const { order } = action.payload;
+    case actions.SET_PAYMENT_ORDER: {
+      const { paymentOrder } = action.payload;
       return {
         ...state,
-        order,
+        paymentOrder,
       };
     }
     case actions.SET_ORDER_ERRORS: {
@@ -134,7 +134,7 @@ export default function(state = initialState, action) {
     case actions.RESET_ORDER: {
       return {
         ...state,
-        order: null,
+        paymentOrder: null,
         orderError: null,
       };
     }
