@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { Box, Step } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
@@ -33,30 +33,20 @@ const useStyles = makeStyles({
 
 function PaymentPage() {
   const history = useHistory();
-  let { stepId } = useParams();
-  const stepIdn = Number(stepId);
+  const [stepId, setActiveStep] = useState(0);
   const { below, above } = useViewport();
   const classes = useStyles();
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if(stepIdn !== 0) {
-      history.push(`/send/0`);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function setActiveStep(step) {
-    history.push(`/send/${step}`);
-  }
   function onExit() {
     history.push('/');
   }
   function handleNext() {
-    setActiveStep(stepIdn + 1);
+    setActiveStep(stepId + 1);
   }
   function handleBack() {
-    setActiveStep(stepIdn - 1);
+    setActiveStep(stepId - 1);
   }
   function onEditRecap() {
     dispatch(resetOrder());
@@ -87,7 +77,7 @@ function PaymentPage() {
         { below('medium') &&
         <>
           <CustomMobileStepper
-            activeStep={stepIdn}
+            activeStep={stepId}
             steps={stepElements.length}
             variant="dots"
             position="static"
@@ -96,12 +86,12 @@ function PaymentPage() {
             backButton={<div></div>}
           />
           <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-            {steps[stepIdn]}
+            {steps[stepId]}
           </Box>
         </>
         }
         { above('medium') &&
-        <CustomStepper alternativeLabel activeStep={stepIdn} connector={<CustomStepConnector />}>
+        <CustomStepper alternativeLabel activeStep={stepId} connector={<CustomStepConnector />}>
           {steps.map(label => (
             <Step key={label}>
               <CustomLabel StepIconComponent={CustomStepIcon}>{label}</CustomLabel>
@@ -109,7 +99,7 @@ function PaymentPage() {
           ))}
         </CustomStepper>
         }
-        {stepElements[stepIdn]}
+        {stepElements[stepId]}
       </ABox>
       <Footer />
     </>

@@ -50,7 +50,7 @@ function App() {
           <Route path="/my-account">
             <RequireConnection eth box><MyAccountPage /></RequireConnection>
           </Route>
-          <Route path="/send/:stepId">
+          <Route path="/send">
             <RequireConnection eth><PaymentPage /></RequireConnection>
           </Route>
           <Route path="/send">
