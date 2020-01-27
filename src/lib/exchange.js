@@ -107,13 +107,17 @@ export async function checkTradeAllowance(tradeDetails, signer) {
   const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
 
   const senderAddress = await signer.getAddress();
+  const tokenBalance = await tokenContract.balanceOf(senderAddress);
+  if(tradeDetails.inputAmount.amount.gt(tokenBalance)) {
+    throw new Error('token-balance-too-low');
+  }
+
   const allowance = await tokenContract.allowance(senderAddress, executionDetails.exchangeAddress);
 
   if(tradeDetails.inputAmount.amount.gt(allowance)) {
     const allowanceAmount = tradeDetails.inputAmount.amount.toString();
     const estimatedGas = await tokenContract.estimate.approve(executionDetails.exchangeAddress, allowanceAmount)
     const gasLimit = calculatedGasMargin(estimatedGas);
-    console.log(estimatedGas.toString(), gasLimit.toString());
     return tokenContract.approve(
       executionDetails.exchangeAddress,
       allowanceAmount,

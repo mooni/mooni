@@ -68,7 +68,7 @@ export const createOrder = () => async function (dispatch, getState)  {
   const fromAddress = getAddress(state);
   const paymentRequest = getPaymentRequest(state);
 
-  if(paymentRequest.amountDetail.tradeExact === 'INPUT') throw new Error('not implemented');
+  if(paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   try {
     const orderDetail = await Bity.order({
@@ -120,7 +120,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const paymentOrder = getPaymentOrder(state);
   const ethManager = getETHManager(getState());
 
-  if(paymentOrder.paymentRequest.amountDetail.tradeExact === 'INPUT') throw new Error('not implemented');
+  if(paymentOrder.paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   const bityInputAmount = paymentOrder.bityOrder.input.amount;
   const bityDepositAddress = paymentOrder.bityOrder.payment_details.crypto_address;
