@@ -148,4 +148,8 @@ class ETHManager extends EventEmitter {
   }
 }
 
+export function getEtherscanTxURL(hash) {
+  return `https://etherscan.io/tx/${hash}`;
+}
+
 export default ETHManager;

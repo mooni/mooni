@@ -112,6 +112,10 @@ const Bity = {
     });
     return data;
   },
+
+  getOrderStatusPage(orderId) {
+    return `https://go.bity.com/order-status?id=${orderId}`;
+  }
 };
 
 export default Bity;

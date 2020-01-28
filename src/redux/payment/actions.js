@@ -12,6 +12,7 @@ export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const SET_TOKEN_EXCHANGE = 'SET_TOKEN_EXCHANGE';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
+export const SET_PAYMENT_TRANSACTION = 'SET_PAYMENT_TRANSACTION';
 
 export const setAmountDetail = (amountDetail) => ({
   type: SET_AMOUNT_DETAIL,
@@ -60,6 +61,12 @@ export const setPaymentStatus = (paymentStatus) => ({
   type: SET_PAYMENT_STATUS,
   payload: {
     paymentStatus,
+  }
+});
+export const setPaymentTransaction = (paymentTransaction) => ({
+  type: SET_PAYMENT_TRANSACTION,
+  payload: {
+    paymentTransaction,
   }
 });
 
@@ -125,6 +132,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
   const paymentOrder = getPaymentOrder(state);
   const ethManager = getETHManager(getState());
+  dispatch(setPaymentTransaction(null));
 
   if(paymentOrder.paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
@@ -136,6 +144,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
       dispatch(setPaymentStatus('approval'));
       const tx = await ethManager.send(bityDepositAddress, bityInputAmount);
+      dispatch(setPaymentTransaction({ hash: tx.hash }));
 
       dispatch(setPaymentStatus('mining-payment'));
       await ethManager.waitForConfirmedTransaction(tx.hash);
@@ -155,6 +164,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
         bityDepositAddress,
         ethManager.signer,
       );
+      dispatch(setPaymentTransaction({ hash: executeTx.hash }));
 
       dispatch(setPaymentStatus('mining-payment'));
       await ethManager.waitForConfirmedTransaction(executeTx.hash);

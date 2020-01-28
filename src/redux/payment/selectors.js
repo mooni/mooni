@@ -10,3 +10,4 @@ export const getReference = selectProperty([STATE_NAME, 'paymentRequest', 'refer
 export const getPaymentOrder = selectProperty([STATE_NAME, 'paymentOrder']);
 export const getOrderErrors = selectProperty([STATE_NAME, 'orderErrors']);
 export const getPaymentStatus = selectProperty([STATE_NAME, 'paymentStatus']);
+export const getPaymentTransaction = selectProperty([STATE_NAME, 'paymentTransaction']);
