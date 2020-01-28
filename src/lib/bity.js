@@ -92,8 +92,12 @@ const Bity = {
         withCredentials: true,
       });
 
-      const order = await Bity.getOrder(headers.location);
-      return order;
+      const { data } = await instance({
+        method: 'get',
+        url: headers.location,
+        withCredentials: true,
+      });
+      return data;
     } catch(error) {
       if(error && error.response && error.response.data && error.response.data.errors) {
         const apiError = new Error('api_error');
@@ -104,16 +108,28 @@ const Bity = {
       }
     }
   },
-  async getOrder(orderLocation) {
+  async getOrderDetails(orderId) {
     const { data } = await instance({
       method: 'get',
-      url: orderLocation,
+      url: `/v2/orders/${orderId}`,
       withCredentials: true,
     });
+
+    let paymentStatus = 'waiting';
+    if(data.timestamp_cancelled) {
+      paymentStatus = 'cancelled';
+    } else if(data.timestamp_executed) {
+      paymentStatus = 'executed';
+    } else if(data.timestamp_payment_received) {
+      paymentStatus = 'received';
+    }
+
+    data.paymentStatus = paymentStatus;
+
     return data;
   },
 
-  getOrderStatusPage(orderId) {
+  getOrderStatusPageURL(orderId) {
     return `https://go.bity.com/order-status?id=${orderId}`;
   }
 };

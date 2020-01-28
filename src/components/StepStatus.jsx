@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
@@ -10,10 +10,39 @@ import { getEtherscanTxURL } from '../lib/eth';
 
 import { getPaymentOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
 
+const POLL_INTERVAL = 2000;
+function useUpdatedOrder(orderId) {
+  const [orderDetails, setOrderDetails] = useState(null);
+
+  useEffect(() => {
+    let intervalId;
+
+    function fetchNewData() {
+      Bity.getOrderDetails(orderId)
+        .then(newOrderDetails => {
+          setOrderDetails(newOrderDetails);
+          if(newOrderDetails.paymentStatus === 'executed' || newOrderDetails.paymentStatus === 'cancelled') {
+            clearInterval(intervalId);
+          }
+        })
+        .catch(console.error);
+    }
+    intervalId = setInterval(fetchNewData, POLL_INTERVAL);
+    fetchNewData();
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [orderId]);
+
+  return orderDetails;
+}
 function StepStatus({ onBack, onExit }) {
   const paymentStatus = useSelector(getPaymentStatus);
   const paymentOrder = useSelector(getPaymentOrder);
   const paymentTransaction = useSelector(getPaymentTransaction);
+
+  const orderDetails = useUpdatedOrder(paymentOrder.bityOrder.id);
 
   // TODO update bity order
   return (
@@ -37,8 +66,16 @@ function StepStatus({ onBack, onExit }) {
         </Box>
         <Box py={2} textAlign="center">
           Transaction sent! <br/>
-          The exchange is done and the wire transfer has been initiated. <br/>
-          Bank transfers can take several days to arrive, please be patient.
+          {orderDetails ?
+            <Box>
+              {orderDetails.paymentStatus === 'waiting' && 'Waiting bity to catch the transaction...'}
+              {orderDetails.paymentStatus === 'received' && 'Bity has received the transaction...'}
+              {orderDetails.paymentStatus === 'executed' && 'The exchange is done and the wire transfer has been initiated. Bank transfers can take several days to arrive, please be patient.'}
+              {orderDetails.paymentStatus === 'cancelled' && 'Bity has cancelled the order. Please contact their support'}
+            </Box>
+            :
+            <Box>Loading order status...</Box>
+          }
         </Box>
         <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
       </Box>
@@ -58,7 +95,7 @@ function StepStatus({ onBack, onExit }) {
       <Box my={1}>
         {paymentTransaction && <Button href={getEtherscanTxURL(paymentTransaction.hash)} wide icon={<IconExternal/>} label="Open transaction explorer" />}
         <Box mt={1}/>
-        {paymentOrder?.bityOrder && <Button href={Bity.getOrderStatusPage(paymentOrder.bityOrder.id)} wide icon={<IconExternal/>} label="Open Bity Order page" />}
+        {paymentOrder?.bityOrder && <Button href={Bity.getOrderStatusPageURL(paymentOrder.bityOrder.id)} wide icon={<IconExternal/>} label="Open Bity Order page" />}
       </Box>
     </Box>
   )
