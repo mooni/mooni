@@ -2,9 +2,11 @@
 
 Easily transfer funds from your crypto wallet to your bank account.
 
-[🖼 Landing page](https://mooni.launchaco.com)
+[🖼 Landing page](https://mooni.tech)
 
-[🚀 Web Application](https://mooni.now.sh)
+[🚀 Web Application](https://app.mooni.tech)
+
+[📚 Developer documentation](https://doc.mooni.tech)
 
 [🔮 Frontend integration](./#-Frontend-integration)
 
@@ -22,7 +24,7 @@ Mooni is a simple solution for end-users, marketplaces or DAOs to cash out crypt
 * **No account** Withdraw up to 5000€ per year without KYC
 * **Decentralized** All in browser
 
-[🚀 Use Mooni now](https://mooni.now.sh)
+[🚀 Use Mooni now](https://app.mooni.tech)
 
 _This project is in early stage and shall be used with care._
 
