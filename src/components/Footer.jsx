@@ -15,7 +15,7 @@ function Footer() {
       <Grid container justify="center" alignItems="center" spacing={4}>
         <Grid item>
           <Box display="flex" justifyContent="center" alignItems="center">
-            <Link href="https://mooni.launchaco.com" external style={{ textDecoration: 'none' }}>
+            <Link href="https://mooni.tech" external style={{ textDecoration: 'none' }}>
               About
             </Link>
           </Box>
