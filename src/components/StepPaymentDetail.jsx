@@ -1,115 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
-import { Box, Paper, Grid } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Grid } from '@material-ui/core';
 
-import { Button, Field, DropDown, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
+import RateForm from '../components/RateForm';
 
-import { setPaymentDetail } from '../redux/payment/actions';
-import { getPaymentDetail } from '../redux/payment/selectors';
+import { setAmountDetail, setReference } from '../redux/payment/actions';
+import { getAmountDetail, getReference } from '../redux/payment/selectors';
 
-import { OUTPUT_CURRENCIES } from '../lib/currencies';
-
-const useStyles = makeStyles(theme => ({
-  formRow: {
-    padding: theme.spacing(1, 1),
+const fields = {
+  outputAmount: {
+    required: true,
+    min: 10,
+    pattern: /^[0-9]+\.?[0-9]*$/,
+    validate: value => Number(value) >= 10,
   },
-  amountInput: {
-    textAlign: 'right',
-    border: 'none',
-    width: '100%',
+  reference: {
+    pattern: /^[0-9A-Za-z ]*$/,
   },
-  amountLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: 6,
-  },
-  exchangeIcon: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-}));
+};
 
 function StepPaymentDetail({ onComplete, onBack }) {
-  const classes = useStyles();
-
-  const paymentDetails = useSelector(getPaymentDetail);
+  const amountDetails = useSelector(getAmountDetail);
+  const reference = useSelector(getReference);
   const dispatch = useDispatch();
+  const [rateRequest, setRateRequest] = useState(null);
 
-  const [selectedCurrency, setSelectedCurrency] = useState(Math.max(OUTPUT_CURRENCIES.indexOf(paymentDetails.outputCurrency), 0));
-
-  const { register, handleSubmit, errors } = useForm({
+  const { register, handleSubmit, errors, setValue } = useForm({
     mode: 'onChange',
-    defaultValues: paymentDetails ? {
-      amount: paymentDetails.outputAmount ?? 100,
-      reference: paymentDetails.reference ?? '',
-    } : {
-      amount: 100,
-      reference: '',
+    defaultValues: {
+      reference: reference || '',
     },
   });
 
-  const onSubmit = handleSubmit(async data => {
-    dispatch(setPaymentDetail({
-      outputAmount: data.amount,
-      outputCurrency: OUTPUT_CURRENCIES[selectedCurrency],
-      reference: data.reference,
-    }));
+  useEffect(() => {
+    rateRequest && setValue('outputAmount', rateRequest.amount, true);
+  }, [rateRequest, setValue]);
+
+  useEffect(() => {
+    register({ name: 'outputAmount' }, fields.outputAmount);
+    setValue('outputAmount', amountDetails.amount, true);
+  }, [register]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onSubmit = handleSubmit(data => {
+    dispatch(setAmountDetail(rateRequest));
+    dispatch(setReference(data.reference));
 
     onComplete();
   });
-
-  const fields = {
-    amount: {
-      required: true,
-      min: 0,
-      pattern: /^[0-9]+\.?[0-9]*$/,
-      validate: value => Number(value) > 0,
-    },
-    reference: {
-      pattern: /^[0-9A-Za-z ]*$/,
-    },
-  };
 
   const hasErrors = Object.keys(errors).length !== 0;
 
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <Paper className={classes.formRow}>
-          <Grid container spacing={0}>
-            <Grid item xs={8}>
-              <Box display="flex" flexDirection="row">
-                <Box className={classes.amountLabel}>
-                  Amount
-                </Box>
-                <WideInput
-                  type="number"
-                  name="amount"
-                  min={0}
-                  ref={register(fields.amount)}
-                  className={classes.amountInput}
-                  adornment={<Box>Amount</Box>}
-                  adornmentSettings={{ width: 50 }}
-                  placeholder="10"
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={4}>
-              <DropDown
-                items={OUTPUT_CURRENCIES}
-                selected={selectedCurrency}
-                onChange={setSelectedCurrency}
-                wide
-              />
-            </Grid>
-          </Grid>
-          {errors.amount && <FieldError>Invalid amount</FieldError>}
-        </Paper>
+        <RateForm onChange={setRateRequest} invalid={!!errors.outputAmount} defaultRateRequest={amountDetails}/>
         <Box py={2}>
           <Field label="Reference (optional)">
             <WideInput

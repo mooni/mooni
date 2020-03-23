@@ -95,6 +95,13 @@ class ETHManager extends EventEmitter {
     });
   }
 
+  async waitForConfirmedTransaction(hash) {
+    const receipt = await this.provider.waitForTransaction(hash);
+    if(receipt.status === 0) {
+      throw new Error('transaction-fail');
+    }
+  }
+
   static async createETHManager(walletType = 'injected') {
     const ethereum = await ETHManager.getWalletProvider(walletType);
 
@@ -139,6 +146,10 @@ class ETHManager extends EventEmitter {
       }
     }
   }
+}
+
+export function getEtherscanTxURL(hash) {
+  return `https://etherscan.io/tx/${hash}`;
 }
 
 export default ETHManager;
