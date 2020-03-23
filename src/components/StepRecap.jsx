@@ -11,7 +11,7 @@ import RecipientInfo from '../components/RecipientInfo';
 
 import { getRecipient, getPaymentOrder, getOrderErrors } from '../redux/payment/selectors';
 
-function StepRecap({ onComplete, onBack }) {
+function StepRecap({ onComplete }) {
   const recipient = useSelector(getRecipient);
   const paymentOrder = useSelector(getPaymentOrder);
   const orderErrors = useSelector(getOrderErrors);
@@ -29,9 +29,6 @@ function StepRecap({ onComplete, onBack }) {
             <Box key={error.code}><b>{error.code}</b> {error.message}</Box>
           ))}
         </Info>
-        <Box pt={2}>
-          <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
-        </Box>
       </Box>
     );
   }
@@ -79,14 +76,7 @@ function StepRecap({ onComplete, onBack }) {
                 </Box>
               </Modal>
             </Box>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
-              </Grid>
-            </Grid>
+            <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
           </>
           :
           <Loader text="Creating order ..." />

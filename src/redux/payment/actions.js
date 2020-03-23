@@ -13,6 +13,7 @@ export const SET_TOKEN_EXCHANGE = 'SET_TOKEN_EXCHANGE';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 export const SET_PAYMENT_TRANSACTION = 'SET_PAYMENT_TRANSACTION';
+export const SET_PAYMENT_STEP = 'SET_PAYMENT_STEP';
 
 export const setAmountDetail = (amountDetail) => ({
   type: SET_AMOUNT_DETAIL,
@@ -67,6 +68,12 @@ export const setPaymentTransaction = (paymentTransaction) => ({
   type: SET_PAYMENT_TRANSACTION,
   payload: {
     paymentTransaction,
+  }
+});
+export const setPaymentStep = (stepId) => ({
+  type: SET_PAYMENT_STEP,
+  payload: {
+    stepId,
   }
 });
 

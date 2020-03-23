@@ -5,6 +5,7 @@ import * as actions from "./actions";
 export const STATE_NAME = 'PAYMENT';
 
 const initialEmptyState = {
+  paymentStep: 0,
   paymentRequest: {
     recipient: null,
     contactPerson: null,
@@ -23,8 +24,33 @@ const initialEmptyState = {
   paymentTransaction: null,
 };
 
-const initialState = initialEmptyState;
-// const initialState = initialMockState;
+const initialMockState = {
+  paymentStep: 0,
+  paymentRequest: {
+    recipient: {
+      iban: 'NL91ABNA9326322815',
+      owner: {
+        name: 'alice',
+      }
+    },
+    contactPerson: null,
+    amountDetail: {
+      inputCurrency: INPUT_CURRENCIES[0],
+      outputCurrency: OUTPUT_CURRENCIES[0],
+      amount: 100,
+      tradeExact: 'OUTPUT',
+    },
+    reference: '',
+  },
+  paymentOrder: null,
+  orderError: null,
+  tokenExchange: null,
+  paymentStatus: null,
+  paymentTransaction: null,
+};
+
+// const initialState = initialEmptyState;
+const initialState = initialMockState;
 
 export default function(state = initialState, action) {
   switch (action.type) {
@@ -108,6 +134,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         transaction,
+      };
+    }
+    case actions.SET_PAYMENT_STEP: {
+      const { stepId } = action.payload;
+      return {
+        ...state,
+        paymentStep: stepId,
       };
     }
     default:

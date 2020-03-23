@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { Box, Step } from '@material-ui/core'
+import { Box, Button, IconButton } from '@material-ui/core'
+import { ArrowBack, ArrowForward } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 import { useViewport, Box as ABox } from '@aragon/ui'
 
 import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
-import StepContact from '../components/StepContact';
+import StepAmount from '../components/StepAmount';
 import StepRecap from '../components/StepRecap';
 import StepStatus from '../components/StepStatus';
 import Footer from '../components/Footer';
 
 import { CustomStepper, CustomStepConnector, CustomStepIcon, CustomLabel, CustomMobileStepper } from '../components/StepComponents';
 
-import { createOrder, sendPayment, resetOrder } from '../redux/payment/actions';
+import { createOrder, sendPayment, resetOrder, setPaymentStep } from '../redux/payment/actions';
+import { getPaymentStep } from '../redux/payment/selectors';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -33,8 +35,7 @@ const useStyles = makeStyles({
 
 function PaymentPage() {
   const history = useHistory();
-  const [stepId, setActiveStep] = useState(0);
-  const { below, above } = useViewport();
+  const stepId = useSelector(getPaymentStep);
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -43,14 +44,14 @@ function PaymentPage() {
     history.push('/');
   }
   function handleNext() {
-    setActiveStep(stepId + 1);
+    dispatch(setPaymentStep(stepId + 1));
   }
   function handleBack() {
-    setActiveStep(stepId - 1);
+    dispatch(setPaymentStep(Math.max(0, stepId - 1)));
   }
   function onEditRecap() {
     dispatch(resetOrder());
-    setActiveStep(2);
+    dispatch(setPaymentStep(stepId - 1));
   }
   function onPrepareRecap() {
     dispatch(resetOrder());
@@ -62,46 +63,46 @@ function PaymentPage() {
     handleNext();
   }
 
-  const steps = ['Recipient', 'Payment Details', 'Contact', 'Recap', 'Status'];
+  const steps = ['Amount', 'Recipient', 'Payment Details', 'Recap', 'Status'];
   const stepElements = [
+    <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
-    <StepPaymentDetail onComplete={handleNext} onBack={handleBack} />,
-    <StepContact onComplete={onPrepareRecap} onBack={handleBack} />,
-    <StepRecap onComplete={onSend} onBack={onEditRecap} />,
+    <StepPaymentDetail onComplete={onPrepareRecap} />,
+    <StepRecap onComplete={onSend} />,
     <StepStatus onExit={onExit} onBack={onEditRecap} />,
   ];
 
   return (
     <>
       <ABox width={1} py={3}>
-        { below('medium') &&
-        <>
-          <CustomMobileStepper
-            activeStep={stepId}
-            steps={stepElements.length}
-            variant="dots"
-            position="static"
-            className={classes.mobileStepperRoot}
-            nextButton={<div></div>}
-            backButton={<div></div>}
-          />
-          <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-            {steps[stepId]}
-          </Box>
-        </>
-        }
-        { above('medium') &&
-        <CustomStepper alternativeLabel activeStep={stepId} connector={<CustomStepConnector />}>
-          {steps.map(label => (
-            <Step key={label}>
-              <CustomLabel StepIconComponent={CustomStepIcon}>{label}</CustomLabel>
-            </Step>
-          ))}
-        </CustomStepper>
+        <CustomMobileStepper
+          activeStep={stepId}
+          steps={stepElements.length}
+          variant="progress"
+          position="static"
+          className={classes.mobileStepperRoot}
+        />
+
+        <Box textAlign="center" className={classes.mobileStepperStepLabel}>
+          {steps[stepId]}
+        </Box>
+
+        {stepId !== 0 && <Box mb={2}>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            startIcon={<ArrowBack/>}
+            disabled={stepId === 0}
+            style={{width: '100%'}}
+            onClick={handleBack}
+          >
+            Back
+          </Button>
+        </Box>
         }
         {stepElements[stepId]}
       </ABox>
-      <Footer />
     </>
   );
 }

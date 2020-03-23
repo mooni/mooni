@@ -15,6 +15,9 @@ export const CustomMobileStepper = withStyles({
     padding: '9px',
     background: 'none',
   },
+  progress: {
+    width: '100%'
+  },
   dotActive: {
     backgroundColor: '#784af4',
   },

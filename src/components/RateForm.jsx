@@ -194,72 +194,70 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
 
   return (
     <Box p={1} mt={3}>
-      <Paper className={classes.formRow}>
-        <Grid container spacing={1}>
-          <Grid item xs={8}>
-            <TextInput
-              type="number"
-              min={0}
-              value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
-              disabled
-              readOnly
-              wide
-              adornment={<Box>You send</Box>}
-              className={classes.amountInput}
-              adornmentSettings={{ width: 50 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <DropDown
-              items={inputCurrencies.map(symbol =>
-                CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
-              )}
-              selected={rateDetails.inputCurrencyId}
-              onChange={onChangeInputCurrency}
-              wide
-            />
-          </Grid>
+      <Grid container spacing={1}>
+        <Grid item xs={8}>
+          <TextInput
+            type="number"
+            min={0}
+            value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
+            disabled
+            readOnly
+            wide
+            adornment={<Box>You send</Box>}
+            className={classes.amountInput}
+            adornmentSettings={{ width: 50 }}
+          />
         </Grid>
-        <Box mt={1}/>
-        <Grid container spacing={1}>
-          <Grid item xs={8}>
-            <TextInput
-              type="number"
-              min={0}
-              value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
-              onChange={onChangeOutputValue}
-              wide
-              className={[classes.amountInput, classes.selectedAmountInput].join(' ')}
-              adornment={<Box>You get</Box>}
-              adornmentSettings={{ width: 50 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <DropDown
-              items={outputCurrencies.map(symbol =>
-                CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
-              )}
-              selected={rateDetails.outputCurrencyId}
-              onChange={onChangeOutputCurrency}
-              wide
-            />
-          </Grid>
+        <Grid item xs={4}>
+          <DropDown
+            items={inputCurrencies.map(symbol =>
+              CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
+            )}
+            selected={rateDetails.inputCurrencyId}
+            onChange={onChangeInputCurrency}
+            wide
+          />
         </Grid>
-        <Box mt={1}/>
-        <Info title="Estimated exchange rate">
-          {invalid &&
-          <Box display="flex" justifyContent="center">
-            <FieldError>Invalid amount</FieldError>
-          </Box>
-          }
-          {!invalid && rate &&
-          <Box textAlign="center" width={1}>~{rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}</Box>
-          }
-          {!invalid && !rate &&
-          <Box display="flex" justifyContent="center"><LoadingRing size={12} /></Box>
-          }
-        </Info>
-      </Paper>
+      </Grid>
+      <Box mt={1}/>
+      <Grid container spacing={1}>
+        <Grid item xs={8}>
+          <TextInput
+            type="number"
+            min={0}
+            value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
+            onChange={onChangeOutputValue}
+            wide
+            className={[classes.amountInput, classes.selectedAmountInput].join(' ')}
+            adornment={<Box>You get</Box>}
+            adornmentSettings={{ width: 50 }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <DropDown
+            items={outputCurrencies.map(symbol =>
+              CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
+            )}
+            selected={rateDetails.outputCurrencyId}
+            onChange={onChangeOutputCurrency}
+            wide
+          />
+        </Grid>
+      </Grid>
+      <Box mt={1}/>
+      <Info title="Estimated exchange rate">
+        {invalid &&
+        <Box display="flex" justifyContent="center">
+          <FieldError>Invalid amount</FieldError>
+        </Box>
+        }
+        {!invalid && rate &&
+        <Box textAlign="center" width={1}>~{rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}</Box>
+        }
+        {!invalid && !rate &&
+        <Box display="flex" justifyContent="center"><LoadingRing size={12} /></Box>
+        }
+      </Info>
     </Box>
   );
 }

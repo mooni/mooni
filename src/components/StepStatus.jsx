@@ -37,6 +37,7 @@ function useUpdatedOrder(orderId) {
 
   return orderDetails;
 }
+
 function StepStatus({ onBack, onExit }) {
   const paymentStatus = useSelector(getPaymentStatus);
   const paymentOrder = useSelector(getPaymentOrder);

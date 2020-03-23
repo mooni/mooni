@@ -47,10 +47,10 @@
     did-resolver "0.0.6"
     ipfs-did-document "^1.2.3"
 
-"@aragon/ui@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@aragon/ui/-/ui-1.0.0.tgz#2d317295ff634c04c5fc8e6016cce8698803ec08"
-  integrity sha512-EU8rWt2Hjlb68d/aR5KzRg9WWFEi3HBy2gafV8yJf7JE5tlzR6H/3AsGVSELU2BTNBXSCbnfRfSM2c5LWpQNgA==
+"@aragon/ui@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@aragon/ui/-/ui-1.3.1.tgz#f1ac4c7778ea4ed895640790e97dbf284edc0b76"
+  integrity sha512-qt2Xd9WfIC9VBBQnDo8PgUQDcSY+4bCwwJY2yCPN4sKeYKccCyVO1p6qfgSNw5+EuCY+r+NHZddmJLIUNYFu8g==
   dependencies:
     "@babel/runtime" "^7.3.1"
     airbnb-prop-types "^2.9.0"
