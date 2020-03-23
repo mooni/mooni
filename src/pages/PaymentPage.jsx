@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { Box, Button, IconButton } from '@material-ui/core'
-import { ArrowBack, ArrowForward } from '@material-ui/icons'
+import { Box, Button } from '@material-ui/core'
+import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
-import { useViewport, Box as ABox } from '@aragon/ui'
+import { Box as ABox } from '@aragon/ui'
 
 import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepAmount from '../components/StepAmount';
 import StepRecap from '../components/StepRecap';
 import StepStatus from '../components/StepStatus';
-import Footer from '../components/Footer';
 
-import { CustomStepper, CustomStepConnector, CustomStepIcon, CustomLabel, CustomMobileStepper } from '../components/StepComponents';
+import { CustomMobileStepper } from '../components/StepComponents';
 
 import { createOrder, sendPayment, resetOrder, setPaymentStep } from '../redux/payment/actions';
 import { getPaymentStep } from '../redux/payment/selectors';

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import BN from 'bignumber.js';
 
-import { Box, Grid } from '@material-ui/core';
-import { Button, Countdown, Info, IconArrowLeft, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
+import { Box } from '@material-ui/core';
+import { Button, Countdown, Info, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
 
 import Terms from '../components/Terms';
 import Loader from '../components/Loader';

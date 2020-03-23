@@ -1,15 +1,14 @@
-import React, { useState , useEffect} from 'react';
+import React from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
-import { Box, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
-import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { Button, Field, IconArrowRight } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
-import RateForm from '../components/RateForm';
 
-import {setAmountDetail, setContactPerson, setReference} from '../redux/payment/actions';
-import {getAmountDetail, getContactPerson, getReference} from '../redux/payment/selectors';
+import { setContactPerson, setReference } from '../redux/payment/actions';
+import { getContactPerson, getReference } from '../redux/payment/selectors';
 
 const fields = {
   email: {

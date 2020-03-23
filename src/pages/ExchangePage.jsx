@@ -2,18 +2,12 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 
-import { Grid, Box } from '@material-ui/core';
-import {Link, Button, IconRefresh, IconCoin, Info} from '@aragon/ui'
+import { Box, Typography } from '@material-ui/core';
+import {Button, IconRefresh, Info} from '@aragon/ui'
 
 import RateForm from '../components/RateForm';
-import Footer from '../components/Footer';
 import {setAmountDetail, setPaymentStep} from '../redux/payment/actions';
 import {getAmountDetail} from '../redux/payment/selectors';
-
-const logoStyle = {
-  fontSize: '5rem',
-  cursor: 'default',
-};
 
 export default function Exchange() {
   const history = useHistory();
@@ -31,14 +25,19 @@ export default function Exchange() {
 
   return (
     <Box width={1} py={2}>
-      <Box>
+      <Box textAlign="center">
+        <Typography variant="subtitle1">
+        Transfer funds from your crypto wallet to your bank account.
+        </Typography>
+      </Box>
+      <RateForm onChange={setRateRequest} defaultRateRequest={amountDetails}/>
+      <Box pt={1}>
+        <Button mode="strong" onClick={onGoToSend} wide label="Exchange" icon={<IconRefresh/>} />
+      </Box>
+      <Box pt={2}>
         <Info mode="error">
           Mooni is unaudited, please proceed with caution.
         </Info>
-      </Box>
-      <RateForm onChange={setRateRequest} defaultRateRequest={amountDetails}/>
-      <Box pt={2}>
-        <Button mode="strong" onClick={onGoToSend} wide label="Exchange" icon={<IconRefresh/>} />
       </Box>
     </Box>
   );

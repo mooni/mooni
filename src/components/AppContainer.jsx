@@ -1,24 +1,30 @@
 import React from 'react';
-import GitHubButton from 'react-github-btn';
 
 import {
   useHistory,
 } from 'react-router-dom';
 
-import {Link, Info, Main, Header} from '@aragon/ui'
-import {Grid, Box, Container} from '@material-ui/core';
-import Login from './Login';
+import {Main, Header} from '@aragon/ui'
+import {Box, Container} from '@material-ui/core';
 import Account from './Account';
 
+const appNameStyle = {
+  fontFamily:'Montserrat, sans-serif',
+  textTransform: 'uppercase',
+  fontSize: 24,
+  lineHeight: 1,
+  fontWeight: 400,
+  letterSpacing: 1,
+};
 export default function AppContainer({ children }) {
   const history = useHistory();
 
   return (
-    <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}>
+    <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`} theme="light">
       <Header
         primary={
           <Box onClick={() => history.push('/')} style={{cursor: 'pointer'}} fontSize={26}>
-            <span role="img" aria-label="mooni-logo">🌚</span>
+            <span style={appNameStyle}><span role="img" aria-label="mooni-logo">🌚</span> Mooni</span>
           </Box>
         }
         secondary={<Account />}

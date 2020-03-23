@@ -49,8 +49,8 @@ const initialMockState = {
   paymentTransaction: null,
 };
 
-// const initialState = initialEmptyState;
-const initialState = initialMockState;
+const initialState = initialEmptyState;
+// const initialState = initialMockState;
 
 export default function(state = initialState, action) {
   switch (action.type) {

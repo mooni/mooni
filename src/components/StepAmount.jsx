@@ -1,15 +1,13 @@
-import React, { useState , useEffect} from 'react';
-import useForm from 'react-hook-form';
+import React, { useState } from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import { Box, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
-import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
-import { WideInput, FieldError } from './StyledComponents';
+import { Button, IconArrowRight } from '@aragon/ui'
 import RateForm from '../components/RateForm';
 
-import {setAmountDetail, setContactPerson, setReference} from '../redux/payment/actions';
-import {getAmountDetail, getContactPerson, getReference} from '../redux/payment/selectors';
+import {setAmountDetail} from '../redux/payment/actions';
+import {getAmountDetail} from '../redux/payment/selectors';
 
 function StepPaymentDetail({ onComplete }) {
   const dispatch = useDispatch();
