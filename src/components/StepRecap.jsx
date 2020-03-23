@@ -9,11 +9,11 @@ import Terms from '../components/Terms';
 import Loader from '../components/Loader';
 import RecipientInfo from '../components/RecipientInfo';
 
-import { getRecipient, getOrder, getOrderErrors } from '../redux/payment/selectors';
+import { getRecipient, getPaymentOrder, getOrderErrors } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete, onBack }) {
   const recipient = useSelector(getRecipient);
-  const order = useSelector(getOrder);
+  const paymentOrder = useSelector(getPaymentOrder);
   const orderErrors = useSelector(getOrderErrors);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -39,20 +39,30 @@ function StepRecap({ onComplete, onBack }) {
   return (
     <Box width={1} py={3}>
       <RecipientInfo recipient={recipient} />
+      <Box mt={2}/>
       {
-        order ?
+        paymentOrder ?
           <>
-            <Box pt={2}>
-              <Info title="Payment details" mode="info">
-                <Box><b>From:</b> {order.input.amount} {order.input.currency}</Box>
-                <Box><b>Rate:</b> ~{BN(order.output.amount).div(order.input.amount).dp(3).toString()} {order.output.currency}/{order.input.currency} </Box>
-                <Box><b>To:</b> {order.output.amount} {order.output.currency}</Box>
-                <Box><b>Fees:</b> {order.price_breakdown.customer_trading_fee.amount} {order.price_breakdown.customer_trading_fee.currency}</Box>
-              </Info>
-            </Box>
+            <Info title="Payment details" mode="info">
+              <Box pt={2}>
+                {paymentOrder.path === 'DEX_BITY' ?
+                  <>
+                    <Box><b>From:</b> {paymentOrder.tokenRate.inputAmount} {paymentOrder.tokenRate.inputCurrency}</Box>
+                    <Box><b>Rate:</b> ~{BN(paymentOrder.bityOrder.output.amount).div(paymentOrder.tokenRate.inputAmount).dp(3).toString()} {paymentOrder.bityOrder.output.currency}/{paymentOrder.tokenRate.inputCurrency} </Box>
+                  </>
+                  :
+                  <>
+                    <Box><b>From:</b> {paymentOrder.bityOrder.input.amount} {paymentOrder.bityOrder.input.currency}</Box>
+                    <Box><b>Rate:</b> ~{BN(paymentOrder.bityOrder.output.amount).div(paymentOrder.bityOrder.input.amount).dp(3).toString()} {paymentOrder.bityOrder.output.currency}/{paymentOrder.bityOrder.input.currency} </Box>
+                  </>
+                }
+                <Box><b>To:</b> {paymentOrder.bityOrder.output.amount} {paymentOrder.bityOrder.output.currency}</Box>
+                <Box><b>Fees:</b> {paymentOrder.bityOrder.price_breakdown.customer_trading_fee.amount} {paymentOrder.bityOrder.price_breakdown.customer_trading_fee.currency}</Box>
+              </Box>
+            </Info>
             <Box pt={2}>
               <Info title="Price guaranteed until" mode="warning">
-                <Countdown end={new Date(order.timestamp_price_guaranteed)} />
+                <Countdown end={new Date(paymentOrder.bityOrder.timestamp_price_guaranteed)} />
               </Info>
             </Box>
             <Box py={2} display="flex" justifyContent="center">

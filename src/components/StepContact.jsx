@@ -1,6 +1,6 @@
 import React from 'react';
 import useForm from 'react-hook-form';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import { Box, Grid } from '@material-ui/core';
 
@@ -8,12 +8,17 @@ import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 
 import { setContactPerson } from '../redux/payment/actions';
+import { getContactPerson } from '../redux/payment/selectors';
 
 function StepPaymentDetail({ onComplete, onBack }) {
   const dispatch = useDispatch();
+  const contactPerson = useSelector(getContactPerson);
 
   const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      email: contactPerson?.email,
+    }
   });
 
   const onSubmit = handleSubmit(async data => {

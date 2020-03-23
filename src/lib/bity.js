@@ -54,30 +54,27 @@ const Bity = {
     });
 
     return {
-      inputAmount: inputAmount || data.input.amount,
-      outputAmount: outputAmount || data.output.amount,
+      inputAmount: data.input.amount,
+      outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
     };
   },
-  async order({ fromAddress, recipient, paymentDetail, contactPerson }) {
+  async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
     const body = {
       input: {
-        currency: "ETH",
+        currency: paymentDetail.inputCurrency,
         type: 'crypto_address',
-
         crypto_address: fromAddress,
       },
       output: {
         type: 'bank_account',
-
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
         bic_swift: recipient.bic_swift,
-
         currency: paymentDetail.outputCurrency,
         amount: String(paymentDetail.outputAmount),
-        reference: paymentDetail.reference,
+        reference: reference,
       },
     };
 
@@ -95,8 +92,12 @@ const Bity = {
         withCredentials: true,
       });
 
-      const order = await Bity.getOrder(headers.location);
-      return order;
+      const { data } = await instance({
+        method: 'get',
+        url: headers.location,
+        withCredentials: true,
+      });
+      return data;
     } catch(error) {
       if(error && error.response && error.response.data && error.response.data.errors) {
         const apiError = new Error('api_error');
@@ -107,14 +108,30 @@ const Bity = {
       }
     }
   },
-  async getOrder(orderLocation) {
+  async getOrderDetails(orderId) {
     const { data } = await instance({
       method: 'get',
-      url: orderLocation,
+      url: `/v2/orders/${orderId}`,
       withCredentials: true,
     });
+
+    let paymentStatus = 'waiting';
+    if(data.timestamp_cancelled) {
+      paymentStatus = 'cancelled';
+    } else if(data.timestamp_executed) {
+      paymentStatus = 'executed';
+    } else if(data.timestamp_payment_received) {
+      paymentStatus = 'received';
+    }
+
+    data.paymentStatus = paymentStatus;
+
     return data;
   },
+
+  getOrderStatusPageURL(orderId) {
+    return `https://go.bity.com/order-status?id=${orderId}`;
+  }
 };
 
 export default Bity;
