@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(3),
   },
   interRow: {
-    height: 26,
+    height: 46,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -41,7 +41,10 @@ function RateForm({ onChange, defaultRateRequest }) {
     outputAmount: 100,
     tradeExact: 'OUTPUT',
   });
+  const [rateLoading, setRateLoading] = useState(true);
   const [rateRequest, setRateRequest] = useState(null);
+  const [fees, setFees] = useState(null);
+  const debouncedRateRequest = useDebounce(rateRequest, 1000);
 
   useEffect(() => {
     if(defaultRateRequest) {
@@ -71,9 +74,17 @@ function RateForm({ onChange, defaultRateRequest }) {
     }
   }, [defaultRateRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const debouncedRateRequest = useDebounce(rateRequest, 1000);
-  const [rateLoading, setRateLoading] = useState(true);
-  const rate = (rateLoading) ? null : BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
+  let feeValue, feeCurrency, rate;
+  if(!rateLoading) {
+    if(fees.currency === rateDetails.inputCurrency) {
+      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(6).toString();
+      feeCurrency = rateDetails.outputCurrency;
+    } else {
+      feeValue = BN(fees.amount).dp(6).toString();
+      feeCurrency = fees.currency;
+    }
+    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
+  }
 
   useEffect(() => {
     onChange(rateRequest);
@@ -94,9 +105,11 @@ function RateForm({ onChange, defaultRateRequest }) {
 
       setRateDetails(r => ({
         ...r,
-        inputAmount: res.inputAmount,
-        outputAmount: res.outputAmount,
+        inputAmount: BN(res.inputAmount).toString(),
+        outputAmount: BN(res.outputAmount).toString(),
       }));
+
+      setFees(res.fees);
 
       setRateLoading(false);
     })();
@@ -187,14 +200,15 @@ function RateForm({ onChange, defaultRateRequest }) {
       />
 
       <Box className={classes.interRow}>
-        <Typography variant="caption">
-          {
-            rate ?
-              `~${rate} ${rateDetails.outputCurrency}/${rateDetails.inputCurrency}`
-              :
-              <LoadingRing/>
-          }
-        </Typography>
+        {rate ?
+          <Typography variant="caption">
+            <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
+            <br/>
+            <b>Fees:</b> {feeValue} {feeCurrency}
+          </Typography>
+          :
+          <LoadingRing/>
+        }
       </Box>
     </Box>
   );

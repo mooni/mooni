@@ -58,6 +58,10 @@ const Bity = {
       outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
+      fees: {
+        amount: data.price_breakdown.customer_trading_fee.amount,
+        currency: data.price_breakdown.customer_trading_fee.currency,
+      }
     };
   },
   async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {

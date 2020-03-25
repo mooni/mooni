@@ -27,13 +27,11 @@ export default function Exchange() {
     <Box width={1} py={2}>
       <Box textAlign="center">
         <Typography variant="subtitle1">
-        Transfer funds from your crypto wallet to your bank account.
+          Transfer funds from your crypto wallet to your bank account.
         </Typography>
       </Box>
       <RateForm onChange={setRateRequest} defaultRateRequest={amountDetails}/>
-      <Box pt={1}>
-        <Button mode="strong" onClick={onGoToSend} wide label="Exchange" icon={<IconRefresh/>} />
-      </Box>
+      <Button mode="strong" onClick={onGoToSend} wide label="Exchange" icon={<IconRefresh/>} />
       <Box pt={2}>
         <Info mode="error">
           Mooni is unaudited, please proceed with caution.
