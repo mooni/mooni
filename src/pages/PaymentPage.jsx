@@ -11,7 +11,6 @@ import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepAmount from '../components/StepAmount';
 import StepRecap from '../components/StepRecap';
-import StepStatus from '../components/StepStatus';
 
 import { CustomMobileStepper } from '../components/StepComponents';
 
@@ -33,33 +32,27 @@ const useStyles = makeStyles({
 });
 
 function PaymentPage() {
-  const history = useHistory();
-  const stepId = useSelector(getPaymentStep);
   const classes = useStyles();
-
+  const history = useHistory();
   const dispatch = useDispatch();
+  const stepId = useSelector(getPaymentStep);
 
-  function onExit() {
-    history.push('/');
-  }
   function handleNext() {
     dispatch(setPaymentStep(stepId + 1));
   }
   function handleBack() {
+    if(stepId === 3) {
+      dispatch(resetOrder());
+    }
     dispatch(setPaymentStep(Math.max(0, stepId - 1)));
   }
-  function onEditRecap() {
-    dispatch(resetOrder());
-    dispatch(setPaymentStep(stepId - 1));
-  }
   function onPrepareRecap() {
-    dispatch(resetOrder());
     dispatch(createOrder());
     handleNext();
   }
   function onSend() {
     dispatch(sendPayment());
-    handleNext();
+    history.push('/status');
   }
 
   const steps = ['Amount', 'Recipient', 'Payment Details', 'Recap', 'Status'];
@@ -68,7 +61,6 @@ function PaymentPage() {
     <StepRecipient onComplete={handleNext} />,
     <StepPaymentDetail onComplete={onPrepareRecap} />,
     <StepRecap onComplete={onSend} />,
-    <StepStatus onExit={onExit} onBack={onEditRecap} />,
   ];
 
   return (

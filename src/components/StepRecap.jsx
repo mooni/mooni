@@ -17,9 +17,14 @@ function StepRecap({ onComplete }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsOpened, setTermsOpened] = useState(false);
 
+  if(!paymentOrder) {
+    return (
+      <Loader text="Creating order ..." />
+    );
+  }
   const now = new Date();
   const orderExpireDate = new Date(paymentOrder.bityOrder.timestamp_price_guaranteed);
-  
+
   if(orderExpireDate < now) {
     return (
       <Box width={1}>
@@ -44,35 +49,27 @@ function StepRecap({ onComplete }) {
 
   return (
     <Box width={1}>
-      <Box mt={2}/>
-      {
-        paymentOrder ?
-          <>
-            <PaymentOrderRecap paymentOrder={paymentOrder} />
-            <Box pt={2}>
-              <Info title="Price guaranteed until" mode="warning">
-                <Countdown end={orderExpireDate} />
-              </Info>
-            </Box>
-            <Box py={2} display="flex" justifyContent="center">
-              <label>
-                <Checkbox
-                  checked={termsAccepted}
-                  onChange={setTermsAccepted}
-                />
-                I agree with the <Link onClick={() => setTermsOpened(true)}>terms of service</Link>
-              </label>
-              <Modal visible={termsOpened} onClose={() => setTermsOpened(false)}>
-                <Box>
-                  <Terms />
-                </Box>
-              </Modal>
-            </Box>
-            <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
-          </>
-          :
-          <Loader text="Creating order ..." />
-      }
+      <PaymentOrderRecap paymentOrder={paymentOrder} />
+      <Box pt={2}>
+        <Info title="Price guaranteed until" mode="warning">
+          <Countdown end={orderExpireDate} />
+        </Info>
+      </Box>
+      <Box py={2} display="flex" justifyContent="center">
+        <label>
+          <Checkbox
+            checked={termsAccepted}
+            onChange={setTermsAccepted}
+          />
+          I agree with the <Link onClick={() => setTermsOpened(true)}>terms of service</Link>
+        </label>
+        <Modal visible={termsOpened} onClose={() => setTermsOpened(false)}>
+          <Box>
+            <Terms />
+          </Box>
+        </Modal>
+      </Box>
+      <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
     </Box>
   )
 }

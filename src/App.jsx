@@ -13,6 +13,7 @@ import RequireConnection from './components/RequireConnection';
 import Login from './components/Login';
 import PaymentPage from './pages/PaymentPage';
 import ExchangePage from './pages/ExchangePage';
+import StatusPage from './pages/StatusPage';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
         </Route>
         <Route path="/send">
           <RequireConnection eth><PaymentPage /></RequireConnection>
+        </Route>
+        <Route path="/status">
+          <StatusPage />
         </Route>
         <Route path="*">
           <Redirect to="/exchange" />

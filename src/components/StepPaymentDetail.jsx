@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import { Box } from '@material-ui/core';
 
-import { Button, Field, IconArrowRight } from '@aragon/ui'
+import { Button, Field, IconCheck } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 
 import { setContactPerson, setReference } from '../redux/payment/actions';
@@ -64,7 +64,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
             {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>
         </Box>
-        <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={hasErrors} />
+        <Button mode="strong" onClick={onSubmit} wide icon={<IconCheck/>} label="Create order" disabled={hasErrors} />
       </form>
     </Box>
   )

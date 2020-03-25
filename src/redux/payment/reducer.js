@@ -24,57 +24,86 @@ const initialEmptyState = {
 };
 
 const initialMockState = {
-  paymentStep: 3,
+  paymentStep: 0,
   paymentRequest: {
     recipient: {
-      iban: 'NL91ABNA9326322815',
       owner: {
-        name: 'alice',
-      }
+        name: 'fdsfds',
+        country: ''
+      },
+      iban: 'NL91ABNA9326322815'
     },
-    contactPerson: null,
+    contactPerson: {
+      email: 'zfezf@fre.vfr'
+    },
     amountDetail: {
-      inputCurrency: INPUT_CURRENCIES[0],
-      outputCurrency: OUTPUT_CURRENCIES[0],
-      amount: 100,
-      tradeExact: 'OUTPUT',
+      inputCurrency: 'ETH',
+      outputCurrency: 'EUR',
+      amount: 10,
+      tradeExact: 'OUTPUT'
     },
-    reference: '',
+    reference: 'ceferfs'
   },
   paymentOrder: {
     paymentRequest: {
       recipient: {
-        iban: 'NL91ABNA9326322815',
-        bic_swift: '12RE',
         owner: {
-          name: 'Alice Martin',
-          address: '12 rue marsan',
-          zip: '33300',
-          city: 'Bordeaux',
-          country: 'France',
-        }
+          name: 'fdsfds',
+          country: ''
+        },
+        iban: 'NL91ABNA9326322815'
       },
       contactPerson: {
-        email: 'alice@gmail.com',
+        email: 'zfezf@fre.vfr'
       },
       amountDetail: {
-        inputCurrency: INPUT_CURRENCIES[0],
-        outputCurrency: OUTPUT_CURRENCIES[0],
-        amount: 121,
-        tradeExact: 'OUTPUT',
+        inputCurrency: 'ETH',
+        outputCurrency: 'EUR',
+        amount: 10,
+        tradeExact: 'OUTPUT'
       },
-      reference: '',
+      reference: 'ceferfs'
     },
     path: 'BITY',
-    bityOrder: {"input": {"amount": "0.95995978600951674", "currency": "ETH", "type": "crypto_address", "crypto_address": "0x4194ce73ac3fbbece8ffa878c2b5a8c90333e724"}, "output": {"amount": "121", "currency": "EUR", "type": "bank_account", "iban": "NL91ABNA9326322815", "reference": "feozijfze"}, "id": "d441af37-def4-4282-9491-fda18a5bfab5", "timestamp_created": "2020-03-25T11:02:39.315Z", "timestamp_awaiting_payment_since": "2020-03-25T11:02:41.713Z", "timestamp_price_guaranteed": "2021-03-25T11:12:41.713Z", "payment_details": {"crypto_address": "0x86be51fbc3ab2b66e8f9e0913a85cef7b1f89093", "type": "crypto_address"}, "price_breakdown": {"customer_trading_fee": {"amount": "0.00761648181486284", "currency": "ETH"}}},
+    bityOrder: {
+      input: {
+        amount: '0.080414513629301225',
+        currency: 'ETH',
+        type: 'crypto_address',
+        crypto_address: '0x4194ce73ac3fbbece8ffa878c2b5a8c90333e724'
+      },
+      output: {
+        amount: '10',
+        currency: 'EUR',
+        type: 'bank_account',
+        iban: 'NL91ABNA9326322815',
+        reference: 'ceferfs'
+      },
+      id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
+      timestamp_created: '2020-03-25T13:31:28.948Z',
+      timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
+      timestamp_price_guaranteed: '2020-03-25T13:41:31.831Z',
+      payment_details: {
+        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
+        type: 'crypto_address'
+      },
+      price_breakdown: {
+        customer_trading_fee: {
+          amount: '0.000635986164121',
+          currency: 'ETH'
+        }
+      }
+    }
   },
   orderError: null,
-  paymentStatus: null,
-  paymentTransaction: null,
+  paymentStatus: 'mined',
+  paymentTransaction: {
+    hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
+  }
 };
 
-// const initialState = initialEmptyState;
-const initialState = initialMockState;
+const initialState = initialEmptyState;
+// const initialState = initialMockState;
 
 export default function(state = initialState, action) {
   switch (action.type) {
@@ -147,10 +176,10 @@ export default function(state = initialState, action) {
       };
     }
     case actions.SET_PAYMENT_TRANSACTION: {
-      const { transaction } = action.payload;
+      const { paymentTransaction } = action.payload;
       return {
         ...state,
-        transaction,
+        paymentTransaction,
       };
     }
     case actions.SET_PAYMENT_STEP: {

@@ -77,8 +77,7 @@ export const setPaymentStep = (stepId) => ({
 });
 
 export const createOrder = () => async function (dispatch, getState)  {
-  dispatch(setPaymentOrder(null));
-  dispatch(setOrderErrors(null));
+  dispatch(resetOrder());
 
   const state = getState();
   const walletAddress = getAddress(state);

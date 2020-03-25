@@ -24,7 +24,7 @@ export default function AppContainer({ children }) {
       <Header
         primary={
           <Box onClick={() => history.push('/')} style={{cursor: 'pointer'}} fontSize={26}>
-            <span style={appNameStyle}><span role="img" aria-label="mooni-logo">🌚</span> Mooni</span>
+            <span style={appNameStyle} className="noselect"><span role="img" aria-label="mooni-logo">🌚</span> Mooni</span>
           </Box>
         }
         secondary={<Account />}
