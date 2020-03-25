@@ -47,7 +47,7 @@ function StepStatus({ onBack, onExit }) {
 
   // TODO update bity order
   return (
-    <Box width={1} py={3}>
+    <Box width={1}>
       { paymentStatus ===  'approval' &&
       <Loader text="Please approve transaction" />
       }

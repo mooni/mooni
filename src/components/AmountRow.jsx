@@ -57,11 +57,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function CurrencyItem({ symbol, imageUrl }) {
+function CurrencyItem({ symbol }) {
   return (
     <Box display="flex" alignItems="center">
       <img
-        src={imageUrl}
+        src={getCurrencyLogoAddress(symbol)}
         alt={`coin-icon-${symbol}`}
         width={20}
       />
@@ -93,9 +93,7 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
         </Box>
         <Box className={classes.currencySelector}>
           <DropDown
-            items={currencies.map(symbol =>
-              CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
-            )}
+            items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
             selected={currencyId}
             onChange={onChangeCurrency}
             wide
