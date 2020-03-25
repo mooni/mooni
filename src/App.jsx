@@ -9,7 +9,6 @@ import {
 } from 'react-router-dom';
 
 import './App.css'
-import RequireConnection from './components/RequireConnection';
 import Login from './components/Login';
 import PaymentPage from './pages/PaymentPage';
 import ExchangePage from './pages/ExchangePage';
@@ -24,7 +23,7 @@ function App() {
           <ExchangePage />
         </Route>
         <Route path="/send">
-          <RequireConnection eth><PaymentPage /></RequireConnection>
+          <PaymentPage />
         </Route>
         <Route path="/status">
           <StatusPage />

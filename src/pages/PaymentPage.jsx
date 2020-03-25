@@ -7,6 +7,7 @@ import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 import { Box as ABox } from '@aragon/ui'
 
+import RequireConnection from '../components/RequireConnection';
 import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepAmount from '../components/StepAmount';
@@ -64,7 +65,7 @@ function PaymentPage() {
   ];
 
   return (
-    <>
+    <RequireConnection>
       <ABox width={1} py={3}>
         <CustomMobileStepper
           activeStep={stepId}
@@ -94,7 +95,7 @@ function PaymentPage() {
         }
         {stepElements[stepId]}
       </ABox>
-    </>
+    </RequireConnection>
   );
 }
 
