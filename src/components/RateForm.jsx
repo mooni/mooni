@@ -13,6 +13,7 @@ import { getRate } from '../lib/exchange';
 import {
   INPUT_CURRENCIES as inputCurrencies,
   OUTPUT_CURRENCIES as outputCurrencies,
+  // ENABLE_TOKENS,
 } from '../lib/currencies';
 
 const useStyles = makeStyles(theme => ({
@@ -172,7 +173,8 @@ function RateForm({ onChange, defaultRateRequest }) {
         currencyId={rateDetails.inputCurrencyId}
         onChangeCurrency={onChangeInputCurrency}
         currencies={inputCurrencies}
-        disabled
+        valueDisabled
+        // currencyDisabled={!ENABLE_TOKENS}
         caption="Send"
       />
       <AmountRow

@@ -22,7 +22,10 @@ export const TOKEN_DATA = {
   },
 };
 
-export const INPUT_CURRENCIES = ['ETH'].concat(Object.keys(TOKEN_DATA));
+export const ENABLE_TOKENS = false;
+// export const ENABLE_TOKENS = true;
+
+export const INPUT_CURRENCIES = ['ETH'].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
 export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
 
 export function getCurrencyLogoAddress(symbol) {

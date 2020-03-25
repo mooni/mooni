@@ -70,7 +70,7 @@ function CurrencyItem({ symbol }) {
   );
 }
 
-export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, disabled, caption }) {
+export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
   return (
@@ -80,15 +80,15 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
           {caption}
         </Typography>
       </Box>
-      <Box className={[classes.rowRoot, disabled && classes.disabledRow].join(' ')}>
+      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow].join(' ')}>
         <Box flex={1}>
           <input
             type="number"
             min={0}
             value={BN(value ?? 0).dp(3).toString()}
             onChange={onChangeValue}
-            readOnly={disabled}
-            className={[classes.amountInput, disabled && classes.disabledInput].join(' ')}
+            readOnly={valueDisabled}
+            className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}
           />
         </Box>
         <Box className={classes.currencySelector}>
@@ -97,6 +97,7 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
             selected={currencyId}
             onChange={onChangeCurrency}
             wide
+            disabled={currencyDisabled}
             className={classes.currencyButton}
           />
         </Box>
