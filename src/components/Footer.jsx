@@ -1,38 +1,41 @@
 import React from 'react';
-import GitHubButton from 'react-github-btn';
 
-import { Link, Info } from '@aragon/ui'
-import { Grid, Box } from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link, Box } from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  element: {
+    minWidth: 0,
+    display: 'flex',
+    alignItems: 'center',
+    margin: theme.spacing(3),
+  },
+  link: {
+    color: 'black',
+    textDecoration: 'none',
+    '&:hover': {
+      textDecoration: 'none',
+    }
+  }
+}));
 
 function Footer() {
+  const classes = useStyles();
+
   return (
-    <Box pt={2}>
-      <Box pb={2}>
-        <Info mode="warning">
-          This is experimental software provided as an alpha version and is in active development. Please use with care.
-        </Info>
+    <Box className={classes.root}>
+      <Box className={classes.element}>
+        <Link to="/about" component={RouterLink} className={classes.link}>
+          About
+        </Link>
       </Box>
-      <Grid container justify="center" alignItems="center" spacing={4}>
-        <Grid item>
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Link href="https://mooni.tech" external style={{ textDecoration: 'none' }}>
-              About
-            </Link>
-          </Box>
-        </Grid>
-        <Grid item>
-          <Box display="flex" justifyContent="center" alignItems="center">
-            <Link href="mailto:usemooni@gmail.com" external style={{ textDecoration: 'none' }}>
-              Contact
-            </Link>
-          </Box>
-        </Grid>
-        <Grid item>
-          <Box display="flex" justifyContent="center">
-            <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Source code</GitHubButton>
-          </Box>
-        </Grid>
-      </Grid>
     </Box>
   );
 }

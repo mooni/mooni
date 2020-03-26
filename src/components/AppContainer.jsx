@@ -1,37 +1,50 @@
 import React from 'react';
 
-import {
-  useHistory,
-} from 'react-router-dom';
+import {Box} from '@material-ui/core';
+import Header from './Header';
+import Footer from './Footer';
+import { makeStyles } from '@material-ui/core/styles';
 
-import {Main, Header} from '@aragon/ui'
-import {Box, Container} from '@material-ui/core';
-import Account from './Account';
+const useStyles = makeStyles(() => ({
+  root: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    height: '100vh',
+    flexFlow: 'column',
+  },
+  container: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    flex: '1 1 0%',
+  },
+  maxWidth: {
+    maxWidth: '25rem',
+    width: '90%',
+  },
+  footer: {
+    width: '100%',
+    minHeight: '30px',
+    alignSelf: 'flex-end',
+  }
+}));
 
-const appNameStyle = {
-  fontFamily:'Montserrat, sans-serif',
-  textTransform: 'uppercase',
-  fontSize: 24,
-  lineHeight: 1,
-  fontWeight: 400,
-  letterSpacing: 1,
-};
 export default function AppContainer({ children }) {
-  const history = useHistory();
+  const classes = useStyles();
 
   return (
-    <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`} theme="light">
-      <Header
-        primary={
-          <Box onClick={() => history.push('/')} style={{cursor: 'pointer'}} fontSize={26}>
-            <span style={appNameStyle} className="noselect"><span role="img" aria-label="mooni-logo">🌚</span> Mooni</span>
-          </Box>
-        }
-        secondary={<Account />}
-      />
-      <Container maxWidth="xs">
-        {children}
-      </Container>
-    </Main>
+    <Box className={classes.root}>
+      <Header />
+      <Box className={classes.container}>
+        <Box className={classes.maxWidth}>
+          {children}
+        </Box>
+      </Box>
+      <Box className={classes.footer}>
+        <Footer />
+      </Box>
+    </Box>
   );
 }

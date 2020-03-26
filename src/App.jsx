@@ -13,6 +13,7 @@ import Login from './components/Login';
 import PaymentPage from './pages/PaymentPage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
         </Route>
         <Route path="/status">
           <StatusPage />
+        </Route>
+        <Route path="/about">
+          <AboutPage />
         </Route>
         <Route path="*">
           <Redirect to="/exchange" />

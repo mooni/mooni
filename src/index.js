@@ -3,17 +3,25 @@ import ReactDOM from 'react-dom';
 import {
   BrowserRouter as Router,
 } from 'react-router-dom';
+import { Provider } from 'react-redux'
+import { Main } from '@aragon/ui';
 
 import App from './App';
+
 import * as serviceWorker from './serviceWorker';
 
-import { Provider } from 'react-redux'
 import store from './redux/store'
 
 const Root = (
   <Provider store={store}>
     <Router>
-      <App />
+      <Main
+        assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
+        theme="light"
+        layout={false}
+      >
+        <App />
+      </Main>
     </Router>
   </Provider>
 );
