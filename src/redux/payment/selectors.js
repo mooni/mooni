@@ -11,3 +11,5 @@ export const getPaymentOrder = selectProperty([STATE_NAME, 'paymentOrder']);
 export const getOrderErrors = selectProperty([STATE_NAME, 'orderErrors']);
 export const getPaymentStatus = selectProperty([STATE_NAME, 'paymentStatus']);
 export const getPaymentTransaction = selectProperty([STATE_NAME, 'paymentTransaction']);
+
+export const getPaymentStep = selectProperty([STATE_NAME, 'paymentStep']);

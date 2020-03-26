@@ -22,17 +22,18 @@ export const TOKEN_DATA = {
   },
 };
 
-export const INPUT_CURRENCIES = ['ETH'].concat(Object.keys(TOKEN_DATA));
+export const ENABLE_TOKENS = false;
+// export const ENABLE_TOKENS = true;
+
+export const INPUT_CURRENCIES = ['ETH'].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
 export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
 
 export function getCurrencyLogoAddress(symbol) {
   if(symbol === 'ETH') {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+  } else if(OUTPUT_CURRENCIES.indexOf(symbol) !== -1){
+    return `/images/coinIcons/${symbol}.svg`;
   }
   const tokenAddress = TOKEN_DATA[symbol].tokenAddress;
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`;
-}
-
-export function getFiatLogoAddress(symbol) {
-  return `/images/fiatIcons/${symbol}.svg`;
 }

@@ -1,22 +1,18 @@
-import React, { useState , useEffect} from 'react';
+import React from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
 
-import { Box, Grid } from '@material-ui/core';
+import { Box } from '@material-ui/core';
 
-import { Button, Field, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { Button, Field, IconCheck } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
-import RateForm from '../components/RateForm';
 
-import { setAmountDetail, setReference } from '../redux/payment/actions';
-import { getAmountDetail, getReference } from '../redux/payment/selectors';
+import { setContactPerson, setReference } from '../redux/payment/actions';
+import { getContactPerson, getReference } from '../redux/payment/selectors';
 
 const fields = {
-  outputAmount: {
-    required: true,
-    min: 10,
-    pattern: /^[0-9]+\.?[0-9]*$/,
-    validate: value => Number(value) >= 10,
+  email: {
+    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
   },
   reference: {
     pattern: /^[0-9A-Za-z ]*$/,
@@ -24,30 +20,23 @@ const fields = {
 };
 
 function StepPaymentDetail({ onComplete, onBack }) {
-  const amountDetails = useSelector(getAmountDetail);
   const reference = useSelector(getReference);
+  const contactPerson = useSelector(getContactPerson);
   const dispatch = useDispatch();
-  const [rateRequest, setRateRequest] = useState(null);
 
-  const { register, handleSubmit, errors, setValue } = useForm({
+  const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
     defaultValues: {
       reference: reference || '',
+      email: contactPerson?.email,
     },
   });
 
-  useEffect(() => {
-    rateRequest && setValue('outputAmount', rateRequest.amount, true);
-  }, [rateRequest, setValue]);
-
-  useEffect(() => {
-    register({ name: 'outputAmount' }, fields.outputAmount);
-    setValue('outputAmount', amountDetails.amount, true);
-  }, [register]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const onSubmit = handleSubmit(data => {
-    dispatch(setAmountDetail(rateRequest));
     dispatch(setReference(data.reference));
+    dispatch(setContactPerson({
+      email: data.email,
+    }));
 
     onComplete();
   });
@@ -57,8 +46,15 @@ function StepPaymentDetail({ onComplete, onBack }) {
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <RateForm onChange={setRateRequest} invalid={!!errors.outputAmount} defaultRateRequest={amountDetails}/>
-        <Box py={2}>
+        <Box>
+          <Field label="Your email (optional)">
+            <WideInput
+              name="email"
+              ref={register(fields.email)}
+              placeholder="elon@musk.io"
+            />
+            {errors.email && <FieldError>Invalid email</FieldError>}
+          </Field>
           <Field label="Reference (optional)">
             <WideInput
               name="reference"
@@ -68,14 +64,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
             {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>
         </Box>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={hasErrors} />
-          </Grid>
-        </Grid>
+        <Button mode="strong" onClick={onSubmit} wide icon={<IconCheck/>} label="Create order" disabled={hasErrors} />
       </form>
     </Box>
   )

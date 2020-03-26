@@ -16,30 +16,7 @@ function calculatedGasMargin(gas) {
 }
 
 export async function getRate(rateRequest) {
-  if(rateRequest.tradeExact === 'INPUT') {
-
-    let ethInputAmount = rateRequest.amount;
-
-    if(rateRequest.inputCurrency !== 'ETH') {
-      const tokenRate = await rateExactTokenForETH(rateRequest.inputCurrency, rateRequest.amount);
-      ethInputAmount = tokenRate.outputAmount;
-    }
-
-    const bityRate = await Bity.estimate({
-      inputCurrency: 'ETH',
-      outputCurrency: rateRequest.outputCurrency,
-      inputAmount: ethInputAmount,
-    });
-
-    return {
-      inputCurrency: rateRequest.inputCurrency,
-      outputCurrency: rateRequest.outputCurrency,
-      inputAmount:  BN(rateRequest.amount).toString(),
-      outputAmount: BN(bityRate.outputAmount).toString(),
-    };
-
-  }
-  else if(rateRequest.tradeExact === 'OUTPUT') {
+  if(rateRequest.tradeExact === 'OUTPUT') {
 
     const bityRate = await Bity.estimate({
       inputCurrency: 'ETH',
@@ -58,6 +35,7 @@ export async function getRate(rateRequest) {
       ...rateRequest,
       inputAmount:  BN(finalInputAmount).toString(),
       outputAmount: BN(rateRequest.amount).toString(),
+      fees: bityRate.fees,
     }
   } else {
     throw new Error('invalid TRADE_EXACT')

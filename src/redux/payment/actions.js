@@ -9,10 +9,10 @@ export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_REFERENCE = 'SET_REFERENCE';
 export const SET_PAYMENT_ORDER = 'SET_PAYMENT_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
-export const SET_TOKEN_EXCHANGE = 'SET_TOKEN_EXCHANGE';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 export const SET_PAYMENT_TRANSACTION = 'SET_PAYMENT_TRANSACTION';
+export const SET_PAYMENT_STEP = 'SET_PAYMENT_STEP';
 
 export const setAmountDetail = (amountDetail) => ({
   type: SET_AMOUNT_DETAIL,
@@ -69,8 +69,16 @@ export const setPaymentTransaction = (paymentTransaction) => ({
     paymentTransaction,
   }
 });
+export const setPaymentStep = (stepId) => ({
+  type: SET_PAYMENT_STEP,
+  payload: {
+    stepId,
+  }
+});
 
 export const createOrder = () => async function (dispatch, getState)  {
+  dispatch(resetOrder());
+
   const state = getState();
   const walletAddress = getAddress(state);
   const paymentRequest = getPaymentRequest(state);

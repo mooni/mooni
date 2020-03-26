@@ -5,6 +5,7 @@ import * as actions from "./actions";
 export const STATE_NAME = 'PAYMENT';
 
 const initialEmptyState = {
+  paymentStep: 0,
   paymentRequest: {
     recipient: null,
     contactPerson: null,
@@ -18,9 +19,87 @@ const initialEmptyState = {
   },
   paymentOrder: null,
   orderError: null,
-  tokenExchange: null,
   paymentStatus: null,
   paymentTransaction: null,
+};
+
+const initialMockState = {
+  paymentStep: 0,
+  paymentRequest: {
+    recipient: {
+      owner: {
+        name: 'fdsfds',
+        country: ''
+      },
+      iban: 'NL91ABNA9326322815'
+    },
+    contactPerson: {
+      email: 'zfezf@fre.vfr'
+    },
+    amountDetail: {
+      inputCurrency: 'ETH',
+      outputCurrency: 'EUR',
+      amount: 10,
+      tradeExact: 'OUTPUT'
+    },
+    reference: 'ceferfs'
+  },
+  paymentOrder: {
+    paymentRequest: {
+      recipient: {
+        owner: {
+          name: 'fdsfds',
+          country: ''
+        },
+        iban: 'NL91ABNA9326322815'
+      },
+      contactPerson: {
+        email: 'zfezf@fre.vfr'
+      },
+      amountDetail: {
+        inputCurrency: 'ETH',
+        outputCurrency: 'EUR',
+        amount: 10,
+        tradeExact: 'OUTPUT'
+      },
+      reference: 'ceferfs'
+    },
+    path: 'BITY',
+    bityOrder: {
+      input: {
+        amount: '0.080414513629301225',
+        currency: 'ETH',
+        type: 'crypto_address',
+        crypto_address: '0x4194ce73ac3fbbece8ffa878c2b5a8c90333e724'
+      },
+      output: {
+        amount: '10',
+        currency: 'EUR',
+        type: 'bank_account',
+        iban: 'NL91ABNA9326322815',
+        reference: 'ceferfs'
+      },
+      id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
+      timestamp_created: '2020-03-25T13:31:28.948Z',
+      timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
+      timestamp_price_guaranteed: '2020-03-25T13:41:31.831Z',
+      payment_details: {
+        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
+        type: 'crypto_address'
+      },
+      price_breakdown: {
+        customer_trading_fee: {
+          amount: '0.000635986164121',
+          currency: 'ETH'
+        }
+      }
+    }
+  },
+  orderError: null,
+  paymentStatus: 'mined',
+  paymentTransaction: {
+    hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
+  }
 };
 
 const initialState = initialEmptyState;
@@ -82,13 +161,6 @@ export default function(state = initialState, action) {
         orderErrors,
       };
     }
-    case actions.SET_TOKEN_EXCHANGE: {
-      const { tokenExchange } = action.payload;
-      return {
-        ...state,
-        tokenExchange,
-      };
-    }
     case actions.RESET_ORDER: {
       return {
         ...state,
@@ -104,10 +176,17 @@ export default function(state = initialState, action) {
       };
     }
     case actions.SET_PAYMENT_TRANSACTION: {
-      const { transaction } = action.payload;
+      const { paymentTransaction } = action.payload;
       return {
         ...state,
-        transaction,
+        paymentTransaction,
+      };
+    }
+    case actions.SET_PAYMENT_STEP: {
+      const { stepId } = action.payload;
+      return {
+        ...state,
+        paymentStep: stepId,
       };
     }
     default:

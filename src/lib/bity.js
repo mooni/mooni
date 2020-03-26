@@ -7,7 +7,7 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-function removeEmptyStrings(data) {
+function removeEmptyStrings(data = {}) {
   return Object.keys(data).reduce((acc, prop) => {
       if(data[prop] !== '' && data[prop] !== undefined) {
         return Object.assign(acc, { [prop]: data[prop] });
@@ -58,9 +58,14 @@ const Bity = {
       outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
+      fees: {
+        amount: data.price_breakdown.customer_trading_fee.amount,
+        currency: data.price_breakdown.customer_trading_fee.currency,
+      }
     };
   },
   async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
+
     const body = {
       input: {
         currency: paymentDetail.inputCurrency,
@@ -78,7 +83,8 @@ const Bity = {
       },
     };
 
-    if(contactPerson) {
+    const cleanContactPerson = removeEmptyStrings(contactPerson);
+    if(cleanContactPerson.email) {
       body.contact_person = {
         email: contactPerson.email,
       };
@@ -98,6 +104,7 @@ const Bity = {
         withCredentials: true,
       });
       return data;
+
     } catch(error) {
       if(error && error.response && error.response.data && error.response.data.errors) {
         const apiError = new Error('api_error');

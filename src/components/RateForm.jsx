@@ -1,61 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import BN from 'bignumber.js';
 
-import { Hidden, Paper, Grid, Box } from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import ShuffleIcon from '@material-ui/icons/Shuffle';
 
-import { DropDown, TextInput, Info, LoadingRing } from '@aragon/ui'
-import { FieldError } from './StyledComponents';
+import { LoadingRing } from '@aragon/ui'
+import AmountRow from './AmountRow';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
-import { getCurrencyLogoAddress, getFiatLogoAddress } from '../lib/currencies';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
   OUTPUT_CURRENCIES as outputCurrencies,
+  // ENABLE_TOKENS,
 } from '../lib/currencies';
 
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
   },
-  formRow: {
-    padding: theme.spacing(1, 1),
-  },
-  amountInput: {
-    textAlign: 'right',
-    border: 'none',
-    width: '100%',
-  },
-  selectedAmountInput: {
-    backgroundColor: '#ebfafd8a',
-  },
-  amountLabel: {
+  interRow: {
+    height: 46,
     display: 'flex',
     alignItems: 'center',
-  },
-  exchangeIcon: {
-    display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    color: theme.palette.text.secondary,
   },
 }));
 
-function CurrencyItem({ symbol, imageUrl }) {
-  return (
-    <Box display="flex" alignItems="center">
-      <img
-        src={imageUrl}
-        width={20}
-      />
-      <Box ml={1}>{symbol}</Box>
-    </Box>
-  );
-}
-
-function RateForm({ onChange, invalid, defaultRateRequest }) {
+function RateForm({ onChange, defaultRateRequest }) {
   const classes = useStyles();
 
   const [rateDetails, setRateDetails] = useState({
@@ -67,7 +41,10 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
     outputAmount: 100,
     tradeExact: 'OUTPUT',
   });
+  const [rateLoading, setRateLoading] = useState(true);
   const [rateRequest, setRateRequest] = useState(null);
+  const [fees, setFees] = useState(null);
+  const debouncedRateRequest = useDebounce(rateRequest, 1000);
 
   useEffect(() => {
     if(defaultRateRequest) {
@@ -97,9 +74,17 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
     }
   }, [defaultRateRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const debouncedRateRequest = useDebounce(rateRequest, 1000);
-  const [rateLoading, setRateLoading] = useState(true);
-  const rate = (rateLoading) ? null : BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
+  let feeValue, feeCurrency, rate;
+  if(!rateLoading) {
+    if(fees.currency === rateDetails.inputCurrency) {
+      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(6).toString();
+      feeCurrency = rateDetails.outputCurrency;
+    } else {
+      feeValue = BN(fees.amount).dp(6).toString();
+      feeCurrency = fees.currency;
+    }
+    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
+  }
 
   useEffect(() => {
     onChange(rateRequest);
@@ -120,9 +105,11 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
 
       setRateDetails(r => ({
         ...r,
-        inputAmount: res.inputAmount,
-        outputAmount: res.outputAmount,
+        inputAmount: BN(res.inputAmount).toString(),
+        outputAmount: BN(res.outputAmount).toString(),
       }));
+
+      setFees(res.fees);
 
       setRateLoading(false);
     })();
@@ -193,73 +180,36 @@ function RateForm({ onChange, invalid, defaultRateRequest }) {
   }
 
   return (
-    <Box p={1} mt={3}>
-      <Paper className={classes.formRow}>
-        <Grid container spacing={1}>
-          <Grid item xs={8}>
-            <TextInput
-              type="number"
-              min={0}
-              value={BN(rateDetails.inputAmount ?? 0).dp(3).toString()}
-              disabled
-              readOnly
-              wide
-              adornment={<Box>You send</Box>}
-              className={classes.amountInput}
-              adornmentSettings={{ width: 50 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <DropDown
-              items={inputCurrencies.map(symbol =>
-                CurrencyItem({ symbol, imageUrl: getCurrencyLogoAddress(symbol)})
-              )}
-              selected={rateDetails.inputCurrencyId}
-              onChange={onChangeInputCurrency}
-              wide
-            />
-          </Grid>
-        </Grid>
-        <Box mt={1}/>
-        <Grid container spacing={1}>
-          <Grid item xs={8}>
-            <TextInput
-              type="number"
-              min={0}
-              value={BN(rateDetails.outputAmount ?? 0).dp(3).toString()}
-              onChange={onChangeOutputValue}
-              wide
-              className={[classes.amountInput, classes.selectedAmountInput].join(' ')}
-              adornment={<Box>You get</Box>}
-              adornmentSettings={{ width: 50 }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <DropDown
-              items={outputCurrencies.map(symbol =>
-                CurrencyItem({ symbol, imageUrl: getFiatLogoAddress(symbol)})
-              )}
-              selected={rateDetails.outputCurrencyId}
-              onChange={onChangeOutputCurrency}
-              wide
-            />
-          </Grid>
-        </Grid>
-        <Box mt={1}/>
-        <Info title="Estimated exchange rate">
-          {invalid &&
-          <Box display="flex" justifyContent="center">
-            <FieldError>Invalid amount</FieldError>
-          </Box>
-          }
-          {!invalid && rate &&
-          <Box textAlign="center" width={1}>~{rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}</Box>
-          }
-          {!invalid && !rate &&
-          <Box display="flex" justifyContent="center"><LoadingRing size={12} /></Box>
-          }
-        </Info>
-      </Paper>
+    <Box py={1}>
+      <AmountRow
+        value={rateLoading ? '-' : rateDetails.inputAmount}
+        currencyId={rateDetails.inputCurrencyId}
+        onChangeCurrency={onChangeInputCurrency}
+        currencies={inputCurrencies}
+        valueDisabled
+        // currencyDisabled={!ENABLE_TOKENS}
+        caption="Send"
+      />
+      <AmountRow
+        value={rateDetails.outputAmount}
+        currencyId={rateDetails.outputCurrencyId}
+        onChangeValue={onChangeOutputValue}
+        onChangeCurrency={onChangeOutputCurrency}
+        currencies={outputCurrencies}
+        caption="Receive"
+      />
+
+      <Box className={classes.interRow}>
+        {rate ?
+          <Typography variant="caption">
+            <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
+            <br/>
+            <b>Fees:</b> {feeValue} {feeCurrency}
+          </Typography>
+          :
+          <LoadingRing/>
+        }
+      </Box>
     </Box>
   );
 }

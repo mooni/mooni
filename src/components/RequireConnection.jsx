@@ -6,14 +6,10 @@ import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { getBoxManager, getBoxLoading } from '../redux/box/selectors';
 import { openLoginModal } from '../redux/eth/actions';
-import { initBox } from '../redux/box/actions';
 
-function RequireConnection({ children, eth, box }) {
-  const boxManager = useSelector(getBoxManager);
+function RequireConnection({ children }) {
   const ethManager = useSelector(getETHManager);
-  const boxLoading = useSelector(getBoxLoading);
   const ethManagerLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
 
@@ -21,38 +17,18 @@ function RequireConnection({ children, eth, box }) {
     dispatch(openLoginModal());
   }
 
-  async function connectBox() {
-    await dispatch(initBox());
-  }
+  if(ethManager)
+    return children;
 
-  if(
-    (eth ? !!ethManager : true) &&
-    (box ? !!boxManager : true)
-  ) return children;
-
-  if(eth && ethManagerLoading)
+  if(ethManagerLoading)
     return <Loader text="Loading Ethereum provider" />;
 
-  if(box && boxLoading)
-    return <Loader text="Loading 3box" />;
-
-  if(eth && !ethManager) {
+  if(!ethManager) {
     return (
       <Box display="flex" justifyContent="center">
         <EmptyStateCard
           text="Please connect your Ethereum wallet"
           action={<Button onClick={login}>Connect</Button>}
-        />
-      </Box>
-    );
-  }
-
-  if(box && !boxManager) {
-    return (
-      <Box display="flex" justifyContent="center">
-        <EmptyStateCard
-          text="Please connect to 3box to access your contacts"
-          action={<Button onClick={connectBox}>Connect</Button>}
         />
       </Box>
     );

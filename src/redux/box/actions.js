@@ -1,5 +1,6 @@
 import BoxManager from '../../lib/box';
 import { getETHManager } from '../eth/selectors';
+import { getBoxLoading } from './selectors';
 import { fetchMyAccount, resetContacts } from '../contacts/actions';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
@@ -24,18 +25,23 @@ export const initBox = () => async function (dispatch, getState)  {
 
   try {
     const boxManager = await BoxManager.init(ethManager);
-    if(!getETHManager(getState())) { // User disconnected while fetching box
+    const state = getState();
+    if(!getBoxLoading(state) || !getETHManager(getState())) { // cancelled or User disconnected while fetching box
       return;
     }
     dispatch(setBoxManager(boxManager));
     await dispatch(fetchMyAccount());
+    dispatch(setBoxLoading(false));
   } catch(error) {
     console.error('Unable to connect to 3box', error);
     dispatch(resetBox());
+    throw error;
   }
-
-  dispatch(setBoxLoading(false));
 };
+
+export const cancelInitBox = () => async function (dispatch) {
+  dispatch(resetBox());
+}
 
 export const initBoxIfLoggedIn = () => async function (dispatch, getState)  {
   const ethManager = getETHManager(getState());
