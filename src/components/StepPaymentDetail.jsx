@@ -1,6 +1,7 @@
 import React from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
+import EmailValidator from 'email-validator';
 
 import { Box } from '@material-ui/core';
 
@@ -12,7 +13,7 @@ import { getContactPerson, getReference } from '../redux/payment/selectors';
 
 const fields = {
   email: {
-    pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+    validate: EmailValidator.validate,
   },
   reference: {
     pattern: /^[0-9A-Za-z ]*$/,
