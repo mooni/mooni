@@ -25,10 +25,7 @@ function useUpdatedOrder(orderId) {
     function fetchNewData() {
       Bity.getOrderDetails(orderId)
         .then(newOrderDetails => {
-          setOrderDetails({
-            ...newOrderDetails,
-            paymentStatus: 'waiting',
-          });
+          setOrderDetails(newOrderDetails);
           if(newOrderDetails.paymentStatus === 'executed' || newOrderDetails.paymentStatus === 'cancelled') {
             clearInterval(intervalId);
           }
