@@ -7,3 +7,5 @@ yarn-error.log
 public/aragon-ui
 
 build
+
+.now

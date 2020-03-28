@@ -13,7 +13,8 @@ import * as serviceWorker from './serviceWorker';
 
 import store from './redux/store'
 
-LogRocket.init('282s2e/mooni');
+if(process.env.NODE_ENV === 'production')
+  LogRocket.init('282s2e/mooni');
 
 const Root = (
   <Provider store={store}>
