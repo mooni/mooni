@@ -1,4 +1,9 @@
 {
   "name": "mooni",
-  "version": 2
+  "version": 2,
+  "build": {
+    "env": {
+      "LOGROCKET_ID": "282s2e/mooni"
+    }
+  }
 }

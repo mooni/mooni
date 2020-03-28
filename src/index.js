@@ -13,7 +13,8 @@ import * as serviceWorker from './serviceWorker';
 
 import store from './redux/store'
 
-LogRocket.init('282s2e/mooni');
+if(process.env.LOGROCKET_ID)
+  LogRocket.init(process.env.LOGROCKET_ID);
 
 const Root = (
   <Provider store={store}>
