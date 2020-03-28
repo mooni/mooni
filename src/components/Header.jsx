@@ -54,12 +54,12 @@ export default function Header() {
     <Box className={classes.root}>
       <Link to="/" component={RouterLink} className={`${classes.element} ${classes.appLink} noselect`}>
         <span role="img" aria-label="mooni-logo" className={classes.logo}>🌚</span>
-        <span className={classes.appName}>
-            MOONI
-          </span>
+        <h1 className={classes.appName}>
+          MOONI
+        </h1>
         <span className={classes.alpha}>
-            alpha
-          </span>
+          alpha
+        </span>
       </Link>
       <Box className={classes.element}>
         <Account />
