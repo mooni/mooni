@@ -104,12 +104,6 @@ export const createOrder = () => async function (dispatch, getState)  {
       contactPerson: paymentRequest.contactPerson,
     });
 
-    if(!orderDetail.input) {
-      const cookieError = new Error('api_error');
-      cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
-      throw cookieError;
-    }
-
     const paymentOrder = {
       paymentRequest,
       path: 'BITY',

@@ -103,10 +103,16 @@ const Bity = {
         url: headers.location,
         withCredentials: true,
       });
+
+      if(!data.input) {
+        const cookieError = new Error('api_error');
+        cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
+        throw cookieError;
+      }
       return data;
 
     } catch(error) {
-      if(error && error.response && error.response.data && error.response.data.errors) {
+      if(error?.response?.data?.errors) {
         const apiError = new Error('api_error');
         apiError.errors = error.response.data.errors;
         throw apiError;

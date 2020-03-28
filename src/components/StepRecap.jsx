@@ -17,11 +17,24 @@ function StepRecap({ onComplete }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsOpened, setTermsOpened] = useState(false);
 
+  if(orderErrors) {
+    return (
+      <Box width={1}>
+        <Info title="Order error" mode="error">
+          {orderErrors.map(error => (
+            <Box key={error.code}><b>{error.code}</b> {error.message}</Box>
+          ))}
+        </Info>
+      </Box>
+    );
+  }
+
   if(!paymentOrder) {
     return (
       <Loader text="Creating order ..." />
     );
   }
+
   const now = new Date();
   const orderExpireDate = new Date(paymentOrder.bityOrder.timestamp_price_guaranteed);
 
@@ -33,18 +46,6 @@ function StepRecap({ onComplete }) {
         </Info>
       </Box>
     )
-  }
-
-  if(orderErrors) {
-    return (
-      <Box width={1}>
-        <Info title="Order error" mode="error">
-          {orderErrors.map(error => (
-            <Box key={error.code}><b>{error.code}</b> {error.message}</Box>
-          ))}
-        </Info>
-      </Box>
-    );
   }
 
   return (
