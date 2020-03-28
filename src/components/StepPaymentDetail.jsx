@@ -13,7 +13,7 @@ import { getContactPerson, getReference } from '../redux/payment/selectors';
 
 const fields = {
   email: {
-    validate: EmailValidator.validate,
+    validate: value => !value || value === '' || EmailValidator.validate(value),
   },
   reference: {
     pattern: /^[0-9A-Za-z ]*$/,
