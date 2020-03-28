@@ -1,27 +1,23 @@
 import Bity from '../../lib/bity';
-import { getRecipient, getPaymentDetail, getOrder, getContactPerson } from '../payment/selectors';
+import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
+import { rateTokenForExactETH, executeTrade, checkTradeAllowance, getExchangeAddress } from '../../lib/exchange';
 
-export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
-export const SET_PAYMENT_DETAIL = 'SET_PAYMENT_DETAIL';
+export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
-export const SET_ORDER = 'SET_ORDER';
+export const SET_REFERENCE = 'SET_REFERENCE';
+export const SET_PAYMENT_ORDER = 'SET_PAYMENT_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
+export const SET_PAYMENT_TRANSACTION = 'SET_PAYMENT_TRANSACTION';
+export const SET_PAYMENT_STEP = 'SET_PAYMENT_STEP';
 
-export const setInputCurrency = (inputCurrency) => ({
-  type: SET_INPUT_CURRENCY,
+export const setAmountDetail = (amountDetail) => ({
+  type: SET_AMOUNT_DETAIL,
   payload: {
-    inputCurrency,
-  }
-});
-
-export const setPaymentDetail = (paymentDetail) => ({
-  type: SET_PAYMENT_DETAIL,
-  payload: {
-    paymentDetail,
+    amountDetail,
   }
 });
 
@@ -31,6 +27,12 @@ export const setRecipient = (recipient) => ({
     recipient,
   }
 });
+export const setReference = (reference) => ({
+  type: SET_REFERENCE,
+  payload: {
+    reference,
+  }
+});
 export const setContactPerson = (contactPerson) => ({
   type: SET_CONTACT_PERSON,
   payload: {
@@ -38,10 +40,10 @@ export const setContactPerson = (contactPerson) => ({
   }
 });
 
-export const setOrder = (order) => ({
-  type: SET_ORDER,
+export const setPaymentOrder = (paymentOrder) => ({
+  type: SET_PAYMENT_ORDER,
   payload: {
-    order,
+    paymentOrder,
   }
 });
 export const setOrderErrors = (errors) => ({
@@ -61,33 +63,63 @@ export const setPaymentStatus = (paymentStatus) => ({
     paymentStatus,
   }
 });
+export const setPaymentTransaction = (paymentTransaction) => ({
+  type: SET_PAYMENT_TRANSACTION,
+  payload: {
+    paymentTransaction,
+  }
+});
+export const setPaymentStep = (stepId) => ({
+  type: SET_PAYMENT_STEP,
+  payload: {
+    stepId,
+  }
+});
 
 export const createOrder = () => async function (dispatch, getState)  {
+  dispatch(resetOrder());
+
   const state = getState();
-  const fromAddress = getAddress(state);
-  const recipient = getRecipient(state);
-  const paymentDetail = getPaymentDetail(state);
-  const contactPerson = getContactPerson(state);
+  const walletAddress = getAddress(state);
+  const paymentRequest = getPaymentRequest(state);
+
+  if(paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   try {
+    let fromAddress = walletAddress;
+
+    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
+      fromAddress = await getExchangeAddress(paymentRequest.amountDetail.inputCurrency);
+    }
+
     const orderDetail = await Bity.order({
       fromAddress,
-      recipient,
-      paymentDetail,
-      contactPerson,
+      recipient: paymentRequest.recipient,
+      paymentDetail: {
+        inputCurrency: 'ETH',
+        outputAmount: paymentRequest.amountDetail.amount,
+        outputCurrency: paymentRequest.amountDetail.outputCurrency,
+      },
+      reference: paymentRequest.reference,
+      contactPerson: paymentRequest.contactPerson,
     });
 
-    if(!orderDetail.input) {
-      const cookieError = new Error('api_error');
-      cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
-      throw cookieError;
+    const paymentOrder = {
+      paymentRequest,
+      path: 'BITY',
+      bityOrder: orderDetail,
+    };
+
+    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
+      paymentOrder.path = 'DEX_BITY';
+      paymentOrder.tokenRate = await rateTokenForExactETH(paymentRequest.amountDetail.inputCurrency, orderDetail.input.amount);
     }
-    dispatch(setOrder(orderDetail));
-    dispatch(setOrderErrors(null));
+
+    dispatch(setPaymentOrder(paymentOrder));
 
     // TODO register delete order after price guaranteed timeout
   } catch(error) {
-    dispatch(setOrder(null));
+    dispatch(setPaymentOrder(null));
 
     if(error.message === 'api_error') {
       dispatch(setOrderErrors(error.errors));
@@ -100,16 +132,49 @@ export const createOrder = () => async function (dispatch, getState)  {
 
 export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
-  const order = getOrder(state);
+  const paymentOrder = getPaymentOrder(state);
   const ethManager = getETHManager(getState());
+  dispatch(setPaymentTransaction(null));
 
-  const { input: { amount }, payment_details: { crypto_address } } = order;
+  if(paymentOrder.paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
-  dispatch(setPaymentStatus('approval'));
+  const bityInputAmount = paymentOrder.bityOrder.input.amount;
+  const bityDepositAddress = paymentOrder.bityOrder.payment_details.crypto_address;
+
   try {
-    const tx = await ethManager.send(crypto_address, amount);
-    dispatch(setPaymentStatus('pending'));
-    await ethManager.provider.waitForTransaction(tx.hash);
+    if(paymentOrder.path === 'BITY') {
+
+      dispatch(setPaymentStatus('approval'));
+      const tx = await ethManager.send(bityDepositAddress, bityInputAmount);
+      dispatch(setPaymentTransaction({ hash: tx.hash }));
+
+      dispatch(setPaymentStatus('mining-payment'));
+      await ethManager.waitForConfirmedTransaction(tx.hash);
+
+    } else if(paymentOrder.path === 'DEX_BITY') {
+      dispatch(setPaymentStatus('check-allowance'));
+      const approveTx = await checkTradeAllowance(paymentOrder.tokenRate.tradeDetails, ethManager.signer);
+
+      if(approveTx) {
+        dispatch(setPaymentStatus('mining-allowance'));
+        await ethManager.waitForConfirmedTransaction(approveTx.hash);
+      }
+
+      dispatch(setPaymentStatus('approval'));
+      const executeTx = await executeTrade(
+        paymentOrder.tokenRate.tradeDetails,
+        bityDepositAddress,
+        ethManager.signer,
+      );
+      dispatch(setPaymentTransaction({ hash: executeTx.hash }));
+
+      dispatch(setPaymentStatus('mining-payment'));
+      await ethManager.waitForConfirmedTransaction(executeTx.hash);
+
+    } else {
+      throw new Error('invalid payment path');
+    }
+
     dispatch(setPaymentStatus('mined'));
   } catch(error) {
     console.error(error);

@@ -1,13 +1,13 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { Grid, Box } from '@material-ui/core';
 import { Link, Button, IconUser, IconCoin } from '@aragon/ui'
 
-import RateSample from '../components/RateSample';
+import RateForm from '../components/RateForm';
 import Footer from '../components/Footer';
-import { setPaymentDetail } from '../redux/payment/actions';
+import { setAmountDetail } from '../redux/payment/actions';
 
 const logoStyle = {
   fontSize: '5rem',
@@ -17,17 +17,14 @@ const logoStyle = {
 function Welcome() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [rateValues, setRatesValues] = useState(null);
+  const [rateRequest, setRateRequest] = useState(null);
 
-  const onGoToSend = useCallback(() => {
-    if(rateValues) {
-      dispatch(setPaymentDetail({
-        outputAmount: rateValues.outputAmount,
-        outputCurrency: rateValues.outputCurrency,
-      }));
+  const onGoToSend = () => {
+    if(rateRequest) {
+      dispatch(setAmountDetail(rateRequest));
     }
     history.push('/send');
-  }, [history, dispatch, rateValues]);
+  };
 
   return (
     <Box width={1} py={2}>
@@ -37,7 +34,7 @@ function Welcome() {
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
-      <RateSample onChangeValues={setRatesValues}/>
+      <RateForm onChange={setRateRequest}/>
       <Box pt={2}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>

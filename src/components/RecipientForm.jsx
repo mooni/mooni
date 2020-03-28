@@ -9,8 +9,6 @@ import { Box } from '@material-ui/core';
 import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui';
 
 import { WideInput, FieldError } from './StyledComponents';
-import { getMyAccount } from '../redux/contacts/selectors';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(() => ({
   fieldRow: {
@@ -60,15 +58,18 @@ const defaultEndComponent = ({ submit, hasErrors }) => (
   <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
 );
 
-function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndComponent, allowFill }) {
+function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndComponent }) {
   const classes = useStyles();
   const [more, setMore] = useState(false);
-  const myAccount = useSelector(getMyAccount);
 
-  const { register, handleSubmit, errors, setValue, reset, formState } = useForm({
+  const { register, handleSubmit, errors, setValue, reset } = useForm({
     mode: 'onChange',
     defaultValues: initialRecipient || undefined,
   });
+  useEffect(() => {
+    reset(initialRecipient);
+  }, [initialRecipient]);
+
   const [selectedCountry, setSelectedCountry] = useState(
     initialRecipient?.owner?.country ?
       countriesList.indexOf(initialRecipient.owner.country)
@@ -79,10 +80,6 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   function setCountry(index) {
     setSelectedCountry(index);
     setValue('owner.country', countriesList[index]);
-  }
-
-  function resetWithMyAccount() {
-    reset(myAccount);
   }
 
   useEffect(() => {
@@ -136,11 +133,6 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
           {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
         </Field>
       </>}
-      {myAccount && allowFill &&
-      <Button wide size="small" disabled={!formState.dirty} onClick={resetWithMyAccount}>
-        Fill with my account
-      </Button>
-      }
       {endComponent({ submit, hasErrors })}
     </form>
   )

@@ -7,7 +7,7 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-function removeEmptyStrings(data) {
+function removeEmptyStrings(data = {}) {
   return Object.keys(data).reduce((acc, prop) => {
       if(data[prop] !== '' && data[prop] !== undefined) {
         return Object.assign(acc, { [prop]: data[prop] });
@@ -54,34 +54,37 @@ const Bity = {
     });
 
     return {
-      inputAmount: inputAmount || data.input.amount,
-      outputAmount: outputAmount || data.output.amount,
+      inputAmount: data.input.amount,
+      outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
+      fees: {
+        amount: data.price_breakdown.customer_trading_fee.amount,
+        currency: data.price_breakdown.customer_trading_fee.currency,
+      }
     };
   },
-  async order({ fromAddress, recipient, paymentDetail, contactPerson }) {
+  async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
+
     const body = {
       input: {
-        currency: "ETH",
+        currency: paymentDetail.inputCurrency,
         type: 'crypto_address',
-
         crypto_address: fromAddress,
       },
       output: {
         type: 'bank_account',
-
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
         bic_swift: recipient.bic_swift,
-
         currency: paymentDetail.outputCurrency,
         amount: String(paymentDetail.outputAmount),
-        reference: paymentDetail.reference,
+        reference: reference,
       },
     };
 
-    if(contactPerson) {
+    const cleanContactPerson = removeEmptyStrings(contactPerson);
+    if(cleanContactPerson.email) {
       body.contact_person = {
         email: contactPerson.email,
       };
@@ -95,10 +98,21 @@ const Bity = {
         withCredentials: true,
       });
 
-      const order = await Bity.getOrder(headers.location);
-      return order;
+      const { data } = await instance({
+        method: 'get',
+        url: headers.location,
+        withCredentials: true,
+      });
+
+      if(!data.input) {
+        const cookieError = new Error('api_error');
+        cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
+        throw cookieError;
+      }
+      return data;
+
     } catch(error) {
-      if(error && error.response && error.response.data && error.response.data.errors) {
+      if(error?.response?.data?.errors) {
         const apiError = new Error('api_error');
         apiError.errors = error.response.data.errors;
         throw apiError;
@@ -107,14 +121,30 @@ const Bity = {
       }
     }
   },
-  async getOrder(orderLocation) {
+  async getOrderDetails(orderId) {
     const { data } = await instance({
       method: 'get',
-      url: orderLocation,
+      url: `/v2/orders/${orderId}`,
       withCredentials: true,
     });
+
+    let paymentStatus = 'waiting';
+    if(data.timestamp_cancelled) {
+      paymentStatus = 'cancelled';
+    } else if(data.timestamp_executed) {
+      paymentStatus = 'executed';
+    } else if(data.timestamp_payment_received) {
+      paymentStatus = 'received';
+    }
+
+    data.paymentStatus = paymentStatus;
+
     return data;
   },
+
+  getOrderStatusPageURL(orderId) {
+    return `https://go.bity.com/order-status?id=${orderId}`;
+  }
 };
 
 export default Bity;

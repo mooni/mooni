@@ -1,116 +1,61 @@
-import React, { useState } from 'react';
+import React from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
+import EmailValidator from 'email-validator';
 
-import { Box, Paper, Grid } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box } from '@material-ui/core';
 
-import { Button, Field, DropDown, IconArrowLeft, IconArrowRight } from '@aragon/ui'
+import { Button, Field, IconCheck } from '@aragon/ui'
 import { WideInput, FieldError } from './StyledComponents';
 
-import { setPaymentDetail } from '../redux/payment/actions';
-import { getPaymentDetail } from '../redux/payment/selectors';
+import { setContactPerson, setReference } from '../redux/payment/actions';
+import { getContactPerson, getReference } from '../redux/payment/selectors';
 
-import { OUTPUT_CURRENCIES } from '../lib/currencies';
-
-const useStyles = makeStyles(theme => ({
-  formRow: {
-    padding: theme.spacing(1, 1),
+const fields = {
+  email: {
+    validate: value => !value || value === '' || EmailValidator.validate(value),
   },
-  amountInput: {
-    textAlign: 'right',
-    border: 'none',
-    width: '100%',
+  reference: {
+    pattern: /^[0-9A-Za-z ]*$/,
   },
-  amountLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: 6,
-  },
-  exchangeIcon: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-}));
+};
 
 function StepPaymentDetail({ onComplete, onBack }) {
-  const classes = useStyles();
-
-  const paymentDetails = useSelector(getPaymentDetail);
+  const reference = useSelector(getReference);
+  const contactPerson = useSelector(getContactPerson);
   const dispatch = useDispatch();
-
-  const [selectedCurrency, setSelectedCurrency] = useState(Math.max(OUTPUT_CURRENCIES.indexOf(paymentDetails.outputCurrency), 0));
 
   const { register, handleSubmit, errors } = useForm({
     mode: 'onChange',
-    defaultValues: paymentDetails ? {
-      amount: paymentDetails.outputAmount ?? 100,
-      reference: paymentDetails.reference ?? '',
-    } : {
-      amount: 100,
-      reference: '',
+    defaultValues: {
+      reference: reference || '',
+      email: contactPerson?.email,
     },
   });
 
-  const onSubmit = handleSubmit(async data => {
-    dispatch(setPaymentDetail({
-      outputAmount: data.amount,
-      outputCurrency: OUTPUT_CURRENCIES[selectedCurrency],
-      reference: data.reference,
+  const onSubmit = handleSubmit(data => {
+    dispatch(setReference(data.reference));
+    dispatch(setContactPerson({
+      email: data.email,
     }));
 
     onComplete();
   });
-
-  const fields = {
-    amount: {
-      required: true,
-      min: 0,
-      pattern: /^[0-9]+\.?[0-9]*$/,
-      validate: value => Number(value) > 0,
-    },
-    reference: {
-      pattern: /^[0-9A-Za-z ]*$/,
-    },
-  };
 
   const hasErrors = Object.keys(errors).length !== 0;
 
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
-        <Paper className={classes.formRow}>
-          <Grid container spacing={0}>
-            <Grid item xs={8}>
-              <Box display="flex" flexDirection="row">
-                <Box className={classes.amountLabel}>
-                  Amount
-                </Box>
-                <WideInput
-                  type="number"
-                  name="amount"
-                  min={0}
-                  ref={register(fields.amount)}
-                  className={classes.amountInput}
-                  adornment={<Box>Amount</Box>}
-                  adornmentSettings={{ width: 50 }}
-                  placeholder="10"
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={4}>
-              <DropDown
-                items={OUTPUT_CURRENCIES}
-                selected={selectedCurrency}
-                onChange={setSelectedCurrency}
-                wide
-              />
-            </Grid>
-          </Grid>
-          {errors.amount && <FieldError>Invalid amount</FieldError>}
-        </Paper>
-        <Box py={2}>
+        <Box>
+          <Field label="Your email (optional)">
+            <WideInput
+              name="email"
+              ref={register(fields.email)}
+              placeholder="elon@musk.io"
+            />
+            {errors.email && <FieldError>Invalid email</FieldError>}
+          </Field>
           <Field label="Reference (optional)">
             <WideInput
               name="reference"
@@ -120,14 +65,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
             {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>
         </Box>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Button mode="normal" onClick={onBack} wide icon={<IconArrowLeft/>} label="Go back" />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={hasErrors} />
-          </Grid>
-        </Grid>
+        <Button mode="strong" onClick={onSubmit} wide icon={<IconCheck/>} label="Create order" disabled={hasErrors} />
       </form>
     </Box>
   )

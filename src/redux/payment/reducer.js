@@ -1,83 +1,157 @@
-import { OUTPUT_CURRENCIES } from '../../lib/currencies';
+import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
 
 import * as actions from "./actions";
 
 export const STATE_NAME = 'PAYMENT';
 
-/*
-const exampleRecipient = {
-  owner: {
-    name: 'Alice Martin',
-    address: '5 Rue de Rivoli',
-    zip: '75001',
-    city: 'Paris',
-    country: 'FR',
-  },
-  iban: 'FR7630006000011234567890189',
-  bic_swift: 'BNPAFRPP',
-};
-const exampleRecipientOnlyNameAndIban = {
-  owner: {
-    name: 'Alice Martin',
-  },
-  iban: 'FR7630006000011234567890189',
-};
-
-const exampleOrder = {"input": {"amount": "0.742746699517954364", "currency": "ETH", "type": "crypto_address", "crypto_address": "0x430f05b7cf0a80dcfeeebb45fe8a8d008c13141e"}, "output": {"amount": "100", "currency": "EUR", "type": "bank_account", "iban": "FR7630006000011234567890189"}, "id": "d554c5c4-e0cd-499f-be13-f2c3107ca658", "timestamp_created": "2019-11-25T18:24:44.874Z", "timestamp_awaiting_payment_since": "2019-11-25T18:24:46.870Z", "timestamp_price_guaranteed": "2019-11-25T18:34:46.870Z", "payment_details": {"crypto_address": "0x0ab11b28e1706d504583abbe3428027d96c59a65", "type": "crypto_address"}, "price_breakdown": {"customer_trading_fee": {"amount": "0.005892573957327453", "currency": "ETH"}}};
-*/
-
-const initialState = {
-  inputCurrency: null,
-  paymentDetail: {
-    outputCurrency: OUTPUT_CURRENCIES[0],
-    outputAmount: 100,
+const initialEmptyState = {
+  paymentStep: 0,
+  paymentRequest: {
+    recipient: null,
+    contactPerson: null,
+    amountDetail: {
+      inputCurrency: INPUT_CURRENCIES[0],
+      outputCurrency: OUTPUT_CURRENCIES[0],
+      amount: 100,
+      tradeExact: 'OUTPUT',
+    },
     reference: '',
   },
-  recipient: null,
-  // recipient: exampleRecipient,
-  // recipient: exampleRecipientOnlyNameAndIban,
-  contactPerson: null,
-  order: null,
-  //order: exampleOrder,
+  paymentOrder: null,
   orderError: null,
   paymentStatus: null,
+  paymentTransaction: null,
 };
+
+const initialMockState = {
+  paymentStep: 0,
+  paymentRequest: {
+    recipient: {
+      owner: {
+        name: 'fdsfds',
+        country: ''
+      },
+      iban: 'NL91ABNA9326322815'
+    },
+    contactPerson: {
+      email: 'zfezf@fre.vfr'
+    },
+    amountDetail: {
+      inputCurrency: 'ETH',
+      outputCurrency: 'EUR',
+      amount: 10,
+      tradeExact: 'OUTPUT'
+    },
+    reference: 'ceferfs'
+  },
+  paymentOrder: {
+    paymentRequest: {
+      recipient: {
+        owner: {
+          name: 'fdsfds',
+          country: ''
+        },
+        iban: 'NL91ABNA9326322815'
+      },
+      contactPerson: {
+        email: 'zfezf@fre.vfr'
+      },
+      amountDetail: {
+        inputCurrency: 'ETH',
+        outputCurrency: 'EUR',
+        amount: 10,
+        tradeExact: 'OUTPUT'
+      },
+      reference: 'ceferfs'
+    },
+    path: 'BITY',
+    bityOrder: {
+      input: {
+        amount: '0.080414513629301225',
+        currency: 'ETH',
+        type: 'crypto_address',
+        crypto_address: '0x4194ce73ac3fbbece8ffa878c2b5a8c90333e724'
+      },
+      output: {
+        amount: '10',
+        currency: 'EUR',
+        type: 'bank_account',
+        iban: 'NL91ABNA9326322815',
+        reference: 'ceferfs'
+      },
+      id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
+      timestamp_created: '2020-03-25T13:31:28.948Z',
+      timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
+      timestamp_price_guaranteed: '2020-03-25T13:41:31.831Z',
+      payment_details: {
+        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
+        type: 'crypto_address'
+      },
+      price_breakdown: {
+        customer_trading_fee: {
+          amount: '0.000635986164121',
+          currency: 'ETH'
+        }
+      }
+    }
+  },
+  orderError: null,
+  paymentStatus: 'mined',
+  paymentTransaction: {
+    hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
+  }
+};
+
+const initialState = initialEmptyState;
+// const initialState = initialMockState;
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case actions.SET_INPUT_CURRENCY: {
-      const { inputCurrency } = action.payload;
+    case actions.SET_AMOUNT_DETAIL: {
+      const { amountDetail } = action.payload;
       return {
         ...state,
-        inputCurrency,
-      };
-    }
-    case actions.SET_PAYMENT_DETAIL: {
-      const { paymentDetail } = action.payload;
-      return {
-        ...state,
-        paymentDetail,
+        paymentRequest: {
+          ...state.paymentRequest,
+          amountDetail,
+        },
       };
     }
     case actions.SET_RECIPIENT: {
       const { recipient } = action.payload;
       return {
         ...state,
-        recipient,
+        paymentRequest: {
+          ...state.paymentRequest,
+          recipient,
+        },
       };
     }
     case actions.SET_CONTACT_PERSON: {
       const { contactPerson } = action.payload;
       return {
         ...state,
-        contactPerson,
+        paymentRequest: {
+          ...state.paymentRequest,
+          contactPerson,
+        },
       };
     }
-    case actions.SET_ORDER: {
-      const { order } = action.payload;
+    case actions.SET_REFERENCE: {
+      const { reference } = action.payload;
       return {
         ...state,
-        order,
+        paymentRequest: {
+          ...state.paymentRequest,
+          reference,
+        },
+      };
+    }
+    case actions.SET_PAYMENT_ORDER: {
+      const { paymentOrder } = action.payload;
+      return {
+        ...state,
+        paymentOrder,
       };
     }
     case actions.SET_ORDER_ERRORS: {
@@ -90,7 +164,7 @@ export default function(state = initialState, action) {
     case actions.RESET_ORDER: {
       return {
         ...state,
-        order: null,
+        paymentOrder: null,
         orderError: null,
       };
     }
@@ -99,6 +173,20 @@ export default function(state = initialState, action) {
       return {
         ...state,
         paymentStatus,
+      };
+    }
+    case actions.SET_PAYMENT_TRANSACTION: {
+      const { paymentTransaction } = action.payload;
+      return {
+        ...state,
+        paymentTransaction,
+      };
+    }
+    case actions.SET_PAYMENT_STEP: {
+      const { stepId } = action.payload;
+      return {
+        ...state,
+        paymentStep: stepId,
       };
     }
     default:

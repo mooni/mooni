@@ -7,7 +7,6 @@ import { Button, Modal, Link } from '@aragon/ui'
 import { getLoginModalOpen } from '../redux/eth/selectors';
 import { initETH, openLoginModal } from '../redux/eth/actions';
 
-// const AUTO_CONNECT = false;
 const walletProviders = [
   {
     name: 'Metamask',
@@ -48,15 +47,6 @@ function Login() {
   function onCloseModal() {
     dispatch(openLoginModal(false));
   }
-
-  /*
-  // Automatic connect ?
-  useEffect(() => {
-    if(AUTO_CONNECT && eth && !ethManager) {
-      connectETH().catch(console.error);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  */
 
   return (
     <Modal
