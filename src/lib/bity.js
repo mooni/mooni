@@ -68,11 +68,11 @@ const Bity = {
     };
   },
 
-  async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
+  async order({ fromAddress, recipient, reference, rateRequest, contactPerson }) {
 
     const body = {
       input: {
-        currency: paymentDetail.inputCurrency,
+        currency: rateRequest.inputCurrency,
         type: 'crypto_address',
         crypto_address: fromAddress,
       },
@@ -81,11 +81,17 @@ const Bity = {
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
         bic_swift: recipient.bic_swift,
-        currency: paymentDetail.outputCurrency,
-        amount: String(paymentDetail.outputAmount),
+        currency: rateRequest.outputCurrency,
         reference: reference,
       },
     };
+
+    if(rateRequest.tradeExact === 'INPUT')
+      body.input.amount = String(rateRequest.amount); else
+    if(rateRequest.tradeExact === 'OUTPUT')
+      body.output.amount = String(rateRequest.amount);
+    else
+      throw new Error('invalid TRADE_EXACT');
 
     const cleanContactPerson = removeEmptyStrings(contactPerson);
     if(cleanContactPerson.email) {
@@ -113,7 +119,14 @@ const Bity = {
         cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
         throw cookieError;
       }
-      return data;
+
+      return {
+        ...data,
+        fees: {
+          amount: data.price_breakdown.customer_trading_fee.amount,
+          currency: data.price_breakdown.customer_trading_fee.currency,
+        }
+      };
 
     } catch(error) {
       if(error?.response?.data?.errors) {

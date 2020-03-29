@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { DropDown } from '@aragon/ui'
 
-import { getCurrencyLogoAddress } from '../lib/currencies';
+import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -77,7 +77,7 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
   const classes = useStyles();
 
   const displayedValue = value ?
-    (active ? value : BN(value).sd(7).toString())
+    (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toString())
   : '';
 
   return (

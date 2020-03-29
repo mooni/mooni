@@ -92,6 +92,10 @@ const initialMockState = {
           amount: '0.000635986164121',
           currency: 'ETH'
         }
+      },
+      fees: {
+        amount: '0.000635986164121',
+        currency: 'ETH'
       }
     }
   },

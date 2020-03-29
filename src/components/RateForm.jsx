@@ -13,6 +13,7 @@ import { getRate } from '../lib/exchange';
 import {
   INPUT_CURRENCIES as inputCurrencies,
   OUTPUT_CURRENCIES as outputCurrencies,
+  SIGNIFICANT_DIGITS,
   // ENABLE_TOKENS,
 } from '../lib/currencies';
 
@@ -174,13 +175,13 @@ function RateForm({ onChange, defaultRateRequest }) {
   let feeValue, feeCurrency, rate;
   if(!rateLoading) {
     if(fees.currency === rateDetails.inputCurrency) {
-      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(6).toString();
+      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
       feeCurrency = rateDetails.outputCurrency;
     } else {
-      feeValue = BN(fees.amount).dp(6).toString();
+      feeValue = BN(fees.amount).sd(SIGNIFICANT_DIGITS).toString();
       feeCurrency = fees.currency;
     }
-    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).dp(3).toString();
+    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
   }
 
   return (

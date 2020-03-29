@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
 import {textStyle, Field} from '@aragon/ui';
 
-import { getCurrencyLogoAddress } from '../lib/currencies';
+import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -82,7 +82,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={BN(value ?? 0).dp(3).toString()}
+            value={BN(value).sd(SIGNIFICANT_DIGITS).toString()}
             readOnly
             className={classes.amountInput}
           />
@@ -119,23 +119,21 @@ export default function PaymentOrderRecap({ paymentOrder }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = BN(
-    paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount
-  ).dp(6).toString();
+  const inputAmount = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
   const inputCurrency = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
 
-  const outputAmount = BN(paymentOrder.bityOrder.output.amount).dp(6).toString();
+  const outputAmount = paymentOrder.bityOrder.output.amount;
   const outputCurrency = paymentOrder.bityOrder.output.currency;
 
-  const rate = BN(outputAmount).div(inputAmount).dp(3).toString();
+  const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
 
   let fees, feesCurrency;
-  if(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.currency === paymentOrder.bityOrder.input.currency) {
-    fees = BN(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.amount).times(outputAmount).div(inputAmount).dp(6).toString();
+  if(paymentOrder.bityOrder.fees.currency === paymentOrder.bityOrder.input.currency) {
+    fees = BN(paymentOrder.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
     feesCurrency = paymentOrder.bityOrder.output.currency;
   }  else {
-    fees = BN(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.amount).dp(6).toString();
-    feesCurrency = paymentOrder.bityOrder.price_breakdown.customer_trading_fee.currency;
+    fees = BN(paymentOrder.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = paymentOrder.bityOrder.fees.currency;
   }
 
   return (
@@ -152,8 +150,9 @@ export default function PaymentOrderRecap({ paymentOrder }) {
       {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
       {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
 
-      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" disabled/>
-      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" disabled/>
+      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
+      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" />
+
       <Typography variant="caption">
         <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
       </Typography><br/>
