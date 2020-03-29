@@ -15,7 +15,7 @@ export const SubTitle = styled.p`
   margin-bottom: ${2 * GU}px;
 `;
 export const Content = styled.p`
-  ${textStyle('body1')};
+  ${textStyle('body2')};
   margin-bottom: ${1 * GU}px;
 `;
 
@@ -29,14 +29,14 @@ function Terms() {
         1.1 Object
       </SubTitle>
       <Content>
-        This terms and condition applies between <b>Mooni</b>, which is an open source software, and a <b>user</b>, which is the person that use this software.
+        This terms and conditions applies between <b>Mooni</b>, which is an open source software, and a <b>user</b>, which is the person that use this software.
       </Content>
       <SubTitle>
         1.2 Service
       </SubTitle>
       <Content>
         Mooni is a web application that allows to transfer funds from a crypto wallet to a bank account. <br/>
-        It is not a money service provider, and does not hold any financial license. Instead, it uses different third party services such as a foreign exchange, decentralized liquidity providers and data storages, in order to serve its purpose.
+        It is not a money service provider, does not holds any funds, and does not hold any financial license. Instead, it uses different third party services such as a foreign exchange, decentralized liquidity providers and data storages, in order to serve its purpose.
       </Content>
       <SubTitle>
         1.3 Third parties
@@ -44,7 +44,7 @@ function Terms() {
       <Content>
         Mooni make the use of the following third party services: <Link href="https://bity.com" external>Bity</Link>, <Link href="https://uniswap.org" external>Uniswap</Link>, <Link href="https://3box.io" external>3Box</Link>.<br/>
         By accepting this terms, the user also accept all the terms of the third party services, notably the <Link href="https://bity.com/legal/" external>terms of Bity</Link>, which is responsible of the crypto->fiat exchange. <br/>
-        Notably, the user acknoledge that the financial transactions executed are legally acceptable. This acceptability is determined by Bity own rules.
+        Notably, the user acknowledge that the financial transactions executed are legally acceptable. This acceptability is determined by Bity own rules.
       </Content>
       <SubTitle>
         2.1 Experimental
