@@ -7,7 +7,7 @@ import { Link, Button, IconUser, IconCoin } from '@aragon/ui'
 
 import RateForm from '../components/RateForm';
 import Footer from '../components/Footer';
-import { setAmountDetail } from '../redux/payment/actions';
+import { setRateRequest } from '../redux/payment/actions';
 
 const logoStyle = {
   fontSize: '5rem',
@@ -17,11 +17,11 @@ const logoStyle = {
 function Welcome() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const [rateRequest, setRateRequest] = useState(null);
+  const [rateRequest, setLocalRateRequest] = useState(null);
 
   const onGoToSend = () => {
     if(rateRequest) {
-      dispatch(setAmountDetail(rateRequest));
+      dispatch(setRateRequest(rateRequest));
     }
     history.push('/send');
   };
@@ -34,7 +34,7 @@ function Welcome() {
       <Box display="flex" justifyContent="center" textAlign="center" fontSize="h6.fontSize">
         Easily transfer funds from your crypto wallet to your bank account.
       </Box>
-      <RateForm onChange={setRateRequest}/>
+      <RateForm onChange={setLocalRateRequest}/>
       <Box pt={2}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>

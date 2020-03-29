@@ -5,10 +5,9 @@ import {
   rateTokenToETH,
   executeTrade,
   checkTradeAllowance,
-  getExchangeAddress,
 } from '../../lib/exchange';
 
-export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
+export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_REFERENCE = 'SET_REFERENCE';
@@ -19,10 +18,10 @@ export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 export const SET_PAYMENT_TRANSACTION = 'SET_PAYMENT_TRANSACTION';
 export const SET_PAYMENT_STEP = 'SET_PAYMENT_STEP';
 
-export const setAmountDetail = (amountDetail) => ({
-  type: SET_AMOUNT_DETAIL,
+export const setRateRequest = (rateRequest) => ({
+  type: SET_RATE_REQUEST,
   payload: {
-    amountDetail,
+    rateRequest,
   }
 });
 
@@ -88,22 +87,17 @@ export const createOrder = () => async function (dispatch, getState)  {
   const walletAddress = getAddress(state);
   const paymentRequest = getPaymentRequest(state);
 
-  if(paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
+  if(paymentRequest.rateRequest.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   try {
-    let fromAddress = walletAddress;
-
-    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
-      fromAddress = await getExchangeAddress(paymentRequest.amountDetail.inputCurrency);
-    }
 
     const orderDetail = await Bity.order({
-      fromAddress,
+      walletAddress,
       recipient: paymentRequest.recipient,
       paymentDetail: {
         inputCurrency: 'ETH',
-        outputAmount: paymentRequest.amountDetail.amount,
-        outputCurrency: paymentRequest.amountDetail.outputCurrency,
+        outputAmount: paymentRequest.rateRequest.amount,
+        outputCurrency: paymentRequest.rateRequest.outputCurrency,
       },
       reference: paymentRequest.reference,
       contactPerson: paymentRequest.contactPerson,
@@ -115,9 +109,9 @@ export const createOrder = () => async function (dispatch, getState)  {
       bityOrder: orderDetail,
     };
 
-    if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
+    if(paymentRequest.rateRequest.inputCurrency !== 'ETH') {
       paymentOrder.path = 'DEX_BITY';
-      paymentOrder.tokenRate = await rateTokenToETH(paymentRequest.amountDetail.inputCurrency, orderDetail.input.amount, 'EXACT_ETH');
+      paymentOrder.tokenRate = await rateTokenToETH(paymentRequest.rateRequest.inputCurrency, orderDetail.input.amount, 'EXACT_ETH');
     }
 
     dispatch(setPaymentOrder(paymentOrder));
@@ -141,7 +135,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const ethManager = getETHManager(getState());
   dispatch(setPaymentTransaction(null));
 
-  if(paymentOrder.paymentRequest.amountDetail.tradeExact !== 'OUTPUT') throw new Error('not implemented');
+  if(paymentOrder.paymentRequest.rateRequest.tradeExact !== 'OUTPUT') throw new Error('not implemented');
 
   const bityInputAmount = paymentOrder.bityOrder.input.amount;
   const bityDepositAddress = paymentOrder.bityOrder.payment_details.crypto_address;

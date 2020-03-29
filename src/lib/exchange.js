@@ -74,8 +74,8 @@ export async function rateTokenToETH(symbol, amount, tradeExact) {
   const exactAmount = ethers.utils.parseEther(String(amount)); // TODO token decimals
 
   const method = (
-    tradeExact === 'EXACT_TOKEN' && tradeExactTokensForEth ||
-    tradeExact === 'EXACT_ETH' && tradeTokensForExactEth
+    (tradeExact === 'EXACT_TOKEN' && tradeExactTokensForEth) ||
+    (tradeExact === 'EXACT_ETH' && tradeTokensForExactEth)
   );
 
   const tradeDetails = await method(tokenAddress, exactAmount);

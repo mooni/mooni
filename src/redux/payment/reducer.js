@@ -9,7 +9,7 @@ const initialEmptyState = {
   paymentRequest: {
     recipient: null,
     contactPerson: null,
-    amountDetail: {
+    rateRequest: {
       inputCurrency: INPUT_CURRENCIES[0],
       outputCurrency: OUTPUT_CURRENCIES[0],
       amount: 100,
@@ -36,7 +36,7 @@ const initialMockState = {
     contactPerson: {
       email: 'zfezf@fre.vfr'
     },
-    amountDetail: {
+    rateRequest: {
       inputCurrency: 'ETH',
       outputCurrency: 'EUR',
       amount: 10,
@@ -56,7 +56,7 @@ const initialMockState = {
       contactPerson: {
         email: 'zfezf@fre.vfr'
       },
-      amountDetail: {
+      rateRequest: {
         inputCurrency: 'ETH',
         outputCurrency: 'EUR',
         amount: 10,
@@ -107,13 +107,13 @@ const initialState = initialEmptyState;
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case actions.SET_AMOUNT_DETAIL: {
-      const { amountDetail } = action.payload;
+    case actions.SET_RATE_REQUEST: {
+      const { rateRequest } = action.payload;
       return {
         ...state,
         paymentRequest: {
           ...state.paymentRequest,
-          amountDetail,
+          rateRequest,
         },
       };
     }
