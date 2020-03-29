@@ -14,13 +14,14 @@ import PaymentPage from './pages/PaymentPage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
 import AboutPage from './pages/AboutPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
   return (
     <AppContainer>
       <Login />
       <Switch>
-        <Route path="/exchange">
+        <Route path="/">
           <ExchangePage />
         </Route>
         <Route path="/send">
@@ -32,8 +33,11 @@ function App() {
         <Route path="/about">
           <AboutPage />
         </Route>
+        <Route path="/terms">
+          <TermsPage />
+        </Route>
         <Route path="*">
-          <Redirect to="/exchange" />
+          <Redirect to="/" />
         </Route>
       </Switch>
     </AppContainer>
