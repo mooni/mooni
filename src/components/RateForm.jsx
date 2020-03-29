@@ -111,64 +111,47 @@ function RateForm({ onChange, defaultRateRequest }) {
     return () => isMounted = false;
   }, [debouncedRateRequest]);
 
-  function onChangeInputCurrency(currencyId) {
+  function onChangeInputCurrency(inputCurrencyId) {
     setRateLoading(true);
-    const newRateDetails = {
+    const inputCurrency = inputCurrencies[inputCurrencyId];
+    setRateDetails({
       ...rateDetails,
-      inputCurrency: inputCurrencies[currencyId],
-      inputCurrencyId: currencyId,
-    };
-    setRateDetails(newRateDetails);
+      inputCurrency,
+      inputCurrencyId,
+    });
     setRateRequest({
       ...rateRequest,
-      inputCurrency: newRateDetails.inputCurrency,
+      inputCurrency,
     });
   }
-  function onChangeOutputCurrency(currencyId) {
+  function onChangeOutputCurrency(outputCurrencyId) {
     setRateLoading(true);
-    const newRateDetails = {
+    const outputCurrency = outputCurrencies[outputCurrencyId];
+    setRateDetails({
       ...rateDetails,
-      outputCurrency: outputCurrencies[currencyId],
-      outputCurrencyId: currencyId,
-    };
-    setRateDetails(newRateDetails);
-    setRateRequest({
-      ...rateRequest,
-      outputCurrency: newRateDetails.outputCurrency,
+      outputCurrency,
+      outputCurrencyId,
     });
-  }
-
-  function onChangeInputValue(e) {
-    setRateLoading(true);
-    const value = Number(e.target.value);
-    const newRateDetails = {
-      ...rateDetails,
-      inputAmount: value,
-      outputAmount: null,
-      tradeExact: 'INPUT',
-    };
-    setRateDetails(newRateDetails);
     setRateRequest({
       ...rateRequest,
-      amount: newRateDetails.inputAmount,
-      tradeExact: newRateDetails.tradeExact,
+      outputCurrency,
     });
   }
 
-  function onChangeOutputValue(e) {
+  const onChangeValue = tradeExact => e => {
     setRateLoading(true);
-    const value = Number(e.target.value);
+    const amount = Number(e.target.value);
     const newRateDetails = {
       ...rateDetails,
-      inputAmount: null,
-      outputAmount: value,
-      tradeExact: 'OUTPUT',
+      inputAmount: tradeExact === 'INPUT' && amount,
+      outputAmount: tradeExact === 'OUTPUT' && amount,
+      tradeExact,
     };
     setRateDetails(newRateDetails);
     setRateRequest({
       ...rateRequest,
-      amount: newRateDetails.outputAmount,
-      tradeExact: newRateDetails.tradeExact,
+      tradeExact,
+      amount,
     });
   }
 
@@ -189,7 +172,7 @@ function RateForm({ onChange, defaultRateRequest }) {
       <AmountRow
         value={rateDetails.inputAmount}
         currencyId={rateDetails.inputCurrencyId}
-        onChangeValue={onChangeInputValue}
+        onChangeValue={onChangeValue('INPUT')}
         onChangeCurrency={onChangeInputCurrency}
         currencies={inputCurrencies}
         active={rateDetails.tradeExact === 'INPUT'}
@@ -198,7 +181,7 @@ function RateForm({ onChange, defaultRateRequest }) {
       <AmountRow
         value={rateDetails.outputAmount}
         currencyId={rateDetails.outputCurrencyId}
-        onChangeValue={onChangeOutputValue}
+        onChangeValue={onChangeValue('OUTPUT')}
         onChangeCurrency={onChangeOutputCurrency}
         currencies={outputCurrencies}
         active={rateDetails.tradeExact === 'OUTPUT'}
