@@ -1,7 +1,12 @@
 import Bity from '../../lib/bity';
 import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
-import { rateTokenForExactETH, executeTrade, checkTradeAllowance, getExchangeAddress } from '../../lib/exchange';
+import {
+  rateTokenToETH,
+  executeTrade,
+  checkTradeAllowance,
+  getExchangeAddress,
+} from '../../lib/exchange';
 
 export const SET_AMOUNT_DETAIL = 'SET_AMOUNT_DETAIL';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
@@ -112,7 +117,7 @@ export const createOrder = () => async function (dispatch, getState)  {
 
     if(paymentRequest.amountDetail.inputCurrency !== 'ETH') {
       paymentOrder.path = 'DEX_BITY';
-      paymentOrder.tokenRate = await rateTokenForExactETH(paymentRequest.amountDetail.inputCurrency, orderDetail.input.amount);
+      paymentOrder.tokenRate = await rateTokenToETH(paymentRequest.amountDetail.inputCurrency, orderDetail.input.amount, 'EXACT_ETH');
     }
 
     dispatch(setPaymentOrder(paymentOrder));

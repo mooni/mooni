@@ -20,14 +20,14 @@ const useStyles = makeStyles(theme => ({
     border: '1px solid black',
     borderWidth: '1px',
     paddingLeft: theme.spacing(2),
-    borderColor: theme.palette.divider,
+    borderColor: '#ffffff',
     paddingRight: theme.spacing(2),
     display: 'flex',
     borderRadius: 30,
     height: 62,
     alignItems: 'center',
     backgroundColor: theme.palette.background.paper,
-    boxShadow: '1px 1px 7px rgba(47, 36, 36, 0.09)',
+    boxShadow: '1px 1px 7px rgba(73, 177, 189, 0.16)',
   },
   disabledRow: {
     backgroundColor: theme.palette.background.default,
@@ -51,6 +51,9 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 20,
     borderColor: '#aecfd6',
   },
+  activeRow: {
+    borderColor: '#9edbe4',
+  },
   disabledInput: {
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.default,
@@ -70,8 +73,12 @@ function CurrencyItem({ symbol }) {
   );
 }
 
-export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, valueDisabled, currencyDisabled, caption }) {
+export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, active, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
+
+  const displayedValue = value ?
+    (active ? value : BN(value).sd(7).toString())
+  : '';
 
   return (
     <Box className={classes.root}>
@@ -80,12 +87,12 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
           {caption}
         </Typography>
       </Box>
-      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow].join(' ')}>
+      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow].join(' ')}>
         <Box flex={1}>
           <input
-            type="number"
+            type={value ? 'number' : 'text'}
             min={0}
-            value={BN(value ?? 0).dp(3).toString()}
+            value={displayedValue}
             onChange={onChangeValue}
             readOnly={valueDisabled}
             className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}

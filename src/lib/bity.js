@@ -32,9 +32,7 @@ const Bity = {
     return data.currencies.map(currency => currency.code);
   },
 
-  async estimate({ inputCurrency, outputCurrency, inputAmount = null, outputAmount = null }) {
-    if(inputAmount && outputAmount) throw new Error('please only provide input or output amount');
-
+  async estimate({ inputCurrency, outputCurrency, amount, tradeExact }) {
     const body = {
       input: {
         currency: inputCurrency,
@@ -44,8 +42,12 @@ const Bity = {
       },
     };
 
-    if(inputAmount) body.input.amount = String(inputAmount);
-    if(outputAmount) body.output.amount = String(outputAmount);
+    if(tradeExact === 'INPUT')
+      body.input.amount = String(amount); else
+    if(tradeExact === 'OUTPUT')
+      body.output.amount = String(amount);
+    else
+      throw new Error('invalid TRADE_EXACT');
 
     const { data } = await instance({
       method: 'post',
@@ -58,12 +60,14 @@ const Bity = {
       outputAmount: data.output.amount,
       inputCurrency,
       outputCurrency,
+      tradeExact,
       fees: {
         amount: data.price_breakdown.customer_trading_fee.amount,
         currency: data.price_breakdown.customer_trading_fee.currency,
       }
     };
   },
+
   async order({ fromAddress, recipient, reference, paymentDetail, contactPerson }) {
 
     const body = {
