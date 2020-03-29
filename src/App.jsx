@@ -21,7 +21,7 @@ function App() {
     <AppContainer>
       <Login />
       <Switch>
-        <Route path="/">
+        <Route exact path="/">
           <ExchangePage />
         </Route>
         <Route path="/send">
