@@ -48,19 +48,21 @@ function StepPaymentDetail({ onComplete, onBack }) {
     <Box width={1}>
       <form onSubmit={onSubmit}>
         <Box>
-          <Field label="Your email (optional)" data-private>
+          <Field label="Your email (optional)">
             <WideInput
               name="email"
               ref={register(fields.email)}
-              placeholder="elon@musk.io"
+              placeholder="alice@gmail.com"
+              data-private
             />
             {errors.email && <FieldError>Invalid email</FieldError>}
           </Field>
-          <Field label="Reference (optional)" data-private>
+          <Field label="Reference (optional)">
             <WideInput
               name="reference"
               ref={register(fields.reference)}
               placeholder="Bill A2313"
+              data-private
             />
             {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>
