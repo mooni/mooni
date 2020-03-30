@@ -12,7 +12,7 @@ import { usePageViews } from './lib/analytics';
 
 import './App.css'
 import Login from './components/Login';
-import PaymentPage from './pages/PaymentPage';
+import HomePage from './pages/HomePage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
 import AboutPage from './pages/AboutPage';
@@ -26,10 +26,10 @@ function App() {
       <Login />
       <Switch>
         <Route exact path="/">
-          <ExchangePage />
+          <HomePage />
         </Route>
-        <Route path="/send">
-          <PaymentPage />
+        <Route path="/exchange">
+          <ExchangePage />
         </Route>
         <Route path="/status">
           <StatusPage />

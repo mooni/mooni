@@ -71,7 +71,7 @@ export default function StepStatus() {
     dispatch(resetOrder());
     dispatch(setPaymentTransaction(null));
     dispatch(setPaymentStep(0));
-    history.push('/send');
+    history.push('/exchange');
   }
   function onExit() {
     history.push('/');
