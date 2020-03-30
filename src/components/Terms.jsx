@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Info, Link, textStyle, GU } from '@aragon/ui'
+import { Link, textStyle, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import styled from 'styled-components';
@@ -70,7 +70,7 @@ function Terms() {
         2.4 User data
       </SubTitle>
       <Content>
-        In order to improve the user experience and usabilty of the platform, the software may record some user activity on the website. These data are anonymised and does not contain any private informations. Such collected data can be: IP address, network requests, page views, user interactions, errors or order statuses.
+        In order to improve the user experience and usabilty of the platform, the software may record some user activity on the website. These data are anonymised and does not contain any private informations. Such collected data can be: IP address, user agent, network requests, page views, user interactions, errors or order statuses.
       </Content>
     </Box>
   );
