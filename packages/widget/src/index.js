@@ -1,6 +1,6 @@
 import styles from './styles';
 
-const appUrl = 'https://app.mooni.tech/send';
+const appUrl = 'https://app.mooni.tech';
 
 const MooniWidget = {
   /**
