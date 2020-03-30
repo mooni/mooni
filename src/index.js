@@ -5,16 +5,12 @@ import {
 } from 'react-router-dom';
 import { Provider } from 'react-redux'
 import { Main } from '@aragon/ui';
-import LogRocket from 'logrocket';
 
 import App from './App';
 
 import * as serviceWorker from './serviceWorker';
 
 import store from './redux/store'
-
-if(process.env.NODE_ENV === 'production')
-  LogRocket.init('282s2e/mooni');
 
 const Root = (
   <Provider store={store}>

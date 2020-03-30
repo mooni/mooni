@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Info, Link, textStyle, GU } from '@aragon/ui'
+import { Link, textStyle, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import styled from 'styled-components';
@@ -29,7 +29,7 @@ function Terms() {
         1.1 Object
       </SubTitle>
       <Content>
-        This terms and conditions applies between <b>Mooni</b>, which is an open source software, and a <b>user</b>, which is the person that use this software.
+        This terms and conditions applies between <b>Mooni</b>, which is an open source software, provided as a web platform, and a <b>user</b>, which is the person that use this platform.
       </Content>
       <SubTitle>
         1.2 Service
@@ -47,23 +47,30 @@ function Terms() {
         Notably, the user acknowledge that the financial transactions executed are legally acceptable. This acceptability is determined by Bity own rules.
       </Content>
       <SubTitle>
-        2.1 Experimental
+        2.1 Experimental product
       </SubTitle>
       <Content>
-        By using this software, the user acknowledge that they are using open source experimental software which is provided as is and is under heavy development.<br/>
-        There may be bugs and undesired behaviour, that may result in a loss of funds, and the well execution of the software is not guaranteed.
+        By using this software, the user acknowledge that they are using open source experimental software. The platform, its software and all content found on it are provided on an “as is” and “as available” basis.<br/>
+        The open source contributors of this software do not give any warranties, whether express or implied, as to the suitability or usability of the website, its software or any of its content.<br/>
       </Content>
       <SubTitle>
         2.2 Limitation of liability
       </SubTitle>
       <Content>
-        The open source contributors of this software deny all responsibility if a bug happens or if any funds are lost because of the use of this software.
+        The open source contributors of this software will not be liable for any loss, whether such loss is direct, indirect, special or consequential, suffered by any party as a result of their use of the Mooni platform, its software or content. Any transactions on the website are done at the user’s own risk and the user will be solely responsible for any damage to any computer system or loss of data or funds that results from such activities.
       </Content>
       <SubTitle>
         2.3 Provided support
       </SubTitle>
       <Content>
-        In case of a bug or lost funds, the users can get help by <Link href="mailto:usemooni@gmail.com" external>contacting the contributors</Link> of this project, or by directly contacting Bity, but nothing is guaranteed in terms of response or funds recovery.
+        In case of a bug or lost funds, the users can get help by <Link href="mailto:usemooni@gmail.com" external>contacting the contributors</Link> of this project, or by directly contacting Bity, but nothing is guaranteed in terms of response or funds recovery. <br/>
+        Should you encounter any bugs, glitches, lack of functionality or other problems on the website, please let us know immediately so we can rectify these accordingly.
+      </Content>
+      <SubTitle>
+        2.4 User data
+      </SubTitle>
+      <Content>
+        In order to improve the user experience and usabilty of the platform, the software may record some user activity on the website. These data are anonymised and does not contain any private informations. Such collected data can be: IP address, user agent, network requests, page views, user interactions, errors or order statuses.
       </Content>
     </Box>
   );

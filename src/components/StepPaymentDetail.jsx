@@ -52,7 +52,8 @@ function StepPaymentDetail({ onComplete, onBack }) {
             <WideInput
               name="email"
               ref={register(fields.email)}
-              placeholder="elon@musk.io"
+              placeholder="alice@gmail.com"
+              data-private
             />
             {errors.email && <FieldError>Invalid email</FieldError>}
           </Field>
@@ -61,6 +62,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
               name="reference"
               ref={register(fields.reference)}
               placeholder="Bill A2313"
+              data-private
             />
             {errors.reference && <FieldError>Invalid reference, please only use regular letters and numbers</FieldError>}
           </Field>

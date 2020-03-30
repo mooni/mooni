@@ -1,8 +1,19 @@
 import { useEffect }  from 'react';
 import { useLocation }  from 'react-router-dom';
 import ReactGA from 'react-ga';
+import LogRocket from 'logrocket';
 
-ReactGA.initialize('UA-68373171-8');
+if(process.env.NODE_ENV === 'production') {
+  LogRocket.init(
+    '282s2e/mooni',
+    {
+      network: {
+        isEnabled: false,
+      },
+    }
+  );
+  ReactGA.initialize('UA-68373171-8');
+}
 
 export function sendEvent(category, action, label, value) {
   ReactGA.event({
@@ -19,3 +30,12 @@ export function usePageViews() {
     ReactGA.pageview(location.pathname);
   }, [location]);
 }
+
+export const logRocketMiddleware = LogRocket.reduxMiddleware({
+  actionSanitizer: function (action) {
+    return { type: action.type };
+  },
+  stateSanitizer: function (_) {
+    return {};
+  },
+});
