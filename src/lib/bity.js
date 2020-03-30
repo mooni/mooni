@@ -128,16 +128,16 @@ const Bity = {
       withCredentials: true,
     });
 
-    let paymentStatus = 'waiting';
+    let orderStatus = 'waiting';
     if(data.timestamp_cancelled) {
-      paymentStatus = 'cancelled';
+      orderStatus = 'cancelled';
     } else if(data.timestamp_executed) {
-      paymentStatus = 'executed';
+      orderStatus = 'executed';
     } else if(data.timestamp_payment_received) {
-      paymentStatus = 'received';
+      orderStatus = 'received';
     }
 
-    data.paymentStatus = paymentStatus;
+    data.orderStatus = orderStatus;
 
     return data;
   },
