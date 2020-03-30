@@ -18,7 +18,7 @@ const initialEmptyState = {
     reference: '',
   },
   paymentOrder: null,
-  orderError: null,
+  orderErrors: null,
   paymentStatus: null,
   paymentTransaction: null,
 };
@@ -99,7 +99,7 @@ const initialMockState = {
       }
     }
   },
-  orderError: null,
+  orderErrors: null,
   paymentStatus: 'mined',
   paymentTransaction: {
     hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
@@ -169,7 +169,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         paymentOrder: null,
-        orderError: null,
+        orderErrors: null,
       };
     }
     case actions.SET_PAYMENT_STATUS: {

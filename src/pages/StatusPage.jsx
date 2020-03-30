@@ -14,7 +14,7 @@ import {resetOrder, setPaymentStep, setPaymentTransaction} from '../redux/paymen
 import styled from 'styled-components';
 
 const POLL_INTERVAL = 2000;
-function useUpdatedOrder(orderId) {
+function useUpdatedOrder(orderId, paymentStatus) {
   const [orderDetails, setOrderDetails] = useState(null);
 
   useEffect(() => {
@@ -26,19 +26,21 @@ function useUpdatedOrder(orderId) {
       Bity.getOrderDetails(orderId)
         .then(newOrderDetails => {
           setOrderDetails(newOrderDetails);
-          if(newOrderDetails.paymentStatus === 'executed' || newOrderDetails.paymentStatus === 'cancelled') {
+          if(newOrderDetails.orderStatus === 'executed' || newOrderDetails.orderStatus === 'cancelled') {
             clearInterval(intervalId);
           }
         })
         .catch(console.error);
     }
-    intervalId = setInterval(fetchNewData, POLL_INTERVAL);
     fetchNewData();
+
+    if(paymentStatus === 'mined')
+      intervalId = setInterval(fetchNewData, POLL_INTERVAL);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [orderId]);
+  }, [orderId, paymentStatus]);
 
   return orderDetails;
 }
@@ -59,7 +61,7 @@ export default function StepStatus() {
   const paymentOrder = useSelector(getPaymentOrder);
   const paymentTransaction = useSelector(getPaymentTransaction);
 
-  const orderDetails = useUpdatedOrder(paymentOrder?.bityOrder?.id);
+  const orderDetails = useUpdatedOrder(paymentOrder?.bityOrder?.id, paymentStatus);
 
   if(!paymentOrder) {
     history.push('/');
@@ -108,7 +110,7 @@ export default function StepStatus() {
     );
 
     // MINED, cancelled
-  } else if(paymentStatus ===  'mined' && orderDetails.paymentStatus === 'cancelled') {
+  } else if(paymentStatus ===  'mined' && orderDetails.orderStatus === 'cancelled') {
     content = (
       <Box>
         <Box display="flex" justifyContent="center" alignItems="center">
@@ -130,7 +132,7 @@ export default function StepStatus() {
     );
 
     // MINED, executed
-  } else if(paymentStatus ===  'mined' && orderDetails.paymentStatus === 'executed') {
+  } else if(paymentStatus ===  'mined' && orderDetails.orderStatus === 'executed') {
     content = (
       <Box>
         <Box display="flex" justifyContent="center" alignItems="center">
@@ -149,7 +151,7 @@ export default function StepStatus() {
     );
 
     // MINED, waiting
-  } else if(paymentStatus ===  'mined' && (orderDetails.paymentStatus === 'waiting' || orderDetails.paymentStatus === 'received')) {
+  } else if(paymentStatus ===  'mined' && (orderDetails.orderStatus === 'waiting' || orderDetails.paymentStatus === 'received')) {
     content = (
       <Box>
         <Box display="flex" justifyContent="center" alignItems="center">
@@ -160,8 +162,8 @@ export default function StepStatus() {
             Transaction successfuly sent.
           </Box>
           <Box>
-            {orderDetails.paymentStatus === 'waiting' && 'Waiting for Bity to catch it...'}
-            {orderDetails.paymentStatus === 'received' && 'Bity has received the transaction, waiting for confirmation...'}
+            {orderDetails.orderStatus === 'waiting' && 'Waiting for Bity to catch it...'}
+            {orderDetails.orderStatus === 'received' && 'Bity has received the transaction, waiting for confirmation...'}
             <Box display="flex" justifyContent="center"><LoadingRing/></Box>
           </Box>
         </Box>
@@ -172,7 +174,7 @@ export default function StepStatus() {
   } else {
     content = (
       <Box>
-        Unknown status ({paymentStatus}, {orderDetails.paymentStatus})
+        Unknown status ({paymentStatus}, {orderDetails.orderStatus})
       </Box>
     );
   }
