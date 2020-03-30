@@ -6,18 +6,18 @@ import { Box, Typography } from '@material-ui/core';
 import {Button, IconRefresh, Info} from '@aragon/ui'
 
 import RateForm from '../components/RateForm';
-import {setAmountDetail, setPaymentStep} from '../redux/payment/actions';
-import {getAmountDetail} from '../redux/payment/selectors';
+import {setRateRequest, setPaymentStep} from '../redux/payment/actions';
+import {getRateRequest} from '../redux/payment/selectors';
 
 export default function Exchange() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const amountDetails = useSelector(getAmountDetail);
-  const [rateRequest, setRateRequest] = useState(null);
+  const defaultRateRequest = useSelector(getRateRequest);
+  const [rateRequest, setLocalRateRequest] = useState(null);
 
   const onGoToSend = () => {
     if(rateRequest) {
-      dispatch(setAmountDetail(rateRequest));
+      dispatch(setRateRequest(rateRequest));
       dispatch(setPaymentStep(1));
     }
     history.push('/send');
@@ -30,7 +30,7 @@ export default function Exchange() {
           Transfer funds from your crypto wallet to your bank account.
         </Typography>
       </Box>
-      <RateForm onChange={setRateRequest} defaultRateRequest={amountDetails}/>
+      <RateForm onChange={setLocalRateRequest} defaultRateRequest={defaultRateRequest}/>
       <Button mode="strong" onClick={onGoToSend} wide label="Exchange" icon={<IconRefresh/>} />
       <Box pt={2}>
         <Info mode="error">

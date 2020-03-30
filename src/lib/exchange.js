@@ -15,56 +15,70 @@ function calculatedGasMargin(gas) {
   return gas.add(offset);
 }
 
-export async function getRate(rateRequest) {
-  if(rateRequest.tradeExact === 'OUTPUT') {
+export async function getRate({ inputCurrency, outputCurrency, amount, tradeExact }) {
+  const rateResult = {
+    inputCurrency,
+    outputCurrency,
+    tradeExact,
+  };
+
+  if(tradeExact === 'INPUT') {
+
+    let ethInputAmount = amount;
+
+    if(inputCurrency !== 'ETH') {
+      const tokenRate = await rateTokenToETH(inputCurrency, amount, 'EXACT_TOKEN');
+      ethInputAmount = tokenRate.outputAmount;
+    }
 
     const bityRate = await Bity.estimate({
       inputCurrency: 'ETH',
-      outputCurrency: rateRequest.outputCurrency,
-      outputAmount: rateRequest.amount,
+      outputCurrency: outputCurrency,
+      amount: ethInputAmount,
+      tradeExact: 'INPUT'
+    });
+
+    rateResult.inputAmount = BN(amount).toString();
+    rateResult.outputAmount = BN(bityRate.outputAmount).toString();
+    rateResult.fees = bityRate.fees;
+
+  } else if(tradeExact === 'OUTPUT') {
+
+    const bityRate = await Bity.estimate({
+      inputCurrency: 'ETH',
+      outputCurrency: outputCurrency,
+      amount: amount,
+      tradeExact: 'OUTPUT'
     });
 
     let finalInputAmount = bityRate.inputAmount;
 
-    if(rateRequest.inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenForExactETH(rateRequest.inputCurrency, bityRate.inputAmount);
+    if(inputCurrency !== 'ETH') {
+      const tokenRate = await rateTokenToETH(inputCurrency, bityRate.inputAmount, 'EXACT_ETH');
       finalInputAmount = tokenRate.inputAmount;
     }
 
-    return {
-      ...rateRequest,
-      inputAmount:  BN(finalInputAmount).toString(),
-      outputAmount: BN(rateRequest.amount).toString(),
-      fees: bityRate.fees,
-    }
+    rateResult.inputAmount = BN(finalInputAmount).toString();
+    rateResult.outputAmount = BN(amount).toString();
+    rateResult.fees = bityRate.fees;
+
   } else {
-    throw new Error('invalid TRADE_EXACT')
+    throw new Error('invalid TRADE_EXACT');
   }
+
+  return rateResult;
 }
 
-export async function rateTokenForExactETH(symbol, ethAmount) {
+export async function rateTokenToETH(symbol, amount, tradeExact) {
   const { tokenAddress } = TOKEN_DATA[symbol];
-  const exactETHAmount = ethers.utils.parseEther(ethAmount);
+  const exactAmount = ethers.utils.parseEther(String(amount)); // TODO token decimals
 
-  const tradeDetails = await tradeTokensForExactEth(tokenAddress, exactETHAmount);
-  const serializedResponse = stringifyObj(tradeDetails);
+  const method = (
+    (tradeExact === 'EXACT_TOKEN' && tradeExactTokensForEth) ||
+    (tradeExact === 'EXACT_ETH' && tradeTokensForExactEth)
+  );
 
-  return {
-    inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toString(),
-    outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toString(),
-    inputCurrency: symbol,
-    outputCurrency: 'ETH',
-    rate: serializedResponse.executionRate.rate,
-    invertedRate: serializedResponse.executionRate.rateInverted,
-    tradeDetails,
-  }
-}
-
-export async function rateExactTokenForETH(symbol, tokenAmount) {
-  const { tokenAddress } = TOKEN_DATA[symbol];
- const exactTokenAmount = ethers.utils.parseEther(String(tokenAmount));
-
-  const tradeDetails = await tradeExactTokensForEth(tokenAddress, exactTokenAmount);
+  const tradeDetails = await method(tokenAddress, exactAmount);
   const serializedResponse = stringifyObj(tradeDetails);
 
   return {

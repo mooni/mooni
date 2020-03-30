@@ -35,6 +35,11 @@ function Footer() {
         v0.2
       </Box>
       <Box className={classes.element}>
+        <Link to="/terms" component={RouterLink} className={classes.link}>
+          Terms
+        </Link>
+      </Box>
+      <Box className={classes.element}>
         <Link to="/about" component={RouterLink} className={classes.link}>
           About
         </Link>

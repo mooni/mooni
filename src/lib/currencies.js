@@ -37,3 +37,5 @@ export function getCurrencyLogoAddress(symbol) {
   const tokenAddress = TOKEN_DATA[symbol].tokenAddress;
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`;
 }
+
+export const SIGNIFICANT_DIGITS = 7;
