@@ -51,7 +51,7 @@ function StepRecap({ onComplete }) {
   return (
     <Box width={1}>
       <PaymentOrderRecap paymentOrder={paymentOrder} />
-      <Box pt={2}>
+      <Box pt={1}>
         <Info title="Price guaranteed until" mode="warning">
           <Countdown end={orderExpireDate} />
         </Info>

@@ -82,7 +82,7 @@ const initialMockState = {
       id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
       timestamp_created: '2020-03-25T13:31:28.948Z',
       timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
-      timestamp_price_guaranteed: '2020-03-25T13:41:31.831Z',
+      timestamp_price_guaranteed: '2021-03-25T13:41:31.831Z',
       payment_details: {
         crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
         type: 'crypto_address'

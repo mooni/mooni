@@ -4,9 +4,11 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import {textStyle, Field} from '@aragon/ui';
+import {textStyle, Field, GU} from '@aragon/ui';
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+
+import bityLogo from '../assets/bity_logo_blue.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -56,6 +58,11 @@ const Title = styled.p`
 
 const Value = styled.p`
   ${textStyle('body3')};
+`;
+
+const PoweredBy = styled.span`
+  ${textStyle('label2')};
+  margin-right: ${0.5 * GU}px;
 `;
 
 function RecipientRow({ label, value }) {
@@ -142,23 +149,32 @@ export default function PaymentOrderRecap({ paymentOrder }) {
         Order summary
       </Title>
 
-      <RecipientRow label="Name" value={recipient.owner.name}/>
-      {fullAddress && <RecipientRow label="Address" value={fullAddress}/>}
+      <Box px={1}>
+        <RecipientRow label="Name" value={recipient.owner.name}/>
+        {fullAddress && <RecipientRow label="Address" value={fullAddress}/>}
 
-      <RecipientRow label="IBAN" value={recipient.iban}/>
-      {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
-      {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
-      {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+        <RecipientRow label="IBAN" value={recipient.iban}/>
+        {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
+        {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
+        {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+      </Box>
 
       <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
       <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" />
 
-      <Typography variant="caption">
-        <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
-      </Typography><br/>
-      <Typography variant="caption">
-        <b>Fees:</b> {fees} {feesCurrency}
-      </Typography>
+      <Box textAlign="center">
+        <Typography variant="caption">
+          <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
+        </Typography><br/>
+        <Typography variant="caption">
+          <b>Fees:</b> {fees} {feesCurrency}
+        </Typography>
+      </Box>
+
+      <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
+        <PoweredBy>Powered by </PoweredBy>
+        <img src={bityLogo} alt="bity" width={70} />
+      </Box>
     </Box>
   )
 }
