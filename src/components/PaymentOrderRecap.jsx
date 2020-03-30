@@ -62,7 +62,7 @@ function RecipientRow({ label, value }) {
   const classes = useStyles();
   return (
     <Field label={label} className={classes.recipientField}>
-      <Value>{value}</Value>
+      <Value data-private>{value}</Value>
     </Field>
   )
 }
