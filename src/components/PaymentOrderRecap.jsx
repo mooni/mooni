@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import {textStyle, Field, GU} from '@aragon/ui';
+import {Link, textStyle, Field, GU} from '@aragon/ui';
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
@@ -173,7 +173,7 @@ export default function PaymentOrderRecap({ paymentOrder }) {
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
         <PoweredBy>Powered by </PoweredBy>
-        <img src={bityLogo} alt="bity" width={70} />
+        <Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link>
       </Box>
     </Box>
   )
