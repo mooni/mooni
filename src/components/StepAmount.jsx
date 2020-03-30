@@ -6,17 +6,17 @@ import { Box } from '@material-ui/core';
 import { Button, IconArrowRight } from '@aragon/ui'
 import RateForm from '../components/RateForm';
 
-import {setAmountDetail} from '../redux/payment/actions';
-import {getAmountDetail} from '../redux/payment/selectors';
+import { setRateRequest } from '../redux/payment/actions';
+import { getRateRequest } from '../redux/payment/selectors';
 
-function StepPaymentDetail({ onComplete }) {
+export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();
-  const amountDetails = useSelector(getAmountDetail);
-  const [rateRequest, setRateRequest] = useState(null);
+  const defaultRateRequest = useSelector(getRateRequest);
+  const [rateRequest, setLocalRateRequest] = useState(null);
 
-  const onSubmit = data => {
+  const onSubmit = () => {
     if(rateRequest) {
-      dispatch(setAmountDetail(rateRequest));
+      dispatch(setRateRequest(rateRequest));
     }
 
     onComplete();
@@ -24,10 +24,8 @@ function StepPaymentDetail({ onComplete }) {
 
   return (
     <Box width={1}>
-      <RateForm onChange={setRateRequest} defaultRateRequest={amountDetails}/>
+      <RateForm onChange={setLocalRateRequest} defaultRateRequest={defaultRateRequest}/>
       <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" />
     </Box>
   )
 }
-
-export default StepPaymentDetail;
