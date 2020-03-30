@@ -48,7 +48,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
     <Box width={1}>
       <form onSubmit={onSubmit}>
         <Box>
-          <Field label="Your email (optional)">
+          <Field label="Your email (optional)" data-private>
             <WideInput
               name="email"
               ref={register(fields.email)}
@@ -56,7 +56,7 @@ function StepPaymentDetail({ onComplete, onBack }) {
             />
             {errors.email && <FieldError>Invalid email</FieldError>}
           </Field>
-          <Field label="Reference (optional)">
+          <Field label="Reference (optional)" data-private>
             <WideInput
               name="reference"
               ref={register(fields.reference)}

@@ -91,11 +91,11 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
   return (
     <form onSubmit={submit}>
-      <Field label="Name" className={classes.fieldRow}>
+      <Field label="Name" className={classes.fieldRow} data-private>
         <WideInput name="owner.name" ref={register(fields.name)} required/>
         {errors['owner.name'] && <FieldError>Please enter your name</FieldError>}
       </Field>
-      <Field label="IBAN" className={classes.fieldRow}>
+      <Field label="IBAN" className={classes.fieldRow} data-private>
         <WideInput name="iban" ref={register(fields.iban)} required/>
         {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
@@ -106,23 +106,23 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
       </Box>
       {more &&
       <>
-        <Field label="BIC/SWIFT" className={classes.fieldRow}>
+        <Field label="BIC/SWIFT" className={classes.fieldRow} data-private>
           <WideInput name="bic_swift" ref={register(fields.bic_swift)}/>
           {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
         </Field>
-        <Field label="Address" className={classes.fieldRow}>
+        <Field label="Address" className={classes.fieldRow} data-private>
           <WideInput name="owner.address" ref={register(fields.address)}/>
           {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
         </Field>
-        <Field label="Zip/Postal code" className={classes.fieldRow}>
+        <Field label="Zip/Postal code" className={classes.fieldRow} data-private>
           <WideInput name="owner.zip" ref={register(fields.zip)}/>
           {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
         </Field>
-        <Field label="City" className={classes.fieldRow}>
+        <Field label="City" className={classes.fieldRow} data-private>
           <WideInput name="owner.city" ref={register(fields.city)}/>
           {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
         </Field>
-        <Field label="Country" className={classes.fieldRow}>
+        <Field label="Country" className={classes.fieldRow} data-private>
           <DropDown
             items={countriesList}
             selected={selectedCountry}

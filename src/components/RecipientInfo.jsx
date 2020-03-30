@@ -19,7 +19,7 @@ function RecipientInfo({ recipient }) {
   }
 
   return (
-    <Info title="Recipient">
+    <Info title="Recipient" data-private>
       <Box>
         <b>Name:&nbsp;</b>
         {recipient.owner.name}
