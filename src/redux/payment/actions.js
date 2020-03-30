@@ -7,6 +7,8 @@ import { getAddress, getETHManager } from '../eth/selectors';
 //   checkTradeAllowance,
 // } from '../../lib/exchange';
 
+import { sendEvent } from '../../lib/analytics';
+
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
@@ -83,6 +85,8 @@ export const setPaymentStep = (stepId) => ({
 export const createOrder = () => async function (dispatch, getState)  {
   dispatch(resetOrder());
 
+  sendEvent('order', 'create', 'init');
+
   const state = getState();
   const fromAddress = getAddress(state);
   const paymentRequest = getPaymentRequest(state);
@@ -113,9 +117,12 @@ export const createOrder = () => async function (dispatch, getState)  {
     // }
 
     dispatch(setPaymentOrder(paymentOrder));
+    sendEvent('order', 'create', 'done');
 
   } catch(error) {
     dispatch(setPaymentOrder(null));
+
+    sendEvent('order', 'create', 'error');
 
     if(error.message === 'api_error') {
       dispatch(setOrderErrors(error.errors));
@@ -127,6 +134,9 @@ export const createOrder = () => async function (dispatch, getState)  {
 };
 
 export const sendPayment = () => async function (dispatch, getState)  {
+
+  sendEvent('payment', 'send', 'init');
+
   const state = getState();
   const paymentOrder = getPaymentOrder(state);
   const ethManager = getETHManager(state);
@@ -175,8 +185,11 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
     dispatch(setPaymentStatus('mined'));
 
+    sendEvent('payment', 'send', 'done');
+
   } catch(error) {
     console.error(error);
+    sendEvent('payment', 'send', 'error');
     dispatch(setPaymentStatus('error'));
   }
 };
