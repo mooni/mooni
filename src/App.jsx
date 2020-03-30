@@ -8,6 +8,8 @@ import {
   Redirect,
 } from 'react-router-dom';
 
+import { usePageViews } from './lib/analytics';
+
 import './App.css'
 import Login from './components/Login';
 import PaymentPage from './pages/PaymentPage';
@@ -16,6 +18,8 @@ import StatusPage from './pages/StatusPage';
 import AboutPage from './pages/AboutPage';
 
 function App() {
+  usePageViews();
+
   return (
     <AppContainer>
       <Login />
