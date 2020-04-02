@@ -7,31 +7,31 @@ import { Button, Modal, Link, IconCaution, useTheme } from '@aragon/ui'
 import { getLoginModalOpen } from '../redux/eth/selectors';
 import { initETH, openLoginModal } from '../redux/eth/actions';
 
+import MetamaskIcon from '../assets/wallets/metamask-fox.svg';
+import WalletConnectIcon from '../assets/wallets/walletConnectIcon.svg';
+import PortisIcon from '../assets/wallets/portis_icon.svg';
+import LedgerIcon from '../assets/wallets/ledger.png';
+
 const walletProviders = [
   {
-    name: 'Metamask',
+    name: 'Web3 Browser',
     type: 'injected',
-    icon: <img src="/images/wallets/metamask-fox.svg" width="18" alt="metamask-wallet-icon"/>,
-  },
-  {
-    name: 'Coinbase Wallet',
-    type: 'injected',
-    icon: <img src="/images/wallets/coinbaseWalletIcon.svg" width="18" alt="coinbase-wallet-icon"/>,
+    icon: <img src={MetamaskIcon} width="18" alt="metamask-wallet-icon"/>,
   },
   {
     name: 'WalletConnect',
     type: 'WalletConnect',
-    icon: <img src="/images/wallets/walletConnectIcon.svg" width="18" alt="walletconnect-icon"/>,
+    icon: <img src={WalletConnectIcon} width="18" alt="walletconnect-icon"/>,
   },
   {
     name: 'Portis',
     type: 'Portis',
-    icon: <img src="/images/wallets/portis_icon.svg" width="16" alt="portis-icon"/>,
+    icon: <img src={PortisIcon} width="16" alt="portis-icon"/>,
   },
   {
     name: 'Ledger',
     type: 'Ledger',
-    icon: <img src="/images/wallets/ledger.png" width="16" alt="ledger-icon"/>,
+    icon: <img src={LedgerIcon} width="16" alt="ledger-icon"/>,
   },
 ];
 
