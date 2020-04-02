@@ -92,11 +92,11 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   return (
     <form onSubmit={submit}>
       <Field label="Name" className={classes.fieldRow}>
-        <WideInput name="owner.name" ref={register(fields.name)} required/>
+        <WideInput name="owner.name" ref={register(fields.name)} required data-private/>
         {errors['owner.name'] && <FieldError>Please enter your name</FieldError>}
       </Field>
       <Field label="IBAN" className={classes.fieldRow}>
-        <WideInput name="iban" ref={register(fields.iban)} required/>
+        <WideInput name="iban" ref={register(fields.iban)} required data-private/>
         {errors.iban && <FieldError>Invalid IBAN</FieldError>}
       </Field>
       <Box className={classes.fieldRow}>
@@ -107,19 +107,19 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
       {more &&
       <>
         <Field label="BIC/SWIFT" className={classes.fieldRow}>
-          <WideInput name="bic_swift" ref={register(fields.bic_swift)}/>
+          <WideInput name="bic_swift" ref={register(fields.bic_swift)} data-private/>
           {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
         </Field>
         <Field label="Address" className={classes.fieldRow}>
-          <WideInput name="owner.address" ref={register(fields.address)}/>
+          <WideInput name="owner.address" ref={register(fields.address)} data-private/>
           {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
         </Field>
         <Field label="Zip/Postal code" className={classes.fieldRow}>
-          <WideInput name="owner.zip" ref={register(fields.zip)}/>
+          <WideInput name="owner.zip" ref={register(fields.zip)} data-private/>
           {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
         </Field>
         <Field label="City" className={classes.fieldRow}>
-          <WideInput name="owner.city" ref={register(fields.city)}/>
+          <WideInput name="owner.city" ref={register(fields.city)} data-private/>
           {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
         </Field>
         <Field label="Country" className={classes.fieldRow}>
@@ -129,6 +129,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
             onChange={setCountry}
             placeholder="Please select a country"
             wide
+            data-private
           />
           {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
         </Field>

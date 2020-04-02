@@ -4,9 +4,11 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import {textStyle, Field} from '@aragon/ui';
+import {Link, textStyle, Field, GU} from '@aragon/ui';
 
-import { getCurrencyLogoAddress } from '../lib/currencies';
+import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+
+import bityLogo from '../assets/bity_logo_blue.svg';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,11 +60,16 @@ const Value = styled.p`
   ${textStyle('body3')};
 `;
 
+const PoweredBy = styled.span`
+  ${textStyle('label2')};
+  margin-right: ${0.5 * GU}px;
+`;
+
 function RecipientRow({ label, value }) {
   const classes = useStyles();
   return (
     <Field label={label} className={classes.recipientField}>
-      <Value>{value}</Value>
+      <Value data-private>{value}</Value>
     </Field>
   )
 }
@@ -82,7 +89,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={BN(value ?? 0).dp(3).toString()}
+            value={BN(value).sd(SIGNIFICANT_DIGITS).toString()}
             readOnly
             className={classes.amountInput}
           />
@@ -119,23 +126,21 @@ export default function PaymentOrderRecap({ paymentOrder }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = BN(
-    paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount
-  ).dp(6).toString();
+  const inputAmount = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
   const inputCurrency = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
 
-  const outputAmount = BN(paymentOrder.bityOrder.output.amount).dp(6).toString();
+  const outputAmount = paymentOrder.bityOrder.output.amount;
   const outputCurrency = paymentOrder.bityOrder.output.currency;
 
-  const rate = BN(outputAmount).div(inputAmount).dp(3).toString();
+  const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
 
   let fees, feesCurrency;
-  if(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.currency === paymentOrder.bityOrder.input.currency) {
-    fees = BN(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.amount).times(outputAmount).div(inputAmount).dp(6).toString();
+  if(paymentOrder.bityOrder.fees.currency === paymentOrder.bityOrder.input.currency) {
+    fees = BN(paymentOrder.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
     feesCurrency = paymentOrder.bityOrder.output.currency;
   }  else {
-    fees = BN(paymentOrder.bityOrder.price_breakdown.customer_trading_fee.amount).dp(6).toString();
-    feesCurrency = paymentOrder.bityOrder.price_breakdown.customer_trading_fee.currency;
+    fees = BN(paymentOrder.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = paymentOrder.bityOrder.fees.currency;
   }
 
   return (
@@ -144,22 +149,32 @@ export default function PaymentOrderRecap({ paymentOrder }) {
         Order summary
       </Title>
 
-      <RecipientRow label="Name" value={recipient.owner.name}/>
-      {fullAddress && <RecipientRow label="Address" value={fullAddress}/>}
+      <Box px={1}>
+        <RecipientRow label="Name" value={recipient.owner.name}/>
+        {fullAddress && <RecipientRow label="Address" value={fullAddress}/>}
 
-      <RecipientRow label="IBAN" value={recipient.iban}/>
-      {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
-      {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
-      {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+        <RecipientRow label="IBAN" value={recipient.iban}/>
+        {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
+        {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
+        {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+      </Box>
 
-      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" disabled/>
-      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" disabled/>
-      <Typography variant="caption">
-        <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
-      </Typography><br/>
-      <Typography variant="caption">
-        <b>Fees:</b> {fees} {feesCurrency}
-      </Typography>
+      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
+      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" />
+
+      <Box textAlign="center">
+        <Typography variant="caption">
+          <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
+        </Typography><br/>
+        <Typography variant="caption">
+          <b>Fees:</b> {fees} {feesCurrency}
+        </Typography>
+      </Box>
+
+      <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
+        <PoweredBy>Powered by </PoweredBy>
+        <Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link>
+      </Box>
     </Box>
   )
 }

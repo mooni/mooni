@@ -8,23 +8,28 @@ import {
   Redirect,
 } from 'react-router-dom';
 
+import { usePageViews } from './lib/analytics';
+
 import './App.css'
 import Login from './components/Login';
-import PaymentPage from './pages/PaymentPage';
+import HomePage from './pages/HomePage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
 import AboutPage from './pages/AboutPage';
+import TermsPage from './pages/TermsPage';
 
 function App() {
+  usePageViews();
+
   return (
     <AppContainer>
       <Login />
       <Switch>
+        <Route exact path="/">
+          <HomePage />
+        </Route>
         <Route path="/exchange">
           <ExchangePage />
-        </Route>
-        <Route path="/send">
-          <PaymentPage />
         </Route>
         <Route path="/status">
           <StatusPage />
@@ -32,8 +37,11 @@ function App() {
         <Route path="/about">
           <AboutPage />
         </Route>
+        <Route path="/terms">
+          <TermsPage />
+        </Route>
         <Route path="*">
-          <Redirect to="/exchange" />
+          <Redirect to="/" />
         </Route>
       </Switch>
     </AppContainer>

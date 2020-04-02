@@ -1,6 +1,6 @@
 {
   "name": "mooni",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "logrocket": "^1.0.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-ga": "^2.7.0",
     "react-github-btn": "^1.1.1",
     "react-hook-form": "^3.28.1",
     "react-redux": "^7.2.0",

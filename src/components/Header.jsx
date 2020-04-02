@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1),
   },
   appName: {
-    fontFamily:'Montserrat, sans-serif',
+    fontFamily: `'Montserrat', sans-serif`,
     textTransform: 'uppercase',
     fontSize: 24,
     lineHeight: 1,

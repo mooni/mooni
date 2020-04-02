@@ -48,7 +48,7 @@ function Account() {
 
   return (
     <Box display="flex">
-      <Box mr={1}>{addressComponent}</Box>
+      <Box mr={1} data-private>{addressComponent}</Box>
       <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />
     </Box>
   );

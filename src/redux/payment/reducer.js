@@ -9,7 +9,7 @@ const initialEmptyState = {
   paymentRequest: {
     recipient: null,
     contactPerson: null,
-    amountDetail: {
+    rateRequest: {
       inputCurrency: INPUT_CURRENCIES[0],
       outputCurrency: OUTPUT_CURRENCIES[0],
       amount: 100,
@@ -18,7 +18,7 @@ const initialEmptyState = {
     reference: '',
   },
   paymentOrder: null,
-  orderError: null,
+  orderErrors: null,
   paymentStatus: null,
   paymentTransaction: null,
 };
@@ -36,7 +36,7 @@ const initialMockState = {
     contactPerson: {
       email: 'zfezf@fre.vfr'
     },
-    amountDetail: {
+    rateRequest: {
       inputCurrency: 'ETH',
       outputCurrency: 'EUR',
       amount: 10,
@@ -56,7 +56,7 @@ const initialMockState = {
       contactPerson: {
         email: 'zfezf@fre.vfr'
       },
-      amountDetail: {
+      rateRequest: {
         inputCurrency: 'ETH',
         outputCurrency: 'EUR',
         amount: 10,
@@ -82,7 +82,7 @@ const initialMockState = {
       id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
       timestamp_created: '2020-03-25T13:31:28.948Z',
       timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
-      timestamp_price_guaranteed: '2020-03-25T13:41:31.831Z',
+      timestamp_price_guaranteed: '2021-03-25T13:41:31.831Z',
       payment_details: {
         crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
         type: 'crypto_address'
@@ -92,10 +92,14 @@ const initialMockState = {
           amount: '0.000635986164121',
           currency: 'ETH'
         }
+      },
+      fees: {
+        amount: '0.000635986164121',
+        currency: 'ETH'
       }
     }
   },
-  orderError: null,
+  orderErrors: null,
   paymentStatus: 'mined',
   paymentTransaction: {
     hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
@@ -107,13 +111,13 @@ const initialState = initialEmptyState;
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case actions.SET_AMOUNT_DETAIL: {
-      const { amountDetail } = action.payload;
+    case actions.SET_RATE_REQUEST: {
+      const { rateRequest } = action.payload;
       return {
         ...state,
         paymentRequest: {
           ...state.paymentRequest,
-          amountDetail,
+          rateRequest,
         },
       };
     }
@@ -165,7 +169,7 @@ export default function(state = initialState, action) {
       return {
         ...state,
         paymentOrder: null,
-        orderError: null,
+        orderErrors: null,
       };
     }
     case actions.SET_PAYMENT_STATUS: {
