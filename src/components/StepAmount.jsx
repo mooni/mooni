@@ -16,10 +16,7 @@ export default function StepAmount({ onComplete }) {
   const [rateValid, setRateValid] = useState(false);
 
   const onSubmit = () => {
-    if(rateRequest) {
-      dispatch(setRateRequest(rateRequest));
-    }
-
+    dispatch(setRateRequest(rateRequest));
     onComplete();
   };
 
