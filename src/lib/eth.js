@@ -47,15 +47,28 @@ class ETHManager extends EventEmitter {
       this.ethereum.on('networkChanged', reloadPage);
       this.ethereum.on('chainChanged', reloadPage);
       this.ethereum.on('stop', () => this.emit('stop'));
+      this.ethereum.on('close', () => this.emit('stop'));
     }
 
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
     this.signer = this.provider.getSigner();
 
+    await this.checkNotContract();
+
     // TODO add error message in UI
     // if(await this.getNetworkId() !== MAINNET_NETWORK_ID) {
     //   throw new Error('not_on_mainnet');
     // }
+  }
+
+  async checkNotContract() {
+    const code = await this.provider.getCode(this.getAddress());
+    if(code !== '0x') {
+      if(this.ethereum.close) {
+        await this.ethereum.close();
+      }
+      throw new Error('eth_smart_account_not_supported');
+    }
   }
 
   updateAccounts(accounts) {
@@ -66,6 +79,9 @@ class ETHManager extends EventEmitter {
   close() {
     if(this.ethereum.on) {
       this.ethereum.removeAllListeners();
+    }
+    if(this.ethereum.close) {
+      this.ethereum.close();
     }
     this.removeAllListeners();
   }

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box, } from '@material-ui/core';
-import { Button, Modal, Link } from '@aragon/ui'
+import { Button, Modal, Link, IconCaution, useTheme } from '@aragon/ui'
 
 import { getLoginModalOpen } from '../redux/eth/selectors';
 import { initETH, openLoginModal } from '../redux/eth/actions';
@@ -36,15 +36,22 @@ const walletProviders = [
 ];
 
 function Login() {
+  const [error, setError] = useState(null);
   const modalOpen = useSelector(getLoginModalOpen);
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   async function connectETH(walletType) {
-    dispatch(openLoginModal(false));
-    await dispatch(initETH(walletType));
+    const error = await dispatch(initETH(walletType));
+    if(!error) {
+      dispatch(openLoginModal(false));
+    } else {
+      setError(error);
+    }
   }
 
   function onCloseModal() {
+    setError(null);
     dispatch(openLoginModal(false));
   }
 
@@ -56,6 +63,30 @@ function Login() {
       width={300}
       padding={16}
     >
+      { error ?
+        <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
+          <Box
+            fontSize={14}
+            width={1}
+            textAlign="center"
+            mb={1}
+          >
+            Unable to connect wallet
+          </Box>
+          <Box fontSize={12}>
+            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
+              <IconCaution size="large" style={{ color: theme.negative }}  />
+            </Box>
+            {
+              error === 'eth_smart_account_not_supported' ?
+                'We currently do not support smart account wallets such as Argent or Gnosis Safe.'
+                :
+                'The wallet you are trying to connect with seems incompatible. Please report this problem to our support.'
+            }
+            <br/>Sorry for the inconvenience.
+          </Box>
+        </Box>
+      :
         <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
           <Box
             fontSize={14}
@@ -85,6 +116,7 @@ function Login() {
             <Link href="https://ethereum.org/use/#3-what-is-a-wallet-and-which-one-should-i-use" external>Learn more about wallets</Link>
           </Box>
         </Box>
+      }
     </Modal>
   );
 }
