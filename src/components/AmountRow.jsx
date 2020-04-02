@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { DropDown } from '@aragon/ui'
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+import { isValue } from '../lib/numbers';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -76,7 +77,7 @@ function CurrencyItem({ symbol }) {
 export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, active, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
-  const displayedValue = value ?
+  const displayedValue = isValue(value) ?
     (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toString())
   : '';
 
@@ -91,7 +92,6 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
         <Box flex={1}>
           <input
             type={value ? 'number' : 'text'}
-            min={0}
             value={displayedValue}
             onChange={onChangeValue}
             readOnly={valueDisabled}
@@ -103,9 +103,9 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
             items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
             selected={currencyId}
             onChange={onChangeCurrency}
-            wide
             disabled={currencyDisabled}
             className={classes.currencyButton}
+            wide
           />
         </Box>
       </Box>

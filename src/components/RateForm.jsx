@@ -9,6 +9,7 @@ import AmountRow from './AmountRow';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
+import { isNotNull } from '../lib/numbers';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
@@ -30,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function RateForm({ onChange, defaultRateRequest }) {
+function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequest }) {
   const classes = useStyles();
 
   const [rateDetails, setRateDetails] = useState({
@@ -77,11 +78,12 @@ function RateForm({ onChange, defaultRateRequest }) {
 
   useEffect(() => {
     onChange(rateRequest);
+    onValid(rateRequest && isNotNull(rateRequest.amount))
   }, [onChange, rateRequest]);
 
   useEffect(() => {
     let isMounted = true;
-    if (!debouncedRateRequest || debouncedRateRequest.amount === 0) return;
+    if (!debouncedRateRequest || !isNotNull(debouncedRateRequest.amount)) return;
 
     (async () => {
 
@@ -140,11 +142,12 @@ function RateForm({ onChange, defaultRateRequest }) {
 
   const onChangeValue = tradeExact => e => {
     setRateLoading(true);
-    const amount = Number(e.target.value);
+    const amount = e.target.value;
+    if(Number(amount) < 0) return;
     const newRateDetails = {
       ...rateDetails,
-      inputAmount: tradeExact === 'INPUT' && amount,
-      outputAmount: tradeExact === 'OUTPUT' && amount,
+      inputAmount: tradeExact === 'INPUT' ? amount : null,
+      outputAmount: tradeExact === 'OUTPUT' ? amount : null,
       tradeExact,
     };
     setRateDetails(newRateDetails);
