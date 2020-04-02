@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Link as RouterLink } from 'react-router-dom';
 import { Link, Box } from '@material-ui/core';
+import { Link as ALink } from '@aragon/ui';
 import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -32,7 +33,7 @@ function Footer() {
   return (
     <Box className={classes.root}>
       <Box className={classes.element}>
-        v0.3
+        <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.3</ALink>
       </Box>
       <Box className={classes.element}>
         <Link to="/terms" component={RouterLink} className={classes.link}>
