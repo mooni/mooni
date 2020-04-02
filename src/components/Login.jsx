@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Box, } from '@material-ui/core';
-import { Button, Modal, Link, IconCaution, useTheme } from '@aragon/ui'
+import { Box, Dialog } from '@material-ui/core';
+import { Button, LoadingRing, Link, IconCaution, useTheme } from '@aragon/ui'
 
-import { getLoginModalOpen } from '../redux/eth/selectors';
+import {getETHManagerLoading, getLoginModalOpen} from '../redux/eth/selectors';
 import { initETH, openLoginModal } from '../redux/eth/actions';
 
 import MetamaskIcon from '../assets/wallets/metamask-fox.svg';
@@ -38,15 +38,15 @@ const walletProviders = [
 function Login() {
   const [error, setError] = useState(null);
   const modalOpen = useSelector(getLoginModalOpen);
+  const ethLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
   const theme = useTheme();
 
   async function connectETH(walletType) {
     const error = await dispatch(initETH(walletType));
+    setError(error);
     if(!error) {
       dispatch(openLoginModal(false));
-    } else {
-      setError(error);
     }
   }
 
@@ -56,14 +56,19 @@ function Login() {
   }
 
   return (
-    <Modal
-      visible={modalOpen}
+    <Dialog
+      open={modalOpen}
       onClose={onCloseModal}
-      closeButton={true}
-      width={300}
-      padding={16}
+      maxWidth="sm"
     >
-      { error ?
+      <Box p={1}>
+        {ethLoading &&
+        <Box display="flex" alignItems="center">
+          <LoadingRing mode="half-circle" />
+        </Box>
+        }
+
+        {error &&
         <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
           <Box
             fontSize={14}
@@ -75,18 +80,22 @@ function Login() {
           </Box>
           <Box fontSize={12}>
             <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
-              <IconCaution size="large" style={{ color: theme.negative }}  />
+              <IconCaution size="large" style={{color: theme.negative}}/>
             </Box>
-            {
-              error === 'eth_smart_account_not_supported' ?
-                'We currently do not support smart account wallets such as Argent or Gnosis Safe.'
-                :
-                'The wallet you are trying to connect with seems incompatible. Please report this problem to our support.'
+            {error === 'eth_smart_account_not_supported' &&
+            'We currently do not support smart account wallets such as Argent or Gnosis Safe.'
             }
-            <br/>Sorry for the inconvenience.
+            {error === 'no_ethereum_provider' &&
+            'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.'
+            }
+            {error === 'unknown_error' &&
+            'The wallet you are trying to connect with seems incompatible. Please report this problem to our support.'
+            }
           </Box>
         </Box>
-      :
+        }
+
+        {!ethLoading && !error &&
         <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
           <Box
             fontSize={14}
@@ -116,8 +125,9 @@ function Login() {
             <Link href="https://ethereum.org/use/#3-what-is-a-wallet-and-which-one-should-i-use" external>Learn more about wallets</Link>
           </Box>
         </Box>
-      }
-    </Modal>
+        }
+      </Box>
+    </Dialog>
   );
 }
 

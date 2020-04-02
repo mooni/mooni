@@ -126,7 +126,7 @@ class ETHManager extends EventEmitter {
       await ethManager.init();
       return ethManager;
     } else {
-      throw new Error('no-ethereum-provider');
+      throw new Error('no_ethereum_provider');
     }
   }
 
