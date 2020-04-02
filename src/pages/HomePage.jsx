@@ -14,6 +14,7 @@ export default function HomePage() {
   const dispatch = useDispatch();
   const defaultRateRequest = useSelector(getRateRequest);
   const [rateRequest, setLocalRateRequest] = useState(null);
+  const [rateValid, setRateValid] = useState(false);
 
   const onGoToExchange = () => {
     if(rateRequest) {
@@ -30,8 +31,8 @@ export default function HomePage() {
           Transfer funds from your crypto wallet to your bank account.
         </Typography>
       </Box>
-      <RateForm onChange={setLocalRateRequest} defaultRateRequest={defaultRateRequest}/>
-      <Button mode="strong" onClick={onGoToExchange} wide label="Exchange" icon={<IconRefresh/>} />
+      <RateForm onChange={setLocalRateRequest} onValid={setRateValid} defaultRateRequest={defaultRateRequest}/>
+      <Button mode="strong" onClick={onGoToExchange} wide label="Exchange" icon={<IconRefresh/>} disabled={!rateValid} />
       <Box pt={2}>
         <Info mode="error">
           Mooni is unaudited, please proceed with caution.

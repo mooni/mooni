@@ -13,6 +13,7 @@ export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();
   const defaultRateRequest = useSelector(getRateRequest);
   const [rateRequest, setLocalRateRequest] = useState(null);
+  const [rateValid, setRateValid] = useState(false);
 
   const onSubmit = () => {
     if(rateRequest) {
@@ -24,8 +25,8 @@ export default function StepAmount({ onComplete }) {
 
   return (
     <Box width={1}>
-      <RateForm onChange={setLocalRateRequest} defaultRateRequest={defaultRateRequest}/>
-      <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" />
+      <RateForm onChange={setLocalRateRequest} onValid={setRateValid} defaultRateRequest={defaultRateRequest}/>
+      <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={!rateValid} />
     </Box>
   )
 }
