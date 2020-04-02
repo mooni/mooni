@@ -32,7 +32,7 @@ function Footer() {
   return (
     <Box className={classes.root}>
       <Box className={classes.element}>
-        v0.2
+        v0.3
       </Box>
       <Box className={classes.element}>
         <Link to="/terms" component={RouterLink} className={classes.link}>
