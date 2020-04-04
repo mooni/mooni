@@ -145,10 +145,6 @@ export default function PaymentOrderRecap({ paymentOrder }) {
 
   return (
     <Box>
-      <Title>
-        Order summary
-      </Title>
-
       <Box px={1}>
         <RecipientRow label="Name" value={recipient.owner.name}/>
         {fullAddress && <RecipientRow label="Address" value={fullAddress}/>}

@@ -58,9 +58,9 @@ MooniWidget.open();
 
 An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it.
 
-We also provided some [code examples](https://github.com/pakokrew/mooni/tree/ea4947468e02e0ebf7ab216074c3f9fc27c2c197/host-example/README.md) that includes Mooni widget.
+We also provided some [code examples](./host-example) that includes Mooni widget.
 
-You can check [the package](widget.md) to get full documentation.
+You can check [the package](./packages/widget) to get full documentation.
 
 ## 💻 Development
 
@@ -76,19 +76,3 @@ yarn start
 # Build production bundle
 yarn build
 ```
-
-## 💭 TODO
-
-Here's a list of what to come next
-
-* Add login without wallet, display deposit address
-* Fix Steps UX on mobile
-* Reset order after exceed guaranteed time
-* Update status from bity after payment on an /order/{orderId} page
-* Add liquidity provider to accept any ERC20 token
-* Support more wallet providers \(Ledger, Fortmatic\)
-* bity cookies not supported on Safari
-* add link to transaction while waiting mined and mined
-* assert wallet on mainnet
-* Try to pass web3 provider through iframe
-

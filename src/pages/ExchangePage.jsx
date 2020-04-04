@@ -12,6 +12,7 @@ import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepAmount from '../components/StepAmount';
 import StepRecap from '../components/StepRecap';
+import { SmallWidth } from '../components/StyledComponents';
 
 import { CustomMobileStepper } from '../components/StepComponents';
 
@@ -24,8 +25,8 @@ const useStyles = makeStyles({
     flexGrow: 1,
   },
   mobileStepperStepLabel: {
-    fontSize: 14,
-    fontWeight: 400,
+    fontSize: 16,
+    fontWeight: 500,
     lineHeight: 1.5,
     textTransform: 'uppercase',
     marginBottom: '14px',
@@ -56,7 +57,7 @@ export default function ExchangePage() {
     history.push('/status');
   }
 
-  const steps = ['Amount', 'Recipient', 'Payment Details', 'Recap', 'Status'];
+  const steps = ['Amount', 'Recipient', 'Payment Details', 'Order summary'];
   const stepElements = [
     <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
@@ -66,35 +67,37 @@ export default function ExchangePage() {
 
   return (
     <RequireConnection>
-      <ABox width={1} py={3}>
-        <CustomMobileStepper
-          activeStep={stepId}
-          steps={stepElements.length}
-          variant="progress"
-          position="static"
-          className={classes.mobileStepperRoot}
-        />
+      <SmallWidth>
+        <ABox width={1} py={3}>
+          <CustomMobileStepper
+            activeStep={stepId}
+            steps={stepElements.length}
+            variant="progress"
+            position="static"
+            className={classes.mobileStepperRoot}
+          />
 
-        <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-          {steps[stepId]}
-        </Box>
+          <Box textAlign="center" className={classes.mobileStepperStepLabel}>
+            {steps[stepId]}
+          </Box>
 
-        {stepId !== 0 && <Box mb={2}>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            startIcon={<ArrowBack/>}
-            disabled={stepId === 0}
-            style={{width: '100%'}}
-            onClick={handleBack}
-          >
-            Back
-          </Button>
-        </Box>
-        }
-        {stepElements[stepId]}
-      </ABox>
+          {stepId !== 0 && <Box mb={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="small"
+              startIcon={<ArrowBack/>}
+              disabled={stepId === 0}
+              style={{width: '100%'}}
+              onClick={handleBack}
+            >
+              Back
+            </Button>
+          </Box>
+          }
+          {stepElements[stepId]}
+        </ABox>
+      </SmallWidth>
     </RequireConnection>
   );
 }

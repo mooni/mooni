@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import { Box } from '@material-ui/core';
 
-import { Button, IconArrowRight } from '@aragon/ui'
+import { Button, IconRefresh } from '@aragon/ui'
 import RateForm from '../components/RateForm';
 
 import { setRateRequest } from '../redux/payment/actions';
@@ -23,7 +23,7 @@ export default function StepAmount({ onComplete }) {
   return (
     <Box width={1}>
       <RateForm onChange={setLocalRateRequest} onValid={setRateValid} defaultRateRequest={defaultRateRequest}/>
-      <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Save amount" disabled={!rateValid} />
+      <Button mode="strong" onClick={onSubmit} wide icon={<IconRefresh />} label="Exchange" disabled={!rateValid} />
     </Box>
   )
 }

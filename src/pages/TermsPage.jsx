@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Box } from '@material-ui/core';
 import Terms from '../components/Terms';
+import { MediumWidth } from '../components/StyledComponents';
 
 export default function TermsPage() {
   return (
-    <Box pt={2}>
+    <MediumWidth>
       <Terms/>
-    </Box>
+    </MediumWidth>
   );
 }
