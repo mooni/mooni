@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     border: '1px solid black',
     borderWidth: '1px',
     paddingLeft: theme.spacing(2),
-    borderColor: '#ffffff',
+    borderColor: '#e3f1f3',
     paddingRight: theme.spacing(2),
     display: 'flex',
     borderRadius: 30,
@@ -29,6 +29,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     backgroundColor: theme.palette.background.paper,
     boxShadow: '1px 1px 7px rgba(73, 177, 189, 0.16)',
+  },
+  activeRow: {
+    borderColor: '#9edbe4',
   },
   disabledRow: {
     backgroundColor: theme.palette.background.default,
@@ -51,9 +54,6 @@ const useStyles = makeStyles(theme => ({
   currencyButton: {
     borderRadius: 20,
     borderColor: '#aecfd6',
-  },
-  activeRow: {
-    borderColor: '#9edbe4',
   },
   disabledInput: {
     color: theme.palette.text.secondary,

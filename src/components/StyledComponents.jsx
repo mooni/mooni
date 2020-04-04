@@ -1,12 +1,15 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import {textStyle, useTheme} from '@aragon/ui';
+import { useTheme } from '@aragon/ui';
 
-export const GroupLabel = styled.div`
-  ${textStyle('label1')};
-  margin-top: 10px;
-  margin-bottom: 10px;
+export const SmallWidth = styled.div`
+  max-width: 25rem;
+  width: 90%;
+`;
+export const MediumWidth = styled.div`
+  max-width: 40rem;
+  width: 90%;
 `;
 
 export function FieldError({ text, children }) {

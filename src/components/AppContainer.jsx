@@ -20,10 +20,6 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     flex: '1 1 0%',
   },
-  maxWidth: {
-    maxWidth: '25rem',
-    width: '90%',
-  },
   footer: {
     width: '100%',
     minHeight: '30px',
@@ -38,9 +34,7 @@ export default function AppContainer({ children }) {
     <Box className={classes.root}>
       <Header />
       <Box className={classes.container}>
-        <Box className={classes.maxWidth}>
-          {children}
-        </Box>
+        {children}
       </Box>
       <Box className={classes.footer}>
         <Footer />
