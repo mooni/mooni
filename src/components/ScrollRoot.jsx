@@ -19,7 +19,7 @@ export default function AppContainer({ children }) {
       setVHProperty(scrollRootRef.current);
       const debounced = debounce(() => setVHProperty(scrollRootRef.current), 200);
       window.addEventListener('resize', debounced);
-      return () => window.removeListener('resize', debounced);
+      return () => window.removeEventListener('resize', debounced);
     }
   }, [scrollRootRef]);
 
