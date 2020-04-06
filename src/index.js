@@ -19,6 +19,7 @@ const Root = (
         assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
         theme="light"
         layout={false}
+        scrollView={false}
       >
         <App />
       </Main>

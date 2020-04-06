@@ -3,13 +3,15 @@ import React from 'react';
 import {Box} from '@material-ui/core';
 import Header from './Header';
 import Footer from './Footer';
+import ScrollRoot from './ScrollRoot';
+
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() => ({
   root: {
+    minHeight: '100%',
     display: 'flex',
     alignItems: 'flex-start',
-    height: '100vh',
     flexFlow: 'column',
   },
   container: {
@@ -18,27 +20,27 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     flexDirection: 'column',
-    flex: '1 1 0%',
+    flex: 1,
   },
   footer: {
     width: '100%',
-    minHeight: '30px',
     alignSelf: 'flex-end',
   }
 }));
 
 export default function AppContainer({ children }) {
   const classes = useStyles();
-
   return (
-    <Box className={classes.root}>
-      <Header />
-      <Box className={classes.container}>
-        {children}
+    <ScrollRoot>
+      <Box className={classes.root}>
+        <Header />
+        <Box className={classes.container}>
+          {children}
+        </Box>
+        <Box className={classes.footer}>
+          <Footer />
+        </Box>
       </Box>
-      <Box className={classes.footer}>
-        <Footer />
-      </Box>
-    </Box>
+    </ScrollRoot>
   );
 }
