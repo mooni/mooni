@@ -8,7 +8,7 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-function removeEmptyStrings(data = {}) {
+function removeEmptyStrings(data: object = {}) {
   return Object.keys(data).reduce((acc, prop) => {
       if(data[prop] !== '' && data[prop] !== undefined) {
         return Object.assign(acc, { [prop]: data[prop] });
@@ -19,20 +19,6 @@ function removeEmptyStrings(data = {}) {
 }
 
 const Bity = {
-  async getCurrencies(tags = []) {
-    const params = {
-      tags: tags.join(','),
-    };
-
-    const { data } = await instance({
-      method: 'get',
-      url: '/v2/currencies',
-      params,
-    });
-
-    return data.currencies.map(currency => currency.code);
-  },
-
   async estimate(rateRequest: RateRequest): Promise<RateResult> {
     const { inputCurrency, outputCurrency, amount, tradeExact } = rateRequest;
 
@@ -144,7 +130,7 @@ const Bity = {
     }
   },
 
-  async getOrderDetails(orderId) {
+  async getOrderDetails(orderId: string) {
     const { data } = await instance({
       method: 'get',
       url: `/v2/orders/${orderId}`,
@@ -165,7 +151,7 @@ const Bity = {
     return data;
   },
 
-  getOrderStatusPageURL(orderId) {
+  getOrderStatusPageURL(orderId: string) {
     return `https://go.bity.com/order-status?id=${orderId}`;
   }
 };

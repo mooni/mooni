@@ -5,7 +5,7 @@ import * as actions from './actions';
 
 export const STATE_NAME = 'PAYMENT';
 
-interface State {
+export interface State {
   exchangeStep: number;
   orderRequest?: OrderRequest;
   order?: Order;
@@ -156,7 +156,7 @@ const initialMockStateComplete: State = {
 const initialState = initialEmptyState;
 // const initialState = initialMockStateMinimum;
 
-export default function(state : State = initialState, action): State {
+export default function(state : State = initialState, action: { type: string, payload?: any }): State {
   switch (action.type) {
     case actions.SET_RATE_REQUEST: {
       const { rateRequest }: { rateRequest: RateRequest } = action.payload;

@@ -47,7 +47,7 @@ export type OrderErrors = any[];
 export class OrderError extends Error {
   errors: OrderErrors;
   _orderError: boolean;
-  constructor(message, errors: OrderErrors = []) {
+  constructor(message: string, errors: OrderErrors = []) {
     super(message);
     this._orderError = true;
     this.errors = errors;
