@@ -84,7 +84,7 @@ export const createOrder = () => async function (dispatch, getState)  {
 
   const state = getState();
   const fromAddress = getAddress(state);
-  const orderRequest: OrderRequest = getOrderRequest(state);
+  const orderRequest = getOrderRequest(state);
 
   if(orderRequest.rateRequest.inputCurrency !== 'ETH')
     throw new Error('order from other that ETH not implemented');
@@ -119,7 +119,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   sendEvent('payment', 'send', 'init');
 
   const state = getState();
-  const order: Order = getOrder(state);
+  const order = getOrder(state);
   const ethManager = getETHManager(state);
   dispatch(setPaymentTransaction(null));
 
@@ -140,7 +140,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
     // TODO ERC20
     // } else
-    // if(paymentOrder.path === 'DEX_BITY') {
+    // if(order.path === 'DEX_BITY') {
     //
     //   dispatch(setPaymentStatus('check-allowance'));
     //   const approveTx = await checkTradeAllowance(paymentOrder.tokenRate.tradeDetails, ethManager.signer);
