@@ -1,6 +1,9 @@
+import { ETH } from '@uniswap/sdk';
+
 export const TOKEN_DATA = {
   DAI: {
-    tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',    // mainnet
+    // tokenAddress: '0x2448eE2641d78CC42D7AD76498917359D961A783', // rinkeby
   },
   USDC: {
     tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
@@ -22,14 +25,14 @@ export const TOKEN_DATA = {
   },
 };
 
-export const ENABLE_TOKENS = false;
-// export const ENABLE_TOKENS = true;
+export const ENABLE_TOKENS = true;
+// export const ENABLE_TOKENS = false;
 
-export const INPUT_CURRENCIES = ['ETH'].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
+export const INPUT_CURRENCIES = [ETH].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
 export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
 
 export function getCurrencyLogoAddress(symbol) {
-  if(symbol === 'ETH') {
+  if(symbol === ETH) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
   } else if(OUTPUT_CURRENCIES.indexOf(symbol) !== -1){
     return `/images/coinIcons/${symbol}.svg`;

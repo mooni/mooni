@@ -4,17 +4,22 @@ import {
   getExecutionDetails,
   TRADE_METHODS,
   tradeExactTokensForEth,
-  tradeTokensForExactEth
+  tradeTokensForExactEth,
+  SUPPORTED_CHAIN_ID,
+  ETH,
 } from '@uniswap/sdk';
-import ERC20_ABI from './abis/ERC20.json';
 import {ethers} from 'ethers';
 
+import ERC20_ABI from './abis/ERC20.json';
 import {TOKEN_DATA} from './currencies';
 import Bity from './bity';
 
-import { ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact } from './types';
+import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
 
 const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
+
+const CHAIN_ID = SUPPORTED_CHAIN_ID.Mainnet;
+// const CHAIN_ID = SUPPORTED_CHAIN_ID.Rinkeby;
 
 // TODO slippage
 
@@ -37,13 +42,17 @@ export async function getRate(rateRequest: RateRequest) {
 
     let ethInputAmount = rateRequest.amount;
 
-    if(rateRequest.inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenToETH(rateRequest.inputCurrency, rateRequest.amount, TradeExact.INPUT);
+    if(rateRequest.inputCurrency !== ETH) {
+      const tokenRate = await rateTokenToETH({
+        symbol: rateRequest.inputCurrency,
+        amount: rateRequest.amount,
+        tradeExact: TradeExact.INPUT,
+      });
       ethInputAmount = tokenRate.outputAmount;
     }
 
     const bityRate = await Bity.estimate({
-      inputCurrency: 'ETH',
+      inputCurrency: ETH,
       outputCurrency: rateRequest.outputCurrency,
       amount: ethInputAmount,
       tradeExact: TradeExact.INPUT
@@ -56,7 +65,7 @@ export async function getRate(rateRequest: RateRequest) {
   } else if(rateRequest.tradeExact === TradeExact.OUTPUT) {
 
     const bityRate = await Bity.estimate({
-      inputCurrency: 'ETH',
+      inputCurrency: ETH,
       outputCurrency: rateRequest.outputCurrency,
       amount: rateRequest.amount,
       tradeExact: TradeExact.OUTPUT
@@ -64,8 +73,12 @@ export async function getRate(rateRequest: RateRequest) {
 
     let finalInputAmount = bityRate.inputAmount;
 
-    if(rateRequest.inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenToETH(rateRequest.inputCurrency, bityRate.inputAmount, TradeExact.OUTPUT);
+    if(rateRequest.inputCurrency !== ETH) {
+      const tokenRate = await rateTokenToETH({
+        symbol: rateRequest.inputCurrency,
+        amount: bityRate.inputAmount,
+        tradeExact: TradeExact.OUTPUT,
+      });
       finalInputAmount = tokenRate.inputAmount;
     }
 
@@ -82,27 +95,118 @@ export async function getRate(rateRequest: RateRequest) {
 
 export async function createOrder(orderRequest: OrderRequest, fromAddress: string): Promise<Order> {
 
-  if(orderRequest.rateRequest.inputCurrency !== 'ETH')
-    throw new Error('order from other that ETH not implemented');
-  // TODO ERC20
+  if(orderRequest.rateRequest.inputCurrency === ETH) {
 
-  const bityOrder = await Bity.order({
-      recipient: orderRequest.recipient,
-      rateRequest: orderRequest.rateRequest,
-      reference: orderRequest.reference,
-    },
-    fromAddress
-  );
+    const bityOrder = await Bity.order(
+      {
+        recipient: orderRequest.recipient,
+        rateRequest: orderRequest.rateRequest,
+        reference: orderRequest.reference,
+      },
+      fromAddress
+    );
 
-  return {
-    orderRequest,
-    bityOrder,
-    path: ExchangePath.BITY,
-  };
+    return {
+      orderRequest,
+      estimatedRates: {
+        inputAmount: bityOrder.input.amount,
+        inputCurrency: orderRequest.rateRequest.inputCurrency,
+        outputAmount: bityOrder.output.amount,
+        outputCurrency: orderRequest.rateRequest.outputCurrency,
+      },
+      bityOrder,
+      path: ExchangePath.BITY,
+    };
+
+  } else {
+
+    if(orderRequest.rateRequest.tradeExact === TradeExact.INPUT) {
+
+      const { outputAmount: ethAmount } = await rateTokenToETH({
+        symbol: orderRequest.rateRequest.inputCurrency,
+        amount: orderRequest.rateRequest.amount,
+        tradeExact: TradeExact.INPUT,
+      });
+
+      const { inputAmount: estimatedInput, tradeDetails } = await rateTokenToETH({
+        symbol: orderRequest.rateRequest.inputCurrency,
+        amount: ethAmount,
+        tradeExact: TradeExact.OUTPUT,
+      });
+
+      const bityOrder = await Bity.order(
+        {
+          recipient: orderRequest.recipient,
+          rateRequest: {
+            inputCurrency: ETH,
+            outputCurrency: orderRequest.rateRequest.outputCurrency,
+            amount: ethAmount,
+            tradeExact: TradeExact.INPUT,
+          },
+          reference: orderRequest.reference,
+        },
+        fromAddress
+      );
+
+      return {
+        orderRequest,
+        estimatedRates: {
+          inputAmount: estimatedInput,
+          inputCurrency: orderRequest.rateRequest.inputCurrency,
+          outputAmount: bityOrder.output.amount,
+          outputCurrency: orderRequest.rateRequest.outputCurrency,
+        },
+        bityOrder,
+        path: ExchangePath.DEX_BITY,
+        tradeData: {
+          tradeDetails,
+        }
+      };
+
+    } else {
+
+      const bityOrder = await Bity.order(
+        {
+          recipient: orderRequest.recipient,
+          rateRequest: {
+            inputCurrency: ETH,
+            outputCurrency: orderRequest.rateRequest.outputCurrency,
+            amount: orderRequest.rateRequest.amount,
+            tradeExact: TradeExact.OUTPUT,
+          },
+          reference: orderRequest.reference,
+        },
+        fromAddress
+      );
+
+      const { inputAmount: estimatedInput, tradeDetails } = await rateTokenToETH({
+        symbol: orderRequest.rateRequest.inputCurrency,
+        amount: bityOrder.input.amount,
+        tradeExact: TradeExact.OUTPUT,
+      });
+
+      return {
+        orderRequest,
+        estimatedRates: {
+          inputAmount: estimatedInput,
+          inputCurrency: orderRequest.rateRequest.inputCurrency,
+          outputAmount: bityOrder.output.amount,
+          outputCurrency: orderRequest.rateRequest.outputCurrency,
+        },
+        bityOrder,
+        path: ExchangePath.DEX_BITY,
+        tradeData: {
+          tradeDetails,
+        }
+      };
+
+    }
+
+  }
 
 }
 
-export async function rateTokenToETH(symbol: string, amount: string, tradeExact: TradeExact) {
+export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: string, amount: string, tradeExact: TradeExact }): Promise<DexTrade> {
   const { tokenAddress } = TOKEN_DATA[symbol];
   const exactAmount = ethers.utils.parseEther(String(amount)); // TODO token decimals
 
@@ -112,25 +216,20 @@ export async function rateTokenToETH(symbol: string, amount: string, tradeExact:
   );
   if(!method) throw new Error('invalid tradeExact');
 
-  const tradeDetails = await method(tokenAddress, exactAmount);
+  const tradeDetails = await method(tokenAddress, exactAmount, CHAIN_ID);
   const serializedResponse = stringifyObj(tradeDetails);
 
   return {
     inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toString(),
     outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toString(),
     inputCurrency: symbol,
-    outputCurrency: 'ETH',
+    outputCurrency: ETH,
+    tradeExact,
     rate: serializedResponse.executionRate.rate,
     invertedRate: serializedResponse.executionRate.rateInverted,
     tradeDetails,
   }
 }
-
-// export async function getExchangeAddress(symbol) {
-//   const { tokenAddress } = TOKEN_DATA[symbol];
-//   const tokenReserves = await getTokenReserves(tokenAddress);
-//   return tokenReserves.exchange.address;
-// }
 
 export async function checkTradeAllowance(tradeDetails, signer) {
   const executionDetails = getExecutionDetails(tradeDetails);
@@ -148,7 +247,7 @@ export async function checkTradeAllowance(tradeDetails, signer) {
 
   if(tradeDetails.inputAmount.amount.gt(allowance)) {
     const allowanceAmount = tradeDetails.inputAmount.amount.toString();
-    const estimatedGas = await tokenContract.estimate.approve(executionDetails.exchangeAddress, allowanceAmount)
+    const estimatedGas = await tokenContract.estimate.approve(executionDetails.exchangeAddress, allowanceAmount);
     const gasLimit = calculatedGasMargin(estimatedGas);
     return tokenContract.approve(
       executionDetails.exchangeAddress,
@@ -161,11 +260,11 @@ export async function checkTradeAllowance(tradeDetails, signer) {
   return null;
 }
 
-export async function executeTrade(tradeDetails, recipient, signer) {
+export async function executeTrade(tradeDetails: any, recipient: string | undefined, signer: any) {
   const executionDetails = getExecutionDetails(
     tradeDetails,
-    200, // max slippage (2%)
-    10, // deadline, 10 minutes
+    undefined, // max slippage, default 200 (2%)
+    undefined, // deadline, default 10 minutes
     recipient,
   );
 

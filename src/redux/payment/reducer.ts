@@ -1,7 +1,7 @@
 import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
 import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient } from '../../lib/types';
 
-import * as actions from "./actions";
+import * as actions from './actions';
 
 export const STATE_NAME = 'PAYMENT';
 
@@ -37,7 +37,30 @@ const initialEmptyState: State = {
   paymentTransaction: undefined,
 };
 
-const initialMockState: State = {
+const initialMockStateMinimum: State = {
+  exchangeStep: 0,
+  orderRequest: {
+    recipient: {
+      owner: {
+        name: 'Alice Martin',
+      },
+      iban: 'NL84INGB1679475908',
+    },
+    rateRequest: {
+      inputCurrency: INPUT_CURRENCIES[1],
+      outputCurrency: OUTPUT_CURRENCIES[0],
+      amount: '20',
+      tradeExact: TradeExact.OUTPUT,
+    },
+    reference: '',
+  },
+  order: undefined,
+  orderErrors: undefined,
+  paymentStatus: undefined,
+  paymentTransaction: undefined,
+};
+
+const initialMockStateComplete: State = {
   exchangeStep: 0,
   orderRequest: {
     recipient: {
@@ -82,6 +105,12 @@ const initialMockState: State = {
       },
       reference: 'ref'
     },
+    estimatedRates: {
+      inputCurrency: 'ETH',
+      outputCurrency: 'EUR',
+      inputAmount: '0.1',
+      outputAmount: '10',
+    },
     bityOrder: {
       input: {
         amount: '0.080414513629301225',
@@ -125,7 +154,7 @@ const initialMockState: State = {
 };
 
 const initialState = initialEmptyState;
-// const initialState = initialMockState;
+// const initialState = initialMockStateMinimum;
 
 export default function(state : State = initialState, action): State {
   switch (action.type) {

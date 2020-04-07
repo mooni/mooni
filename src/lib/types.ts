@@ -18,6 +18,17 @@ export interface RateResult {
   fees: object;
 }
 
+export interface DexTrade {
+  inputCurrency: string;
+  outputCurrency: string;
+  inputAmount: string;
+  outputAmount: string;
+  tradeExact: TradeExact;
+  rate: string;
+  invertedRate: string;
+  tradeDetails: any;
+}
+
 export interface Recipient {
   owner: {
     name: string;
@@ -48,11 +59,53 @@ export interface OrderRequest {
   rateRequest: RateRequest;
   reference?: string;
 }
-export type BityOrderResponse = any;
+
+export type BityOrderResponse = {
+  input: {
+    amount: string,
+    currency: string,
+    type: string,
+    crypto_address: string
+  },
+  output: {
+    amount: string,
+    currency: string,
+    type: string,
+    iban: string,
+    reference: string
+  },
+  id: string,
+  timestamp_created: string,
+  timestamp_awaiting_payment_since: string,
+  timestamp_price_guaranteed: string,
+  payment_details: {
+    crypto_address: string,
+    type: string
+  },
+  price_breakdown: {
+    customer_trading_fee: {
+      amount: string,
+      currency: string
+    }
+  },
+  fees: {
+    amount: string,
+    currency: string
+  }
+};
 
 export interface Order {
   orderRequest: OrderRequest;
+  estimatedRates: {
+    inputAmount: string;
+    inputCurrency: string;
+    outputAmount: string;
+    outputCurrency: string;
+  };
   bityOrder: BityOrderResponse;
   path: ExchangePath;
+  tradeData?: {
+    tradeDetails: any;
+  };
 }
 

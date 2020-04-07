@@ -7,8 +7,8 @@ import { Box } from '@material-ui/core';
 import { getAddress, getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 import { initETH, openLoginModal, logout } from '../redux/eth/actions';
 
-const AUTO_CONNECT = false; // TODO remember
-// const AUTO_CONNECT = true;
+const AUTO_CONNECT = false;
+// const AUTO_CONNECT = true;  // TODO remember/autodetect
 
 function Account() {
   const address = useSelector(getAddress);

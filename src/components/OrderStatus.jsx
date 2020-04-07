@@ -86,12 +86,16 @@ export default function OrderStatus() {
 
   let content;
 
-  if(paymentStatus ===  'approval') {
-    content = <Loader text="Please approve transaction in your wallet" />;
+  if(paymentStatus ===  'approval-trade') {
+    content = <Loader text="Please approve trade transaction in your wallet" />;
+  } else if(paymentStatus ===  'approval-payment') {
+    content = <Loader text="Please approve payment transaction in your wallet" />;
   } else if(paymentStatus ===  'check-allowance') {
     content = <Loader text="Please approve Uniswap to spend your tokens in your wallet" />;
   } else if(paymentStatus ===  'mining-allowance') {
     content = <Loader text="Mining allowance..." />;
+  } else if(paymentStatus ===  'mining-trade') {
+    content = <Loader text="Mining trade..." />;
   } else if(paymentStatus ===  'mining-payment') {
     content = <Loader text="Mining payment..." />;
 

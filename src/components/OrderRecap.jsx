@@ -126,25 +126,22 @@ export default function OrderRecap({ order }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = order.bityOrder.input.amount;
-  const inputCurrency = order.bityOrder.input.currency;
-  // TODO ERC20
-  // const inputAmount = order.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
-  // const inputCurrency = order.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
-
-  const outputAmount = order.bityOrder.output.amount;
-  const outputCurrency = order.bityOrder.output.currency;
+  const inputAmount = order.estimatedRates.inputAmount;
+  const inputCurrency = order.estimatedRates.inputCurrency;
+  const outputAmount = order.estimatedRates.outputAmount;
+  const outputCurrency = order.estimatedRates.outputCurrency;
 
   const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
 
   let fees, feesCurrency;
-  if(order.bityOrder.fees.currency === order.bityOrder.input.currency) {
-    fees = BN(order.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = order.bityOrder.output.currency;
-  }  else {
+  // TODO
+  // if(order.bityOrder.fees.currency === order.bityOrder.input.currency) {
+  //   fees = BN(order.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
+  //   feesCurrency = order.bityOrder.output.currency;
+  // }  else {
     fees = BN(order.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
     feesCurrency = order.bityOrder.fees.currency;
-  }
+  // }
 
   return (
     <Box>
