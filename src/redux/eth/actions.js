@@ -36,7 +36,7 @@ export const setAddress = (address) => ({
   }
 });
 
-export const resetETHManager = () => async function (dispatch, getState) {
+export const resetETHManager = () => function (dispatch, getState) {
   const ethManager = getETHManager(getState());
   if(ethManager) {
     ethManager.close();

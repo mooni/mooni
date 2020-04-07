@@ -14,24 +14,24 @@ import LedgerIcon from '../assets/wallets/ledger.png';
 
 const walletProviders = [
   {
-    name: 'Web3 Browser',
+    name: 'Metamask',
     type: 'injected',
-    icon: <img src={MetamaskIcon} width="18" alt="metamask-wallet-icon"/>,
+    icon: <img src={MetamaskIcon} width="18" height="16" alt="metamask-wallet-icon"/>,
   },
   {
     name: 'WalletConnect',
     type: 'WalletConnect',
-    icon: <img src={WalletConnectIcon} width="18" alt="walletconnect-icon"/>,
+    icon: <img src={WalletConnectIcon} width="18" height="16" alt="walletconnect-icon"/>,
   },
   {
     name: 'Portis',
     type: 'Portis',
-    icon: <img src={PortisIcon} width="16" alt="portis-icon"/>,
+    icon: <img src={PortisIcon} width="18" height="22" alt="portis-icon"/>,
   },
   {
     name: 'Ledger',
     type: 'Ledger',
-    icon: <img src={LedgerIcon} width="16" alt="ledger-icon"/>,
+    icon: <img src={LedgerIcon} width="18" height="18" alt="ledger-icon"/>,
   },
 ];
 
