@@ -1,4 +1,5 @@
 import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
+import { TradeExact } from '../../lib/types';
 
 import * as actions from "./actions";
 
@@ -13,7 +14,7 @@ const initialEmptyState = {
       inputCurrency: INPUT_CURRENCIES[0],
       outputCurrency: OUTPUT_CURRENCIES[0],
       amount: 100,
-      tradeExact: 'OUTPUT',
+      tradeExact: TradeExact.OUTPUT,
     },
     reference: '',
   },
@@ -40,7 +41,7 @@ const initialMockState = {
       inputCurrency: 'ETH',
       outputCurrency: 'EUR',
       amount: 10,
-      tradeExact: 'OUTPUT'
+      tradeExact: TradeExact.OUTPUT
     },
     reference: 'ceferfs'
   },
@@ -60,7 +61,7 @@ const initialMockState = {
         inputCurrency: 'ETH',
         outputCurrency: 'EUR',
         amount: 10,
-        tradeExact: 'OUTPUT'
+        tradeExact: TradeExact.OUTPUT
       },
       reference: 'ceferfs'
     },

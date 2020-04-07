@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { TradeExact, RateRequest, RateResult } from './types';
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -17,6 +18,16 @@ function removeEmptyStrings(data = {}) {
     {});
 }
 
+class BityError extends Error {
+  errors: any[];
+  _bityError: boolean;
+  constructor(message, errors: any[] = []) {
+    super(message);
+    this._bityError = true;
+    this.errors = errors;
+  }
+}
+
 const Bity = {
   async getCurrencies(tags = []) {
     const params = {
@@ -32,8 +43,10 @@ const Bity = {
     return data.currencies.map(currency => currency.code);
   },
 
-  async estimate({ inputCurrency, outputCurrency, amount, tradeExact }) {
-    const body = {
+  async estimate(rateRequest: RateRequest): Promise<RateResult> {
+    const { inputCurrency, outputCurrency, amount, tradeExact } = rateRequest;
+
+    const body: any = {
       input: {
         currency: inputCurrency,
       },
@@ -42,9 +55,9 @@ const Bity = {
       },
     };
 
-    if(tradeExact === 'INPUT')
+    if(tradeExact === TradeExact.INPUT)
       body.input.amount = String(amount); else
-    if(tradeExact === 'OUTPUT')
+    if(tradeExact === TradeExact.OUTPUT)
       body.output.amount = String(amount);
     else
       throw new Error('invalid TRADE_EXACT');
@@ -70,7 +83,7 @@ const Bity = {
 
   async order({ fromAddress, recipient, reference, rateRequest, contactPerson }) {
 
-    const body = {
+    const body: any = {
       input: {
         currency: rateRequest.inputCurrency,
         type: 'crypto_address',
@@ -86,14 +99,14 @@ const Bity = {
       },
     };
 
-    if(rateRequest.tradeExact === 'INPUT')
+    if(rateRequest.tradeExact === TradeExact.INPUT)
       body.input.amount = String(rateRequest.amount); else
-    if(rateRequest.tradeExact === 'OUTPUT')
+    if(rateRequest.tradeExact === TradeExact.OUTPUT)
       body.output.amount = String(rateRequest.amount);
     else
       throw new Error('invalid TRADE_EXACT');
 
-    const cleanContactPerson = removeEmptyStrings(contactPerson);
+    const cleanContactPerson: any = removeEmptyStrings(contactPerson);
     if(cleanContactPerson.email) {
       body.contact_person = {
         email: contactPerson.email,
@@ -115,9 +128,10 @@ const Bity = {
       });
 
       if(!data.input) {
-        const cookieError = new Error('api_error');
-        cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
-        throw cookieError;
+        throw new BityError(
+          'api_error',
+          [{code: 'cookie', message: 'your browser does not support cookies'}]
+        );
       }
 
       return {
@@ -130,9 +144,10 @@ const Bity = {
 
     } catch(error) {
       if(error?.response?.data?.errors) {
-        const apiError = new Error('api_error');
-        apiError.errors = error.response.data.errors;
-        throw apiError;
+        throw new BityError(
+          'api_error',
+          error.response.data.errors
+        );
       } else {
         throw error;
       }

@@ -6,6 +6,8 @@ import { ethers } from 'ethers';
 import { TOKEN_DATA } from './currencies';
 import Bity from './bity';
 
+import { TradeExact, RateRequest, RateResult } from './types';
+
 const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
 // TODO slippage
@@ -15,51 +17,54 @@ function calculatedGasMargin(gas) {
   return gas.add(offset);
 }
 
-export async function getRate({ inputCurrency, outputCurrency, amount, tradeExact }) {
-  const rateResult = {
-    inputCurrency,
-    outputCurrency,
-    tradeExact,
+export async function getRate(rateRequest: RateRequest) {
+  const rateResult: RateResult = {
+    inputCurrency: rateRequest.inputCurrency,
+    outputCurrency: rateRequest.outputCurrency,
+    tradeExact: rateRequest.tradeExact,
+    inputAmount: '',
+    outputAmount: '',
+    fees: {},
   };
 
-  if(tradeExact === 'INPUT') {
+  if(rateRequest.tradeExact === TradeExact.INPUT) {
 
-    let ethInputAmount = amount;
+    let ethInputAmount = rateRequest.amount;
 
-    if(inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenToETH(inputCurrency, amount, 'EXACT_TOKEN');
+    if(rateRequest.inputCurrency !== 'ETH') {
+      const tokenRate = await rateTokenToETH(rateRequest.inputCurrency, rateRequest.amount, TradeExact.INPUT);
       ethInputAmount = tokenRate.outputAmount;
     }
 
     const bityRate = await Bity.estimate({
       inputCurrency: 'ETH',
-      outputCurrency: outputCurrency,
+      outputCurrency: rateRequest.outputCurrency,
       amount: ethInputAmount,
-      tradeExact: 'INPUT'
+      tradeExact: TradeExact.INPUT
     });
 
-    rateResult.inputAmount = BN(amount).toString();
-    rateResult.outputAmount = BN(bityRate.outputAmount).toString();
+    rateResult.inputAmount = new BN(rateRequest.amount).toString();
+    rateResult.outputAmount = new BN(bityRate.outputAmount).toString();
     rateResult.fees = bityRate.fees;
 
-  } else if(tradeExact === 'OUTPUT') {
+  } else if(rateRequest.tradeExact === TradeExact.OUTPUT) {
 
     const bityRate = await Bity.estimate({
       inputCurrency: 'ETH',
-      outputCurrency: outputCurrency,
-      amount: amount,
-      tradeExact: 'OUTPUT'
+      outputCurrency: rateRequest.outputCurrency,
+      amount: rateRequest.amount,
+      tradeExact: TradeExact.OUTPUT
     });
 
     let finalInputAmount = bityRate.inputAmount;
 
-    if(inputCurrency !== 'ETH') {
-      const tokenRate = await rateTokenToETH(inputCurrency, bityRate.inputAmount, 'EXACT_ETH');
+    if(rateRequest.inputCurrency !== 'ETH') {
+      const tokenRate = await rateTokenToETH(rateRequest.inputCurrency, bityRate.inputAmount, TradeExact.OUTPUT);
       finalInputAmount = tokenRate.inputAmount;
     }
 
-    rateResult.inputAmount = BN(finalInputAmount).toString();
-    rateResult.outputAmount = BN(amount).toString();
+    rateResult.inputAmount = new BN(finalInputAmount).toString();
+    rateResult.outputAmount = new BN(rateRequest.amount).toString();
     rateResult.fees = bityRate.fees;
 
   } else {
@@ -69,14 +74,15 @@ export async function getRate({ inputCurrency, outputCurrency, amount, tradeExac
   return rateResult;
 }
 
-export async function rateTokenToETH(symbol, amount, tradeExact) {
+export async function rateTokenToETH(symbol: string, amount: string, tradeExact: TradeExact) {
   const { tokenAddress } = TOKEN_DATA[symbol];
   const exactAmount = ethers.utils.parseEther(String(amount)); // TODO token decimals
 
   const method = (
-    (tradeExact === 'EXACT_TOKEN' && tradeExactTokensForEth) ||
-    (tradeExact === 'EXACT_ETH' && tradeTokensForExactEth)
+    (tradeExact === TradeExact.INPUT && tradeExactTokensForEth) ||
+    (tradeExact === TradeExact.OUTPUT && tradeTokensForExactEth)
   );
+  if(!method) throw new Error('invalid tradeExact');
 
   const tradeDetails = await method(tokenAddress, exactAmount);
   const serializedResponse = stringifyObj(tradeDetails);
@@ -92,11 +98,11 @@ export async function rateTokenToETH(symbol, amount, tradeExact) {
   }
 }
 
-export async function getExchangeAddress(symbol) {
-  const { tokenAddress } = TOKEN_DATA[symbol];
-  const tokenReserves = await getTokenReserves(tokenAddress);
-  return tokenReserves.exchange.address;
-}
+// export async function getExchangeAddress(symbol) {
+//   const { tokenAddress } = TOKEN_DATA[symbol];
+//   const tokenReserves = await getTokenReserves(tokenAddress);
+//   return tokenReserves.exchange.address;
+// }
 
 export async function checkTradeAllowance(tradeDetails, signer) {
   const executionDetails = getExecutionDetails(tradeDetails);
@@ -130,8 +136,8 @@ export async function checkTradeAllowance(tradeDetails, signer) {
 export async function executeTrade(tradeDetails, recipient, signer) {
   const executionDetails = getExecutionDetails(
     tradeDetails,
-    null, // max slippage, default 200 (2%)
-    null, // deadline, default 10 minutes
+    200, // max slippage (2%)
+    10, // deadline, 10 minutes
     recipient,
   );
 
@@ -140,7 +146,7 @@ export async function executeTrade(tradeDetails, recipient, signer) {
   const tradeMethod = TRADE_METHODS[executionDetails.methodName];
   const args = executionDetails.methodArguments.map(a => a.toString());
 
-  const overrides = {
+  const overrides: any = {
     value: ethers.utils.parseEther(executionDetails.value.toString()),
   };
 
