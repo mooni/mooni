@@ -1,61 +1,101 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Box, } from '@material-ui/core';
-import { Button, Modal, Link } from '@aragon/ui'
+import { Box, Dialog } from '@material-ui/core';
+import { Button, LoadingRing, Link, IconCaution, useTheme } from '@aragon/ui'
 
-import { getLoginModalOpen } from '../redux/eth/selectors';
+import {getETHManagerLoading, getLoginModalOpen} from '../redux/eth/selectors';
 import { initETH, openLoginModal } from '../redux/eth/actions';
+
+import MetamaskIcon from '../assets/wallets/metamask-fox.svg';
+import WalletConnectIcon from '../assets/wallets/walletConnectIcon.svg';
+import PortisIcon from '../assets/wallets/portis_icon.svg';
+import LedgerIcon from '../assets/wallets/ledger.png';
 
 const walletProviders = [
   {
     name: 'Metamask',
     type: 'injected',
-    icon: <img src="/images/wallets/metamask-fox.svg" width="18" alt="metamask-wallet-icon"/>,
-  },
-  {
-    name: 'Coinbase Wallet',
-    type: 'injected',
-    icon: <img src="/images/wallets/coinbaseWalletIcon.svg" width="18" alt="coinbase-wallet-icon"/>,
+    icon: <img src={MetamaskIcon} width="18" height="16" alt="metamask-wallet-icon"/>,
   },
   {
     name: 'WalletConnect',
     type: 'WalletConnect',
-    icon: <img src="/images/wallets/walletConnectIcon.svg" width="18" alt="walletconnect-icon"/>,
+    icon: <img src={WalletConnectIcon} width="18" height="16" alt="walletconnect-icon"/>,
   },
   {
     name: 'Portis',
     type: 'Portis',
-    icon: <img src="/images/wallets/portis_icon.svg" width="16" alt="portis-icon"/>,
+    icon: <img src={PortisIcon} width="18" height="22" alt="portis-icon"/>,
   },
   {
     name: 'Ledger',
     type: 'Ledger',
-    icon: <img src="/images/wallets/ledger.png" width="16" alt="ledger-icon"/>,
+    icon: <img src={LedgerIcon} width="18" height="18" alt="ledger-icon"/>,
   },
 ];
 
 function Login() {
+  const [error, setError] = useState(null);
   const modalOpen = useSelector(getLoginModalOpen);
+  const ethLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   async function connectETH(walletType) {
-    dispatch(openLoginModal(false));
-    await dispatch(initETH(walletType));
+    const error = await dispatch(initETH(walletType));
+    setError(error);
+    if(!error) {
+      dispatch(openLoginModal(false));
+    }
   }
 
   function onCloseModal() {
+    setError(null);
     dispatch(openLoginModal(false));
   }
 
   return (
-    <Modal
-      visible={modalOpen}
+    <Dialog
+      open={modalOpen}
       onClose={onCloseModal}
-      closeButton={true}
-      width={300}
-      padding={16}
+      maxWidth="sm"
     >
+      <Box p={1}>
+        {ethLoading &&
+        <Box display="flex" alignItems="center">
+          <LoadingRing mode="half-circle" />
+        </Box>
+        }
+
+        {error &&
+        <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
+          <Box
+            fontSize={14}
+            width={1}
+            textAlign="center"
+            mb={1}
+          >
+            Unable to connect wallet
+          </Box>
+          <Box fontSize={12}>
+            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
+              <IconCaution size="large" style={{color: theme.negative}}/>
+            </Box>
+            {error === 'eth_smart_account_not_supported' &&
+            'We currently do not support smart account wallets such as Argent or Gnosis Safe.'
+            }
+            {error === 'no_ethereum_provider' &&
+            'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.'
+            }
+            {error === 'unknown_error' &&
+            'The wallet you are trying to connect with seems incompatible. Please report this problem to our support.'
+            }
+          </Box>
+        </Box>
+        }
+
+        {!ethLoading && !error &&
         <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
           <Box
             fontSize={14}
@@ -85,7 +125,9 @@ function Login() {
             <Link href="https://ethereum.org/use/#3-what-is-a-wallet-and-which-one-should-i-use" external>Learn more about wallets</Link>
           </Box>
         </Box>
-    </Modal>
+        }
+      </Box>
+    </Dialog>
   );
 }
 
