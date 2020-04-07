@@ -63,6 +63,14 @@ export const resetOrder = () => ({
   type: RESET_ORDER,
 });
 
+export const setExchangeStep = (stepId) => ({
+  type: SET_PAYMENT_STEP,
+  payload: {
+    stepId,
+  }
+});
+
+
 export const setPaymentStatus = (paymentStatus) => ({
   type: SET_PAYMENT_STATUS,
   payload: {
@@ -73,12 +81,6 @@ export const setPaymentTransaction = (paymentTransaction) => ({
   type: SET_PAYMENT_TRANSACTION,
   payload: {
     paymentTransaction,
-  }
-});
-export const setPaymentStep = (stepId) => ({
-  type: SET_PAYMENT_STEP,
-  payload: {
-    stepId,
   }
 });
 

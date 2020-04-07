@@ -16,8 +16,8 @@ import { SmallWidth } from '../components/StyledComponents';
 
 import { CustomMobileStepper } from '../components/StepComponents';
 
-import { createOrder, sendPayment, resetOrder, setPaymentStep } from '../redux/payment/actions';
-import { getPaymentStep } from '../redux/payment/selectors';
+import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
+import { getExchangeStep } from '../redux/payment/selectors';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -37,16 +37,16 @@ export default function ExchangePage() {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
-  const stepId = useSelector(getPaymentStep);
+  const stepId = useSelector(getExchangeStep);
 
   function handleNext() {
-    dispatch(setPaymentStep(stepId + 1));
+    dispatch(setExchangeStep(stepId + 1));
   }
   function handleBack() {
     if(stepId === 3) {
       dispatch(resetOrder());
     }
-    dispatch(setPaymentStep(Math.max(0, stepId - 1)));
+    dispatch(setExchangeStep(Math.max(0, stepId - 1)));
   }
   function onPrepareRecap() {
     dispatch(createOrder());

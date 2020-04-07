@@ -5,7 +5,7 @@ import * as actions from "./actions";
 export const STATE_NAME = 'PAYMENT';
 
 const initialEmptyState = {
-  paymentStep: 0,
+  exchangeStep: 0,
   paymentRequest: {
     recipient: null,
     contactPerson: null,
@@ -24,7 +24,7 @@ const initialEmptyState = {
 };
 
 const initialMockState = {
-  paymentStep: 0,
+  exchangeStep: 0,
   paymentRequest: {
     recipient: {
       owner: {
@@ -190,7 +190,7 @@ export default function(state = initialState, action) {
       const { stepId } = action.payload;
       return {
         ...state,
-        paymentStep: stepId,
+        exchangeStep: stepId,
       };
     }
     default:

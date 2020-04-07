@@ -10,7 +10,7 @@ import Bity from '../lib/bity';
 import { getEtherscanTxURL } from '../lib/eth';
 
 import { getPaymentOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
-import {resetOrder, setPaymentStep, setPaymentTransaction} from '../redux/payment/actions';
+import {resetOrder, setExchangeStep, setPaymentTransaction} from '../redux/payment/actions';
 import styled from 'styled-components';
 
 const POLL_INTERVAL = 2000;
@@ -70,7 +70,7 @@ export default function OrderStatus() {
   function onRestart() {
     dispatch(resetOrder());
     dispatch(setPaymentTransaction(null));
-    dispatch(setPaymentStep(0));
+    dispatch(setExchangeStep(0));
     history.push('/exchange');
   }
   function onExit() {

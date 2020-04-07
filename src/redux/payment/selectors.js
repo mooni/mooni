@@ -7,9 +7,10 @@ export const getRecipient = selectProperty([STATE_NAME, 'paymentRequest', 'recip
 export const getContactPerson = selectProperty([STATE_NAME, 'paymentRequest', 'contactPerson']);
 export const getReference = selectProperty([STATE_NAME, 'paymentRequest', 'reference']);
 
+export const getExchangeStep = selectProperty([STATE_NAME, 'exchangeStep']);
+
 export const getPaymentOrder = selectProperty([STATE_NAME, 'paymentOrder']);
 export const getOrderErrors = selectProperty([STATE_NAME, 'orderErrors']);
 export const getPaymentStatus = selectProperty([STATE_NAME, 'paymentStatus']);
 export const getPaymentTransaction = selectProperty([STATE_NAME, 'paymentTransaction']);
 
-export const getPaymentStep = selectProperty([STATE_NAME, 'paymentStep']);
