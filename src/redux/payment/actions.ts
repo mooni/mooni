@@ -1,5 +1,4 @@
-import Bity from '../../lib/bity';
-import { getPaymentRequest, getPaymentOrder } from '../payment/selectors';
+import { getPaymentRequest, getPaymentOrder } from './selectors';
 import { getAddress, getETHManager } from '../eth/selectors';
 // import {
 //   rateTokenToETH,
@@ -7,11 +6,11 @@ import { getAddress, getETHManager } from '../eth/selectors';
 //   checkTradeAllowance,
 // } from '../../lib/exchange';
 
+import { createOrder as libCreateOrder } from '../../lib/exchange';
 import { sendEvent } from '../../lib/analytics';
 
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
-export const SET_CONTACT_PERSON = 'SET_CONTACT_PERSON';
 export const SET_REFERENCE = 'SET_REFERENCE';
 export const SET_PAYMENT_ORDER = 'SET_PAYMENT_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
@@ -37,12 +36,6 @@ export const setReference = (reference) => ({
   type: SET_REFERENCE,
   payload: {
     reference,
-  }
-});
-export const setContactPerson = (contactPerson) => ({
-  type: SET_CONTACT_PERSON,
-  payload: {
-    contactPerson,
   }
 });
 
@@ -98,27 +91,14 @@ export const createOrder = () => async function (dispatch, getState)  {
 
   try {
 
-    const orderDetail = await Bity.order({
+    const order = await libCreateOrder({
       fromAddress,
       recipient: paymentRequest.recipient,
       rateRequest: paymentRequest.rateRequest,
       reference: paymentRequest.reference,
-      contactPerson: paymentRequest.contactPerson,
     });
 
-    const paymentOrder = {
-      paymentRequest,
-      path: 'BITY',
-      bityOrder: orderDetail,
-    };
-
-    // TODO, if tradeExact === INPUT && inputCurrency !== ETH then resulting ETH amount may be different that what bity expects
-    // if(paymentRequest.rateRequest.inputCurrency !== 'ETH') {
-    //   paymentOrder.path = 'DEX_BITY';
-    //   paymentOrder.tokenRate = await rateTokenToETH(paymentRequest.rateRequest.inputCurrency, orderDetail.input.amount, 'EXACT_ETH');
-    // }
-
-    dispatch(setPaymentOrder(paymentOrder));
+    dispatch(setPaymentOrder(order));
     sendEvent('order', 'create', 'done');
 
   } catch(error) {
@@ -126,7 +106,7 @@ export const createOrder = () => async function (dispatch, getState)  {
 
     sendEvent('order', 'create', 'error');
 
-    if(error.message === 'api_error') {
+    if(error._orderError) {
       dispatch(setOrderErrors(error.errors));
     } else {
       console.error(error);
@@ -159,6 +139,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
       await ethManager.waitForConfirmedTransaction(tx.hash);
 
+    // TODO ERC20
     // } else
     // if(paymentOrder.path === 'DEX_BITY') {
     //

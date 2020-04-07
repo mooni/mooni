@@ -58,12 +58,12 @@ export default function OrderStatus() {
   const theme = useTheme();
 
   const paymentStatus = useSelector(getPaymentStatus);
-  const paymentOrder = useSelector(getPaymentOrder);
+  const order = useSelector(getPaymentOrder);
   const paymentTransaction = useSelector(getPaymentTransaction);
 
-  const orderDetails = useUpdatedOrder(paymentOrder?.bityOrder?.id, paymentStatus);
+  const orderDetails = useUpdatedOrder(order?.bityOrder?.id, paymentStatus);
 
-  if(!paymentOrder) {
+  if(!order) {
     history.push('/');
   }
 

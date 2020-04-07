@@ -1,5 +1,5 @@
 import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
-import { TradeExact } from '../../lib/types';
+import { TradeExact, ExchangePath } from '../../lib/types';
 
 import * as actions from "./actions";
 
@@ -9,7 +9,6 @@ const initialEmptyState = {
   exchangeStep: 0,
   paymentRequest: {
     recipient: null,
-    contactPerson: null,
     rateRequest: {
       inputCurrency: INPUT_CURRENCIES[0],
       outputCurrency: OUTPUT_CURRENCIES[0],
@@ -29,13 +28,15 @@ const initialMockState = {
   paymentRequest: {
     recipient: {
       owner: {
-        name: 'fdsfds',
-        country: ''
+        country: 'NL',
+        name: 'fdsfsd',
+        address: 'dfsfdsfq',
+        zip: 'fdsqfqs',
+        city: 'dsfqs'
       },
-      iban: 'NL91ABNA9326322815'
-    },
-    contactPerson: {
-      email: 'zfezf@fre.vfr'
+      iban: 'NL84INGB1679475908',
+      bic_swift: 'CMCIFR2A',
+      email: 'dfd@fez.fr'
     },
     rateRequest: {
       inputCurrency: 'ETH',
@@ -43,19 +44,21 @@ const initialMockState = {
       amount: 10,
       tradeExact: TradeExact.OUTPUT
     },
-    reference: 'ceferfs'
+    reference: 'ref'
   },
   paymentOrder: {
-    paymentRequest: {
+    orderRequest: {
       recipient: {
         owner: {
-          name: 'fdsfds',
-          country: ''
+          country: 'NL',
+          name: 'fdsfsd',
+          address: 'dfsfdsfq',
+          zip: 'fdsqfqs',
+          city: 'dsfqs'
         },
-        iban: 'NL91ABNA9326322815'
-      },
-      contactPerson: {
-        email: 'zfezf@fre.vfr'
+        iban: 'NL84INGB1679475908',
+        bic_swift: 'CMCIFR2A',
+        email: 'dfd@fez.fr'
       },
       rateRequest: {
         inputCurrency: 'ETH',
@@ -63,9 +66,8 @@ const initialMockState = {
         amount: 10,
         tradeExact: TradeExact.OUTPUT
       },
-      reference: 'ceferfs'
+      reference: 'ref'
     },
-    path: 'BITY',
     bityOrder: {
       input: {
         amount: '0.080414513629301225',
@@ -98,7 +100,8 @@ const initialMockState = {
         amount: '0.000635986164121',
         currency: 'ETH'
       }
-    }
+    },
+    path: ExchangePath.BITY,
   },
   orderErrors: null,
   paymentStatus: 'mined',
@@ -129,16 +132,6 @@ export default function(state = initialState, action) {
         paymentRequest: {
           ...state.paymentRequest,
           recipient,
-        },
-      };
-    }
-    case actions.SET_CONTACT_PERSON: {
-      const { contactPerson } = action.payload;
-      return {
-        ...state,
-        paymentRequest: {
-          ...state.paymentRequest,
-          contactPerson,
         },
       };
     }

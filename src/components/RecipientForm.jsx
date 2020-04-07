@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useForm from 'react-hook-form';
 import IBAN from 'iban';
 import { makeStyles } from '@material-ui/core/styles';
+import EmailValidator from 'email-validator';
 
 import { COUNTRIES } from '../lib/countries';
 
@@ -49,6 +50,9 @@ const fields = {
     minLength: 8,
     maxLength: 11,
     pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
+  },
+  email: {
+    validate: value => !value || value === '' || EmailValidator.validate(value),
   },
 };
 
@@ -109,6 +113,10 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         <Field label="BIC/SWIFT" className={classes.fieldRow}>
           <WideInput name="bic_swift" ref={register(fields.bic_swift)} data-private/>
           {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
+        </Field>
+        <Field label="Email">
+          <WideInput name="email" ref={register(fields.email)} data-private/>
+          {errors.email && <FieldError>Invalid email</FieldError>}
         </Field>
         <Field label="Address" className={classes.fieldRow}>
           <WideInput name="owner.address" ref={register(fields.address)} data-private/>

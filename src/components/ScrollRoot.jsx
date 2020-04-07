@@ -11,7 +11,7 @@ function setVHProperty(element) {
   element.style.setProperty('--vh', `${vh}px`);
 }
 
-export default function AppContainer({ children }) {
+export default function ScrollRoot({ children }) {
   const scrollRootRef = useRef();
 
   useEffect(() => {

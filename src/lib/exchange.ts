@@ -1,12 +1,18 @@
 import BN from 'bignumber.js';
-import { tradeTokensForExactEth, tradeExactTokensForEth, getExecutionDetails, getTokenReserves, EXCHANGE_ABI, TRADE_METHODS } from '@uniswap/sdk';
+import {
+  EXCHANGE_ABI,
+  getExecutionDetails,
+  TRADE_METHODS,
+  tradeExactTokensForEth,
+  tradeTokensForExactEth
+} from '@uniswap/sdk';
 import ERC20_ABI from './abis/ERC20.json';
-import { ethers } from 'ethers';
+import {ethers} from 'ethers';
 
-import { TOKEN_DATA } from './currencies';
+import {TOKEN_DATA} from './currencies';
 import Bity from './bity';
 
-import { TradeExact, RateRequest, RateResult } from './types';
+import { ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact } from './types';
 
 const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
@@ -72,6 +78,27 @@ export async function getRate(rateRequest: RateRequest) {
   }
 
   return rateResult;
+}
+
+export async function createOrder(orderRequest: OrderRequest): Promise<Order> {
+
+  if(orderRequest.rateRequest.inputCurrency !== 'ETH')
+    throw new Error('order from other that ETH not implemented');
+  // TODO ERC20
+
+  const bityOrder = await Bity.order({
+    fromAddress: orderRequest.fromAddress,
+    recipient: orderRequest.recipient,
+    rateRequest: orderRequest.rateRequest,
+    reference: orderRequest.reference,
+  });
+
+  return {
+    orderRequest,
+    bityOrder,
+    path: ExchangePath.BITY,
+  };
+
 }
 
 export async function rateTokenToETH(symbol: string, amount: string, tradeExact: TradeExact) {

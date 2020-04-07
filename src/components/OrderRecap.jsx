@@ -109,8 +109,8 @@ function AmountRow({ value, symbol, caption }) {
   );
 }
 
-export default function PaymentOrderRecap({ paymentOrder }) {
-  const recipient = paymentOrder.paymentRequest.recipient;
+export default function OrderRecap({ order }) {
+  const recipient = order.orderRequest.recipient;
 
   let fullAddress = '';
   if(recipient.owner?.address) {
@@ -126,21 +126,24 @@ export default function PaymentOrderRecap({ paymentOrder }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
-  const inputCurrency = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
+  const inputAmount = order.bityOrder.input.amount;
+  const inputCurrency = order.bityOrder.input.currency;
+  // TODO ERC20
+  // const inputAmount = order.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
+  // const inputCurrency = order.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
 
-  const outputAmount = paymentOrder.bityOrder.output.amount;
-  const outputCurrency = paymentOrder.bityOrder.output.currency;
+  const outputAmount = order.bityOrder.output.amount;
+  const outputCurrency = order.bityOrder.output.currency;
 
   const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
 
   let fees, feesCurrency;
-  if(paymentOrder.bityOrder.fees.currency === paymentOrder.bityOrder.input.currency) {
-    fees = BN(paymentOrder.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = paymentOrder.bityOrder.output.currency;
+  if(order.bityOrder.fees.currency === order.bityOrder.input.currency) {
+    fees = BN(order.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = order.bityOrder.output.currency;
   }  else {
-    fees = BN(paymentOrder.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = paymentOrder.bityOrder.fees.currency;
+    fees = BN(order.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = order.bityOrder.fees.currency;
   }
 
   return (
@@ -151,8 +154,8 @@ export default function PaymentOrderRecap({ paymentOrder }) {
 
         <RecipientRow label="IBAN" value={recipient.iban}/>
         {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
-        {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
-        {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+        {order.orderRequest.reference && <RecipientRow label="Reference" value={order.orderRequest.reference}/>}
+        {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
       </Box>
 
       <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />

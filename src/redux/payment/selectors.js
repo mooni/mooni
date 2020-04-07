@@ -4,7 +4,6 @@ import { STATE_NAME } from './reducer';
 export const getPaymentRequest = selectProperty([STATE_NAME, 'paymentRequest']);
 export const getRateRequest = selectProperty([STATE_NAME, 'paymentRequest', 'rateRequest']);
 export const getRecipient = selectProperty([STATE_NAME, 'paymentRequest', 'recipient']);
-export const getContactPerson = selectProperty([STATE_NAME, 'paymentRequest', 'contactPerson']);
 export const getReference = selectProperty([STATE_NAME, 'paymentRequest', 'reference']);
 
 export const getExchangeStep = selectProperty([STATE_NAME, 'exchangeStep']);

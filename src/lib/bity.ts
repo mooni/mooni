@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TradeExact, RateRequest, RateResult } from './types';
+import { TradeExact, RateRequest, OrderError, RateResult, BityOrderRequest, BityOrderResponse } from './types';
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -16,16 +16,6 @@ function removeEmptyStrings(data = {}) {
       return acc;
     },
     {});
-}
-
-class BityError extends Error {
-  errors: any[];
-  _bityError: boolean;
-  constructor(message, errors: any[] = []) {
-    super(message);
-    this._bityError = true;
-    this.errors = errors;
-  }
 }
 
 const Bity = {
@@ -81,7 +71,8 @@ const Bity = {
     };
   },
 
-  async order({ fromAddress, recipient, reference, rateRequest, contactPerson }) {
+  async order(orderRequest: BityOrderRequest): Promise<BityOrderResponse> {
+    const { fromAddress, recipient, reference, rateRequest } = orderRequest;
 
     const body: any = {
       input: {
@@ -106,10 +97,9 @@ const Bity = {
     else
       throw new Error('invalid TRADE_EXACT');
 
-    const cleanContactPerson: any = removeEmptyStrings(contactPerson);
-    if(cleanContactPerson.email) {
+    if(recipient.email) {
       body.contact_person = {
-        email: contactPerson.email,
+        email: recipient.email,
       };
     }
 
@@ -128,7 +118,7 @@ const Bity = {
       });
 
       if(!data.input) {
-        throw new BityError(
+        throw new OrderError(
           'api_error',
           [{code: 'cookie', message: 'your browser does not support cookies'}]
         );
@@ -144,7 +134,7 @@ const Bity = {
 
     } catch(error) {
       if(error?.response?.data?.errors) {
-        throw new BityError(
+        throw new OrderError(
           'api_error',
           error.response.data.errors
         );
@@ -153,6 +143,7 @@ const Bity = {
       }
     }
   },
+
   async getOrderDetails(orderId) {
     const { data } = await instance({
       method: 'get',
