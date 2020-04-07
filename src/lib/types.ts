@@ -31,10 +31,12 @@ export interface Recipient {
   email?: string;
 }
 
+export type OrderErrors = any[];
+
 export class OrderError extends Error {
-  errors: any[];
+  errors: OrderErrors;
   _orderError: boolean;
-  constructor(message, errors: any[] = []) {
+  constructor(message, errors: OrderErrors = []) {
     super(message);
     this._orderError = true;
     this.errors = errors;

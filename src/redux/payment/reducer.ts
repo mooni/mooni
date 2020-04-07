@@ -1,29 +1,43 @@
 import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
-import { TradeExact, ExchangePath } from '../../lib/types';
+import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient } from '../../lib/types';
 
 import * as actions from "./actions";
 
 export const STATE_NAME = 'PAYMENT';
 
-const initialEmptyState = {
+interface State {
+  exchangeStep: number;
+  orderRequest?: OrderRequest;
+  order?: Order;
+  orderErrors?: OrderErrors;
+  paymentStatus?: string;
+  paymentTransaction?: any;
+}
+
+const initialEmptyState: State = {
   exchangeStep: 0,
   orderRequest: {
-    recipient: null,
+    recipient: {
+      owner: {
+        name: '',
+      },
+      iban: '',
+    },
     rateRequest: {
       inputCurrency: INPUT_CURRENCIES[0],
       outputCurrency: OUTPUT_CURRENCIES[0],
-      amount: 100,
+      amount: '100',
       tradeExact: TradeExact.OUTPUT,
     },
     reference: '',
   },
-  order: null,
-  orderErrors: null,
-  paymentStatus: null,
-  paymentTransaction: null,
+  order: undefined,
+  orderErrors: undefined,
+  paymentStatus: undefined,
+  paymentTransaction: undefined,
 };
 
-const initialMockState = {
+const initialMockState: State = {
   exchangeStep: 0,
   orderRequest: {
     recipient: {
@@ -41,7 +55,7 @@ const initialMockState = {
     rateRequest: {
       inputCurrency: 'ETH',
       outputCurrency: 'EUR',
-      amount: 10,
+      amount: '10',
       tradeExact: TradeExact.OUTPUT
     },
     reference: 'ref'
@@ -63,7 +77,7 @@ const initialMockState = {
       rateRequest: {
         inputCurrency: 'ETH',
         outputCurrency: 'EUR',
-        amount: 10,
+        amount: '10',
         tradeExact: TradeExact.OUTPUT
       },
       reference: 'ref'
@@ -103,7 +117,7 @@ const initialMockState = {
     },
     path: ExchangePath.BITY,
   },
-  orderErrors: null,
+  orderErrors: undefined,
   paymentStatus: 'mined',
   paymentTransaction: {
     hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
@@ -113,47 +127,48 @@ const initialMockState = {
 const initialState = initialEmptyState;
 // const initialState = initialMockState;
 
-export default function(state = initialState, action) {
+export default function(state : State = initialState, action): State {
   switch (action.type) {
     case actions.SET_RATE_REQUEST: {
-      const { rateRequest } = action.payload;
+      const { rateRequest }: { rateRequest: RateRequest } = action.payload;
+
       return {
         ...state,
         orderRequest: {
-          ...state.orderRequest,
+          ...(state.orderRequest as OrderRequest),
           rateRequest,
         },
       };
     }
     case actions.SET_RECIPIENT: {
-      const { recipient } = action.payload;
+      const { recipient }: { recipient: Recipient } = action.payload;
       return {
         ...state,
         orderRequest: {
-          ...state.orderRequest,
+          ...(state.orderRequest as OrderRequest),
           recipient,
         },
       };
     }
     case actions.SET_REFERENCE: {
-      const { reference } = action.payload;
+      const { reference }: { reference: string } = action.payload;
       return {
         ...state,
         orderRequest: {
-          ...state.orderRequest,
+          ...(state.orderRequest as OrderRequest),
           reference,
         },
       };
     }
     case actions.SET_ORDER: {
-      const { order } = action.payload;
+      const { order }: { order: Order } = action.payload;
       return {
         ...state,
         order,
       };
     }
     case actions.SET_ORDER_ERRORS: {
-      const { orderErrors } = action.payload;
+      const { orderErrors }: { orderErrors: OrderErrors } = action.payload;
       return {
         ...state,
         orderErrors,
@@ -162,26 +177,26 @@ export default function(state = initialState, action) {
     case actions.RESET_ORDER: {
       return {
         ...state,
-        order: null,
-        orderErrors: null,
+        order: undefined,
+        orderErrors: undefined,
       };
     }
     case actions.SET_PAYMENT_STATUS: {
-      const { paymentStatus } = action.payload;
+      const { paymentStatus }: { paymentStatus: string } = action.payload;
       return {
         ...state,
         paymentStatus,
       };
     }
     case actions.SET_PAYMENT_TRANSACTION: {
-      const { paymentTransaction } = action.payload;
+      const { paymentTransaction }: { paymentTransaction: any } = action.payload;
       return {
         ...state,
         paymentTransaction,
       };
     }
     case actions.SET_PAYMENT_STEP: {
-      const { stepId } = action.payload;
+      const { stepId }: { stepId: number } = action.payload;
       return {
         ...state,
         exchangeStep: stepId,
