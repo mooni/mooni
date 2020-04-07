@@ -8,10 +8,10 @@ import Terms from '../components/Terms';
 import Loader from '../components/Loader';
 import OrderRecap from '../components/OrderRecap';
 
-import { getPaymentOrder, getOrderErrors } from '../redux/payment/selectors';
+import { getOrder, getOrderErrors } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete }) {
-  const order = useSelector(getPaymentOrder);
+  const order = useSelector(getOrder);
   const orderErrors = useSelector(getOrderErrors);
 
   const [termsAccepted, setTermsAccepted] = useState(false);

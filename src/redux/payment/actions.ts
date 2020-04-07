@@ -1,18 +1,18 @@
-import { getPaymentRequest, getPaymentOrder } from './selectors';
-import { getAddress, getETHManager } from '../eth/selectors';
+import {getOrder, getOrderRequest} from './selectors';
+import {getAddress, getETHManager} from '../eth/selectors';
+import {createOrder as libCreateOrder} from '../../lib/exchange';
+import {ExchangePath, Order, OrderRequest} from '../../lib/types';
+import {sendEvent} from '../../lib/analytics';
 // import {
 //   rateTokenToETH,
 //   executeTrade,
 //   checkTradeAllowance,
 // } from '../../lib/exchange';
 
-import { createOrder as libCreateOrder } from '../../lib/exchange';
-import { sendEvent } from '../../lib/analytics';
-
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_REFERENCE = 'SET_REFERENCE';
-export const SET_PAYMENT_ORDER = 'SET_PAYMENT_ORDER';
+export const SET_ORDER = 'SET_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
@@ -39,10 +39,10 @@ export const setReference = (reference) => ({
   }
 });
 
-export const setPaymentOrder = (paymentOrder) => ({
-  type: SET_PAYMENT_ORDER,
+export const setOrder = (order) => ({
+  type: SET_ORDER,
   payload: {
-    paymentOrder,
+    order,
   }
 });
 export const setOrderErrors = (errors) => ({
@@ -84,25 +84,24 @@ export const createOrder = () => async function (dispatch, getState)  {
 
   const state = getState();
   const fromAddress = getAddress(state);
-  const paymentRequest = getPaymentRequest(state);
+  const orderRequest: OrderRequest = getOrderRequest(state);
 
-  if(paymentRequest.rateRequest.inputCurrency !== 'ETH')
+  if(orderRequest.rateRequest.inputCurrency !== 'ETH')
     throw new Error('order from other that ETH not implemented');
 
   try {
 
     const order = await libCreateOrder({
-      fromAddress,
-      recipient: paymentRequest.recipient,
-      rateRequest: paymentRequest.rateRequest,
-      reference: paymentRequest.reference,
-    });
+      recipient: orderRequest.recipient,
+      rateRequest: orderRequest.rateRequest,
+      reference: orderRequest.reference,
+    }, fromAddress);
 
-    dispatch(setPaymentOrder(order));
+    dispatch(setOrder(order));
     sendEvent('order', 'create', 'done');
 
   } catch(error) {
-    dispatch(setPaymentOrder(null));
+    dispatch(setOrder(null));
 
     sendEvent('order', 'create', 'error');
 
@@ -120,15 +119,15 @@ export const sendPayment = () => async function (dispatch, getState)  {
   sendEvent('payment', 'send', 'init');
 
   const state = getState();
-  const paymentOrder = getPaymentOrder(state);
+  const order: Order = getOrder(state);
   const ethManager = getETHManager(state);
   dispatch(setPaymentTransaction(null));
 
-  const bityInputAmount = paymentOrder.bityOrder.input.amount;
-  const bityDepositAddress = paymentOrder.bityOrder.payment_details.crypto_address;
+  const bityInputAmount = order.bityOrder.input.amount;
+  const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
 
   try {
-    if(paymentOrder.path === 'BITY') {
+    if(order.path === ExchangePath.BITY) {
 
       dispatch(setPaymentStatus('approval'));
 

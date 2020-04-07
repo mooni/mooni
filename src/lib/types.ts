@@ -41,16 +41,7 @@ export class OrderError extends Error {
   }
 }
 
-
-export interface BityOrderRequest {
-  fromAddress: string;
-  recipient: Recipient;
-  rateRequest: RateRequest;
-  reference?: string;
-}
-
 export interface OrderRequest {
-  fromAddress: string;
   recipient: Recipient;
   rateRequest: RateRequest;
   reference?: string;

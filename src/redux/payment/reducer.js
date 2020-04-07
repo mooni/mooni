@@ -7,7 +7,7 @@ export const STATE_NAME = 'PAYMENT';
 
 const initialEmptyState = {
   exchangeStep: 0,
-  paymentRequest: {
+  orderRequest: {
     recipient: null,
     rateRequest: {
       inputCurrency: INPUT_CURRENCIES[0],
@@ -17,7 +17,7 @@ const initialEmptyState = {
     },
     reference: '',
   },
-  paymentOrder: null,
+  order: null,
   orderErrors: null,
   paymentStatus: null,
   paymentTransaction: null,
@@ -25,7 +25,7 @@ const initialEmptyState = {
 
 const initialMockState = {
   exchangeStep: 0,
-  paymentRequest: {
+  orderRequest: {
     recipient: {
       owner: {
         country: 'NL',
@@ -46,7 +46,7 @@ const initialMockState = {
     },
     reference: 'ref'
   },
-  paymentOrder: {
+  order: {
     orderRequest: {
       recipient: {
         owner: {
@@ -119,8 +119,8 @@ export default function(state = initialState, action) {
       const { rateRequest } = action.payload;
       return {
         ...state,
-        paymentRequest: {
-          ...state.paymentRequest,
+        orderRequest: {
+          ...state.orderRequest,
           rateRequest,
         },
       };
@@ -129,8 +129,8 @@ export default function(state = initialState, action) {
       const { recipient } = action.payload;
       return {
         ...state,
-        paymentRequest: {
-          ...state.paymentRequest,
+        orderRequest: {
+          ...state.orderRequest,
           recipient,
         },
       };
@@ -139,17 +139,17 @@ export default function(state = initialState, action) {
       const { reference } = action.payload;
       return {
         ...state,
-        paymentRequest: {
-          ...state.paymentRequest,
+        orderRequest: {
+          ...state.orderRequest,
           reference,
         },
       };
     }
-    case actions.SET_PAYMENT_ORDER: {
-      const { paymentOrder } = action.payload;
+    case actions.SET_ORDER: {
+      const { order } = action.payload;
       return {
         ...state,
-        paymentOrder,
+        order,
       };
     }
     case actions.SET_ORDER_ERRORS: {
@@ -162,7 +162,7 @@ export default function(state = initialState, action) {
     case actions.RESET_ORDER: {
       return {
         ...state,
-        paymentOrder: null,
+        order: null,
         orderErrors: null,
       };
     }

@@ -9,7 +9,7 @@ import Loader from '../components/Loader';
 import Bity from '../lib/bity';
 import { getEtherscanTxURL } from '../lib/eth';
 
-import { getPaymentOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
+import { getOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
 import {resetOrder, setExchangeStep, setPaymentTransaction} from '../redux/payment/actions';
 import styled from 'styled-components';
 
@@ -58,7 +58,7 @@ export default function OrderStatus() {
   const theme = useTheme();
 
   const paymentStatus = useSelector(getPaymentStatus);
-  const order = useSelector(getPaymentOrder);
+  const order = useSelector(getOrder);
   const paymentTransaction = useSelector(getPaymentTransaction);
 
   const orderDetails = useUpdatedOrder(order?.bityOrder?.id, paymentStatus);

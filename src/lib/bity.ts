@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TradeExact, RateRequest, OrderError, RateResult, BityOrderRequest, BityOrderResponse } from './types';
+import { TradeExact, RateRequest, OrderError, RateResult, OrderRequest, BityOrderResponse } from './types';
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -71,8 +71,8 @@ const Bity = {
     };
   },
 
-  async order(orderRequest: BityOrderRequest): Promise<BityOrderResponse> {
-    const { fromAddress, recipient, reference, rateRequest } = orderRequest;
+  async order(orderRequest: OrderRequest, fromAddress: string): Promise<BityOrderResponse> {
+    const { recipient, reference, rateRequest } = orderRequest;
 
     const body: any = {
       input: {

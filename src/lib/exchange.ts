@@ -80,18 +80,19 @@ export async function getRate(rateRequest: RateRequest) {
   return rateResult;
 }
 
-export async function createOrder(orderRequest: OrderRequest): Promise<Order> {
+export async function createOrder(orderRequest: OrderRequest, fromAddress: string): Promise<Order> {
 
   if(orderRequest.rateRequest.inputCurrency !== 'ETH')
     throw new Error('order from other that ETH not implemented');
   // TODO ERC20
 
   const bityOrder = await Bity.order({
-    fromAddress: orderRequest.fromAddress,
-    recipient: orderRequest.recipient,
-    rateRequest: orderRequest.rateRequest,
-    reference: orderRequest.reference,
-  });
+      recipient: orderRequest.recipient,
+      rateRequest: orderRequest.rateRequest,
+      reference: orderRequest.reference,
+    },
+    fromAddress
+  );
 
   return {
     orderRequest,
