@@ -51,21 +51,32 @@ export const initETH = (walletType) => async function (dispatch)  {
   try {
     const ethManager = await ETHManager.createETHManager(walletType);
     dispatch(setETHManager(ethManager));
+    dispatch(setAddress(ethManager.getAddress()));
+    dispatch(setETHManagerLoading(false));
+
     ethManager.on('accountsChanged', () => {
       dispatch(setAddress(ethManager.getAddress()));
     });
     ethManager.on('stop', () => {
       dispatch(resetETHManager());
     });
-    dispatch(setAddress(ethManager.getAddress()));
 
-    dispatch(setETHManagerLoading(false));
+    dispatch(initBoxIfLoggedIn()).catch(console.error);
 
-    await dispatch(initBoxIfLoggedIn());
+    return null;
   } catch(error) {
     dispatch(resetETHManager());
     dispatch(setETHManagerLoading(false));
     console.error('Unable to connect to ethereum', error);
+    if(error.message === 'eth_smart_account_not_supported') {
+      return 'eth_smart_account_not_supported';
+    } else if(error.message === 'no_ethereum_provider') {
+      return 'no_ethereum_provider';
+    } else if(error.message === 'User closed WalletConnect modal') {
+      return null;
+    } else {
+      return 'unknown_error';
+    }
   }
 };
 
