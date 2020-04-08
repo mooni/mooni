@@ -31,6 +31,9 @@ export const ENABLE_TOKENS = true;
 export const INPUT_CURRENCIES = [ETH].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
 export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
 
+export const DEFAULT_INPUT_CURRENCY = 'DAI';
+export const DEFAULT_OUTPUT_CURRENCY = 'EUR';
+
 export function getCurrencyLogoAddress(symbol) {
   if(symbol === ETH) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';

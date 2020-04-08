@@ -1,4 +1,4 @@
-import { INPUT_CURRENCIES, OUTPUT_CURRENCIES } from '../../lib/currencies';
+import { INPUT_CURRENCIES, OUTPUT_CURRENCIES, DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../../lib/currencies';
 import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient } from '../../lib/types';
 
 import * as actions from './actions';
@@ -24,8 +24,8 @@ const initialEmptyState: State = {
       iban: '',
     },
     rateRequest: {
-      inputCurrency: INPUT_CURRENCIES[0],
-      outputCurrency: OUTPUT_CURRENCIES[0],
+      inputCurrency: DEFAULT_INPUT_CURRENCY,
+      outputCurrency: DEFAULT_OUTPUT_CURRENCY,
       amount: '100',
       tradeExact: TradeExact.OUTPUT,
     },
