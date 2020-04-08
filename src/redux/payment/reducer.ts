@@ -1,5 +1,23 @@
-import { INPUT_CURRENCIES, OUTPUT_CURRENCIES, DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../../lib/currencies';
-import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient, Payment, PaymentStep, PaymentStatus } from '../../lib/types';
+import {
+  DEFAULT_INPUT_CURRENCY,
+  DEFAULT_OUTPUT_CURRENCY,
+  INPUT_CURRENCIES,
+  OUTPUT_CURRENCIES
+} from '../../lib/currencies';
+import {
+  ExchangePath,
+  Order,
+  OrderErrors,
+  OrderRequest,
+  Payment,
+  PaymentStatus,
+  PaymentStep,
+  PaymentStepId,
+  PaymentStepStatus,
+  RateRequest,
+  Recipient,
+  TradeExact
+} from '../../lib/types';
 
 import * as actions from './actions';
 
@@ -144,11 +162,36 @@ const initialMockStateComplete: State = {
     path: ExchangePath.BITY,
   },
   orderErrors: undefined,
-  payment: undefined,
+  payment: {
+    status: PaymentStatus.DONE,
+    steps: [
+      {
+        id: PaymentStepId.ALLOWANCE,
+        status: PaymentStepStatus.DONE,
+        txHash: 'fref'
+      },
+      {
+        id: PaymentStepId.TRADE,
+        status: PaymentStepStatus.APPROVAL,
+      },
+      {
+        id: PaymentStepId.TRADE,
+        status: PaymentStepStatus.QUEUED,
+      },
+      {
+        id: PaymentStepId.PAYMENT,
+        status: PaymentStepStatus.ERROR,
+      },
+      {
+        id: PaymentStepId.PAYMENT,
+        status: PaymentStepStatus.MINING,
+      },
+    ],
+  },
 };
 
-const initialState = initialEmptyState;
-// const initialState = initialMockStateMinimum;
+// const initialState = initialEmptyState;
+const initialState = initialMockStateMinimum;
 
 export default function(state : State = initialState, action: { type: string, payload?: any }): State {
   switch (action.type) {

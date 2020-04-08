@@ -15,7 +15,7 @@ const Title = styled.p`
 const Header = styled.p`
   ${textStyle('title4')};
   text-align: center;
-  margin-top: ${2 * GU}px;
+  margin-top: ${4 * GU}px;
   margin-bottom: ${1 * GU}px;
 `;
 const Content = styled.p`

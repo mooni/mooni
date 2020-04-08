@@ -13,6 +13,7 @@ import {
   IconEllipsis,
   GU,
   IconPermissions,
+  useViewport,
 } from '@aragon/ui'
 import styled from 'styled-components';
 
@@ -41,13 +42,25 @@ const Hint = styled.p`
 `;
 const StatusLabel = styled.p`
   ${textStyle('label2')};
+  white-space: nowrap;
 `;
 const StatusSecondary = styled.p`
   ${textStyle('label2')};
   display: flex;
+  align-items: center;
+  font-style: italic;
+  font-size: 10px;
+  margin-left: ${GU}px;
 `;
-const ExternalButton = styled(Button)`
-  width: 110px;
+
+const StatusListItem = styled(ListItem)`
+  border: 1px solid #f9fafc;
+  background-color: #ffffffc9;
+  margin-bottom: 6px;
+  border-left: 1px solid white;
+  padding: 13px;
+  border-radius: 11px;
+  box-shadow: 1px 1px 7px rgba(145, 190, 195, 0.16);
 `;
 
 function OngoingMessage() {
@@ -93,42 +106,74 @@ function ErrorMessage() {
   )
 }
 
+function ExternalButton({ url, label }) {
+  const { below } = useViewport();
+  const theme = useTheme();
+
+  let display = 'all';
+  const style = {};
+  if(below('medium')) {
+    display = 'icon';
+    style.width = '50px';
+  } else {
+    style.width = '110px';
+  }
+
+  return (
+    <Button href={url} style={style} size="mini" display={display} icon={<IconExternal style={{color: theme.accent}}/>} label={label} />
+  )
+}
 function StatusRow({ id, status, txHash, bityOrderId }) {
   const theme = useTheme();
 
+  let color;
+  if(status === PaymentStepStatus.DONE) color = theme.positive;
+  if(status === PaymentStepStatus.ERROR) color = theme.negative;
+  if(status === PaymentStepStatus.APPROVAL) color = theme.infoSurfaceContent;
+  if(status === PaymentStepStatus.QUEUED) color = theme.disabledContent;
+  if(status === PaymentStepStatus.MINING) color = theme.warningSurfaceContent;
+
+  let borderLeftColor;
+  if(status === PaymentStepStatus.DONE) borderLeftColor = '#9de2c9';
+  if(status === PaymentStepStatus.ERROR) borderLeftColor = theme.negative;
+  if(status === PaymentStepStatus.APPROVAL) borderLeftColor = theme.infoSurfaceContent;
+  if(status === PaymentStepStatus.QUEUED) borderLeftColor = '#c8d7e4';
+  if(status === PaymentStepStatus.MINING) borderLeftColor = '#ead4ae';
+
+  let backgroundColor = theme.surface;
+  if(status === PaymentStepStatus.DONE) backgroundColor = '#f1fbf8';
+
   return (
-    <ListItem>
+    <StatusListItem disableGutters style={{ borderLeftColor, backgroundColor }}>
       <Box display="flex" width={1} alignItems="center">
         <Box width={24} mr={1} display="flex" justifyContent="center">
           {status === PaymentStepStatus.MINING && <LoadingRing/>}
-          {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color: theme.positive }}/>}
-          {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color: theme.negative }}  />}
-          {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color: theme.infoSurfaceContent }}  />}
-          {status === PaymentStepStatus.QUEUED && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
+          {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color }}/>}
+          {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color }}  />}
+          {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color }}  />}
+          {status === PaymentStepStatus.QUEUED && <IconEllipsis size="medium" style={{ color }}  />}
         </Box>
-        <Box flex={1}>
+        <Box flex={1} display="flex">
           <StatusLabel>
             {id === PaymentStepId.ALLOWANCE && 'Token allowance'}
             {id === PaymentStepId.TRADE && 'Token exchange'}
             {id === PaymentStepId.PAYMENT && 'Payment'}
             {id === PaymentStepId.BITY && 'Fiat exchange'}
           </StatusLabel>
-        </Box>
-        <Box ml={1} alignSelf="flex-end">
           <StatusSecondary>
-            {status === PaymentStepStatus.MINING && <span style={{color: theme.warningSurfaceContent}}>Mining</span>}
-            {status === PaymentStepStatus.ERROR && <span style={{color: theme.negative}}>Error</span>}
-            {status === PaymentStepStatus.APPROVAL && <span style={{color: theme.infoSurfaceContent}}>Approval</span>}
+            {status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
+            {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
+            {status === PaymentStepStatus.APPROVAL && <span style={{ color }}>Approval</span>}
           </StatusSecondary>
-          {txHash &&
-          <ExternalButton href={getEtherscanTxURL(txHash)} size="mini" icon={<IconExternal style={{color: theme.accent}}/>} label="Transaction" />
-          }
-          {bityOrderId &&
-          <ExternalButton href={Bity.getOrderStatusPageURL(bityOrderId)} size="mini" icon={<IconExternal style={{color: theme.accent}}/>} label="Bity order" />
-          }
         </Box>
+        {txHash &&
+        <ExternalButton url={getEtherscanTxURL(txHash)} label="Transaction" />
+        }
+        {bityOrderId &&
+        <ExternalButton url={Bity.getOrderStatusPageURL(bityOrderId)} label="Bity order" />
+        }
       </Box>
-    </ListItem>
+    </StatusListItem>
   )
 }
 
@@ -139,7 +184,7 @@ export default function PaymentStatusComponent({ payment }) {
         Order status
       </Title>
 
-      <Box mx={2} mb={2}>
+      <Box mb={2}>
         <List>
           {payment.steps.map(step =>
             <StatusRow key={step.id} id={step.id} status={step.status} txHash={step.txHash} bityOrderId={step.bityOrderId} />

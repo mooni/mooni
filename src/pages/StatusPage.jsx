@@ -54,8 +54,9 @@ export default function OrderStatusContainer() {
 
   const orderDetails = useUpdatedOrder(order?.bityOrder?.id /* TODO , paymentStatus */);
 
-  if(!order) {
+  if(!order || !payment) {
     history.push('/');
+    return <div/>;
   }
 
   function onRestart() {
@@ -77,5 +78,5 @@ export default function OrderStatusContainer() {
     <SmallWidth>
       <PaymentStatus payment={payment}/>
     </SmallWidth>
-  )
+  );
 }
