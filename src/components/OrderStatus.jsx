@@ -1,201 +1,157 @@
-import React, { useState, useEffect } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React from 'react';
 
-import { Box, Typography } from '@material-ui/core';
-import {Button, IconClock, LoadingRing, IconArrowLeft, IconHome, IconCheck, IconCaution, IconExternal, useTheme, textStyle} from '@aragon/ui'
-import { useHistory } from 'react-router-dom';
-
-import Loader from '../components/Loader';
-import Bity from '../lib/bity';
-import { getEtherscanTxURL } from '../lib/eth';
-
-import { getOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
-import {resetOrder, setExchangeStep, setPaymentTransaction} from '../redux/payment/actions';
+import { Box, List, ListItem } from '@material-ui/core';
+import {
+  Button,
+  LoadingRing,
+  IconArrowLeft,
+  IconCheck,
+  IconExternal,
+  useTheme,
+  textStyle,
+  IconWarning,
+  IconEllipsis,
+  GU,
+  IconPermissions,
+} from '@aragon/ui'
 import styled from 'styled-components';
 
-const POLL_INTERVAL = 2000;
-function useUpdatedOrder(orderId, paymentStatus) {
-  const [orderDetails, setOrderDetails] = useState(null);
+import { SimpleLink } from './StyledComponents';
 
-  useEffect(() => {
-    if(!orderId) return;
-
-    let intervalId;
-
-    function fetchNewData() {
-      Bity.getOrderDetails(orderId)
-        .then(newOrderDetails => {
-          setOrderDetails(newOrderDetails);
-          if(newOrderDetails.orderStatus === 'executed' || newOrderDetails.orderStatus === 'cancelled') {
-            clearInterval(intervalId);
-          }
-        })
-        .catch(console.error);
-    }
-    fetchNewData();
-
-    if(paymentStatus === 'mined')
-      intervalId = setInterval(fetchNewData, POLL_INTERVAL);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [orderId, paymentStatus]);
-
-  return orderDetails;
-}
+import { getEtherscanTxURL } from '../lib/eth';
+import Bity from '../lib/bity';
 
 const Title = styled.p`
   ${textStyle('title3')};
   text-align: center;
+  margin-bottom: ${2 * GU}px;
 `;
 
-// TODO Support opening this page with /:orderId without tracking blockchain transaction state
+const SubTitle = styled.p`
+  ${textStyle('title4')};
+  text-align: center;
+  margin-bottom: ${2 * GU}px;
+`;
 
-export default function OrderStatus() {
-  const history = useHistory();
-  const dispatch = useDispatch();
+const Hint = styled.p`
+  ${textStyle('body3')};
+  margin-bottom: ${2 * GU}px;
+  text-align: center;
+`;
+const StatusLabel = styled.p`
+  ${textStyle('label2')};
+`;
+const StatusSecondary = styled.p`
+  ${textStyle('label2')};
+  display: flex;
+`;
+const ExternalButton = styled(Button)`
+  width: 110px;
+`;
+
+function OngoingMessage() {
+  return (
+    <Hint>
+      You will be prompted to accept transactions in your ethereum wallet. Please do not close this tab until the order is complete.
+    </Hint>
+  )
+}
+
+function SuccessMessage() {
+  const tweetURL = "https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=https://app.mooni.tech&hashtags=defi,offramp,crypto";
+
+  return (
+    <Box width={1}>
+      <SubTitle>
+        That's a success 👌
+      </SubTitle>
+      <Hint>
+        The payment is complete and the bank transfer have been sent. <br/>
+        Funds will arrive in you bank account between one hour and one/two days from now, depending on your bank.
+      </Hint>
+      <Box display="flex" justifyContent="center">
+        <SimpleLink href={tweetURL} external>Spread the love ❤️</SimpleLink>
+      </Box>
+    </Box>
+  )
+}
+
+function ErrorMessage() {
+  return (
+    <Box width={1}>
+      <SubTitle>
+        Oops, something went wrong 🤭
+      </SubTitle>
+      <Hint>
+        An error occurred while trying to send the transaction. <br/>
+        You may have denied transactions in your wallet. <br/>
+        If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
+      </Hint>
+      <Button mode="normal" wide icon={<IconArrowLeft/>} label="Retry" />
+    </Box>
+  )
+}
+
+function StatusRow({ status, label, txHash, bityOrderId }) {
   const theme = useTheme();
 
-  const paymentStatus = useSelector(getPaymentStatus);
-  const order = useSelector(getOrder);
-  const paymentTransaction = useSelector(getPaymentTransaction);
-
-  const orderDetails = useUpdatedOrder(order?.bityOrder?.id, paymentStatus);
-
-  if(!order) {
-    history.push('/');
-  }
-
-  function onRestart() {
-    dispatch(resetOrder());
-    dispatch(setPaymentTransaction(null));
-    dispatch(setExchangeStep(0));
-    history.push('/exchange');
-  }
-  function onExit() {
-    history.push('/');
-  }
-
-
-  if(!orderDetails) {
-    return (
-      <Loader text="Loading order status..." />
-    )
-  }
-
-  let content;
-
-  if(paymentStatus ===  'approval-trade') {
-    content = <Loader text="Please approve trade transaction in your wallet" />;
-  } else if(paymentStatus ===  'approval-payment') {
-    content = <Loader text="Please approve payment transaction in your wallet" />;
-  } else if(paymentStatus ===  'check-allowance') {
-    content = <Loader text="Please approve Uniswap to spend your tokens in your wallet" />;
-  } else if(paymentStatus ===  'mining-allowance') {
-    content = <Loader text="Mining allowance..." />;
-  } else if(paymentStatus ===  'mining-trade') {
-    content = <Loader text="Mining trade..." />;
-  } else if(paymentStatus ===  'mining-payment') {
-    content = <Loader text="Mining payment..." />;
-
-    // ERROR
-  } else if(paymentStatus ===  'error') {
-    content = (
-      <>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <IconCaution size="large" style={{ color: theme.negative }}  />
+  return (
+    <ListItem>
+      <Box display="flex" width={1} alignItems="center">
+        <Box width={24} mr={1} display="flex" justifyContent="center">
+          {status === 'mining' && <LoadingRing/>}
+          {status === 'done' && <IconCheck size="medium" style={{ color: theme.positive }}/>}
+          {status === 'error' && <IconWarning size="medium" style={{ color: theme.negative }}  />}
+          {status === 'approval' && <IconPermissions size="medium" style={{ color: theme.infoSurfaceContent }}  />}
+          {status === 'queued' && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
         </Box>
-        <Box py={2} textAlign="center" color="text.primary">
-          An error occurred while trying to send the transaction. Please retry later.
+        <Box flex={1}>
+          <StatusLabel>
+            {label}
+          </StatusLabel>
         </Box>
-        <Button mode="normal" onClick={onRestart} wide icon={<IconArrowLeft/>} label="Retry" />
-      </>
-    );
-
-    // MINED, cancelled
-  } else if(paymentStatus ===  'mined' && orderDetails.orderStatus === 'cancelled') {
-    content = (
-      <>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <IconCaution size="large" style={{ color: theme.negative }} />
+        <Box ml={1} alignSelf="flex-end">
+          <StatusSecondary>
+            {status === 'mining' && <span style={{color: theme.warningSurfaceContent}}>Mining</span>}
+            {status === 'error' && <span style={{color: theme.negative}}>Error</span>}
+            {status === 'approval' && <span style={{color: theme.infoSurfaceContent}}>Approval</span>}
+          </StatusSecondary>
+          {txHash &&
+          <ExternalButton href={getEtherscanTxURL(txHash)} size="mini" icon={<IconExternal style={{color: theme.accent}}/>} label="Transaction" />
+          }
+          {bityOrderId &&
+          <ExternalButton href={Bity.getOrderStatusPageURL(bityOrderId)} size="mini" icon={<IconExternal style={{color: theme.accent}}/>} label="Bity order" />
+          }
         </Box>
-        <Box py={2} textAlign="center">
-          <Box>
-            Bity has cancelled the order.
-          </Box>
-          <Box>
-            Please contact their support service with your order id:
-          </Box>
-          <Typography variant="caption ">
-            {orderDetails.id}
-          </Typography>
-        </Box>
-        <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
-      </>
-    );
-
-    // MINED, executed
-  } else if(paymentStatus ===  'mined' && orderDetails.orderStatus === 'executed') {
-    content = (
-      <>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <IconCheck size="large" style={{ color: theme.positive }} />
-        </Box>
-        <Box py={2} textAlign="center">
-          <Box>
-            The exchange is done and the wire transfer has been initiated.
-          </Box>
-          <Box>
-            Bank transfers take from hours to days to arrive, please be patient.
-          </Box>
-        </Box>
-        <Button mode="normal" onClick={onExit} wide icon={<IconHome/>} label="Go home" />
-      </>
-    );
-
-    // MINED, waiting
-  } else if(paymentStatus ===  'mined' && (orderDetails.orderStatus === 'waiting' || orderDetails.paymentStatus === 'received')) {
-    content = (
-      <>
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <IconClock size="large" style={{ color: theme.warningSurfaceContent }} />
-        </Box>
-        <Box py={2} textAlign="center">
-          <Box>
-            Transaction successfuly sent.
-          </Box>
-          <Box>
-            {orderDetails.orderStatus === 'waiting' && 'Waiting for Bity to catch it...'}
-            {orderDetails.orderStatus === 'received' && 'Bity has received the transaction, waiting for confirmation...'}
-            <Box display="flex" justifyContent="center"><LoadingRing/></Box>
-          </Box>
-        </Box>
-      </>
-    );
-
-    // ??
-  } else {
-    content = (
-      <Box>
-        Unknown status ({paymentStatus}, {orderDetails.orderStatus})
       </Box>
-    );
-  }
+    </ListItem>
+  )
+}
 
+export default function OrderStatus() {
   return (
     <Box width={1}>
       <Title>
         Order status
       </Title>
 
-      {content}
-
-      <Box my={1}>
-        {paymentTransaction && <Button href={getEtherscanTxURL(paymentTransaction.hash)} wide icon={<IconExternal style={{color: theme.accent}}/>} label="Open transaction" />}
-        <Box mt={1}/>
-        {paymentTransaction && orderDetails && <Button href={Bity.getOrderStatusPageURL(orderDetails.id)} wide icon={<IconExternal style={{color: theme.accent}}/>} label="Open Bity order" />}
+      <Box mx={2} mb={2}>
+        <List>
+            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
+            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
+            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
+            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
+            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
+            {/*<StatusRow status="approval" label="Token exchange" />*/}
+            {/*<StatusRow status="mining" label="Payment" />*/}
+            {/*<StatusRow status="error" label="Payment" />*/}
+            {/*<StatusRow status="queued" label="Fiat exchange" bityOrderId={orderDetails.id}/>*/}
+        </List>
       </Box>
+
+      {/*<OngoingMessage/>*/}
+      {/*<ErrorMessage/>*/}
+      <SuccessMessage/>
     </Box>
   )
 }
