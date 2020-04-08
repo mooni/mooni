@@ -11,8 +11,6 @@ import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
 const infuraId = process.env.REACT_APP_INFURA_ID || 'd118ed6a19594e16893c0c29d09a2536';
 const portisAppId = process.env.REACT_APP_PORTIS_APP_ID || 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2';
 
-// export const MAINNET_NETWORK_ID = 1;
-
 function reloadPage() {
   window.location.reload()
 }

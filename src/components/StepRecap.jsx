@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, Countdown, Info, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
+import { Button, Info, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
 
 import Terms from '../components/Terms';
 import Loader from '../components/Loader';
-import PaymentOrderRecap from '../components/PaymentOrderRecap';
+import OrderRecap from '../components/OrderRecap';
 
-import { getPaymentOrder, getOrderErrors } from '../redux/payment/selectors';
+import { getOrder, getOrderErrors } from '../redux/payment/selectors';
 
 function StepRecap({ onComplete }) {
-  const paymentOrder = useSelector(getPaymentOrder);
+  const order = useSelector(getOrder);
   const orderErrors = useSelector(getOrderErrors);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -29,14 +29,14 @@ function StepRecap({ onComplete }) {
     );
   }
 
-  if(!paymentOrder) {
+  if(!order) {
     return (
       <Loader text="Creating order ..." />
     );
   }
 
   const now = new Date();
-  const orderExpireDate = new Date(paymentOrder.bityOrder.timestamp_price_guaranteed);
+  const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
 
   if(orderExpireDate < now) {
     return (
@@ -50,12 +50,7 @@ function StepRecap({ onComplete }) {
 
   return (
     <Box width={1}>
-      <PaymentOrderRecap paymentOrder={paymentOrder} />
-      <Box pt={1}>
-        <Info title="Price guaranteed until" mode="warning">
-          <Countdown end={orderExpireDate} />
-        </Info>
-      </Box>
+      <OrderRecap order={order} />
       <Box py={2} display="flex" justifyContent="center">
         <label>
           <Checkbox

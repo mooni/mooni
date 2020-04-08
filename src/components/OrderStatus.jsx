@@ -9,8 +9,8 @@ import Loader from '../components/Loader';
 import Bity from '../lib/bity';
 import { getEtherscanTxURL } from '../lib/eth';
 
-import { getPaymentOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
-import {resetOrder, setPaymentStep, setPaymentTransaction} from '../redux/payment/actions';
+import { getOrder, getPaymentStatus, getPaymentTransaction } from '../redux/payment/selectors';
+import {resetOrder, setExchangeStep, setPaymentTransaction} from '../redux/payment/actions';
 import styled from 'styled-components';
 
 const POLL_INTERVAL = 2000;
@@ -58,19 +58,19 @@ export default function OrderStatus() {
   const theme = useTheme();
 
   const paymentStatus = useSelector(getPaymentStatus);
-  const paymentOrder = useSelector(getPaymentOrder);
+  const order = useSelector(getOrder);
   const paymentTransaction = useSelector(getPaymentTransaction);
 
-  const orderDetails = useUpdatedOrder(paymentOrder?.bityOrder?.id, paymentStatus);
+  const orderDetails = useUpdatedOrder(order?.bityOrder?.id, paymentStatus);
 
-  if(!paymentOrder) {
+  if(!order) {
     history.push('/');
   }
 
   function onRestart() {
     dispatch(resetOrder());
     dispatch(setPaymentTransaction(null));
-    dispatch(setPaymentStep(0));
+    dispatch(setExchangeStep(0));
     history.push('/exchange');
   }
   function onExit() {
@@ -86,12 +86,16 @@ export default function OrderStatus() {
 
   let content;
 
-  if(paymentStatus ===  'approval') {
-    content = <Loader text="Please approve transaction in your wallet" />;
+  if(paymentStatus ===  'approval-trade') {
+    content = <Loader text="Please approve trade transaction in your wallet" />;
+  } else if(paymentStatus ===  'approval-payment') {
+    content = <Loader text="Please approve payment transaction in your wallet" />;
   } else if(paymentStatus ===  'check-allowance') {
     content = <Loader text="Please approve Uniswap to spend your tokens in your wallet" />;
   } else if(paymentStatus ===  'mining-allowance') {
     content = <Loader text="Mining allowance..." />;
+  } else if(paymentStatus ===  'mining-trade') {
+    content = <Loader text="Mining trade..." />;
   } else if(paymentStatus ===  'mining-payment') {
     content = <Loader text="Mining payment..." />;
 
