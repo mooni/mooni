@@ -98,7 +98,7 @@ function ErrorMessage() {
       </SubTitle>
       <Hint>
         An error occurred while trying to send the transaction. <br/>
-        You may have denied transactions in your wallet. <br/>
+        You may have denied a transaction in your wallet. <br/>
         If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
       </Hint>
       <Button mode="normal" wide icon={<IconArrowLeft/>} label="Retry" />

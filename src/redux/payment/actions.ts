@@ -149,6 +149,38 @@ export const createOrder = () => async function (dispatch, getState)  {
   }
 };
 
+async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }) {
+  dispatch(updatePaymentStep({
+    id: stepId,
+    status: PaymentStepStatus.APPROVAL,
+  }));
+
+  try {
+    const txHash = await paymentFunction();
+
+    if(txHash) {
+      dispatch(updatePaymentStep({
+        id: stepId,
+        status: PaymentStepStatus.MINING,
+        txHash,
+      }));
+      await ethManager.waitForConfirmedTransaction(txHash);
+    }
+
+    dispatch(updatePaymentStep({
+      id: stepId,
+      status: PaymentStepStatus.DONE,
+    }));
+  } catch(error) {
+    dispatch(updatePaymentStep({
+      id: stepId,
+      status: PaymentStepStatus.ERROR,
+      error, // TODO
+    }));
+    throw error;
+  }
+}
+
 export const sendPayment = () => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
@@ -164,82 +196,44 @@ export const sendPayment = () => async function (dispatch, getState)  {
     if(order.path === ExchangePath.DEX_BITY) {
 
       if(!order.tradeData) throw new Error('missing trade data');
+      const tradeDetails = order.tradeData.tradeDetails;
 
       // Allowance
-
-      dispatch(updatePaymentStep({
-        id: PaymentStepId.ALLOWANCE,
-        status: PaymentStepStatus.APPROVAL,
-      }));
-
-      const approveTx = await checkTradeAllowance(order.tradeData.tradeDetails, ethManager.signer);
-      if(approveTx) {
-        dispatch(updatePaymentStep({
-          id: PaymentStepId.ALLOWANCE,
-          status: PaymentStepStatus.MINING,
-          txHash: approveTx.hash,
-        }));
-        await ethManager.waitForConfirmedTransaction(approveTx.hash);
-      }
-      dispatch(updatePaymentStep({
-        id: PaymentStepId.ALLOWANCE,
-        status: PaymentStepStatus.DONE,
-      }));
+      await sendPaymentStep({
+        dispatch, ethManager,
+        stepId: PaymentStepId.ALLOWANCE,
+        paymentFunction: async () => checkTradeAllowance(tradeDetails, ethManager.signer).then(tx => tx?.hash)
+      });
 
       // Trade
-
-      dispatch(updatePaymentStep({
-        id: PaymentStepId.TRADE,
-        status: PaymentStepStatus.APPROVAL,
-      }));
-
-      const tradeTx = await executeTrade(
-        order.tradeData.tradeDetails,
-        undefined,
-        ethManager.signer,
-      );
-      dispatch(updatePaymentStep({
-        id: PaymentStepId.TRADE,
-        status: PaymentStepStatus.MINING,
-        txHash: tradeTx.hash,
-      }));
-
-      await ethManager.waitForConfirmedTransaction(tradeTx.hash);
-      dispatch(updatePaymentStep({
-        id: PaymentStepId.TRADE,
-        status: PaymentStepStatus.DONE,
-      }));
+      await sendPaymentStep({
+        dispatch, ethManager,
+        stepId: PaymentStepId.TRADE,
+        paymentFunction: async () => executeTrade(
+          tradeDetails,
+          undefined,
+          ethManager.signer,
+        ).then(tx => tx.hash)
+      });
 
     }
 
     // Payment
-
-    dispatch(updatePaymentStep({
-      id: PaymentStepId.PAYMENT,
-      status: PaymentStepStatus.APPROVAL,
-    }));
-
-    const tx = await ethManager.send(bityDepositAddress, bityInputAmount);
-    dispatch(updatePaymentStep({
-      id: PaymentStepId.PAYMENT,
-      status: PaymentStepStatus.MINING,
-      txHash: tx.hash,
-    }));
-
-    await ethManager.waitForConfirmedTransaction(tx.hash);
-    dispatch(updatePaymentStep({
-      id: PaymentStepId.PAYMENT,
-      status: PaymentStepStatus.DONE,
-    }));
-
+    await sendPaymentStep({
+      dispatch, ethManager,
+      stepId: PaymentStepId.PAYMENT,
+      paymentFunction: async () => ethManager.send(bityDepositAddress, bityInputAmount).then(tx => tx.hash)
+    });
 
     dispatch(setPaymentStatus(PaymentStatus.DONE));
 
     sendEvent('payment', 'send', 'done');
 
   } catch(error) {
+
     console.error(error);
     sendEvent('payment', 'send', 'error');
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
+
   }
 };

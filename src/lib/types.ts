@@ -120,6 +120,7 @@ export interface PaymentStep {
   status: PaymentStepStatus;
   txHash?: string;
   bityOrderId?: string;
+  error?: any; // TODO
 }
 
 export interface Payment {
