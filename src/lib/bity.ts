@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { TradeExact, RateRequest, OrderError, RateResult, OrderRequest, BityOrderResponse } from './types';
+import BN from "bignumber.js";
+import {SIGNIFICANT_DIGITS} from "./currencies";
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -16,6 +18,21 @@ function removeEmptyStrings(data: object = {}) {
       return acc;
     },
     {});
+}
+
+function extractFees(order: any): { amount: string, currency: string}  {
+  let feesAmount = order.price_breakdown.customer_trading_fee.amount;
+  let feesCurrency = order.price_breakdown.customer_trading_fee.currency;
+
+  if(feesCurrency === order.input.currency) {
+    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = order.output.currency;
+  }
+
+  return {
+    amount: feesAmount,
+    currency: feesCurrency,
+  };
 }
 
 const Bity = {
@@ -50,10 +67,7 @@ const Bity = {
       inputCurrency,
       outputCurrency,
       tradeExact,
-      fees: {
-        amount: data.price_breakdown.customer_trading_fee.amount,
-        currency: data.price_breakdown.customer_trading_fee.currency,
-      }
+      fees: extractFees(data),
     };
   },
 
@@ -112,10 +126,7 @@ const Bity = {
 
       return {
         ...data,
-        fees: {
-          amount: data.price_breakdown.customer_trading_fee.amount,
-          currency: data.price_breakdown.customer_trading_fee.currency,
-        }
+        fees: extractFees(data),
       };
 
     } catch(error) {

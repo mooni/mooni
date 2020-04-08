@@ -15,7 +15,10 @@ export interface RateResult {
   inputAmount: string;
   outputAmount: string;
   tradeExact: TradeExact;
-  fees: object;
+  fees?: {
+    amount: string;
+    currency: string;
+  };
 }
 
 export interface DexTrade {

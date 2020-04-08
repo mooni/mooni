@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import {Link, textStyle, Field, GU} from '@aragon/ui';
+import { Link, textStyle, Field, GU, Info, Countdown } from '@aragon/ui';
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
@@ -132,16 +132,7 @@ export default function OrderRecap({ order }) {
   const outputCurrency = order.estimatedRates.outputCurrency;
 
   const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-
-  let fees, feesCurrency;
-  // TODO
-  // if(order.bityOrder.fees.currency === order.bityOrder.input.currency) {
-  //   fees = BN(order.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-  //   feesCurrency = order.bityOrder.output.currency;
-  // }  else {
-    fees = BN(order.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = order.bityOrder.fees.currency;
-  // }
+  const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
 
   return (
     <Box>
@@ -163,13 +154,19 @@ export default function OrderRecap({ order }) {
           <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
         </Typography><br/>
         <Typography variant="caption">
-          <b>Fees:</b> {fees} {feesCurrency}
+          <b>Fees:</b> {order.bityOrder.fees.amount} {order.bityOrder.fees.currency}
         </Typography>
       </Box>
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
         <PoweredBy>Powered by </PoweredBy>
         <Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link>
+      </Box>
+
+      <Box pt={1}>
+        <Info title="Price guaranteed until" mode="warning">
+          <Countdown end={orderExpireDate} />
+        </Info>
       </Box>
     </Box>
   )

@@ -159,15 +159,8 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     });
   }
 
-  let feeValue, feeCurrency, rate;
+  let rate;
   if(!rateLoading) {
-    if(fees.currency === rateDetails.inputCurrency) {
-      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-      feeCurrency = rateDetails.outputCurrency;
-    } else {
-      feeValue = BN(fees.amount).sd(SIGNIFICANT_DIGITS).toString();
-      feeCurrency = fees.currency;
-    }
     rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
   }
 
@@ -197,7 +190,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
           <Typography variant="caption">
             <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
             <br/>
-            <b>Fees:</b> {feeValue} {feeCurrency}
+            <b>Fees:</b> {fees.amount} {fees.currency}
           </Typography>
           :
           <LoadingRing/>

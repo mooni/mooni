@@ -28,14 +28,13 @@ function calculatedGasMargin(gas) {
   return gas.add(offset);
 }
 
-export async function getRate(rateRequest: RateRequest) {
+export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
   const rateResult: RateResult = {
     inputCurrency: rateRequest.inputCurrency,
     outputCurrency: rateRequest.outputCurrency,
     tradeExact: rateRequest.tradeExact,
     inputAmount: '',
     outputAmount: '',
-    fees: {},
   };
 
   if(rateRequest.tradeExact === TradeExact.INPUT) {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, Countdown, Info, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
+import { Button, Info, IconCoin, Checkbox, Link, Modal } from '@aragon/ui'
 
 import Terms from '../components/Terms';
 import Loader from '../components/Loader';
@@ -51,11 +51,6 @@ function StepRecap({ onComplete }) {
   return (
     <Box width={1}>
       <OrderRecap order={order} />
-      <Box pt={1}>
-        <Info title="Price guaranteed until" mode="warning">
-          <Countdown end={orderExpireDate} />
-        </Info>
-      </Box>
       <Box py={2} display="flex" justifyContent="center">
         <label>
           <Checkbox
