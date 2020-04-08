@@ -90,18 +90,19 @@ function SuccessMessage() {
   )
 }
 
-function ErrorMessage() {
+function ErrorMessage({ onRestart }) {
+  // TODO adapt error on payment, tell to keep bity order id
   return (
     <Box width={1}>
       <SubTitle>
         Oops, something went wrong 🤭
       </SubTitle>
       <Hint>
-        An error occurred while trying to send the transaction. <br/>
+        An error occurred while trying to send a transaction. <br/>
         You may have denied a transaction in your wallet. <br/>
         If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
       </Hint>
-      <Button mode="normal" wide icon={<IconArrowLeft/>} label="Retry" />
+      <Button mode="normal" onClick={onRestart} wide icon={<IconArrowLeft/>} label="Retry" />
     </Box>
   )
 }
@@ -123,6 +124,7 @@ function ExternalButton({ url, label }) {
     <Button href={url} style={style} size="mini" display={display} icon={<IconExternal style={{color: theme.accent}}/>} label={label} />
   )
 }
+
 function StatusRow({ id, status, txHash, bityOrderId }) {
   const theme = useTheme();
 
@@ -161,7 +163,7 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
             {id === PaymentStepId.BITY && 'Fiat exchange'}
           </StatusLabel>
           <StatusSecondary>
-            {status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
+            {!bityOrderId && status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
             {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
             {status === PaymentStepStatus.APPROVAL && <span style={{ color }}>Approval</span>}
           </StatusSecondary>
@@ -177,7 +179,7 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   )
 }
 
-export default function PaymentStatusComponent({ payment }) {
+export default function PaymentStatusComponent({ payment, onRestart }) {
   return (
     <Box width={1}>
       <Title>
@@ -193,7 +195,7 @@ export default function PaymentStatusComponent({ payment }) {
       </Box>
 
       {payment.status === PaymentStatus.ONGOING && <OngoingMessage />}
-      {payment.status === PaymentStatus.ERROR && <ErrorMessage />}
+      {payment.status === PaymentStatus.ERROR && <ErrorMessage onRestart={onRestart} />}
       {payment.status === PaymentStatus.DONE && <SuccessMessage />}
     </Box>
   )

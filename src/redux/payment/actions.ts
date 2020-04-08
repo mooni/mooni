@@ -3,6 +3,7 @@ import {getAddress, getETHManager} from '../eth/selectors';
 import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '../../lib/exchange';
 import {ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
+import Bity from '../../lib/bity';
 
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 
@@ -181,6 +182,48 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
   }
 }
 
+function watchBityOrder(dispatch, orderId) {
+  const POLL_INTERVAL = 5000;
+  let intervalId;
+
+  dispatch(updatePaymentStep({
+    id: PaymentStepId.BITY,
+    status: PaymentStepStatus.MINING,
+  }));
+
+  function fetchNewData() {
+    Bity.getOrderDetails(orderId)
+      .then(orderDetails => {
+
+        if(orderDetails.orderStatus === 'executed') {
+
+          clearInterval(intervalId);
+          dispatch(updatePaymentStep({
+            id: PaymentStepId.BITY,
+            status: PaymentStepStatus.DONE,
+          }));
+          dispatch(setPaymentStatus(PaymentStatus.DONE));
+          sendEvent('payment', 'send', 'done');
+
+        } else if(orderDetails.orderStatus === 'cancelled') {
+
+          clearInterval(intervalId);
+          dispatch(updatePaymentStep({
+            id: PaymentStepId.BITY,
+            status: PaymentStepStatus.ERROR,
+            error: new Error('Bity order cancelled'),
+          }));
+          dispatch(setPaymentStatus(PaymentStatus.ERROR));
+          sendEvent('payment', 'send', 'error');
+
+        }
+      })
+      .catch(console.error);
+  }
+  fetchNewData();
+  intervalId = setInterval(fetchNewData, POLL_INTERVAL);
+}
+
 export const sendPayment = () => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
@@ -225,9 +268,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       paymentFunction: async () => ethManager.send(bityDepositAddress, bityInputAmount).then(tx => tx.hash)
     });
 
-    dispatch(setPaymentStatus(PaymentStatus.DONE));
-
-    sendEvent('payment', 'send', 'done');
+    watchBityOrder(dispatch, order.bityOrder.id);
 
   } catch(error) {
 
