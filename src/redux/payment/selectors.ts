@@ -12,6 +12,6 @@ export const getExchangeStep: (state: State) => number = selectProperty([STATE_N
 
 export const getOrder: (state: State) => Order = selectProperty([STATE_NAME, 'order']);
 export const getOrderErrors: (state: State) => OrderErrors = selectProperty([STATE_NAME, 'orderErrors']);
-export const getPaymentStatus: (state: State) => string = selectProperty([STATE_NAME, 'paymentStatus']);
-export const getPaymentTransaction: (state: State) => any = selectProperty([STATE_NAME, 'paymentTransaction']);
+
+export const getPayment: (state: State) => string = selectProperty([STATE_NAME, 'payment']);
 

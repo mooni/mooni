@@ -1,5 +1,5 @@
 import { INPUT_CURRENCIES, OUTPUT_CURRENCIES, DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../../lib/currencies';
-import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient } from '../../lib/types';
+import { TradeExact, ExchangePath, Order, OrderErrors, OrderRequest, RateRequest, Recipient, Payment, PaymentStep, PaymentStatus } from '../../lib/types';
 
 import * as actions from './actions';
 
@@ -10,8 +10,7 @@ export interface State {
   orderRequest?: OrderRequest;
   order?: Order;
   orderErrors?: OrderErrors;
-  paymentStatus?: string;
-  paymentTransaction?: any;
+  payment?: Payment;
 }
 
 const initialEmptyState: State = {
@@ -33,8 +32,7 @@ const initialEmptyState: State = {
   },
   order: undefined,
   orderErrors: undefined,
-  paymentStatus: undefined,
-  paymentTransaction: undefined,
+  payment: undefined,
 };
 
 const initialMockStateMinimum: State = {
@@ -49,15 +47,14 @@ const initialMockStateMinimum: State = {
     rateRequest: {
       inputCurrency: INPUT_CURRENCIES[1],
       outputCurrency: OUTPUT_CURRENCIES[0],
-      amount: '20',
+      amount: '10',
       tradeExact: TradeExact.OUTPUT,
     },
     reference: '',
   },
   order: undefined,
   orderErrors: undefined,
-  paymentStatus: undefined,
-  paymentTransaction: undefined,
+  payment: undefined,
 };
 
 const initialMockStateComplete: State = {
@@ -147,10 +144,7 @@ const initialMockStateComplete: State = {
     path: ExchangePath.BITY,
   },
   orderErrors: undefined,
-  paymentStatus: 'mined',
-  paymentTransaction: {
-    hash: '0xbc6a9e0587c6bd877008e2b31b5735d1c96163eb9f5f1f893ff52af7c1b655f2'
-  }
+  payment: undefined,
 };
 
 const initialState = initialEmptyState;
@@ -210,26 +204,52 @@ export default function(state : State = initialState, action: { type: string, pa
         orderErrors: undefined,
       };
     }
-    case actions.SET_PAYMENT_STATUS: {
-      const { paymentStatus }: { paymentStatus: string } = action.payload;
-      return {
-        ...state,
-        paymentStatus,
-      };
-    }
-    case actions.SET_PAYMENT_TRANSACTION: {
-      const { paymentTransaction }: { paymentTransaction: any } = action.payload;
-      return {
-        ...state,
-        paymentTransaction,
-      };
-    }
-    case actions.SET_PAYMENT_STEP: {
+    case actions.SET_EXCHANGE_STEP: {
       const { stepId }: { stepId: number } = action.payload;
       return {
         ...state,
         exchangeStep: stepId,
       };
+    }
+    case actions.RESET_PAYMENT: {
+      return {
+        ...state,
+        payment: undefined,
+      };
+    }
+    case actions.SET_PAYMENT: {
+      const { payment }: { payment: Payment } = action.payload;
+      return {
+        ...state,
+        payment,
+      };
+    }
+    case actions.UPDATE_PAYMENT_STEP: {
+      const { paymentStepUpdate }: { paymentStepUpdate: PaymentStep } = action.payload;
+
+      if(!state.payment) throw new Error('Cannot update payment step on undefined');
+
+      const stepIndex = state.payment.steps.findIndex(s => s.id === paymentStepUpdate.id);
+      if(stepIndex === -1) throw new Error('payment step not found');
+
+      const newState = Object.assign({}, state);
+      newState.payment = Object.assign({}, state.payment);
+      newState.payment.steps = state.payment.steps.map((s,i) =>
+        i === stepIndex ? Object.assign({}, s, paymentStepUpdate) : s
+      );
+
+      return newState;
+    }
+    case actions.SET_PAYMENT_STATUS: {
+      const { status }: { status: PaymentStatus } = action.payload;
+
+      if(!state.payment) throw new Error('Cannot update payment status on undefined');
+
+      const newState = Object.assign({}, state);
+      newState.payment = Object.assign({}, state.payment);
+      newState.payment.status = status;
+
+      return newState;
     }
     default:
       return state;

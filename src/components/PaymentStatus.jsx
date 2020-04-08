@@ -20,6 +20,7 @@ import { SimpleLink } from './StyledComponents';
 
 import { getEtherscanTxURL } from '../lib/eth';
 import Bity from '../lib/bity';
+import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../lib/types';
 
 const Title = styled.p`
   ${textStyle('title3')};
@@ -92,29 +93,32 @@ function ErrorMessage() {
   )
 }
 
-function StatusRow({ status, label, txHash, bityOrderId }) {
+function StatusRow({ id, status, txHash, bityOrderId }) {
   const theme = useTheme();
 
   return (
     <ListItem>
       <Box display="flex" width={1} alignItems="center">
         <Box width={24} mr={1} display="flex" justifyContent="center">
-          {status === 'mining' && <LoadingRing/>}
-          {status === 'done' && <IconCheck size="medium" style={{ color: theme.positive }}/>}
-          {status === 'error' && <IconWarning size="medium" style={{ color: theme.negative }}  />}
-          {status === 'approval' && <IconPermissions size="medium" style={{ color: theme.infoSurfaceContent }}  />}
-          {status === 'queued' && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
+          {status === PaymentStepStatus.MINING && <LoadingRing/>}
+          {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color: theme.positive }}/>}
+          {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color: theme.negative }}  />}
+          {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color: theme.infoSurfaceContent }}  />}
+          {status === PaymentStepStatus.QUEUED && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
         </Box>
         <Box flex={1}>
           <StatusLabel>
-            {label}
+            {id === PaymentStepId.ALLOWANCE && 'Token allowance'}
+            {id === PaymentStepId.TRADE && 'Token exchange'}
+            {id === PaymentStepId.PAYMENT && 'Payment'}
+            {id === PaymentStepId.BITY && 'Fiat exchange'}
           </StatusLabel>
         </Box>
         <Box ml={1} alignSelf="flex-end">
           <StatusSecondary>
-            {status === 'mining' && <span style={{color: theme.warningSurfaceContent}}>Mining</span>}
-            {status === 'error' && <span style={{color: theme.negative}}>Error</span>}
-            {status === 'approval' && <span style={{color: theme.infoSurfaceContent}}>Approval</span>}
+            {status === PaymentStepStatus.MINING && <span style={{color: theme.warningSurfaceContent}}>Mining</span>}
+            {status === PaymentStepStatus.ERROR && <span style={{color: theme.negative}}>Error</span>}
+            {status === PaymentStepStatus.APPROVAL && <span style={{color: theme.infoSurfaceContent}}>Approval</span>}
           </StatusSecondary>
           {txHash &&
           <ExternalButton href={getEtherscanTxURL(txHash)} size="mini" icon={<IconExternal style={{color: theme.accent}}/>} label="Transaction" />
@@ -128,7 +132,7 @@ function StatusRow({ status, label, txHash, bityOrderId }) {
   )
 }
 
-export default function OrderStatus() {
+export default function PaymentStatusComponent({ payment }) {
   return (
     <Box width={1}>
       <Title>
@@ -137,21 +141,15 @@ export default function OrderStatus() {
 
       <Box mx={2} mb={2}>
         <List>
-            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
-            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
-            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
-            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
-            <StatusRow status="done" label="Token allowance" txHash="dfeif"/>
-            {/*<StatusRow status="approval" label="Token exchange" />*/}
-            {/*<StatusRow status="mining" label="Payment" />*/}
-            {/*<StatusRow status="error" label="Payment" />*/}
-            {/*<StatusRow status="queued" label="Fiat exchange" bityOrderId={orderDetails.id}/>*/}
+          {payment.steps.map(step =>
+            <StatusRow key={step.id} id={step.id} status={step.status} txHash={step.txHash} bityOrderId={step.bityOrderId} />
+          )}
         </List>
       </Box>
 
-      {/*<OngoingMessage/>*/}
-      {/*<ErrorMessage/>*/}
-      <SuccessMessage/>
+      {payment.status === PaymentStatus.ONGOING && <OngoingMessage />}
+      {payment.status === PaymentStatus.ERROR && <ErrorMessage />}
+      {payment.status === PaymentStatus.DONE && <SuccessMessage />}
     </Box>
   )
 }
