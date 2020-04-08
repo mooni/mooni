@@ -3,9 +3,10 @@ import {
   EXCHANGE_ABI,
   getExecutionDetails,
   TRADE_METHODS,
-  tradeExactTokensForEth,
-  tradeTokensForExactEth,
+  tradeExactTokensForEthWithData,
+  tradeTokensForExactEthWithData,
   SUPPORTED_CHAIN_ID,
+  getTokenReserves,
   ETH,
 } from '@uniswap/sdk';
 import {ethers} from 'ethers';
@@ -205,17 +206,20 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
 }
 
+
 export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: string, amount: string, tradeExact: TradeExact }): Promise<DexTrade> {
   const { tokenAddress } = TOKEN_DATA[symbol];
-  const exactAmount = ethers.utils.parseEther(String(amount)); // TODO token decimals
+  const tokenReserves = await getTokenReserves(tokenAddress, CHAIN_ID);
+
+  const exactAmount = new BN(amount).times(10 ** tokenReserves.token.decimals);
 
   const method = (
-    (tradeExact === TradeExact.INPUT && tradeExactTokensForEth) ||
-    (tradeExact === TradeExact.OUTPUT && tradeTokensForExactEth)
+    (tradeExact === TradeExact.INPUT && tradeExactTokensForEthWithData) ||
+    (tradeExact === TradeExact.OUTPUT && tradeTokensForExactEthWithData)
   );
   if(!method) throw new Error('invalid tradeExact');
 
-  const tradeDetails = await method(tokenAddress, exactAmount, CHAIN_ID);
+  const tradeDetails = await method(tokenReserves, exactAmount);
   const serializedResponse = stringifyObj(tradeDetails);
 
   return {
