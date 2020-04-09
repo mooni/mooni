@@ -76,14 +76,14 @@ function SuccessMessage() {
   return (
     <Box width={1}>
       <SubTitle>
-        That's a success 👌
+        That's a success <span role="img" aria-label="alright">👌</span>
       </SubTitle>
       <Hint>
         The payment is complete and the bank transfer have been sent. <br/>
         Funds will arrive in you bank account between one hour and one/two days from now, depending on your bank.
       </Hint>
       <Box display="flex" justifyContent="center">
-        <SimpleLink href={tweetURL} external>Spread the love <span role="img">❤️</span></SimpleLink>
+        <SimpleLink href={tweetURL} external>Spread the love <span role="img" aria-label="love">❤️</span></SimpleLink>
       </Box>
     </Box>
   )
@@ -94,7 +94,7 @@ function ErrorMessage({ onRestart }) {
   return (
     <Box width={1}>
       <SubTitle>
-        Oops, something went wrong <span role="img">🤭</span>
+        Oops, something went wrong <span role="img" aria-label="oops">🤭</span>
       </SubTitle>
       <Hint>
         An error occurred while trying to send a transaction. <br/>
