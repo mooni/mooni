@@ -1,7 +1,7 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import { useTheme } from '@aragon/ui';
+import { Link, useTheme } from '@aragon/ui';
 
 export const SmallWidth = styled.div`
   max-width: 25rem;
@@ -41,4 +41,11 @@ export const WideInput = styled.input`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
+`;
+
+export const SimpleLink = styled(Link)`
+  text-decoration: none;
+  &:hover: {
+    textDecoration: none;
+  }
 `;

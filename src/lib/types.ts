@@ -112,3 +112,20 @@ export interface Order {
   };
 }
 
+export enum PaymentStepStatus { QUEUED, APPROVAL, MINING, DONE, ERROR }
+export enum PaymentStatus { ONGOING, DONE, ERROR }
+export enum PaymentStepId { ALLOWANCE, TRADE, PAYMENT, BITY }
+export interface PaymentStep {
+  id: PaymentStepId;
+  status: PaymentStepStatus;
+  txHash?: string;
+  bityOrderId?: string;
+  error?: any; // TODO
+}
+
+export interface Payment {
+  status: PaymentStatus;
+  steps: PaymentStep[];
+}
+
+
