@@ -163,7 +163,7 @@ const initialMockStateComplete: State = {
   },
   orderErrors: undefined,
   payment: {
-    status: PaymentStatus.DONE,
+    status: PaymentStatus.ONGOING,
     steps: [
       {
         id: PaymentStepId.ALLOWANCE,
@@ -190,8 +190,8 @@ const initialMockStateComplete: State = {
   },
 };
 
-// const initialState = initialEmptyState;
-const initialState = initialMockStateMinimum;
+const initialState = initialEmptyState;
+// const initialState = initialMockStateComplete;
 
 export default function(state : State = initialState, action: { type: string, payload?: any }): State {
   switch (action.type) {

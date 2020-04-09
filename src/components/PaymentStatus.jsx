@@ -14,6 +14,8 @@ import {
   GU,
   IconPermissions,
   useViewport,
+  Info,
+  Help,
 } from '@aragon/ui'
 import styled from 'styled-components';
 
@@ -65,9 +67,9 @@ const StatusListItem = styled(ListItem)`
 
 function OngoingMessage() {
   return (
-    <Hint>
-      You will be prompted to accept transactions in your ethereum wallet. Please do not close this tab until the order is complete.
-    </Hint>
+    <Info mode="warning">
+      Please do not close this tab until the process is complete.
+    </Info>
   )
 }
 
@@ -165,7 +167,15 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
           <StatusSecondary>
             {!bityOrderId && status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
             {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
-            {status === PaymentStepStatus.APPROVAL && <span style={{ color }}>Approval</span>}
+            {status === PaymentStepStatus.APPROVAL &&
+            <Box display="flex" style={{color}}>
+              <span style={{marginRight: GU}}>Approval</span>
+              <Help hint="What does that mean ?">
+                We are waiting for you to accept a transaction in your Ethereum wallet.
+              </Help>
+            </Box>
+            }
+
           </StatusSecondary>
         </Box>
         {txHash &&
