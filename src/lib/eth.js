@@ -38,7 +38,7 @@ function defaultProviderEnable(engine) {
   });
 }
 
-class ETHManager extends EventEmitter {
+export default class ETHManager extends EventEmitter {
   constructor(ethereum) {
     super();
     this.ethereum = ethereum;
@@ -48,7 +48,7 @@ class ETHManager extends EventEmitter {
     this.accounts = await this.ethereum.enable();
 
     if (this.ethereum.on) {
-      this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
+      this.ethereum.on('accountsChanged', reloadPage);
       this.ethereum.on('networkChanged', reloadPage);
       this.ethereum.on('chainChanged', reloadPage);
       this.ethereum.on('stop', () => this.emit('stop'));
@@ -60,12 +60,12 @@ class ETHManager extends EventEmitter {
 
     await this.checkIsContract();
     if(this.isContract) {
-      await this.close();
+      this.close();
       throw new Error('eth_smart_account_not_supported');
     }
 
     if(await this.getNetworkId() !== CHAIN_ID) {
-      await this.close();
+      this.close();
       throw new Error('eth_wrong_network_id');
     }
   }
@@ -172,4 +172,11 @@ export function getEtherscanTxURL(hash) {
   return `https://etherscan.io/tx/${hash}`;
 }
 
-export default ETHManager;
+export function detectWalletError(error) {
+  if(
+    error.code === 4001 ||  // Metamask
+    error.message.includes('User canceled') // Trust wallet
+  )
+    return new Error('user-rejected-transaction');
+  return null;
+}

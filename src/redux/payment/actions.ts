@@ -6,6 +6,7 @@ import {sendEvent} from '../../lib/analytics';
 import Bity from '../../lib/bity';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
+import { detectWalletError } from '../../lib/eth';
 
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 
@@ -176,12 +177,15 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
       status: PaymentStepStatus.DONE,
     }));
   } catch(error) {
+
+    let capturedError = detectWalletError(error) || error;
     dispatch(updatePaymentStep({
       id: stepId,
       status: PaymentStepStatus.ERROR,
-      error, // TODO
+      error: capturedError,
     }));
-    throw error;
+    throw capturedError;
+
   }
 }
 
@@ -216,7 +220,7 @@ function watchBityOrder(dispatch, orderId) {
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
-            error: new Error('Bity order cancelled'),
+            error: new Error('bity-order-cancelled'),
           }));
           dispatch(setPaymentStatus(PaymentStatus.ERROR));
           sendEvent('payment', 'send', 'error');

@@ -51,6 +51,9 @@ const StatusSecondary = styled.p`
   font-style: italic;
   font-size: 10px;
 `;
+const ErrorMessage = styled.p`
+  ${textStyle('body3')};
+`;
 
 const StatusListItem = styled(ListItem)`
   border: 1px solid #f9fafc;
@@ -62,7 +65,7 @@ const StatusListItem = styled(ListItem)`
   box-shadow: 1px 1px 7px rgba(145, 190, 195, 0.16);
 `;
 
-function OngoingMessage() {
+function PaymentOngoingInfo() {
   return (
     <Info mode="warning">
       Please do not close this tab until the process is complete.
@@ -70,7 +73,7 @@ function OngoingMessage() {
   )
 }
 
-function SuccessMessage() {
+function PaymentSuccessInfo() {
   const tweetURL = "https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=https://app.mooni.tech&hashtags=defi,offramp,crypto";
 
   return (
@@ -89,16 +92,50 @@ function SuccessMessage() {
   )
 }
 
-function ErrorMessage({ onRestart }) {
-  // TODO adapt error on payment, tell to keep bity order id
+function getPaymentStepMessage(error) {
+
+  let message = 'Unknown error.';
+
+  if(error.message === 'user-rejected-transaction')
+    message = 'You refused the transaction in your wallet.'; else
+  if(error.message === 'token-balance-too-low')
+    message = 'Your token balance is too low.'; else
+  if(error.message === 'bity-order-cancelled')
+    message = 'The order have been cancelled by bity. Please go to their order page and contact their support.';
+
+  return message;
+
+}
+
+function PaymentErrorInfo({ onRestart, payment }) {
+  const stepsWithError = payment.steps.filter(step => !!step.error);
+
   return (
     <Box width={1}>
       <SubTitle>
         Oops, something went wrong <span role="img" aria-label="oops">🤭</span>
       </SubTitle>
+      {stepsWithError.length > 0 &&
+      <>
+        <Info mode="error" style={{paddingTop: 0, paddingBottom: 0}}>
+          {stepsWithError.map(step => (
+            <Box key={step.id} py={1}>
+              <StatusLabel>
+                {step.id === PaymentStepId.ALLOWANCE && 'Token allowance'}
+                {step.id === PaymentStepId.TRADE && 'Token exchange'}
+                {step.id === PaymentStepId.PAYMENT && 'Payment'}
+                {step.id === PaymentStepId.BITY && 'Fiat exchange'}
+              </StatusLabel>
+              <ErrorMessage>
+                {getPaymentStepMessage(step.error)}
+              </ErrorMessage>
+            </Box>
+          ))}
+        </Info>
+        <Box mt={2} />
+      </>
+      }
       <Hint>
-        An error occurred while trying to send a transaction. <br/>
-        You may have denied a transaction in your wallet. <br/>
         If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
       </Hint>
       <Button mode="normal" onClick={onRestart} wide icon={<IconArrowLeft/>} label="Retry" />
@@ -202,9 +239,9 @@ export default function PaymentStatusComponent({ payment, onRestart }) {
         </List>
       </Box>
 
-      {payment.status === PaymentStatus.ONGOING && <OngoingMessage />}
-      {payment.status === PaymentStatus.ERROR && <ErrorMessage onRestart={onRestart} />}
-      {payment.status === PaymentStatus.DONE && <SuccessMessage />}
+      {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo />}
+      {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo onRestart={onRestart} payment={payment} />}
+      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo />}
     </Box>
   )
 }

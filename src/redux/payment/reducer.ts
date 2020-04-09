@@ -163,27 +163,26 @@ const initialMockStateComplete: State = {
   },
   orderErrors: undefined,
   payment: {
-    status: PaymentStatus.ONGOING,
+    status: PaymentStatus.ERROR,
     steps: [
       {
         id: PaymentStepId.ALLOWANCE,
         status: PaymentStepStatus.DONE,
-        txHash: 'fref'
+        txHash: 'fref',
+        error: new Error('token-balance-too-low'),
       },
       {
         id: PaymentStepId.TRADE,
         status: PaymentStepStatus.APPROVAL,
-      },
-      {
-        id: PaymentStepId.TRADE,
-        status: PaymentStepStatus.QUEUED,
+        // error: new Error('token-balance-too-low'),
       },
       {
         id: PaymentStepId.PAYMENT,
         status: PaymentStepStatus.ERROR,
+        // error: new Error('bity-order-cancelled'),
       },
       {
-        id: PaymentStepId.PAYMENT,
+        id: PaymentStepId.BITY,
         status: PaymentStepStatus.MINING,
       },
     ],
