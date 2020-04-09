@@ -13,6 +13,16 @@ if(process.env.NODE_ENV === 'production') {
     }
   );
   ReactGA.initialize('UA-68373171-8');
+  LogRocket.getSessionURL(function (sessionURL) {
+    ReactGA.event({
+      category: 'LogRocket',
+      action: sessionURL,
+    });
+  });
+}
+
+export function track(eventName) {
+  LogRocket.track(eventName);
 }
 
 export function sendEvent(category, action, label, value) {
@@ -22,6 +32,11 @@ export function sendEvent(category, action, label, value) {
     label,
     value,
   });
+}
+
+export function captureError(message, error) {
+  LogRocket.captureMessage(message);
+  LogRocket.captureException(error);
 }
 
 export function usePageViews() {

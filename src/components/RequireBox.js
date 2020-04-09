@@ -14,7 +14,7 @@ function BoxLoading() {
   }
   return (
     <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
-      <img src="images/3box-3.svg" width={40} />
+      <img src="images/3box-3.svg" alt="3box-logo" width={40} />
       <Box
         fontSize={14}
         width={1}

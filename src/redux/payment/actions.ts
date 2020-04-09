@@ -4,6 +4,8 @@ import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '
 import {ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
 import Bity from '../../lib/bity';
+import { track } from '../../lib/analytics';
+import { log, logError } from '../../lib/log';
 
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 
@@ -142,9 +144,10 @@ export const createOrder = () => async function (dispatch, getState)  {
     sendEvent('order', 'create', 'error');
 
     if(error._orderError) {
+      logError('Bity order creation error', error);
       dispatch(setOrderErrors(error.errors));
     } else {
-      console.error(error);
+      logError('Bity order creation unknown error', error);
       dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
     }
   }
@@ -204,6 +207,8 @@ function watchBityOrder(dispatch, orderId) {
           }));
           dispatch(setPaymentStatus(PaymentStatus.DONE));
           sendEvent('payment', 'send', 'done');
+          log('PAYMENT: bity ok');
+          track('PAYMENT: bity ok');
 
         } else if(orderDetails.orderStatus === 'cancelled') {
 
@@ -215,10 +220,12 @@ function watchBityOrder(dispatch, orderId) {
           }));
           dispatch(setPaymentStatus(PaymentStatus.ERROR));
           sendEvent('payment', 'send', 'error');
+          log('PAYMENT: bity cancelled');
+          track('PAYMENT: bity cancelled');
 
         }
       })
-      .catch(console.error);
+      .catch(error => logError('Error while fetching order state', error));
   }
   fetchNewData();
   intervalId = setInterval(fetchNewData, POLL_INTERVAL);
@@ -234,6 +241,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   const bityInputAmount = order.bityOrder.input.amount;
   const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
+  log('PAYMENT: bity order id', order.bityOrder.id);
 
   try {
     if(order.path === ExchangePath.DEX_BITY) {
@@ -247,6 +255,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
         stepId: PaymentStepId.ALLOWANCE,
         paymentFunction: async () => checkTradeAllowance(tradeDetails, ethManager.signer).then(tx => tx?.hash)
       });
+      log('PAYMENT: allowance ok');
+      track('PAYMENT: allowance ok');
 
       // Trade
       await sendPaymentStep({
@@ -258,6 +268,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
           ethManager.signer,
         ).then(tx => tx.hash)
       });
+      log('PAYMENT: trade ok');
+      track('PAYMENT: trade ok');
 
     }
 
@@ -267,12 +279,14 @@ export const sendPayment = () => async function (dispatch, getState)  {
       stepId: PaymentStepId.PAYMENT,
       paymentFunction: async () => ethManager.send(bityDepositAddress, bityInputAmount).then(tx => tx.hash)
     });
+    log('PAYMENT: payment ok');
+    track('PAYMENT: payment ok');
 
     watchBityOrder(dispatch, order.bityOrder.id);
 
   } catch(error) {
 
-    console.error(error);
+    logError('Error while sending payment', error);
     sendEvent('payment', 'send', 'error');
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
 
