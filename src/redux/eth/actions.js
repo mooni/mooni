@@ -2,6 +2,7 @@ import ETHManager from '../../lib/eth';
 
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
+import { logError } from '../../lib/log';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -61,7 +62,7 @@ export const initETH = (walletType) => async function (dispatch)  {
       dispatch(resetETHManager());
     });
 
-    dispatch(initBoxIfLoggedIn()).catch(console.error);
+    dispatch(initBoxIfLoggedIn()).catch(error => logError('unable to enable box after login', error));
 
     return null;
   } catch(error) {
@@ -76,7 +77,7 @@ export const initETH = (walletType) => async function (dispatch)  {
     } else if(error.message === 'User closed WalletConnect modal') {
       return null;
     } else {
-      console.error('Unable to connect to ethereum', error);
+      logError('Unable to open ethereum wallet', error);
       return 'unknown_error';
     }
   }

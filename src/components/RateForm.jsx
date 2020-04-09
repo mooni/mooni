@@ -12,6 +12,7 @@ import { getRate } from '../lib/exchange';
 import { isNotNull } from '../lib/numbers';
 
 import { TradeExact } from '../lib/types';
+import { logError } from '../lib/log';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
@@ -109,7 +110,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
 
       setRateLoading(false);
 
-    })().catch(console.error);
+    })().catch(error => logError('unable to fetch rates', error));
 
     return () => isMounted = false;
   }, [debouncedRateRequest]);

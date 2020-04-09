@@ -32,8 +32,6 @@ export const updateMyAccount = (myAccount) => async function (dispatch, getState
   const boxManager = getBoxManager(getState());
 
   await boxManager.setPrivate('myAccount', myAccount);
-  console.log('saved account informations');
-
   dispatch(setMyAccount(myAccount));
 };
 
