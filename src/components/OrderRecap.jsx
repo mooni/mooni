@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import { Link, textStyle, Field, GU, Info, Countdown } from '@aragon/ui';
+import { Link, textStyle, Field, GU, Info, Timer } from '@aragon/ui';
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
@@ -159,8 +159,8 @@ export default function OrderRecap({ order }) {
       </Box>
 
       <Box pt={1}>
-        <Info title="Price guaranteed until" mode="warning">
-          <Countdown end={orderExpireDate} />
+        <Info title="Price guaranteed for" mode="warning">
+          <Timer end={orderExpireDate} />
         </Info>
       </Box>
     </Box>
