@@ -144,10 +144,10 @@ export const createOrder = () => async function (dispatch, getState)  {
     sendEvent('order', 'create', 'error');
 
     if(error._orderError) {
-      logError('Bity order error', error);
+      logError('Bity order creation error', error);
       dispatch(setOrderErrors(error.errors));
     } else {
-      logError('Unable to create order', error);
+      logError('Bity order creation unknown error', error);
       dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
     }
   }

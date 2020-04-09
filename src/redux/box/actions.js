@@ -3,7 +3,7 @@ import { getETHManager } from '../eth/selectors';
 import { getBoxLoading } from './selectors';
 import { fetchMyAccount, resetContacts } from '../contacts/actions';
 import { track } from '../../lib/analytics';
-import { logError } from '../../lib/log';
+import { log, logError } from '../../lib/log';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 export const SET_BOX_LOADING = 'SET_BOX_LOADING';
