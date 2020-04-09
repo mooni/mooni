@@ -51,11 +51,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Title = styled.p`
-  ${textStyle('title3')};
-  text-align: center;
-`;
-
 const Value = styled.p`
   ${textStyle('body3')};
 `;

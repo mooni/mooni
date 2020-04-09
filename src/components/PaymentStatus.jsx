@@ -48,11 +48,8 @@ const StatusLabel = styled.p`
 `;
 const StatusSecondary = styled.p`
   ${textStyle('label2')};
-  display: flex;
-  align-items: center;
   font-style: italic;
   font-size: 10px;
-  margin-left: ${GU}px;
 `;
 
 const StatusListItem = styled(ListItem)`
@@ -86,7 +83,7 @@ function SuccessMessage() {
         Funds will arrive in you bank account between one hour and one/two days from now, depending on your bank.
       </Hint>
       <Box display="flex" justifyContent="center">
-        <SimpleLink href={tweetURL} external>Spread the love ❤️</SimpleLink>
+        <SimpleLink href={tweetURL} external>Spread the love <span role="img">❤️</span></SimpleLink>
       </Box>
     </Box>
   )
@@ -97,7 +94,7 @@ function ErrorMessage({ onRestart }) {
   return (
     <Box width={1}>
       <SubTitle>
-        Oops, something went wrong 🤭
+        Oops, something went wrong <span role="img">🤭</span>
       </SubTitle>
       <Hint>
         An error occurred while trying to send a transaction. <br/>
@@ -164,19 +161,20 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
             {id === PaymentStepId.PAYMENT && 'Payment'}
             {id === PaymentStepId.BITY && 'Fiat exchange'}
           </StatusLabel>
-          <StatusSecondary>
-            {!bityOrderId && status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
-            {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
+          <Box display="flex" alignItems="center" ml={1}>
+            <StatusSecondary>
+              {!bityOrderId && status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
+              {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
+              {status === PaymentStepStatus.APPROVAL && <span style={{ color }}>Approval</span>}
+            </StatusSecondary>
             {status === PaymentStepStatus.APPROVAL &&
-            <Box display="flex" style={{color}}>
-              <span style={{marginRight: GU}}>Approval</span>
+            <Box ml={1}>
               <Help hint="What does that mean ?">
                 We are waiting for you to accept a transaction in your Ethereum wallet.
               </Help>
             </Box>
             }
-
-          </StatusSecondary>
+          </Box>
         </Box>
         {txHash &&
         <ExternalButton url={getEtherscanTxURL(txHash)} label="Transaction" />
