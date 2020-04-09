@@ -1,5 +1,7 @@
 import { getBoxManager } from '../box/selectors';
 import { setRecipient } from '../payment/actions';
+import { log } from '../../lib/log';
+import { track } from '../../lib/analytics';
 
 export const SET_MY_ACCOUNT = 'SET_MY_ACCOUNT';
 export const SET_MY_ACCOUNT_LOADING = 'SET_MY_ACCOUNT_LOADING';
@@ -33,6 +35,8 @@ export const updateMyAccount = (myAccount) => async function (dispatch, getState
 
   await boxManager.setPrivate('myAccount', myAccount);
   dispatch(setMyAccount(myAccount));
+  log('Box account updated');
+  track('BOX: account-updated');
 };
 
 
