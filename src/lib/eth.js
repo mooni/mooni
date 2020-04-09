@@ -8,8 +8,15 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 import TransporWebUSB from "@ledgerhq/hw-transport-webusb";
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
 
+import {
+  SUPPORTED_CHAIN_ID,
+} from '@uniswap/sdk';
+
 const infuraId = process.env.REACT_APP_INFURA_ID || 'd118ed6a19594e16893c0c29d09a2536';
 const portisAppId = process.env.REACT_APP_PORTIS_APP_ID || 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2';
+
+export const CHAIN_ID = SUPPORTED_CHAIN_ID.Mainnet;
+// export const CHAIN_ID = SUPPORTED_CHAIN_ID.Rinkeby;
 
 function reloadPage() {
   window.location.reload()
@@ -51,22 +58,21 @@ class ETHManager extends EventEmitter {
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
     this.signer = this.provider.getSigner();
 
-    await this.checkNotContract();
-
-    // TODO add error message in UI
-    // if(await this.getNetworkId() !== MAINNET_NETWORK_ID) {
-    //   throw new Error('not_on_mainnet');
-    // }
-  }
-
-  async checkNotContract() {
-    const code = await this.provider.getCode(this.getAddress());
-    if(code !== '0x') {
-      if(this.ethereum.close) {
-        await this.ethereum.close();
-      }
+    await this.checkIsContract();
+    if(this.isContract) {
+      await this.close();
       throw new Error('eth_smart_account_not_supported');
     }
+
+    if(await this.getNetworkId() !== CHAIN_ID) {
+      await this.close();
+      throw new Error('eth_wrong_network_id');
+    }
+  }
+
+  async checkIsContract() {
+    const code = await this.provider.getCode(this.getAddress());
+    this.isContract = code !== '0x';
   }
 
   updateAccounts(accounts) {

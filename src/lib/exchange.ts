@@ -5,7 +5,6 @@ import {
   TRADE_METHODS,
   tradeExactTokensForEthWithData,
   tradeTokensForExactEthWithData,
-  SUPPORTED_CHAIN_ID,
   getTokenReserves,
   ETH,
 } from '@uniswap/sdk';
@@ -13,14 +12,13 @@ import {ethers} from 'ethers';
 
 import ERC20_ABI from './abis/ERC20.json';
 import {TOKEN_DATA} from './currencies';
+import {CHAIN_ID} from './eth';
 import Bity from './bity';
 
 import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
 
 const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
-const CHAIN_ID = SUPPORTED_CHAIN_ID.Mainnet;
-// const CHAIN_ID = SUPPORTED_CHAIN_ID.Rinkeby;
 
 // TODO slippage
 
