@@ -63,6 +63,13 @@ export interface OrderRequest {
   reference?: string;
 }
 
+export enum BityOrderStatus {
+  WAITING = 'WAITING',
+  CANCELLED = 'CANCELLED',
+  EXECUTED = 'EXECUTED',
+  RECEIVED = 'RECEIVED',
+}
+
 export type BityOrderResponse = {
   input: {
     amount: string,
@@ -94,7 +101,8 @@ export type BityOrderResponse = {
   fees: {
     amount: string,
     currency: string
-  }
+  },
+  orderStatus?: BityOrderStatus;
 };
 
 export interface Order {
@@ -112,9 +120,27 @@ export interface Order {
   };
 }
 
-export enum PaymentStepStatus { QUEUED, APPROVAL, MINING, DONE, ERROR }
-export enum PaymentStatus { ONGOING, DONE, ERROR }
-export enum PaymentStepId { ALLOWANCE, TRADE, PAYMENT, BITY }
+export enum PaymentStatus {
+  ONGOING = 'ONGOING',
+  DONE = 'DONE',
+  ERROR = 'ERROR',
+}
+export enum PaymentStepId {
+  ALLOWANCE = 'ALLOWANCE',
+  TRADE = 'TRADE',
+  PAYMENT = 'PAYMENT',
+  BITY = 'BITY',
+}
+export enum PaymentStepStatus {
+  QUEUED = 'QUEUED',
+  APPROVAL = 'APPROVAL',
+  MINING = 'MINING',
+  WAITING = 'WAITING',
+  RECEIVED = 'RECEIVED',
+  DONE = 'DONE',
+  ERROR = 'ERROR',
+}
+
 export interface PaymentStep {
   id: PaymentStepId;
   status: PaymentStepStatus;

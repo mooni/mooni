@@ -1,5 +1,13 @@
 import axios from 'axios';
-import { TradeExact, RateRequest, OrderError, RateResult, OrderRequest, BityOrderResponse } from './types';
+import {
+  BityOrderResponse,
+  BityOrderStatus,
+  OrderError,
+  OrderRequest,
+  RateRequest,
+  RateResult,
+  TradeExact,
+} from './types';
 import BN from "bignumber.js";
 import {SIGNIFICANT_DIGITS} from "./currencies";
 
@@ -141,20 +149,20 @@ const Bity = {
     }
   },
 
-  async getOrderDetails(orderId: string) {
+  async getOrderDetails(orderId: string): Promise<BityOrderResponse> {
     const { data } = await instance({
       method: 'get',
       url: `/v2/orders/${orderId}`,
       withCredentials: true,
     });
 
-    let orderStatus = 'waiting';
+    let orderStatus: BityOrderStatus= BityOrderStatus.WAITING;
     if(data.timestamp_cancelled) {
-      orderStatus = 'cancelled';
+      orderStatus = BityOrderStatus.CANCELLED;
     } else if(data.timestamp_executed) {
-      orderStatus = 'executed';
+      orderStatus = BityOrderStatus.EXECUTED;
     } else if(data.timestamp_payment_received) {
-      orderStatus = 'received';
+      orderStatus = BityOrderStatus.RECEIVED;
     }
 
     data.orderStatus = orderStatus;

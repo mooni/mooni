@@ -65,11 +65,22 @@ const StatusListItem = styled(ListItem)`
   box-shadow: 1px 1px 7px rgba(145, 190, 195, 0.16);
 `;
 
-function PaymentOngoingInfo() {
+function PaymentOngoingInfo({ payment }) {
+  const ongoing = payment.status === PaymentStatus.ONGOING;
+  const bityStep = payment.steps.find(s => s.id === PaymentStepId.BITY);
+
   return (
-    <Info mode="warning">
-      Please do not close this tab until the process is complete.
-    </Info>
+    <Box>
+      {ongoing && bityStep.status === PaymentStepStatus.RECEIVED ?
+        <Hint>
+          Your payment have been received and the bank transfer is being sent. This process can take up to 10 minutes.
+        </Hint>
+        :
+        <Info mode="warning">
+          Please do not close this tab until the process is complete.
+        </Info>
+      }
+    </Box>
   )
 }
 
@@ -170,6 +181,8 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   if(status === PaymentStepStatus.APPROVAL) color = theme.infoSurfaceContent;
   if(status === PaymentStepStatus.QUEUED) color = theme.disabledContent;
   if(status === PaymentStepStatus.MINING) color = theme.warningSurfaceContent;
+  if(status === PaymentStepStatus.WAITING) color = theme.warningSurfaceContent;
+  if(status === PaymentStepStatus.RECEIVED) color = theme.warningSurfaceContent;
 
   let borderLeftColor;
   if(status === PaymentStepStatus.DONE) borderLeftColor = '#9de2c9';
@@ -177,6 +190,8 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   if(status === PaymentStepStatus.APPROVAL) borderLeftColor = theme.infoSurfaceContent;
   if(status === PaymentStepStatus.QUEUED) borderLeftColor = '#c8d7e4';
   if(status === PaymentStepStatus.MINING) borderLeftColor = '#ead4ae';
+  if(status === PaymentStepStatus.WAITING) borderLeftColor = '#ead4ae';
+  if(status === PaymentStepStatus.RECEIVED) borderLeftColor = '#ead4ae';
 
   let backgroundColor = theme.surface;
   if(status === PaymentStepStatus.DONE) backgroundColor = '#f1fbf8';
@@ -186,6 +201,8 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
       <Box display="flex" width={1} alignItems="center">
         <Box width={24} mr={1} display="flex" justifyContent="center">
           {status === PaymentStepStatus.MINING && <LoadingRing/>}
+          {status === PaymentStepStatus.WAITING && <LoadingRing/>}
+          {status === PaymentStepStatus.RECEIVED && <LoadingRing/>}
           {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color }}/>}
           {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color }}  />}
           {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color }}  />}
@@ -200,7 +217,9 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
           </StatusLabel>
           <Box display="flex" alignItems="center" ml={1}>
             <StatusSecondary>
-              {!bityOrderId && status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
+              {status === PaymentStepStatus.MINING && <span style={{ color }}>Mining</span>}
+              {status === PaymentStepStatus.WAITING && <span style={{ color }}>Confirming</span>}
+              {status === PaymentStepStatus.RECEIVED && <span style={{ color }}>Sending</span>}
               {status === PaymentStepStatus.ERROR && <span style={{ color }}>Error</span>}
               {status === PaymentStepStatus.APPROVAL && <span style={{ color }}>Approval</span>}
             </StatusSecondary>
@@ -239,7 +258,7 @@ export default function PaymentStatusComponent({ payment, onRestart }) {
         </List>
       </Box>
 
-      {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo />}
+      {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo payment={payment}/>}
       {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo onRestart={onRestart} payment={payment} />}
       {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo />}
     </Box>

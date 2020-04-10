@@ -1,7 +1,7 @@
 import {getOrder, getOrderRequest} from './selectors';
 import {getAddress, getETHManager} from '../eth/selectors';
 import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '../../lib/exchange';
-import {ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
+import {BityOrderStatus, ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
 import Bity from '../../lib/bity';
 import { track } from '../../lib/analytics';
@@ -195,14 +195,23 @@ function watchBityOrder(dispatch, orderId) {
 
   dispatch(updatePaymentStep({
     id: PaymentStepId.BITY,
-    status: PaymentStepStatus.MINING,
+    status: PaymentStepStatus.WAITING,
   }));
 
   function fetchNewData() {
     Bity.getOrderDetails(orderId)
       .then(orderDetails => {
 
-        if(orderDetails.orderStatus === 'executed') {
+        if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
+
+          dispatch(updatePaymentStep({
+            id: PaymentStepId.BITY,
+            status: PaymentStepStatus.RECEIVED,
+          }));
+          log('PAYMENT: bity received');
+          track('PAYMENT: bity received');
+
+        } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
           clearInterval(intervalId);
           dispatch(updatePaymentStep({
@@ -214,7 +223,7 @@ function watchBityOrder(dispatch, orderId) {
           log('PAYMENT: bity ok');
           track('PAYMENT: bity ok');
 
-        } else if(orderDetails.orderStatus === 'cancelled') {
+        } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
           clearInterval(intervalId);
           dispatch(updatePaymentStep({
