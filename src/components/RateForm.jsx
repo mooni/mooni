@@ -4,13 +4,14 @@ import BN from 'bignumber.js';
 import { Typography, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { LoadingRing } from '@aragon/ui'
+import { LoadingRing, textStyle } from '@aragon/ui'
+import styled from 'styled-components';
+
 import AmountRow from './AmountRow';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
-import { isNotNull } from '../lib/numbers';
-
+import { isNotZero } from '../lib/numbers';
 import { TradeExact } from '../lib/types';
 import { logError } from '../lib/log';
 
@@ -20,11 +21,16 @@ import {
   SIGNIFICANT_DIGITS,
 } from '../lib/currencies';
 
+const InvalidMessage = styled.p`
+  ${textStyle('body4')};
+  color: #c94141;
+`;
+
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
   },
-  interRow: {
+  additionalInfo: {
     height: 46,
     display: 'flex',
     alignItems: 'center',
@@ -45,7 +51,8 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     outputAmount: 100,
     tradeExact: TradeExact.OUTPUT,
   });
-  const [rateLoading, setRateLoading] = useState(true);
+  const [rateLoading, setRateLoading] = useState(false);
+  const [valid, setValid] = useState(true);
   const [rateRequest, setRateRequest] = useState(null);
   const [fees, setFees] = useState(null);
   const debouncedRateRequest = useDebounce(rateRequest, 1000);
@@ -76,16 +83,21 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
         tradeExact: rateDetails.tradeExact,
       });
     }
+    setRateLoading(true);
   }, [defaultRateRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     onChange(rateRequest);
-    onValid(rateRequest && isNotNull(rateRequest.amount))
+    setValid(rateRequest && isNotZero(rateRequest.amount));
   }, [onChange, rateRequest]);
 
   useEffect(() => {
+    onValid(valid);
+  }, [valid, onValid]);
+
+  useEffect(() => {
     let isMounted = true;
-    if (!debouncedRateRequest || !isNotNull(debouncedRateRequest.amount)) return;
+    if (!debouncedRateRequest || !isNotZero(debouncedRateRequest.amount)) return;
 
     (async () => {
 
@@ -145,6 +157,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
   const onChangeValue = tradeExact => e => {
     setRateLoading(true);
     const amount = e.target.value;
+    console.log(amount, Number(amount));
     if(Number(amount) < 0) return;
     const newRateDetails = {
       ...rateDetails,
@@ -161,7 +174,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
   }
 
   let rate;
-  if(!rateLoading) {
+  if(rateDetails) {
     rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
   }
 
@@ -186,15 +199,17 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
         caption="Receive"
       />
 
-      <Box className={classes.interRow}>
-        {rate ?
-          <Typography variant="caption">
-            <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
-            <br/>
-            <b>Fees:</b> {fees.amount} {fees.currency}
-          </Typography>
+      <Box className={classes.additionalInfo}>
+        {valid ?
+          rateLoading ?
+            <LoadingRing/>
+            :
+            <Typography variant="caption">
+              <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
+              {fees && <span><br/><b>Fees:</b> {fees.amount} {fees.currency}</span>}
+            </Typography>
           :
-          <LoadingRing/>
+          <InvalidMessage>Invalid amount</InvalidMessage>
         }
       </Box>
     </Box>

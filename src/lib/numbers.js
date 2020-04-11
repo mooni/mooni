@@ -7,7 +7,7 @@ export function isValue(v) {
     !isNaN(v)
   )
 }
-export function isNotNull(v) {
+export function isNotZero(v) {
   return (
     isValue(v) &&
     v !== 0 &&

@@ -77,9 +77,9 @@ function CurrencyItem({ symbol }) {
 export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, active, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
-  const displayedValue = isValue(value) ?
+  const displayedValue = value !== null ?
     (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toString())
-  : '';
+  : 0;
 
   return (
     <Box className={classes.root}>
@@ -90,13 +90,15 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
       </Box>
       <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow].join(' ')}>
         <Box flex={1}>
-          <input
-            type={value ? 'number' : 'text'}
+          {value !== null && <input
+            type="number"
+            className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}
             value={displayedValue}
             onChange={onChangeValue}
             readOnly={valueDisabled}
-            className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}
+            min={0}
           />
+          }
         </Box>
         <Box className={classes.currencySelector}>
           <DropDown

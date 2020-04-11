@@ -1,6 +1,12 @@
-export enum TradeExact { INPUT, OUTPUT }
+export enum TradeExact {
+  INPUT = 'INPUT',
+  OUTPUT = 'OUTPUT',
+}
 
-export enum ExchangePath { BITY, DEX_BITY }
+export enum ExchangePath {
+  BITY = 'BITY',
+  DEX_BITY = 'DEX_BITY',
+}
 
 export interface RateRequest {
   inputCurrency: string;
