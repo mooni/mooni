@@ -5,6 +5,7 @@ import Box from '@material-ui/core/Box';
 
 import {cancelInitBox, initBox} from '../redux/box/actions';
 import {getBoxLoading} from '../redux/box/selectors';
+import { logError } from '../lib/log';
 
 function BoxLoading() {
   const dispatch = useDispatch();
@@ -42,8 +43,8 @@ export function BoxModal({ visible, onClose }) {
   const dispatch = useDispatch();
 
   function enableBox(){
-    dispatch(initBox());
     onClose();
+    dispatch(initBox()).catch(logError);
   }
 
   return (

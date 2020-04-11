@@ -1,51 +1,33 @@
 import React from 'react';
 
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { Main } from '@aragon/ui';
+
+import './App.css';
+
 import AppContainer from './components/AppContainer';
-
-import {
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
-
-import { usePageViews } from './lib/analytics';
-
-import './App.css'
 import Login from './components/Login';
-import HomePage from './pages/HomePage';
-import ExchangePage from './pages/ExchangePage';
-import StatusPage from './pages/StatusPage';
-import AboutPage from './pages/AboutPage';
-import TermsPage from './pages/TermsPage';
+import Routes from './Routes';
 
-function App() {
-  usePageViews();
+import store from './redux/store';
 
+export default function App() {
   return (
-    <AppContainer>
-      <Login />
-      <Switch>
-        <Route exact path="/">
-          <HomePage />
-        </Route>
-        <Route path="/exchange">
-          <ExchangePage />
-        </Route>
-        <Route path="/status">
-          <StatusPage />
-        </Route>
-        <Route path="/about">
-          <AboutPage />
-        </Route>
-        <Route path="/terms">
-          <TermsPage />
-        </Route>
-        <Route path="*">
-          <Redirect to="/" />
-        </Route>
-      </Switch>
-    </AppContainer>
+    <Provider store={store}>
+      <Router>
+        <Main
+          assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
+          theme="light"
+          layout={false}
+          scrollView={false}
+        >
+          <AppContainer>
+            <Login />
+            <Routes/>
+          </AppContainer>
+        </Main>
+      </Router>
+    </Provider>
   );
 }
-
-export default App;
