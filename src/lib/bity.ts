@@ -92,11 +92,14 @@ const Bity = {
         type: 'bank_account',
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
-        bic_swift: recipient.bic_swift,
         currency: rateRequest.outputCurrency,
         reference: reference,
       },
     };
+
+    if(recipient.bic_swift) {
+      body.output.bic_swift = recipient.bic_swift;
+    }
 
     if(rateRequest.tradeExact === TradeExact.INPUT)
       body.input.amount = String(rateRequest.amount); else

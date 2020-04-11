@@ -23,7 +23,7 @@ import {
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
-  color: #c94141;
+  color: #e61b1b;
 `;
 
 const useStyles = makeStyles(theme => ({
