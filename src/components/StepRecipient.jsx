@@ -55,7 +55,7 @@ function StepRecipient({ onComplete }) {
           onSubmit={onSubmit}
           endComponent={({ submit, hasErrors }) => (
             <>
-              <label className={classes.saveInfoRow}>
+              {/*<label className={classes.saveInfoRow}>
                 <Checkbox
                   checked={saveAccountInfo}
                   onChange={onClickSaveData}
@@ -65,7 +65,7 @@ function StepRecipient({ onComplete }) {
                   Your bank account information can be stored so you don't have to type them again if you come back here.
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
-              </label>
+              </label>*/}
               <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
             </>
           )}
