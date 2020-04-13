@@ -48,7 +48,10 @@
     </p>
     <script>
       setTimeout(() => {
-        document.getElementById('incompatible-browser').style.display = 'block';
+        const incompatibleBrowserElement = document.getElementById('incompatible-browser');
+        if(incompatibleBrowserElement) {
+          incompatibleBrowserElement.style.display = 'block';
+        }
       }, 5000);
     </script>
   </body>
