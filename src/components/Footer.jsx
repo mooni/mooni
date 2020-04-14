@@ -33,7 +33,7 @@ function Footer() {
   return (
     <Box className={classes.root}>
       <Box className={classes.element}>
-        <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.3</ALink>
+        <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.4</ALink>
       </Box>
       <Box className={classes.element}>
         <Link to="/terms" component={RouterLink} className={classes.link}>

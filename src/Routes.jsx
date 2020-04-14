@@ -3,9 +3,8 @@ import React from 'react';
 import {
   Switch,
   Route,
-  Redirect, BrowserRouter as Router,
+  Redirect,
 } from 'react-router-dom';
-
 
 import './App.css';
 
