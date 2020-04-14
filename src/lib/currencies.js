@@ -11,6 +11,9 @@ export const TOKEN_DATA = {
   CHAI: {
     tokenAddress: '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215',
   },
+  WBTC: {
+    tokenAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+  },
   ZRX: {
     tokenAddress: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
   },

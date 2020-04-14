@@ -157,8 +157,8 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
   const onChangeValue = tradeExact => e => {
     setRateLoading(true);
     const amount = e.target.value;
-    console.log(amount, Number(amount));
     if(Number(amount) < 0) return;
+
     const newRateDetails = {
       ...rateDetails,
       inputAmount: tradeExact === TradeExact.INPUT ? amount : null,

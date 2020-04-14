@@ -1,12 +1,12 @@
 import BN from 'bignumber.js';
 import {
+  ETH,
   EXCHANGE_ABI,
   getExecutionDetails,
+  getTokenReserves,
   TRADE_METHODS,
   tradeExactTokensForEthWithData,
   tradeTokensForExactEthWithData,
-  getTokenReserves,
-  ETH,
 } from '@uniswap/sdk';
 import {ethers} from 'ethers';
 
@@ -209,7 +209,8 @@ export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: s
   const { tokenAddress } = TOKEN_DATA[symbol];
   const tokenReserves = await getTokenReserves(tokenAddress, CHAIN_ID);
 
-  const exactAmount = new BN(amount).times(10 ** tokenReserves.token.decimals);
+  const decimals = tradeExact === TradeExact.OUTPUT ? 18 : tokenReserves.token.decimals;
+  const exactAmount = new BN(amount).times(10 ** decimals).dp(0);
 
   const method = (
     (tradeExact === TradeExact.INPUT && tradeExactTokensForEthWithData) ||
