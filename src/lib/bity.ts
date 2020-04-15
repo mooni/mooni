@@ -1,4 +1,15 @@
 import axios from 'axios';
+import {
+  BityOrderResponse,
+  BityOrderStatus,
+  OrderError,
+  OrderRequest,
+  RateRequest,
+  RateResult,
+  TradeExact,
+} from './types';
+import BN from "bignumber.js";
+import {SIGNIFICANT_DIGITS} from "./currencies";
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -7,7 +18,7 @@ const instance = axios.create({
   timeout: 5000,
 });
 
-function removeEmptyStrings(data = {}) {
+function removeEmptyStrings(data: object = {}) {
   return Object.keys(data).reduce((acc, prop) => {
       if(data[prop] !== '' && data[prop] !== undefined) {
         return Object.assign(acc, { [prop]: data[prop] });
@@ -17,23 +28,26 @@ function removeEmptyStrings(data = {}) {
     {});
 }
 
+function extractFees(order: any): { amount: string, currency: string}  {
+  let feesAmount = order.price_breakdown.customer_trading_fee.amount;
+  let feesCurrency = order.price_breakdown.customer_trading_fee.currency;
+
+  if(feesCurrency === order.input.currency) {
+    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesCurrency = order.output.currency;
+  }
+
+  return {
+    amount: feesAmount,
+    currency: feesCurrency,
+  };
+}
+
 const Bity = {
-  async getCurrencies(tags = []) {
-    const params = {
-      tags: tags.join(','),
-    };
+  async estimate(rateRequest: RateRequest): Promise<RateResult> {
+    const { inputCurrency, outputCurrency, amount, tradeExact } = rateRequest;
 
-    const { data } = await instance({
-      method: 'get',
-      url: '/v2/currencies',
-      params,
-    });
-
-    return data.currencies.map(currency => currency.code);
-  },
-
-  async estimate({ inputCurrency, outputCurrency, amount, tradeExact }) {
-    const body = {
+    const body: any = {
       input: {
         currency: inputCurrency,
       },
@@ -42,9 +56,9 @@ const Bity = {
       },
     };
 
-    if(tradeExact === 'INPUT')
+    if(tradeExact === TradeExact.INPUT)
       body.input.amount = String(amount); else
-    if(tradeExact === 'OUTPUT')
+    if(tradeExact === TradeExact.OUTPUT)
       body.output.amount = String(amount);
     else
       throw new Error('invalid TRADE_EXACT');
@@ -61,16 +75,14 @@ const Bity = {
       inputCurrency,
       outputCurrency,
       tradeExact,
-      fees: {
-        amount: data.price_breakdown.customer_trading_fee.amount,
-        currency: data.price_breakdown.customer_trading_fee.currency,
-      }
+      fees: extractFees(data),
     };
   },
 
-  async order({ fromAddress, recipient, reference, rateRequest, contactPerson }) {
+  async order(orderRequest: OrderRequest, fromAddress: string): Promise<BityOrderResponse> {
+    const { recipient, reference, rateRequest } = orderRequest;
 
-    const body = {
+    const body: any = {
       input: {
         currency: rateRequest.inputCurrency,
         type: 'crypto_address',
@@ -80,23 +92,25 @@ const Bity = {
         type: 'bank_account',
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
-        bic_swift: recipient.bic_swift,
         currency: rateRequest.outputCurrency,
         reference: reference,
       },
     };
 
-    if(rateRequest.tradeExact === 'INPUT')
+    if(recipient.bic_swift) {
+      body.output.bic_swift = recipient.bic_swift;
+    }
+
+    if(rateRequest.tradeExact === TradeExact.INPUT)
       body.input.amount = String(rateRequest.amount); else
-    if(rateRequest.tradeExact === 'OUTPUT')
+    if(rateRequest.tradeExact === TradeExact.OUTPUT)
       body.output.amount = String(rateRequest.amount);
     else
       throw new Error('invalid TRADE_EXACT');
 
-    const cleanContactPerson = removeEmptyStrings(contactPerson);
-    if(cleanContactPerson.email) {
+    if(recipient.email) {
       body.contact_person = {
-        email: contactPerson.email,
+        email: recipient.email,
       };
     }
 
@@ -115,43 +129,43 @@ const Bity = {
       });
 
       if(!data.input) {
-        const cookieError = new Error('api_error');
-        cookieError.errors = [{code: 'cookie', message: 'your browser does not support cookies'}];
-        throw cookieError;
+        throw new OrderError(
+          'api_error',
+          [{code: 'cookie', message: 'your browser does not support cookies'}]
+        );
       }
 
       return {
         ...data,
-        fees: {
-          amount: data.price_breakdown.customer_trading_fee.amount,
-          currency: data.price_breakdown.customer_trading_fee.currency,
-        }
+        fees: extractFees(data),
       };
 
     } catch(error) {
       if(error?.response?.data?.errors) {
-        const apiError = new Error('api_error');
-        apiError.errors = error.response.data.errors;
-        throw apiError;
+        throw new OrderError(
+          'api_error',
+          error.response.data.errors
+        );
       } else {
         throw error;
       }
     }
   },
-  async getOrderDetails(orderId) {
+
+  async getOrderDetails(orderId: string): Promise<BityOrderResponse> {
     const { data } = await instance({
       method: 'get',
       url: `/v2/orders/${orderId}`,
       withCredentials: true,
     });
 
-    let orderStatus = 'waiting';
+    let orderStatus: BityOrderStatus= BityOrderStatus.WAITING;
     if(data.timestamp_cancelled) {
-      orderStatus = 'cancelled';
+      orderStatus = BityOrderStatus.CANCELLED;
     } else if(data.timestamp_executed) {
-      orderStatus = 'executed';
+      orderStatus = BityOrderStatus.EXECUTED;
     } else if(data.timestamp_payment_received) {
-      orderStatus = 'received';
+      orderStatus = BityOrderStatus.RECEIVED;
     }
 
     data.orderStatus = orderStatus;
@@ -159,7 +173,7 @@ const Bity = {
     return data;
   },
 
-  getOrderStatusPageURL(orderId) {
+  getOrderStatusPageURL(orderId: string) {
     return `https://go.bity.com/order-status?id=${orderId}`;
   }
 };

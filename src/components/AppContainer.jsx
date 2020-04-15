@@ -21,6 +21,8 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'flex-start',
     flexDirection: 'column',
     flex: 1,
+    marginTop: 20,
+    marginBottom: 20,
   },
   footer: {
     width: '100%',

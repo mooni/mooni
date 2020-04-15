@@ -5,6 +5,7 @@ import Box from '@material-ui/core/Box';
 
 import {cancelInitBox, initBox} from '../redux/box/actions';
 import {getBoxLoading} from '../redux/box/selectors';
+import { logError } from '../lib/log';
 
 function BoxLoading() {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ function BoxLoading() {
   }
   return (
     <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" width={1} p={2}>
-      <img src="images/3box-3.svg" width={40} />
+      <img src="images/3box-3.svg" alt="3box-logo" width={40} />
       <Box
         fontSize={14}
         width={1}
@@ -42,8 +43,8 @@ export function BoxModal({ visible, onClose }) {
   const dispatch = useDispatch();
 
   function enableBox(){
-    dispatch(initBox());
     onClose();
+    dispatch(initBox()).catch(logError);
   }
 
   return (

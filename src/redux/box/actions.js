@@ -2,6 +2,8 @@ import BoxManager from '../../lib/box';
 import { getETHManager } from '../eth/selectors';
 import { getBoxLoading } from './selectors';
 import { fetchMyAccount, resetContacts } from '../contacts/actions';
+import { track } from '../../lib/analytics';
+import { log, logError } from '../../lib/log';
 
 export const SET_BOX_MANAGER = 'SET_BOX_MANAGER';
 export const SET_BOX_LOADING = 'SET_BOX_LOADING';
@@ -32,14 +34,17 @@ export const initBox = () => async function (dispatch, getState)  {
     dispatch(setBoxManager(boxManager));
     await dispatch(fetchMyAccount());
     dispatch(setBoxLoading(false));
+    log('Box opened');
+    track('BOX: opened');
   } catch(error) {
-    console.error('Unable to connect to 3box', error);
+    logError('Unable to connect to 3box', error);
     dispatch(resetBox());
     throw error;
   }
 };
 
 export const cancelInitBox = () => async function (dispatch) {
+  log('Box opening cancelled');
   dispatch(resetBox());
 }
 

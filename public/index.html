@@ -40,5 +40,19 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
+    <p id="incompatible-browser" style="text-align: center; display: none;">
+      Your browser seems incompatible.
+      <br/>
+      If you are using Brave browser, we recommend disabling shields to be able to use this website.
+    </p>
+    <script>
+      setTimeout(() => {
+        const incompatibleBrowserElement = document.getElementById('incompatible-browser');
+        if(incompatibleBrowserElement) {
+          incompatibleBrowserElement.style.display = 'block';
+        }
+      }, 5000);
+    </script>
   </body>
 </html>

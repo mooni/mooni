@@ -4,25 +4,33 @@ import BN from 'bignumber.js';
 import { Typography, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { LoadingRing } from '@aragon/ui'
+import { LoadingRing, textStyle } from '@aragon/ui'
+import styled from 'styled-components';
+
 import AmountRow from './AmountRow';
 
 import { useDebounce } from '../lib/hooks';
 import { getRate } from '../lib/exchange';
-import { isNotNull } from '../lib/numbers';
+import { isNotZero } from '../lib/numbers';
+import { TradeExact } from '../lib/types';
+import { logError } from '../lib/log';
 
 import {
   INPUT_CURRENCIES as inputCurrencies,
   OUTPUT_CURRENCIES as outputCurrencies,
   SIGNIFICANT_DIGITS,
-  // ENABLE_TOKENS,
 } from '../lib/currencies';
+
+const InvalidMessage = styled.p`
+  ${textStyle('body4')};
+  color: #e61b1b;
+`;
 
 const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(3),
   },
-  interRow: {
+  additionalInfo: {
     height: 46,
     display: 'flex',
     alignItems: 'center',
@@ -41,9 +49,10 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     outputCurrency: outputCurrencies[0],
     inputAmount: null,
     outputAmount: 100,
-    tradeExact: 'OUTPUT',
+    tradeExact: TradeExact.OUTPUT,
   });
-  const [rateLoading, setRateLoading] = useState(true);
+  const [rateLoading, setRateLoading] = useState(false);
+  const [valid, setValid] = useState(true);
   const [rateRequest, setRateRequest] = useState(null);
   const [fees, setFees] = useState(null);
   const debouncedRateRequest = useDebounce(rateRequest, 1000);
@@ -55,8 +64,8 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
         inputCurrency: defaultRateRequest.inputCurrency,
         outputCurrencyId: outputCurrencies.indexOf(defaultRateRequest.outputCurrency),
         outputCurrency: defaultRateRequest.outputCurrency,
-        inputAmount: defaultRateRequest.tradeExact === 'INPUT' ? defaultRateRequest.amount : null,
-        outputAmount: defaultRateRequest.tradeExact === 'OUTPUT' ? defaultRateRequest.amount : null,
+        inputAmount: defaultRateRequest.tradeExact === TradeExact.INPUT ? defaultRateRequest.amount : null,
+        outputAmount: defaultRateRequest.tradeExact === TradeExact.OUTPUT ? defaultRateRequest.amount : null,
         tradeExact: defaultRateRequest.tradeExact,
       };
       setRateDetails(newRateDetails);
@@ -70,20 +79,25 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
       setRateRequest({
         inputCurrency: rateDetails.inputCurrency,
         outputCurrency: rateDetails.outputCurrency,
-        amount: rateDetails.tradeExact === 'INPUT' ? rateDetails.inputAmount : rateDetails.outputAmount,
+        amount: rateDetails.tradeExact === TradeExact.INPUT ? rateDetails.inputAmount : rateDetails.outputAmount,
         tradeExact: rateDetails.tradeExact,
       });
     }
+    setRateLoading(true);
   }, [defaultRateRequest]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     onChange(rateRequest);
-    onValid(rateRequest && isNotNull(rateRequest.amount))
+    setValid(rateRequest && isNotZero(rateRequest.amount));
   }, [onChange, rateRequest]);
 
   useEffect(() => {
+    onValid(valid);
+  }, [valid, onValid]);
+
+  useEffect(() => {
     let isMounted = true;
-    if (!debouncedRateRequest || !isNotNull(debouncedRateRequest.amount)) return;
+    if (!debouncedRateRequest || !isNotZero(debouncedRateRequest.amount)) return;
 
     (async () => {
 
@@ -94,9 +108,9 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
       if(!isMounted) return;
 
       const updateRateDetails = {};
-      if(debouncedRateRequest.tradeExact === 'INPUT')
+      if(debouncedRateRequest.tradeExact === TradeExact.INPUT)
         updateRateDetails.outputAmount = BN(res.outputAmount).toString();
-      if(debouncedRateRequest.tradeExact === 'OUTPUT')
+      if(debouncedRateRequest.tradeExact === TradeExact.OUTPUT)
         updateRateDetails.inputAmount = BN(res.inputAmount).toString();
 
       setRateDetails(r => ({
@@ -108,7 +122,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
 
       setRateLoading(false);
 
-    })().catch(console.error);
+    })().catch(error => logError('unable to fetch rates', error));
 
     return () => isMounted = false;
   }, [debouncedRateRequest]);
@@ -144,10 +158,11 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     setRateLoading(true);
     const amount = e.target.value;
     if(Number(amount) < 0) return;
+
     const newRateDetails = {
       ...rateDetails,
-      inputAmount: tradeExact === 'INPUT' ? amount : null,
-      outputAmount: tradeExact === 'OUTPUT' ? amount : null,
+      inputAmount: tradeExact === TradeExact.INPUT ? amount : null,
+      outputAmount: tradeExact === TradeExact.OUTPUT ? amount : null,
       tradeExact,
     };
     setRateDetails(newRateDetails);
@@ -158,15 +173,8 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     });
   }
 
-  let feeValue, feeCurrency, rate;
-  if(!rateLoading) {
-    if(fees.currency === rateDetails.inputCurrency) {
-      feeValue = BN(fees.amount).times(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-      feeCurrency = rateDetails.outputCurrency;
-    } else {
-      feeValue = BN(fees.amount).sd(SIGNIFICANT_DIGITS).toString();
-      feeCurrency = fees.currency;
-    }
+  let rate;
+  if(rateDetails) {
     rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
   }
 
@@ -175,31 +183,33 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
       <AmountRow
         value={rateDetails.inputAmount}
         currencyId={rateDetails.inputCurrencyId}
-        onChangeValue={onChangeValue('INPUT')}
+        onChangeValue={onChangeValue(TradeExact.INPUT)}
         onChangeCurrency={onChangeInputCurrency}
         currencies={inputCurrencies}
-        active={rateDetails.tradeExact === 'INPUT'}
+        active={rateDetails.tradeExact === TradeExact.INPUT}
         caption="Send"
       />
       <AmountRow
         value={rateDetails.outputAmount}
         currencyId={rateDetails.outputCurrencyId}
-        onChangeValue={onChangeValue('OUTPUT')}
+        onChangeValue={onChangeValue(TradeExact.OUTPUT)}
         onChangeCurrency={onChangeOutputCurrency}
         currencies={outputCurrencies}
-        active={rateDetails.tradeExact === 'OUTPUT'}
+        active={rateDetails.tradeExact === TradeExact.OUTPUT}
         caption="Receive"
       />
 
-      <Box className={classes.interRow}>
-        {rate ?
-          <Typography variant="caption">
-            <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
-            <br/>
-            <b>Fees:</b> {feeValue} {feeCurrency}
-          </Typography>
+      <Box className={classes.additionalInfo}>
+        {valid ?
+          rateLoading ?
+            <LoadingRing/>
+            :
+            <Typography variant="caption">
+              <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
+              {fees && <span><br/><b>Fees:</b> {fees.amount} {fees.currency}</span>}
+            </Typography>
           :
-          <LoadingRing/>
+          <InvalidMessage>Invalid amount</InvalidMessage>
         }
       </Box>
     </Box>

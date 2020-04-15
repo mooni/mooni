@@ -21,7 +21,7 @@ export const Content = styled.p`
 
 function Terms() {
   return (
-    <Box pt={4}>
+    <Box pt={6} pb={6}>
       <Title>
         Terms and conditions
       </Title>

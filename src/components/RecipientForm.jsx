@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import useForm from 'react-hook-form';
 import IBAN from 'iban';
-import { makeStyles } from '@material-ui/core/styles';
+import EmailValidator from 'email-validator';
 
 import { COUNTRIES } from '../lib/countries';
 
 import { Box } from '@material-ui/core';
-import { Button, Field, IconArrowRight, DropDown, Link } from '@aragon/ui';
+import { Button, IconArrowRight, DropDown, Link } from '@aragon/ui';
 
-import { WideInput, FieldError } from './StyledComponents';
-
-const useStyles = makeStyles(() => ({
-  fieldRow: {
-    marginBottom: '15px',
-  },
-}));
+import FormField from './FormField';
 
 const fields = {
   name: {
@@ -50,6 +44,9 @@ const fields = {
     maxLength: 11,
     pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
   },
+  email: {
+    validate: value => !value || value === '' || EmailValidator.validate(value),
+  },
 };
 
 const countriesList = Object.keys(COUNTRIES);
@@ -59,7 +56,6 @@ const defaultEndComponent = ({ submit, hasErrors }) => (
 );
 
 function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndComponent }) {
-  const classes = useStyles();
   const [more, setMore] = useState(false);
 
   const { register, handleSubmit, errors, setValue, reset } = useForm({
@@ -91,38 +87,25 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
   return (
     <form onSubmit={submit}>
-      <Field label="Name" className={classes.fieldRow}>
-        <WideInput name="owner.name" ref={register(fields.name)} required data-private/>
-        {errors['owner.name'] && <FieldError>Please enter your name</FieldError>}
-      </Field>
-      <Field label="IBAN" className={classes.fieldRow}>
-        <WideInput name="iban" ref={register(fields.iban)} required data-private/>
-        {errors.iban && <FieldError>Invalid IBAN</FieldError>}
-      </Field>
-      <Box className={classes.fieldRow}>
+
+      <FormField label="Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
+      <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessage="Invalid IBAN" required />
+
+      <Box mb={2}>
         <Link onClick={() => setMore(!more)}>
           {more ? 'Show less' : 'Show more'}
         </Link>
       </Box>
+
       {more &&
       <>
-        <Field label="BIC/SWIFT" className={classes.fieldRow}>
-          <WideInput name="bic_swift" ref={register(fields.bic_swift)} data-private/>
-          {errors.bic_swift && <FieldError>Invalid BIC</FieldError>}
-        </Field>
-        <Field label="Address" className={classes.fieldRow}>
-          <WideInput name="owner.address" ref={register(fields.address)} data-private/>
-          {errors['owner.address'] && <FieldError>Invalid address</FieldError>}
-        </Field>
-        <Field label="Zip/Postal code" className={classes.fieldRow}>
-          <WideInput name="owner.zip" ref={register(fields.zip)} data-private/>
-          {errors['owner.zip'] && <FieldError>Invalid Zip/Code</FieldError>}
-        </Field>
-        <Field label="City" className={classes.fieldRow}>
-          <WideInput name="owner.city" ref={register(fields.city)} data-private/>
-          {errors['owner.city'] && <FieldError>Invalid city</FieldError>}
-        </Field>
-        <Field label="Country" className={classes.fieldRow}>
+        <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessage="Invalid BIC" />
+        <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessage="Invalid email" />
+        <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessage="Invalid address" />
+        <FormField label="Zip/Postal code" name="owner.zip" ref={register(fields.zip)} errors={errors} errorMessage="Invalid Zip/Code" />
+        <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessage="Invalid city" />
+
+        <FormField label="Country" name="owner.country" errors={errors} errorMessage="Invalid country">
           <DropDown
             items={countriesList}
             selected={selectedCountry}
@@ -131,9 +114,10 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
             wide
             data-private
           />
-          {errors['owner.country'] && <FieldError>Invalid country</FieldError>}
-        </Field>
+        </FormField>
+
       </>}
+
       {endComponent({ submit, hasErrors })}
     </form>
   )

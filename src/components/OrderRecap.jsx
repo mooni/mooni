@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import {Link, textStyle, Field, GU} from '@aragon/ui';
+import { Link, textStyle, Field, GU, Info, Timer } from '@aragon/ui';
 
 import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
 
@@ -50,11 +50,6 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 10,
   }
 }));
-
-const Title = styled.p`
-  ${textStyle('title3')};
-  text-align: center;
-`;
 
 const Value = styled.p`
   ${textStyle('body3')};
@@ -109,8 +104,8 @@ function AmountRow({ value, symbol, caption }) {
   );
 }
 
-export default function PaymentOrderRecap({ paymentOrder }) {
-  const recipient = paymentOrder.paymentRequest.recipient;
+export default function OrderRecap({ order }) {
+  const recipient = order.orderRequest.recipient;
 
   let fullAddress = '';
   if(recipient.owner?.address) {
@@ -126,22 +121,13 @@ export default function PaymentOrderRecap({ paymentOrder }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputAmount : paymentOrder.bityOrder.input.amount;
-  const inputCurrency = paymentOrder.path === 'DEX_BITY' ? paymentOrder.tokenRate.inputCurrency : paymentOrder.bityOrder.input.currency;
-
-  const outputAmount = paymentOrder.bityOrder.output.amount;
-  const outputCurrency = paymentOrder.bityOrder.output.currency;
+  const inputAmount = order.estimatedRates.inputAmount;
+  const inputCurrency = order.estimatedRates.inputCurrency;
+  const outputAmount = order.estimatedRates.outputAmount;
+  const outputCurrency = order.estimatedRates.outputCurrency;
 
   const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-
-  let fees, feesCurrency;
-  if(paymentOrder.bityOrder.fees.currency === paymentOrder.bityOrder.input.currency) {
-    fees = BN(paymentOrder.bityOrder.fees.amount).times(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = paymentOrder.bityOrder.output.currency;
-  }  else {
-    fees = BN(paymentOrder.bityOrder.fees.amount).sd(SIGNIFICANT_DIGITS).toString();
-    feesCurrency = paymentOrder.bityOrder.fees.currency;
-  }
+  const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
 
   return (
     <Box>
@@ -151,8 +137,8 @@ export default function PaymentOrderRecap({ paymentOrder }) {
 
         <RecipientRow label="IBAN" value={recipient.iban}/>
         {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
-        {paymentOrder.paymentRequest.reference && <RecipientRow label="Reference" value={paymentOrder.paymentRequest.reference}/>}
-        {paymentOrder.paymentRequest.contactPerson?.email && <RecipientRow label="Contact email" value={paymentOrder.paymentRequest.contactPerson?.email}/>}
+        {order.orderRequest.reference && <RecipientRow label="Reference" value={order.orderRequest.reference}/>}
+        {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
       </Box>
 
       <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
@@ -163,13 +149,19 @@ export default function PaymentOrderRecap({ paymentOrder }) {
           <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
         </Typography><br/>
         <Typography variant="caption">
-          <b>Fees:</b> {fees} {feesCurrency}
+          <b>Fees:</b> {order.bityOrder.fees.amount} {order.bityOrder.fees.currency}
         </Typography>
       </Box>
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
         <PoweredBy>Powered by </PoweredBy>
         <Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link>
+      </Box>
+
+      <Box pt={1}>
+        <Info title="Price guaranteed for" mode="warning">
+          <Timer end={orderExpireDate} />
+        </Info>
       </Box>
     </Box>
   )

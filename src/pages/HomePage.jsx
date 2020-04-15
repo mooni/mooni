@@ -6,7 +6,7 @@ import { Box, Typography } from '@material-ui/core';
 import { Info } from '@aragon/ui'
 
 import StepAmount from '../components/StepAmount';
-import { setPaymentStep } from '../redux/payment/actions';
+import { setExchangeStep } from '../redux/payment/actions';
 import { SmallWidth } from '../components/StyledComponents';
 
 export default function HomePage() {
@@ -14,7 +14,7 @@ export default function HomePage() {
   const dispatch = useDispatch();
 
   const onGoToExchange = () => {
-    dispatch(setPaymentStep(1));
+    dispatch(setExchangeStep(1));
     history.push('/exchange');
   };
 

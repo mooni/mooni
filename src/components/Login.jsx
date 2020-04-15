@@ -85,6 +85,9 @@ function Login() {
             {error === 'eth_smart_account_not_supported' &&
             'We currently do not support smart account wallets such as Argent or Gnosis Safe.'
             }
+            {error === 'eth_wrong_network_id' &&
+            'Your wallet must be using Mainnet network, please switch.'
+            }
             {error === 'no_ethereum_provider' &&
             'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.'
             }

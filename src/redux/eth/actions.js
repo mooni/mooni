@@ -2,6 +2,7 @@ import ETHManager from '../../lib/eth';
 
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
+import { logError } from '../../lib/log';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -61,20 +62,22 @@ export const initETH = (walletType) => async function (dispatch)  {
       dispatch(resetETHManager());
     });
 
-    dispatch(initBoxIfLoggedIn()).catch(console.error);
+    dispatch(initBoxIfLoggedIn()).catch(error => logError('unable to enable box after login', error));
 
     return null;
   } catch(error) {
     dispatch(resetETHManager());
     dispatch(setETHManagerLoading(false));
-    console.error('Unable to connect to ethereum', error);
     if(error.message === 'eth_smart_account_not_supported') {
       return 'eth_smart_account_not_supported';
     } else if(error.message === 'no_ethereum_provider') {
       return 'no_ethereum_provider';
+    } else if(error.message === 'eth_wrong_network_id') {
+      return 'eth_wrong_network_id';
     } else if(error.message === 'User closed WalletConnect modal') {
       return null;
     } else {
+      logError('Unable to open ethereum wallet', error);
       return 'unknown_error';
     }
   }
