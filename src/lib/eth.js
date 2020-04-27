@@ -2,11 +2,12 @@ import EventEmitter from 'events';
 import { ethers } from 'ethers';
 
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import Portis from '@portis/web3';
+// import Portis from '@portis/web3';
 import ProviderEngine from 'web3-provider-engine';
 import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 import TransporWebUSB from "@ledgerhq/hw-transport-webusb";
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
+import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
 
 import {
   SUPPORTED_CHAIN_ID,
@@ -17,6 +18,7 @@ const portisAppId = process.env.REACT_APP_PORTIS_APP_ID || 'dd65a1a7-e0dc-4a9a-a
 
 export const CHAIN_ID = SUPPORTED_CHAIN_ID.Mainnet;
 // export const CHAIN_ID = SUPPORTED_CHAIN_ID.Rinkeby;
+// export const CHAIN_ID = 5777;
 
 function reloadPage() {
   window.location.reload()
@@ -26,16 +28,8 @@ function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
 }
 
-function defaultProviderEnable(engine) {
-  return () => new Promise((resolve, reject) => {
-    engine.sendAsync({ method: 'eth_accounts' }, (error, response) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(response.result)
-      }
-    });
-  });
+function defaultProviderEnable(_) {
+  return async () => null;
 }
 
 export default class ETHManager extends EventEmitter {
@@ -45,7 +39,10 @@ export default class ETHManager extends EventEmitter {
   }
 
   async init() {
-    this.accounts = await this.ethereum.enable();
+    await this.ethereum.enable();
+
+    this.provider = new ethers.providers.Web3Provider(this.ethereum);
+    await this.updateAccounts();
 
     if (this.ethereum.on) {
       this.ethereum.on('accountsChanged', reloadPage);
@@ -55,7 +52,6 @@ export default class ETHManager extends EventEmitter {
       this.ethereum.on('close', () => this.emit('stop'));
     }
 
-    this.provider = new ethers.providers.Web3Provider(this.ethereum);
     this.signer = this.provider.getSigner();
 
     await this.checkIsContract();
@@ -75,9 +71,9 @@ export default class ETHManager extends EventEmitter {
     this.isContract = code !== '0x';
   }
 
-  updateAccounts(accounts) {
-    this.accounts = accounts;
-    this.emit('accountsChanged', accounts);
+  async updateAccounts() {
+    this.accounts = await this.provider.send('eth_accounts', []);
+    this.emit('accountsChanged', this.accounts);
   }
 
   close() {
@@ -139,6 +135,11 @@ export default class ETHManager extends EventEmitter {
       case 'injected': {
         return window.ethereum;
       }
+      case 'iframe': {
+        const provider = new IFrameEthereumProvider();
+        provider.enable = defaultProviderEnable(provider);
+        return provider;
+      }
       case 'WalletConnect': {
         return new WalletConnectProvider({
           infuraId,
@@ -156,11 +157,11 @@ export default class ETHManager extends EventEmitter {
 
         return engine;
       }
-      case 'Portis': {
-        const portis = new Portis(portisAppId, 'mainnet');
-        portis.provider.enable = defaultProviderEnable(portis.provider);
-        return portis.provider;
-      }
+      // case 'Portis': {
+      //   const portis = new Portis(portisAppId, 'mainnet');
+      //   portis.provider.enable = defaultProviderEnable(portis.provider);
+      //   return portis.provider;
+      // }
       default: {
         throw new Error('wallet-provider-not-supported')
       }

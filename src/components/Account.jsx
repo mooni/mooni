@@ -1,27 +1,17 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, useViewport } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { initETH, openLoginModal, logout } from '../redux/eth/actions';
-
-const AUTO_CONNECT = false;
-// const AUTO_CONNECT = true;  // TODO remember/autodetect
+import { getAddress, getETHManagerLoading } from '../redux/eth/selectors';
+import { openLoginModal, logout } from '../redux/eth/actions';
 
 function Account() {
   const address = useSelector(getAddress);
-  const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
   const { below } = useViewport();
-
-  useEffect(() => {
-    if(AUTO_CONNECT && !ethManager) {
-      dispatch(initETH());
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function onLogin() {
     dispatch(openLoginModal());

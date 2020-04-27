@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box, Dialog } from '@material-ui/core';
 import { Button, LoadingRing, Link, IconCaution, useTheme } from '@aragon/ui'
 
 import {getETHManagerLoading, getLoginModalOpen} from '../redux/eth/selectors';
-import { initETH, openLoginModal } from '../redux/eth/actions';
+import { initETH, autoConnect, openLoginModal } from '../redux/eth/actions';
 
 import MetamaskIcon from '../assets/wallets/metamask-fox.svg';
 import WalletConnectIcon from '../assets/wallets/walletConnectIcon.svg';
@@ -54,6 +54,11 @@ function Login() {
     setError(null);
     dispatch(openLoginModal(false));
   }
+
+  useEffect(() => {
+    dispatch(autoConnect()).catch(console.error);
+  }, []);
+
 
   return (
     <Dialog

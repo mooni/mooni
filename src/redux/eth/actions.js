@@ -83,6 +83,13 @@ export const initETH = (walletType) => async function (dispatch)  {
   }
 };
 
+export const autoConnect = () => async (dispatch) => {
+  const isIframe = window && window.parent && window.self && window.parent !== window.self;
+  if (isIframe) {
+    await dispatch(initETH('iframe'));
+  }
+};
+
 export const logout = () => (dispatch) => {
   dispatch(resetETHManager());
   dispatch(resetBox());
