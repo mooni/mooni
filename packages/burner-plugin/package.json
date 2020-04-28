@@ -1,6 +1,6 @@
 {
   "name": "@mooni/burner-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Burner Wallet Plugin to transfer funds to your bank account",
   "repository": {
     "type": "git",
