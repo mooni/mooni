@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/pakokrew/mooni.git"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPL-3.0",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
