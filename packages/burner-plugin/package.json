@@ -1,0 +1,25 @@
+{
+  "name": "@mooni/burner-plugin",
+  "version": "1.0.0",
+  "description": "Burner Wallet Plugin to transfer funds to your bank account",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pakokrew/mooni.git"
+  },
+  "license": "GPL-3.0",
+  "main": "dist/MooniPlugin.js",
+  "types": "dist/MooniPlugin.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start-burner": "tsc -w"
+  },
+  "dependencies": {
+    "@burner-wallet/assets": "^1.0.0",
+    "@burner-wallet/types": "^1.0.0",
+    "@types/react": "*",
+    "url-parse": "^1.4.7"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  }
+}

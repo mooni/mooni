@@ -5,30 +5,29 @@
     "type": "git",
     "url": "https://github.com/pakokrew/mooni.git"
   },
-  "version": "0.2.0",
+  "version": "1.0.0",
   "license": "GPL-3.0",
-  "main": "build/index.cjs.js",
-  "module": "build/index.es.js",
-  "browser": "build/index.umd.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "browser": "dist/index.umd.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn build:cjs && yarn build:umd && yarn build:es",
     "prepublish": "yarn run build",
     "build:cjs": "webpack --config-name=cjs",
     "build:umd": "webpack --config-name=umd",
     "build:es": "webpack --config-name=es",
-    "serve:cjs": "parcel example/cjs/index.html",
-    "serve:es": "parcel example/es/index.html",
-    "serve:umd": "cp build/index.umd.js example/umd/widget.js && serve example/umd"
+    "serve:cjs": "yarn build:cjs && parcel example/cjs/index.html",
+    "serve:es": "yarn build:es && parcel example/es/index.html",
+    "serve:umd": "yarn build:umd && cp dist/index.umd.js example/umd/widget.js && serve example/umd",
+    "start-burner": "webpack --config-name=cjs --watch"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.5",
-    "@babel/plugin-transform-runtime": "^7.7.6",
-    "@babel/preset-env": "^7.7.6",
-    "babel-plugin-add-module-exports": "^1.0.2",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^8.0.6",
+    "add-module-exports-webpack-plugin": "^1.0.0",
     "parcel": "^1.12.4",
     "serve": "^11.2.0",
+    "ts-loader": "^7.0.1",
+    "typescript": "^3.5.2",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   }

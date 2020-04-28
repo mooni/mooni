@@ -50,7 +50,8 @@
 
     <script>
       const btn = document.getElementById('modal-opener');
-      btn.onclick = () => MooniWidget.open();
+      const mooni = new MooniWidget();
+      btn.onclick = () => mooni.open();
     </script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 export default `
 .mo_mooni-container {
-  display: flex;
+  display: none;
   z-index: 999;
   background: rgba(0,0,0,.8);
   position: fixed;
@@ -21,6 +21,7 @@ export default `
   max-width: 400px;
   max-height: 600px;
   background: #fff;
+  display: flex;
 }
 .mo_mooni-closer {
   position: absolute;

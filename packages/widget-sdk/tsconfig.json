@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./dist",
+    "module": "es6",
+    "target": "es5",
+    "typeRoots": [
+      "../../node_modules/@types",
+      "../widget-sdk/@types"
+    ]
+  },
+  "include": [
+    "./src",
+    "../widget-sdk/@types"
+  ]
+}

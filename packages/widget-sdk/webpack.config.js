@@ -1,29 +1,28 @@
+const AddModuleExportsPlugin = require('add-module-exports-webpack-plugin');
 const path = require('path');
+
+const outputDir = path.join(__dirname, 'dist');
 
 const moduleCommon = {
   rules: [
     {
-      test: /\.js$/,
+      test: /\.tsx?$/,
       exclude: /node_modules/,
-      include: path.resolve(__dirname, 'src'),
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: ['@babel/preset-env'],
-          plugins: ['add-module-exports', ['@babel/plugin-transform-runtime']],
-        }
-      }
+      use: 'ts-loader'
     },
   ]
+};
+const resolveCommon = {
+  extensions: [ '.tsx', '.ts', '.js' ],
 };
 
 module.exports = [
   {
     name: 'umd',
     mode: 'production',
-    entry: './src/index.js',
+    entry: './src/index.ts',
     output: {
-      path: path.join(__dirname, 'build'),
+      path: outputDir,
       filename: 'index.umd.js',
       libraryTarget: 'umd',
       globalObject: 'this',
@@ -31,26 +30,30 @@ module.exports = [
       libraryExport: 'default',
     },
     module: moduleCommon,
+    resolve: resolveCommon,
   },
   {
     name: 'cjs',
     mode: 'production',
-    entry: './src/index.js',
+    entry: './src/index.ts',
     output: {
-      path: path.join(__dirname, 'build'),
+      path: outputDir,
       filename: 'index.cjs.js',
       libraryTarget: 'commonjs2',
     },
     module: moduleCommon,
+    resolve: resolveCommon,
+    plugins: [new AddModuleExportsPlugin()],
   },
   {
     name: 'es',
     mode: 'production',
-    entry: './src/index.js',
+    entry: './src/index.ts',
     output: {
-      path: path.join(__dirname, 'build'),
+      path: outputDir,
       filename: 'index.es.js',
     },
     module: moduleCommon,
+    resolve: resolveCommon,
   },
 ];

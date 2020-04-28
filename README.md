@@ -52,21 +52,27 @@ This is useful for marketplace builders which want to increase conversion rate b
 // Import package
 import MooniWidget from '@mooni/widget';
 
+// Instanciate the widget
+const mooni = new MooniWidget();
+
 // Open the widget when you want to show Mooni
-MooniWidget.open();
+mooni.open();
 ```
+Check [the package](./packages/widget-sdk) for full API documentation.
 
 An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it.
 
-We also provided some [code examples](./host-example) that includes Mooni widget.
-
-You can check [the package](./packages/widget) to get full documentation.
-
 ## 💻 Development
 
-### Start tooling
+This repo is a monorepo including different apps and libraries for running mooni which are located under folders in `packages/*`.
 
-```text
+### App
+
+The app is in the `packages/app` folder.
+
+#### Start tooling
+
+```bash
 # Install dependencies
 yarn
 
