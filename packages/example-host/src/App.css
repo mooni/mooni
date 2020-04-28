@@ -9,6 +9,9 @@ body {
 
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .App-logo {
@@ -34,7 +37,8 @@ body {
 }
 
 .App-main {
-  background-color: #AFCBBF;
+  flex: 1;
+  background-color: #dedede;
   padding: 150px;
   display: flex;
   flex-direction: column;
