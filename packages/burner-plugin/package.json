@@ -11,6 +11,7 @@
   "types": "dist/MooniPlugin.d.ts",
   "scripts": {
     "build": "tsc",
+    "prepublish": "yarn run build",
     "start-burner": "tsc -w"
   },
   "dependencies": {
