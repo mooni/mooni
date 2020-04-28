@@ -14,6 +14,8 @@
     "publish": "lerna publish",
     "lint": "eslint '*/**/*.{js,ts,tsx}'",
     "start": "lerna run --scope @mooni/app start",
+    "build:app": "lerna run --scope @mooni/app build",
+    "build:burner": "lerna run --scope @mooni/burner-wallet buuild",
     "start-burner": "lerna run --parallel start-burner"
   },
   "workspaces": [
