@@ -4,9 +4,4 @@
 node_modules
 yarn-error.log
 
-public/aragon-ui
-
-build
-
 .now
-react-app-env.d.ts

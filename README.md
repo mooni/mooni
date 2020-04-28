@@ -6,9 +6,9 @@ Easily transfer funds from your crypto wallet to your bank account.
 
 [🚀 Web Application](https://app.mooni.tech)
 
-[📚 Developer documentation](https://doc.mooni.tech)
+[🔮 Frontend integration](#-frontend-integration)
 
-[🔮 Frontend integration](./#-Frontend-integration)
+[📎 Burner Wallet Plugin](#-burner-wallet-plugin)
 
 > This is experimental software under active development.
 
@@ -26,19 +26,21 @@ Mooni is a simple solution for end-users, marketplaces or DAOs to cash out crypt
 
 [🚀 Use Mooni now](https://app.mooni.tech)
 
-_This project is in early stage and shall be used with care._
 
 ### Use cases
 
-* **Crypto owner** I am an end user and I want to withdraw some crypto to my bank account
+* **Crypto owner** I am a crypto user and I want to withdraw some crypto to my bank account
 * **dApp developer** I am a dApp developer and I want to allow my users to withdraw funds to their bank account \(games, decentralized marketplaces, via a widget\)
-* **DAOs** I have a DAO \(Aragon\) and I want to be able to pay a bill in fiat with Vault funds
+* **DAOs** I am member of a DAO and I want to withdraw funds to my bank account
 
 ## 🔮 Frontend integration
 
 You can easily integrate Mooni into your web application and quickly enable your users to cash out their crypto.
 
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
+
+
+An [example app](https://mooni-widget-example.now.sh) including Mooni widget is available to let you try it out.
 
 ### 🎁 Quick start
 
@@ -52,21 +54,34 @@ This is useful for marketplace builders which want to increase conversion rate b
 // Import package
 import MooniWidget from '@mooni/widget';
 
+// Instanciate the widget
+const mooni = new MooniWidget();
+
 // Open the widget when you want to show Mooni
-MooniWidget.open();
+mooni.open();
 ```
+Check [the package](./packages/widget-sdk) for full API documentation.
 
-An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it.
+## 📎 Burner Wallet Plugin
 
-We also provided some [code examples](./host-example) that includes Mooni widget.
+A plugin for [Burner Wallet](https://github.com/burner-wallet/burner-wallet-2/) have been done to easily add the possibilty to cash out.
 
-You can check [the package](./packages/widget) to get full documentation.
+We have our own [Mooni Burner Wallet](https://burner.mooni.tech) deployed if you want to try it.
+
+Please refer to the [plugin documentation](packages/burner-plugin) for integration instructions.
+
 
 ## 💻 Development
 
-### Start tooling
+This repo is a monorepo including different apps and libraries for running mooni which are located under folders in `packages/*`.
 
-```text
+### App
+
+The app is in the `packages/app` folder.
+
+#### Start tooling
+
+```bash
 # Install dependencies
 yarn
 
@@ -75,4 +90,17 @@ yarn start
 
 # Build production bundle
 yarn build
+```
+
+### Burner plugin
+
+#### Start tooling
+
+```bash
+# Install dependencies
+yarn
+
+# Start dev server
+yarn start:burner
+
 ```

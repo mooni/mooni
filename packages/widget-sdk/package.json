@@ -1,0 +1,38 @@
+{
+  "name": "@mooni/widget",
+  "description": "Mooni Widget SDK",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pakokrew/mooni.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.5",
+  "license": "GPL-3.0",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "browser": "dist/index.umd.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "yarn build:cjs && yarn build:umd && yarn build:es",
+    "prepublish": "yarn run build",
+    "build:cjs": "webpack --config-name=cjs",
+    "build:umd": "webpack --config-name=umd",
+    "build:es": "webpack --config-name=es",
+    "serve:cjs": "yarn build:cjs && parcel example/cjs/index.html",
+    "serve:es": "yarn build:es && parcel example/es/index.html",
+    "serve:umd": "yarn build:umd && cp dist/index.umd.js example/umd/widget.js && serve example/umd",
+    "start-burner": "webpack --config-name=cjs --watch"
+  },
+  "devDependencies": {
+    "add-module-exports-webpack-plugin": "^1.0.0",
+    "parcel": "^1.12.4",
+    "serve": "^11.2.0",
+    "ts-loader": "^7.0.1",
+    "typescript": "^3.5.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  },
+  "gitHead": "0a4db043fcefe21f6519f68108b17dcd12057af9"
+}
