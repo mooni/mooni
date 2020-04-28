@@ -6,6 +6,8 @@ Allows transfering funds from you Burner Wallet to your bank account.
 
 This plugin is using [Mooni](https://mooni.tech) app.
 
+A Burner Wallet have been deployed with this plugin included: [Mooni Burner Wallet](https://burner.mooni.tech).
+
 ## Usage
 
 Install package:
