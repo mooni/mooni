@@ -20,6 +20,7 @@
   "dependencies": {
     "@burner-wallet/assets": "^1.0.0",
     "@burner-wallet/types": "^1.0.0",
+    "@mooni/widget": "^1.0.2",
     "@types/react": "*",
     "url-parse": "^1.4.7"
   },

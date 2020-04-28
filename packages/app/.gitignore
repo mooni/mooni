@@ -6,3 +6,5 @@ public/aragon-ui
 build
 
 react-app-env.d.ts
+
+.now
