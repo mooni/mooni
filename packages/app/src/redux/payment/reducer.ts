@@ -190,7 +190,7 @@ const initialMockStateComplete: State = {
 };
 
 const initialState = initialEmptyState;
-// const initialState = initialMockStateMinimum;
+// const initialState = initialMockStateComplete;
 
 export default function(state : State = initialState, action: { type: string, payload?: any }): State {
   switch (action.type) {
