@@ -181,3 +181,30 @@ export function detectWalletError(error) {
     return new Error('user-rejected-transaction');
   return null;
 }
+
+
+export function detectIframeWeb3Provider() {
+  return new Promise(resolve => {
+
+    const isIframe = window && window.parent && window.self && window.parent !== window.self;
+    if(!isIframe) return resolve(false);
+
+    window.addEventListener('message', e => {
+      if(e?.data?.jsonrpc === '2.0' && e?.data?.id === 'detect-web3-iframe') {
+        resolve(true);
+      }
+    });
+
+    window.parent.postMessage({
+      id: 'detect-web3-iframe',
+      jsonrpc: '2.0',
+      method: 'web3_clientVersion'
+    }, '*');
+
+    setTimeout(() => {
+      resolve(false);
+    }, 1000);
+
+  });
+}
+

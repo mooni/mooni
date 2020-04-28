@@ -36,22 +36,23 @@ const walletProviders = [
 ];
 
 function Login() {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(undefined);
   const modalOpen = useSelector(getLoginModalOpen);
   const ethLoading = useSelector(getETHManagerLoading);
   const dispatch = useDispatch();
   const theme = useTheme();
 
   async function connectETH(walletType) {
-    const error = await dispatch(initETH(walletType));
-    setError(error);
-    if(!error) {
+    try {
+      await dispatch(initETH(walletType));
       dispatch(openLoginModal(false));
+    } catch(error) {
+      setError(error.message);
     }
   }
 
   function onCloseModal() {
-    setError(null);
+    setError(undefined);
     dispatch(openLoginModal(false));
   }
 

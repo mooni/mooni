@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, useViewport } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getETHManagerLoading } from '../redux/eth/selectors';
+import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
 import { openLoginModal, logout } from '../redux/eth/actions';
 
 function Account() {
   const address = useSelector(getAddress);
   const ethManagerLoading = useSelector(getETHManagerLoading);
+  const providerFromIframe = useSelector(getProviderFromIframe);
   const dispatch = useDispatch();
   const { below } = useViewport();
 
@@ -39,7 +40,7 @@ function Account() {
   return (
     <Box display="flex">
       <Box mr={1} data-private>{addressComponent}</Box>
-      <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />
+      {!providerFromIframe && <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />}
     </Box>
   );
 }

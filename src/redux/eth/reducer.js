@@ -6,6 +6,7 @@ const initialState = {
   ethManager: null,
   address: null,
   loginModalOpen: false,
+  providerFromIframe: false,
 };
 
 export default function(state = initialState, action) {
@@ -36,6 +37,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         address,
+      };
+    }
+    case actions.SET_PROVIDER_FROM_IFRAME: {
+      const { providerFromIframe } = action.payload;
+      return {
+        ...state,
+        providerFromIframe,
       };
     }
     default:
