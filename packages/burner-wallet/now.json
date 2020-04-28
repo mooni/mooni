@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "alias": ["burner.mooni.tech", "mooni-burner"],
   "build": {
     "env": {
-      "REACT_APP_INFURA_KEY": "d118ed6a19594e16893c0c29d09a2536"
+      "REACT_APP_INFURA_KEY": "d118ed6a19594e16893c0c29d09a2536",
+      "REACT_APP_MOONI_URL": "https://mooni-git-burner.pakokrew.now.sh/exchange"
     }
   }
 }

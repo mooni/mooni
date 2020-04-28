@@ -20,7 +20,7 @@ const BurnerWallet = () =>
   <ModernUI
     title="Mooni Burner Wallet"
     core={core}
-    plugins={[new MooniPlugin()]}
+    plugins={[new MooniPlugin({ appUrl: process.env.REACT_APP_MOONI_URL })]}
   />
 
 

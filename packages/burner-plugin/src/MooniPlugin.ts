@@ -2,8 +2,18 @@ import { BurnerPluginContext, Plugin } from '@burner-wallet/types';
 import MooniPage from './ui/MooniPage';
 import MooniElement from './ui/MooniElement';
 
+interface MooniConstructor {
+  appUrl?: string;
+}
+
 export default class MooniPlugin implements Plugin {
   private pluginContext?: BurnerPluginContext;
+
+  public appUrl?: string;
+
+  constructor(props: MooniConstructor) {
+    this.appUrl = props.appUrl;
+  }
 
   initializePlugin(pluginContext: BurnerPluginContext) {
     this.pluginContext = pluginContext;
