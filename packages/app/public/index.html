@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="shortcut icon" href="https://app.mooni.tech/logo512.png">
+
+    <meta
+      name="viewport"
+      content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+    <title>Mooni - Easy crypto cash out</title>
+
+    <meta name="description" content="Transfer funds from your crypto wallet to your bank account, without KYC !" />
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@moonidapp">
+    <meta name="twitter:title" content="🌚 Mooni">
+    <meta name="twitter:description" content="Transfer funds from your crypto wallet to your bank account, without KYC !">
+    <meta name="twitter:image:src" content="http://app.mooni.tech/logo512.png">
+    <meta property="og:title" content="🌚 Mooni" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://app.mooni.tech/" />
+    <meta property="og:image" content="http://app.mooni.tech/logo512.png" />
+    <meta property="og:description" content="Transfer funds from your crypto wallet to your bank account, without KYC !" />
+    <meta property="og:site_name" content="Mooni" />
+
+    <meta name="keywords" content="mooni,offramp,crypto off-ramp,fiat,cashout,defi,exchange,ethereum,crypto,cryptocurrency,cryptocurrencies,DAI,ETH" />
+
+    <meta name="robots" content="index,follow" />
+
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+
+    <p id="incompatible-browser" style="text-align: center; display: none;">
+      Your browser seems incompatible.
+      <br/>
+      If you are using Brave browser, we recommend disabling shields to be able to use this website.
+    </p>
+    <script>
+      setTimeout(() => {
+        const incompatibleBrowserElement = document.getElementById('incompatible-browser');
+        if(incompatibleBrowserElement) {
+          incompatibleBrowserElement.style.display = 'block';
+        }
+      }, 10000);
+    </script>
+  </body>
+</html>
