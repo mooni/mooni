@@ -45,7 +45,7 @@ export default class ETHManager extends EventEmitter {
     await this.updateAccounts();
 
     if (this.ethereum.on) {
-      this.ethereum.on('accountsChanged', reloadPage);
+      this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
       this.ethereum.on('networkChanged', reloadPage);
       this.ethereum.on('chainChanged', reloadPage);
       this.ethereum.on('stop', () => this.emit('stop'));
