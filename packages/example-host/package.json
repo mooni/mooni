@@ -1,6 +1,7 @@
 {
   "name": "mooni-widget-react-host",
   "version": "1.0.1",
+  "private": true,
   "dependencies": {
     "@mooni/widget": "^1.0.3",
     "react": "^16.12.0",
