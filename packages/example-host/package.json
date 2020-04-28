@@ -1,9 +1,9 @@
 {
   "name": "mooni-widget-react-host",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "dependencies": {
-    "@mooni/widget": "^1.0.3",
+    "@mooni/widget": "^1.0.5",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "^3.4.1"
