@@ -4,6 +4,10 @@
 
 Mooni widget allows to quickly add Mooni into any web app in minutes.
 
+The widget can either appear as a modal on top of an app, or included inside an HTML element. 
+
+If the hosting app already has a connected user with web3, this wallet can be forwarded to the widget.
+
 ## 🎁 Quick start
 #### Install
 
@@ -11,23 +15,41 @@ Mooni widget allows to quickly add Mooni into any web app in minutes.
  
 #### Start widget
 
-```js
+```javascript
 // Import package
 import MooniWidget from '@mooni/widget';
 
-// Open the widget when you want to show Mooni
-MooniWidget.open();
+// Instanciate the widget
+const mooni = new MooniWidget();
+
+// Open the widget as a modal when you want it
+mooni.open();
 ```
 
 ### 📺 Example apps
 
-An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it.
+An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it out.
 
 We also provided some [code examples](../../host-example) that includes Mooni widget.
 
 ## 🎛 Reference
 
-- `MooniWidget.open() : Function`  Open the Mooni widget, and returns a method to close it.
+#### Instanciation
+
+- `new MooniWidget(opts)`  
+Instanciate a Mooni widget.
+
+`opts.containerElement`: Include Mooni inside of an HTML element on your website. If not set, the widget will appear as a modal.
+
+`opts.web3Provider`: Use your own connected web3 provider.
+
+#### If used as a modal:
+- `mooni.open()`  
+Opens the Mooni widget modal.
+
+
+- `mooni.close()`  
+Closes the Mooni widget modal. Not mandatory, a button is present to enable the user to close it.
 
 ## Additional information
 
