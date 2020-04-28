@@ -1,4 +1,19 @@
 {
-  "name": "mooni",
-  "version": 2
+  "version": 2,
+  "alias": ["app.mooni.tech", "mooni"],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers" : [
+        {
+          "key" : "X-Frame-Options",
+          "value" : "ALLOW-FROM *"
+        },
+        {
+          "key" : "Content-Security-Policy",
+          "value" : "frame-ancestors *"
+        }
+      ]
+    }
+  ]
 }

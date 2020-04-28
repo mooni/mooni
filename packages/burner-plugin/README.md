@@ -1,5 +1,7 @@
 # Burner Wallet Mooni Plugin
 
+[![npm (scoped)](https://img.shields.io/npm/v/@mooni/burner-plugin)](https://www.npmjs.com/package/@mooni/burner-plugin)
+
 Allows transfering funds from you Burner Wallet to your bank account. 
 
 This plugin is using [Mooni](https://mooni.tech) app.
