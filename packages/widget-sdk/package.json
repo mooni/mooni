@@ -5,6 +5,9 @@
     "type": "git",
     "url": "https://github.com/pakokrew/mooni.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.0.1",
   "license": "GPL-3.0",
   "main": "dist/index.cjs.js",
@@ -30,5 +33,6 @@
     "typescript": "^3.5.2",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
-  }
+  },
+  "gitHead": "0a4db043fcefe21f6519f68108b17dcd12057af9"
 }

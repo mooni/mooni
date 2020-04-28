@@ -6,6 +6,9 @@
     "type": "git",
     "url": "https://github.com/pakokrew/mooni.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "GPL-3.0",
   "main": "dist/MooniPlugin.js",
   "types": "dist/MooniPlugin.d.ts",
@@ -22,5 +25,6 @@
   },
   "devDependencies": {
     "typescript": "^3.5.2"
-  }
+  },
+  "gitHead": "0a4db043fcefe21f6519f68108b17dcd12057af9"
 }
