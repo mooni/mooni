@@ -30,7 +30,7 @@ mooni.open();
 
 An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it out.
 
-We also provided some [code examples](../example-host) that includes Mooni widget.
+We also provided some [code examples](../example-host) that includes Mooni widget. You can also check the [Burner Wallet integration](../burner-plugin/src/ui/MooniPage.tsx) for a more advanced use case.
 
 ## 🎛 Reference
 
