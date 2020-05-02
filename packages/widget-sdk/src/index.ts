@@ -116,13 +116,17 @@ class MooniWidget {
             if(error) {
               this.iframeElement!.contentWindow.postMessage({
                   ...result,
+                  id: e.data.id,
                   error,
                 },
                 appOrigin
               );
             } else {
               this.iframeElement!.contentWindow.postMessage(
-                result,
+                {
+                  ...result,
+                  id: e.data.id,
+                },
                 appOrigin
               );
             }

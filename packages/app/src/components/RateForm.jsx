@@ -109,9 +109,9 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
 
       const updateRateDetails = {};
       if(debouncedRateRequest.tradeExact === TradeExact.INPUT)
-        updateRateDetails.outputAmount = BN(res.outputAmount).toString();
+        updateRateDetails.outputAmount = BN(res.outputAmount).toFixed();
       if(debouncedRateRequest.tradeExact === TradeExact.OUTPUT)
-        updateRateDetails.inputAmount = BN(res.inputAmount).toString();
+        updateRateDetails.inputAmount = BN(res.inputAmount).toFixed();
 
       setRateDetails(r => ({
         ...r,
@@ -175,7 +175,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
 
   let rate;
   if(rateDetails) {
-    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toString();
+    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
   }
 
   return (
