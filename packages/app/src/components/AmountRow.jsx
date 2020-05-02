@@ -77,7 +77,7 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
   const classes = useStyles();
 
   const displayedValue = value !== null ?
-    (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toString())
+    (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
   : 0;
 
   return (

@@ -56,8 +56,8 @@ export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
       tradeExact: TradeExact.INPUT
     });
 
-    rateResult.inputAmount = new BN(rateRequest.amount).toString();
-    rateResult.outputAmount = new BN(bityRate.outputAmount).toString();
+    rateResult.inputAmount = new BN(rateRequest.amount).toFixed();
+    rateResult.outputAmount = new BN(bityRate.outputAmount).toFixed();
     rateResult.fees = bityRate.fees;
 
   } else if(rateRequest.tradeExact === TradeExact.OUTPUT) {
@@ -80,8 +80,8 @@ export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
       finalInputAmount = tokenRate.inputAmount;
     }
 
-    rateResult.inputAmount = new BN(finalInputAmount).toString();
-    rateResult.outputAmount = new BN(rateRequest.amount).toString();
+    rateResult.inputAmount = new BN(finalInputAmount).toFixed();
+    rateResult.outputAmount = new BN(rateRequest.amount).toFixed();
     rateResult.fees = bityRate.fees;
 
   } else {
@@ -222,8 +222,8 @@ export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: s
   const serializedResponse = stringifyObj(tradeDetails);
 
   return {
-    inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toString(),
-    outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toString(),
+    inputAmount: tradeDetails.inputAmount.amount.div(10 ** tradeDetails.inputAmount.token.decimals).toFixed(),
+    outputAmount: tradeDetails.outputAmount.amount.div(10 ** tradeDetails.outputAmount.token.decimals).toFixed(),
     inputCurrency: symbol,
     outputCurrency: ETH,
     tradeExact,
@@ -273,7 +273,7 @@ export async function executeTrade(tradeDetails: any, recipient: string | unde
   const exchangeContract = new ethers.Contract(executionDetails.exchangeAddress, EXCHANGE_ABI, signer);
 
   const tradeMethod = TRADE_METHODS[executionDetails.methodName];
-  const args = (executionDetails.methodArguments  as BN[]).map(a => a.toFixed());
+  const args = executionDetails.methodArguments.map(n => new BN(n).toFixed());
 
   const overrides: any = {
     value: ethers.utils.parseEther(executionDetails.value.toFixed()),

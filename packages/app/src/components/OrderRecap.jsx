@@ -84,7 +84,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={BN(value).sd(SIGNIFICANT_DIGITS).toString()}
+            value={BN(value).sd(SIGNIFICANT_DIGITS).toFixed()}
             readOnly
             className={classes.amountInput}
           />
@@ -126,7 +126,7 @@ export default function OrderRecap({ order }) {
   const outputAmount = order.estimatedRates.outputAmount;
   const outputCurrency = order.estimatedRates.outputCurrency;
 
-  const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toString();
+  const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
   const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
 
   return (

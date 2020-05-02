@@ -33,7 +33,7 @@ function extractFees(order: any): { amount: string, currency: string}  {
   let feesCurrency = order.price_breakdown.customer_trading_fee.currency;
 
   if(feesCurrency === order.input.currency) {
-    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).sd(SIGNIFICANT_DIGITS).toString();
+    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).sd(SIGNIFICANT_DIGITS).toFixed();
     feesCurrency = order.output.currency;
   }
 
