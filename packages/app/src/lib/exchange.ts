@@ -248,7 +248,7 @@ export async function checkTradeAllowance(tradeDetails, signer) {
   const allowance = await tokenContract.allowance(senderAddress, executionDetails.exchangeAddress);
 
   if(tradeDetails.inputAmount.amount.gt(allowance)) {
-    const allowanceAmount = tradeDetails.inputAmount.amount.toString();
+    const allowanceAmount = tradeDetails.inputAmount.amount.toFixed();
     const estimatedGas = await tokenContract.estimate.approve(executionDetails.exchangeAddress, allowanceAmount);
     const gasLimit = calculatedGasMargin(estimatedGas);
     return tokenContract.approve(
@@ -273,10 +273,10 @@ export async function executeTrade(tradeDetails: any, recipient: string | unde
   const exchangeContract = new ethers.Contract(executionDetails.exchangeAddress, EXCHANGE_ABI, signer);
 
   const tradeMethod = TRADE_METHODS[executionDetails.methodName];
-  const args = executionDetails.methodArguments.map(a => a.toString());
+  const args = (executionDetails.methodArguments  as BN[]).map(a => a.toFixed());
 
   const overrides: any = {
-    value: ethers.utils.parseEther(executionDetails.value.toString()),
+    value: ethers.utils.parseEther(executionDetails.value.toFixed()),
   };
 
   const estimatedGas = await exchangeContract.estimate[tradeMethod](...args, overrides);
