@@ -8,6 +8,7 @@ import './App.css';
 
 import AppContainer from './components/AppContainer';
 import Login from './components/Login';
+import InfoPanel from './components/InfoPanel';
 import Routes from './Routes';
 
 import store from './redux/store';
@@ -24,6 +25,7 @@ export default function App() {
         >
           <AppContainer>
             <Login />
+            <InfoPanel />
             <Routes/>
           </AppContainer>
         </Main>
