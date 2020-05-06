@@ -7,6 +7,7 @@ import { Main } from '@aragon/ui';
 import './App.css';
 
 import AppContainer from './components/AppContainer';
+import InfoPanel from './components/InfoPanel';
 import ErrorModal from './components/ErrorModal';
 import Routes from './Routes';
 
@@ -29,6 +30,7 @@ export default function App() {
           scrollView={false}
         >
           <AppContainer>
+            <InfoPanel />
             <ErrorModal />
             <Routes/>
           </AppContainer>

@@ -5,11 +5,6 @@ import { Box } from '@material-ui/core';
 
 import styled from 'styled-components';
 
-
-export const Title = styled.p`
-  ${textStyle('title3')};
-   margin-bottom: ${3 * GU}px;
-`;
 export const SubTitle = styled.p`
   ${textStyle('title4')};
   margin-bottom: ${2 * GU}px;
@@ -22,9 +17,6 @@ export const Content = styled.p`
 function Terms() {
   return (
     <Box pt={6} pb={6}>
-      <Title>
-        Terms and conditions
-      </Title>
       <SubTitle>
         1.1 Object
       </SubTitle>

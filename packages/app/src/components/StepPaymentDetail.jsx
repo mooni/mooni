@@ -1,10 +1,11 @@
 import React from 'react';
 import useForm from 'react-hook-form';
 import {useDispatch, useSelector} from 'react-redux';
+import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
 
-import { Button, IconCheck } from '@aragon/ui'
+import { Button, GU, IconCheck, textStyle } from '@aragon/ui'
 
 import { setReference } from '../redux/payment/actions';
 import { getReference } from '../redux/payment/selectors';
@@ -15,6 +16,13 @@ const fields = {
     pattern: /^[0-9A-Za-z ]*$/,
   },
 };
+
+const Hint = styled.p`
+  ${textStyle('body3')};
+  margin-bottom: ${1 * GU}px;
+  text-align: center;
+  color: #5d6d7b;
+`;
 
 function StepPaymentDetail({ onComplete }) {
   const reference = useSelector(getReference);
@@ -37,6 +45,9 @@ function StepPaymentDetail({ onComplete }) {
   return (
     <Box width={1}>
       <form onSubmit={onSubmit}>
+        <Hint>
+          Please provide details for the wire transfer
+        </Hint>
         <FormField
           label="Reference (optional)"
           name="reference"
@@ -44,7 +55,6 @@ function StepPaymentDetail({ onComplete }) {
           errors={errors}
           errorMessage="Invalid reference, please only use regular letters and numbers"
           placeholder="Bill A2313"
-          required
         />
         <Button mode="strong" onClick={onSubmit} wide icon={<IconCheck/>} label="Create order" disabled={hasErrors} />
       </form>
