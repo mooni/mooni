@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import Box from '@material-ui/core/Box';
-import {Checkbox, Button, IconArrowRight, Help} from '@aragon/ui'
+import { Checkbox, Button, IconArrowRight, Help, textStyle, GU } from '@aragon/ui'
 
 import { setRecipient } from '../redux/payment/actions';
 import { getRecipient } from '../redux/payment/selectors';
@@ -21,6 +22,13 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
   },
 }));
+
+const Hint = styled.p`
+  ${textStyle('body3')};
+  margin-bottom: ${1 * GU}px;
+  text-align: center;
+  color: #5d6d7b;
+`;
 
 function StepRecipient({ onComplete }) {
   const classes = useStyles();
@@ -50,6 +58,11 @@ function StepRecipient({ onComplete }) {
     <BoxLoadingContainer>
       <Box width={1}>
         <BoxModal visible={showBoxModal} onClose={() => setShowBoxModal(false)}/>
+
+        <Hint>
+          Please provide details about the recipient
+        </Hint>
+
         <RecipientForm
           initialRecipient={recipient}
           onSubmit={onSubmit}

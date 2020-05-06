@@ -88,7 +88,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   return (
     <form onSubmit={submit}>
 
-      <FormField label="Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
+      <FormField label="Full Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
       <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessage="Invalid IBAN" required />
 
       <Box mb={2}>
