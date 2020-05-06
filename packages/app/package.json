@@ -47,7 +47,7 @@
     "styled-components": "^4.4.1",
     "typescript": "^3.8.3",
     "web3-provider-engine": "^15.0.6",
-    "web3modal": "^1.6.1"
+    "web3modal": "^1.6.2"
   },
   "scripts": {
     "start": "react-scripts start",
