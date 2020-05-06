@@ -50,6 +50,7 @@ const fields = {
 };
 
 const countriesList = Object.keys(COUNTRIES);
+const countriesLabels = Object.values(COUNTRIES);
 
 const defaultEndComponent = ({ submit, hasErrors }) => (
   <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
@@ -106,7 +107,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
         <FormField label="Country" name="owner.country" errors={errors} errorMessage="Invalid country">
           <DropDown
-            items={countriesList}
+            items={countriesLabels}
             selected={selectedCountry}
             onChange={setCountry}
             placeholder="Please select a country"
