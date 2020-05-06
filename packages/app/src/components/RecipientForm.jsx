@@ -97,8 +97,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         </Link>
       </Box>
 
-      {more &&
-      <>
+      <Box display={more ? 'block' : 'none'}>
         <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessage="Invalid BIC" />
         <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessage="Invalid email" />
         <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessage="Invalid address" />
@@ -115,8 +114,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
             data-private
           />
         </FormField>
-
-      </>}
+      </Box>
 
       {endComponent({ submit, hasErrors })}
     </form>
