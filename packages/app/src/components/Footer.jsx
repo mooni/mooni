@@ -4,6 +4,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Link, Box } from '@material-ui/core';
 import { Link as ALink } from '@aragon/ui';
 import {makeStyles} from '@material-ui/core/styles';
+import { useDispatch } from 'react-redux';
+import { setInfoPanel } from '../redux/ui/actions';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,6 +22,7 @@ const useStyles = makeStyles(theme => ({
   },
   link: {
     color: 'black',
+    cursor: 'pointer',
     textDecoration: 'none',
     '&:hover': {
       textDecoration: 'none',
@@ -28,6 +31,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Footer() {
+  const dispatch = useDispatch();
   const classes = useStyles();
 
   return (
@@ -36,12 +40,12 @@ function Footer() {
         <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.4</ALink>
       </Box>
       <Box className={classes.element}>
-        <Link to="/terms" component={RouterLink} className={classes.link}>
+        <Link onClick={() => dispatch(setInfoPanel('terms'))} className={classes.link}>
           Terms
         </Link>
       </Box>
       <Box className={classes.element}>
-        <Link to="/about" component={RouterLink} className={classes.link}>
+        <Link onClick={() => dispatch(setInfoPanel('about'))} className={classes.link}>
           About
         </Link>
       </Box>

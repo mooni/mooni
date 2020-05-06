@@ -173,9 +173,17 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
     });
   }
 
-  let rate;
+  let rate, feeAmount;
   if(rateDetails) {
-    rate = BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
+    rate = new BN(rateDetails.outputAmount).div(rateDetails.inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
+  }
+
+  if(fees) {
+    if(outputCurrencies.includes(fees.currency)) {
+      feeAmount = new BN(fees.amount).dp(2).toFixed();
+    } else {
+      feeAmount = new BN(fees.amount).sd(SIGNIFICANT_DIGITS).toFixed();
+    }
   }
 
   return (
@@ -206,7 +214,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
             :
             <Typography variant="caption">
               <b>Rate:</b> {rate} {rateDetails.outputCurrency}/{rateDetails.inputCurrency}
-              {fees && <span><br/><b>Fees:</b> {fees.amount} {fees.currency}</span>}
+              {fees && <span><br/><b>Fees:</b> {feeAmount} {fees.currency}</span>}
             </Typography>
           :
           <InvalidMessage>Invalid amount</InvalidMessage>

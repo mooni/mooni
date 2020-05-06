@@ -50,6 +50,7 @@ const fields = {
 };
 
 const countriesList = Object.keys(COUNTRIES);
+const countriesLabels = Object.values(COUNTRIES);
 
 const defaultEndComponent = ({ submit, hasErrors }) => (
   <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
@@ -88,7 +89,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   return (
     <form onSubmit={submit}>
 
-      <FormField label="Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
+      <FormField label="Full Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
       <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessage="Invalid IBAN" required />
 
       <Box mb={2}>
@@ -97,8 +98,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         </Link>
       </Box>
 
-      {more &&
-      <>
+      <Box display={more ? 'block' : 'none'}>
         <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessage="Invalid BIC" />
         <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessage="Invalid email" />
         <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessage="Invalid address" />
@@ -107,7 +107,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
         <FormField label="Country" name="owner.country" errors={errors} errorMessage="Invalid country">
           <DropDown
-            items={countriesList}
+            items={countriesLabels}
             selected={selectedCountry}
             onChange={setCountry}
             placeholder="Please select a country"
@@ -115,8 +115,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
             data-private
           />
         </FormField>
-
-      </>}
+      </Box>
 
       {endComponent({ submit, hasErrors })}
     </form>
