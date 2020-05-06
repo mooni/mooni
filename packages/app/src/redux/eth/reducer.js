@@ -6,6 +6,7 @@ const initialState = {
   ethManager: null,
   address: null,
   loginModalOpen: false,
+  modalError: null,
   providerFromIframe: false,
 };
 
@@ -30,6 +31,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         loginModalOpen,
+      };
+    }
+    case actions.SET_MODAL_ERROR: {
+      const { error } = action.payload;
+      return {
+        ...state,
+        modalError: error,
       };
     }
     case actions.SET_ADDRESS: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -7,12 +7,18 @@ import { Main } from '@aragon/ui';
 import './App.css';
 
 import AppContainer from './components/AppContainer';
-import Login from './components/Login';
+import ErrorModal from './components/ErrorModal';
 import Routes from './Routes';
 
 import store from './redux/store';
+import { autoConnect } from './redux/eth/actions';
 
 export default function App() {
+
+  useEffect(() => {
+    store.dispatch(autoConnect()).catch(console.error);
+  }, []);
+
   return (
     <Provider store={store}>
       <Router>
@@ -23,7 +29,7 @@ export default function App() {
           scrollView={false}
         >
           <AppContainer>
-            <Login />
+            <ErrorModal />
             <Routes/>
           </AppContainer>
         </Main>

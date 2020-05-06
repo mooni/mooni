@@ -9,6 +9,7 @@ import { web3Modal } from '../../lib/web3Providers';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
 export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
+export const SET_MODAL_ERROR = 'SET_MODAL_ERROR';
 export const SET_ADDRESS = 'SET_ADDRESS';
 export const SET_PROVIDER_FROM_IFRAME = 'SET_PROVIDER_FROM_IFRAME';
 
@@ -30,6 +31,13 @@ export const openLoginModal = (loginModalOpen = true) => ({
   type: OPEN_LOGIN_MODAL,
   payload: {
     loginModalOpen,
+  }
+});
+
+export const setModalError = (error) => ({
+  type: SET_MODAL_ERROR,
+  payload: {
+    error,
   }
 });
 
@@ -92,8 +100,13 @@ export const initETH = (ethereum) => async function (dispatch)  {
 };
 
 export const openWeb3Modal = () => async (dispatch) => {
-  const ethereum = await web3Modal.connect();
-  await dispatch(initETH(ethereum));
+  try {
+    const ethereum = await web3Modal.connect();
+    await dispatch(initETH(ethereum));
+  } catch(error) {
+    if(error === "Modal closed by user") return;
+    dispatch(setModalError(error));
+  }
 };
 
 export const autoConnect = () => async (dispatch) => {

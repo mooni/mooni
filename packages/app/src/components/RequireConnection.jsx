@@ -6,7 +6,7 @@ import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { openLoginModal } from '../redux/eth/actions';
+import { openWeb3Modal } from '../redux/eth/actions';
 
 function RequireConnection({ children }) {
   const ethManager = useSelector(getETHManager);
@@ -14,7 +14,7 @@ function RequireConnection({ children }) {
   const dispatch = useDispatch();
 
   function login() {
-    dispatch(openLoginModal());
+    dispatch(openWeb3Modal());
   }
 
   if(ethManager)
