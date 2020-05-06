@@ -1,4 +1,5 @@
-import ETHManager, { detectIframeWeb3Provider } from '../../lib/eth';
+import ETHManager from '../../lib/eth';
+import { detectIframeWeb3Provider } from '../../lib/web3Providers';
 
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
