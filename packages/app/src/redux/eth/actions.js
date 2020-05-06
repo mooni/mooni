@@ -4,7 +4,7 @@ import { detectIframeWeb3Provider } from '../../lib/web3Providers';
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
-import { web3Modal } from '../../lib/web3Providers';
+import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -113,7 +113,8 @@ export const autoConnect = () => async (dispatch) => {
   dispatch(setETHManagerLoading(true));
   const initIframeProvider = await detectIframeWeb3Provider();
   if (initIframeProvider) {
-    await dispatch(initETH('iframe'));
+    const ethereum = getWalletProvider('iframe');
+    await dispatch(initETH(ethereum));
     dispatch(setProviderFromIframe(true));
   } else if(web3Modal.cachedProvider) {
     await dispatch(openWeb3Modal());
