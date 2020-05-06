@@ -1,5 +1,7 @@
+import Web3Modal from "web3modal";
 
-// import Portis from '@portis/web3';
+import Fortmatic from "fortmatic";
+import Portis from '@portis/web3';
 import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import ProviderEngine from 'web3-provider-engine';
@@ -9,6 +11,7 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 
 const infuraId = process.env.REACT_APP_INFURA_ID || 'd118ed6a19594e16893c0c29d09a2536';
 const portisAppId = process.env.REACT_APP_PORTIS_APP_ID || 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2';
+const fortmaticId = process.env.REACT_APP_FORTMATIC_ID || 'pk_live_362BC03A6D2421B4';
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
@@ -45,11 +48,11 @@ export async function getWalletProvider(walletType) {
 
       return engine;
     }
-    // case 'Portis': {
-    //   const portis = new Portis(portisAppId, 'mainnet');
-    //   portis.provider.enable = defaultProviderEnable(portis.provider);
-    //   return portis.provider;
-    // }
+    case 'Portis': {
+      const portis = new Portis(portisAppId, 'mainnet');
+      portis.provider.enable = defaultProviderEnable(portis.provider);
+      return portis.provider;
+    }
     default: {
       throw new Error('wallet-provider-not-supported')
     }
@@ -92,3 +95,30 @@ export function detectWalletError(error) {
     return new Error('user-rejected-transaction');
   return null;
 }
+
+const providerOptions = {
+  walletconnect: {
+    package: WalletConnectProvider,
+    options: {
+      infuraId,
+    }
+  },
+  portis: {
+    package: Portis,
+    options: {
+      id: portisAppId
+    }
+  },
+  fortmatic: {
+    package: Fortmatic,
+    options: {
+      key: fortmaticId
+    }
+  }
+};
+
+export const web3Modal = new Web3Modal({
+  'network': "mainnet",
+  'cacheProvider': true,
+  providerOptions,
+});
