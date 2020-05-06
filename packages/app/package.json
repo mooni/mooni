@@ -29,6 +29,7 @@
     "bignumber.js": "^9.0.0",
     "email-validator": "^2.0.4",
     "ethers": "^4.0.46",
+    "fortmatic": "^2.0.6",
     "iban": "^0.0.14",
     "lodash": "^4.17.15",
     "logrocket": "^1.0.7",
@@ -45,7 +46,8 @@
     "reselect": "^4.0.0",
     "styled-components": "^4.4.1",
     "typescript": "^3.8.3",
-    "web3-provider-engine": "^15.0.6"
+    "web3-provider-engine": "^15.0.6",
+    "web3modal": "^1.6.2"
   },
   "scripts": {
     "start": "react-scripts start",

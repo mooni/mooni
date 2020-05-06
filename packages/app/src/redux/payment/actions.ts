@@ -6,7 +6,7 @@ import {sendEvent} from '../../lib/analytics';
 import Bity from '../../lib/bity';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
-import { detectWalletError } from '../../lib/eth';
+import { detectWalletError } from '../../lib/web3Providers';
 
 export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
 
