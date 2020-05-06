@@ -1,6 +1,7 @@
 import ETHManager from '../../lib/eth';
 import { detectIframeWeb3Provider } from '../../lib/web3Providers';
 
+import { setModalError } from '../ui/actions';
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
@@ -9,7 +10,6 @@ import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
 export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
-export const SET_MODAL_ERROR = 'SET_MODAL_ERROR';
 export const SET_ADDRESS = 'SET_ADDRESS';
 export const SET_PROVIDER_FROM_IFRAME = 'SET_PROVIDER_FROM_IFRAME';
 
@@ -31,13 +31,6 @@ export const openLoginModal = (loginModalOpen = true) => ({
   type: OPEN_LOGIN_MODAL,
   payload: {
     loginModalOpen,
-  }
-});
-
-export const setModalError = (error) => ({
-  type: SET_MODAL_ERROR,
-  payload: {
-    error,
   }
 });
 

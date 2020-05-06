@@ -1,6 +1,6 @@
-import Web3Modal from "web3modal";
+import Web3Modal from 'web3modal';
 
-import Fortmatic from "fortmatic";
+import Fortmatic from 'fortmatic';
 import Portis from '@portis/web3';
 import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -118,7 +118,7 @@ const providerOptions = {
 };
 
 export const web3Modal = new Web3Modal({
-  'network': "mainnet",
+  'network': 'mainnet',
   'cacheProvider': true,
   providerOptions,
 });
