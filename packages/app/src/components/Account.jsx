@@ -5,7 +5,7 @@ import { Button, EthIdenticon, AddressField, IconWallet, IconPower, useViewport 
 import { Box } from '@material-ui/core';
 
 import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
-import { openLoginModal, logout } from '../redux/eth/actions';
+import { openWeb3Modal, logout } from '../redux/eth/actions';
 
 function Account() {
   const address = useSelector(getAddress);
@@ -15,7 +15,7 @@ function Account() {
   const { below } = useViewport();
 
   function onLogin() {
-    dispatch(openLoginModal());
+    dispatch(openWeb3Modal());
   }
   function onLogout() {
     dispatch(logout());

@@ -13,6 +13,9 @@ if(process.env.NODE_ENV === 'production') {
     }
   );
   ReactGA.initialize('UA-68373171-8');
+  ReactGA.event({
+    category: 'app',
+  });
   LogRocket.getSessionURL(function (sessionURL) {
     ReactGA.event({
       category: 'LogRocket',

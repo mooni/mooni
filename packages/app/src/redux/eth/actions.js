@@ -1,8 +1,11 @@
-import ETHManager, { detectIframeWeb3Provider } from '../../lib/eth';
+import ETHManager from '../../lib/eth';
+import { detectIframeWeb3Provider } from '../../lib/web3Providers';
 
+import { setModalError } from '../ui/actions';
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
+import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -55,11 +58,13 @@ export const resetETHManager = () => function (dispatch, getState) {
   dispatch(setProviderFromIframe(false));
 };
 
-export const initETH = (walletType) => async function (dispatch)  {
+export const initETH = (ethereum) => async function (dispatch)  {
   dispatch(setETHManagerLoading(true));
   try {
 
-    const ethManager = await ETHManager.createETHManager(walletType);
+    const ethManager = new ETHManager(ethereum);
+    await ethManager.init();
+
     dispatch(setETHManager(ethManager));
     dispatch(setAddress(ethManager.getAddress()));
     dispatch(setETHManagerLoading(false));
@@ -68,23 +73,18 @@ export const initETH = (walletType) => async function (dispatch)  {
       dispatch(setAddress(ethManager.getAddress()));
     });
     ethManager.on('stop', () => {
-      dispatch(resetETHManager());
+      dispatch(logout());
     });
 
     dispatch(initBoxIfLoggedIn()).catch(error => logError('unable to enable box after login', error));
 
   } catch(error) {
-    dispatch(resetETHManager());
-    dispatch(setETHManagerLoading(false));
+    dispatch(logout());
 
     if(error.message === 'eth_smart_account_not_supported') {
       throw new Error('eth_smart_account_not_supported');
-    } else if(error.message === 'no_ethereum_provider') {
-      throw new Error('no_ethereum_provider');
     } else if(error.message === 'eth_wrong_network_id') {
       throw new Error('eth_wrong_network_id');
-    } else if(error.message === 'User closed WalletConnect modal') {
-      return null;
     } else {
       logError('Unable to open ethereum wallet', error);
       throw new Error('unknown_error');
@@ -92,17 +92,31 @@ export const initETH = (walletType) => async function (dispatch)  {
   }
 };
 
+export const openWeb3Modal = () => async (dispatch) => {
+  try {
+    const ethereum = await web3Modal.connect();
+    await dispatch(initETH(ethereum));
+  } catch(error) {
+    if(error === "Modal closed by user") return;
+    dispatch(setModalError(error));
+  }
+};
+
 export const autoConnect = () => async (dispatch) => {
   dispatch(setETHManagerLoading(true));
   const initIframeProvider = await detectIframeWeb3Provider();
   if (initIframeProvider) {
-    await dispatch(initETH('iframe'));
+    const ethereum = getWalletProvider('iframe');
+    await dispatch(initETH(ethereum));
     dispatch(setProviderFromIframe(true));
+  } else if(web3Modal.cachedProvider) {
+    await dispatch(openWeb3Modal());
   }
   dispatch(setETHManagerLoading(false));
 };
 
 export const logout = () => (dispatch) => {
+  web3Modal.clearCachedProvider();
   dispatch(resetETHManager());
   dispatch(resetBox());
 };

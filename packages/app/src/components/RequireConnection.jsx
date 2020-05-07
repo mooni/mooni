@@ -6,7 +6,9 @@ import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { openLoginModal } from '../redux/eth/actions';
+import { openWeb3Modal } from '../redux/eth/actions';
+
+import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
 
 function RequireConnection({ children }) {
   const ethManager = useSelector(getETHManager);
@@ -14,7 +16,7 @@ function RequireConnection({ children }) {
   const dispatch = useDispatch();
 
   function login() {
-    dispatch(openLoginModal());
+    dispatch(openWeb3Modal());
   }
 
   if(ethManager)
@@ -28,6 +30,7 @@ function RequireConnection({ children }) {
       <Box display="flex" justifyContent="center">
         <EmptyStateCard
           text="Please connect your Ethereum wallet"
+          illustration={<img src={LoadImage} width="80%" alt="" />}
           action={<Button onClick={login}>Connect</Button>}
         />
       </Box>
