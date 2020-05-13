@@ -17,7 +17,7 @@
     "start:app": "lerna run --scope @mooni/app start",
     "start:burner": "lerna run --parallel start-burner",
     "build:app": "lerna run --scope @mooni/app build",
-    "build:burner": "lerna run --scope @mooni/burner-wallet buuild"
+    "build:burner": "lerna run --scope @mooni/burner-wallet build"
   },
   "workspaces": [
     "packages/*"

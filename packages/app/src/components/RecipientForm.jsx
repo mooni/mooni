@@ -65,7 +65,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   });
   useEffect(() => {
     reset(initialRecipient);
-  }, [initialRecipient]);
+  }, [reset, initialRecipient]);
 
   const [selectedCountry, setSelectedCountry] = useState(
     initialRecipient?.owner?.country ?

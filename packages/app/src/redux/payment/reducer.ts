@@ -53,6 +53,7 @@ const initialEmptyState: State = {
   payment: undefined,
 };
 
+// eslint-disable-next-line
 const initialMockStateMinimum: State = {
   exchangeStep: 0,
   orderRequest: {
@@ -75,6 +76,7 @@ const initialMockStateMinimum: State = {
   payment: undefined,
 };
 
+// eslint-disable-next-line
 const initialMockStateComplete: State = {
   exchangeStep: 0,
   orderRequest: {

@@ -9,16 +9,17 @@ import {
   tradeTokensForExactEthWithData,
 } from '@uniswap/sdk';
 import {ethers} from 'ethers';
+import config from '../config';
 
 import ERC20_ABI from './abis/ERC20.json';
-import {TOKEN_DATA} from './currencies';
-import {CHAIN_ID} from './eth';
+import { getTokenAddress } from './currencies';
 import Bity from './bity';
 
 import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
 
-const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
+const { CHAIN_ID } = config;
 
+const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
 // TODO slippage
 
@@ -206,7 +207,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
 
 export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: string, amount: string, tradeExact: TradeExact }): Promise<DexTrade> {
-  const { tokenAddress } = TOKEN_DATA[symbol];
+  const tokenAddress = getTokenAddress(symbol);
   const tokenReserves = await getTokenReserves(tokenAddress, CHAIN_ID);
 
   const decimals = tradeExact === TradeExact.OUTPUT ? 18 : tokenReserves.token.decimals;

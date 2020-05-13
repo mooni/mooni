@@ -3,13 +3,9 @@ import { ethers } from 'ethers';
 
 import { getWalletProvider } from './web3Providers';
 
-import {
-  SUPPORTED_CHAIN_ID,
-} from '@uniswap/sdk';
+import config from '../config';
 
-export const CHAIN_ID = SUPPORTED_CHAIN_ID.Mainnet;
-// export const CHAIN_ID = SUPPORTED_CHAIN_ID.Rinkeby;
-// export const CHAIN_ID = 5777;
+const { CHAIN_ID } = config;
 
 function reloadPage() {
   window.location.reload()
