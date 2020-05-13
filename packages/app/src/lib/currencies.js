@@ -24,10 +24,10 @@ const CURRENCIES_DATA = {
   }
 };
 
-const TOKENS = CURRENCIES_DATA.networks[config.CHAIN_ID].tokens;
+export { ETH };
+export const TOKENS = CURRENCIES_DATA.networks[config.CHAIN_ID].tokens;
 
-export const INPUT_CURRENCIES = [ETH].concat(Object.keys(TOKENS));
-export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
+export const FIAT_CURRENCIES = ['EUR', 'CHF'];
 
 export const DEFAULT_INPUT_CURRENCY = 'DAI';
 export const DEFAULT_OUTPUT_CURRENCY = 'EUR';
@@ -37,7 +37,7 @@ export const SIGNIFICANT_DIGITS = 7;
 export const getCurrencyLogoAddress = memoize((symbol) => {
   if(symbol === ETH) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
-  } else if(OUTPUT_CURRENCIES.indexOf(symbol) !== -1){
+  } else if(FIAT_CURRENCIES.includes(symbol)){
     return `/images/coinIcons/${symbol}.svg`;
   }
   const tokenAddress = getTokenAddress(symbol);
@@ -52,13 +52,17 @@ export function getTokenAddress(symbol) {
   return tokenAddress;
 }
 
-export async function fetchTokenName(tokenAddress) {
+export async function fetchTokenSymbol(tokenAddress) {
   const reserves = await getTokenReserves(tokenAddress, defaultProvider);
   if(!reserves.exchange.address) throw new Error('token has no exchange available')
 
   let contract = new ethers.Contract(tokenAddress, ERC20, defaultProvider);
-  const name = await contract.symbol();
-  return name;
+  return contract.symbol();
 }
 
-// fetchTokenName('0xb683E83a532e2Cb7DFa5275eED3698436371cc9f').then(console.log).catch(console.error)
+export async function addToken(tokenAddress) {
+  const checksumAddress = ethers.utils.getAddress(tokenAddress);
+  const symbol = await fetchTokenSymbol(checksumAddress);
+  TOKENS[symbol] = checksumAddress;
+  return [symbol, checksumAddress];
+}

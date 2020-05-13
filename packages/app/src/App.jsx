@@ -13,11 +13,13 @@ import Routes from './Routes';
 
 import store from './redux/store';
 import { autoConnect } from './redux/eth/actions';
+import { initTokens } from './redux/ui/actions';
 
 export default function App() {
 
   useEffect(() => {
     store.dispatch(autoConnect()).catch(console.error);
+    store.dispatch(initTokens());
   }, []);
 
   return (

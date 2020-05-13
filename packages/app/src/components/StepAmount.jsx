@@ -12,11 +12,11 @@ import { getRateRequest } from '../redux/payment/selectors';
 export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();
   const defaultRateRequest = useSelector(getRateRequest);
-  const [rateRequest, setLocalRateRequest] = useState(null);
+  const [localRateRequest, setLocalRateRequest] = useState(null);
   const [rateValid, setRateValid] = useState(false);
 
   const onSubmit = () => {
-    dispatch(setRateRequest(rateRequest));
+    dispatch(setRateRequest(localRateRequest));
     onComplete();
   };
 

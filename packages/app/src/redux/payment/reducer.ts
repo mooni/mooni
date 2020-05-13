@@ -1,8 +1,6 @@
 import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
-  INPUT_CURRENCIES,
-  OUTPUT_CURRENCIES
 } from '../../lib/currencies';
 import {
   ExchangePath,
@@ -64,8 +62,8 @@ const initialMockStateMinimum: State = {
       iban: 'NL84INGB1679475908',
     },
     rateRequest: {
-      inputCurrency: INPUT_CURRENCIES[1],
-      outputCurrency: OUTPUT_CURRENCIES[0],
+      inputCurrency: 'DAI',
+      outputCurrency: 'EUR',
       amount: '10',
       tradeExact: TradeExact.OUTPUT,
     },
