@@ -15,15 +15,14 @@
   "browser": "dist/index.umd.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "yarn build:cjs && yarn build:umd && yarn build:es",
-    "prepublish": "yarn run build",
-    "build:cjs": "webpack --config-name=cjs",
-    "build:umd": "webpack --config-name=umd",
-    "build:es": "webpack --config-name=es",
-    "serve:cjs": "yarn build:cjs && parcel example/cjs/index.html",
-    "serve:es": "yarn build:es && parcel example/es/index.html",
-    "serve:umd": "yarn build:umd && cp dist/index.umd.js example/umd/widget.js && serve example/umd",
-    "start-burner": "webpack --config-name=cjs --watch"
+    "dev": "webpack --watch",
+    "build": "webpack",
+    "prepublish": "yarn build",
+    "serve:cjs": "yarn build && parcel example/cjs/index.html",
+    "serve:es": "yarn build && parcel example/es/index.html",
+    "serve:umd": "yarn build && cp dist/index.umd.js example/umd/widget.js && serve example/umd",
+    "start:burner": "yarn dev",
+    "start:example-host": "yarn dev"
   },
   "devDependencies": {
     "add-module-exports-webpack-plugin": "^1.0.0",

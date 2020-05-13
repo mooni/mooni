@@ -18,7 +18,8 @@
     "typescript": "3.5.1"
   },
   "scripts": {
-    "start-burner": "react-scripts start",
+    "start": "react-scripts start",
+    "start:burner": "yarn start",
     "build": "react-scripts build"
   },
   "browserslist": {

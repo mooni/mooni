@@ -1,5 +1,5 @@
 {
-  "name": "mooni-widget-react-host",
+  "name": "@mooni/example-host",
   "version": "1.0.4",
   "private": true,
   "dependencies": {
@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:example-host": "yarn start",
     "build": "react-scripts build"
   },
   "browserslist": {
