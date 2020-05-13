@@ -9,15 +9,13 @@ import {
   tradeTokensForExactEthWithData,
 } from '@uniswap/sdk';
 import {ethers} from 'ethers';
-import config from '../config';
 
 import ERC20_ABI from './abis/ERC20.json';
 import { getTokenAddress } from './currencies';
 import Bity from './bity';
 
 import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
-
-const { CHAIN_ID } = config;
+import {defaultProvider} from './web3Providers';
 
 const stringifyObj = obj => JSON.parse(JSON.stringify(obj));
 
@@ -208,7 +206,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
 export async function rateTokenToETH({ symbol, amount, tradeExact }: { symbol: string, amount: string, tradeExact: TradeExact }): Promise<DexTrade> {
   const tokenAddress = getTokenAddress(symbol);
-  const tokenReserves = await getTokenReserves(tokenAddress, CHAIN_ID);
+  const tokenReserves = await getTokenReserves(tokenAddress, defaultProvider);
 
   const decimals = tradeExact === TradeExact.OUTPUT ? 18 : tokenReserves.token.decimals;
   const exactAmount = new BN(amount).times(10 ** decimals).dp(0);

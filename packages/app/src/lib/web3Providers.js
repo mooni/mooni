@@ -10,7 +10,16 @@ import createLedgerSubprovider from '@ledgerhq/web3-subprovider';
 import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 
 import config from '../config';
-const { infuraId, portisAppId, fortmaticId } = config;
+import { ethers } from 'ethers';
+const { CHAIN_ID, infuraId, portisAppId, fortmaticId } = config;
+
+const networks = {
+  1: 'homestead',
+  3: 'ropsten',
+  4: 'rinkeby',
+  42: 'kovan',
+};
+export const defaultProvider = new ethers.providers.InfuraProvider(networks[CHAIN_ID], infuraId);
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
