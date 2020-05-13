@@ -1,33 +1,68 @@
-import { ETH } from '@uniswap/sdk';
+import { memoize } from 'lodash';
 
-export const TOKEN_DATA = {
-  DAI: {
-    tokenAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-  },
-  USDC: {
-    tokenAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  },
-  WBTC: {
-    tokenAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-  },
+import { ETH, SUPPORTED_CHAIN_ID, getTokenReserves } from '@uniswap/sdk';
+import config from '../config';
+import { ethers } from 'ethers';
+import { defaultProvider } from './web3Providers';
+import ERC20 from './abis/ERC20';
+
+const CURRENCIES_DATA = {
+  networks: {
+    [SUPPORTED_CHAIN_ID.Mainnet]: {
+      tokens: {
+        DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+        // BTU: '0xb683D83a532e2Cb7DFa5275eED3698436371cc9f',
+      }
+    },
+    [SUPPORTED_CHAIN_ID.Rinkeby]: {
+      tokens: {
+        DAI: '0x2448eE2641d78CC42D7AD76498917359D961A783',
+      }
+    },
+  }
 };
 
-export const ENABLE_TOKENS = true;
+export { ETH };
+export const TOKENS = CURRENCIES_DATA.networks[config.CHAIN_ID].tokens;
 
-export const INPUT_CURRENCIES = [ETH].concat(ENABLE_TOKENS ? Object.keys(TOKEN_DATA) : []);
-export const OUTPUT_CURRENCIES = ['EUR', 'CHF'];
+export const FIAT_CURRENCIES = ['EUR', 'CHF'];
 
 export const DEFAULT_INPUT_CURRENCY = 'DAI';
 export const DEFAULT_OUTPUT_CURRENCY = 'EUR';
 
-export function getCurrencyLogoAddress(symbol) {
+export const SIGNIFICANT_DIGITS = 7;
+
+export const getCurrencyLogoAddress = memoize((symbol) => {
   if(symbol === ETH) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
-  } else if(OUTPUT_CURRENCIES.indexOf(symbol) !== -1){
+  } else if(FIAT_CURRENCIES.includes(symbol)){
     return `/images/coinIcons/${symbol}.svg`;
   }
-  const tokenAddress = TOKEN_DATA[symbol].tokenAddress;
+  const tokenAddress = getTokenAddress(symbol);
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`;
+});
+
+export function getTokenAddress(symbol) {
+  const tokenAddress = TOKENS[symbol];
+  if(!tokenAddress) {
+    throw new Error('unknown-token');
+  }
+  return tokenAddress;
 }
 
-export const SIGNIFICANT_DIGITS = 7;
+export async function fetchTokenSymbol(tokenAddress) {
+  const reserves = await getTokenReserves(tokenAddress, defaultProvider);
+  if(!reserves.exchange.address) throw new Error('token has no exchange available')
+
+  let contract = new ethers.Contract(tokenAddress, ERC20, defaultProvider);
+  return contract.symbol();
+}
+
+export async function addToken(tokenAddress) {
+  const checksumAddress = ethers.utils.getAddress(tokenAddress);
+  const symbol = await fetchTokenSymbol(checksumAddress);
+  TOKENS[symbol] = checksumAddress;
+  return [symbol, checksumAddress];
+}

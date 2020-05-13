@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 
 import Box from '@material-ui/core/Box';
+// eslint-disable-next-line
 import { Checkbox, Button, IconArrowRight, Help, textStyle, GU } from '@aragon/ui'
 
 import { setRecipient } from '../redux/payment/actions';
@@ -15,13 +16,13 @@ import { updateMyAccount } from '../redux/contacts/actions';
 import RecipientForm from './RecipientForm';
 import {BoxLoadingContainer, BoxModal} from './RequireBox';
 
-const useStyles = makeStyles(() => ({
-  saveInfoRow: {
-    marginBottom: '15px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
+// const useStyles = makeStyles(() => ({
+//   saveInfoRow: {
+//     marginBottom: '15px',
+//     display: 'flex',
+//     alignItems: 'center',
+//   },
+// }));
 
 const Hint = styled.p`
   ${textStyle('body3')};
@@ -31,7 +32,7 @@ const Hint = styled.p`
 `;
 
 function StepRecipient({ onComplete }) {
-  const classes = useStyles();
+  // const classes = useStyles();
   const recipient = useSelector(getRecipient);
   const boxManager = useSelector(getBoxManager);
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function StepRecipient({ onComplete }) {
     onComplete();
   }
 
+// eslint-disable-next-line
   function onClickSaveData(value) {
     if(boxManager) {
       setSaveAccountInfo(!saveAccountInfo);

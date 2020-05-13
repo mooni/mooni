@@ -7,6 +7,7 @@ interface MooniWidgetOptions {
   containerElement?: HTMLElement;
   appUrl?: string;
   web3Provider?: any;
+  token?: string;
 }
 
 class MooniWidget {
@@ -17,6 +18,7 @@ class MooniWidget {
   private iframeElement?: HTMLIFrameElement;
   private modalContainer?: HTMLDivElement;
   private appUrl: string;
+  private customToken?: string;
   private web3Provider?: any;
 
   constructor(opts: MooniWidgetOptions = {}) {
@@ -30,6 +32,7 @@ class MooniWidget {
     }
 
     this.appUrl = opts.appUrl || defaultAppUrl;
+    this.customToken = opts.token;
 
     this.createIframe();
 
@@ -37,6 +40,7 @@ class MooniWidget {
       this.web3Provider = opts.web3Provider;
       this.listenWeb3Messages();
     }
+
   }
 
   private createModal() {
@@ -69,7 +73,7 @@ class MooniWidget {
 
     this.iframeElement = document.createElement('iframe');
 
-    this.iframeElement.src = this.appUrl;
+    this.iframeElement.src = this.getAppUrl();
     this.iframeElement.style.flex = '1';
     this.iframeElement.style.border = '0 transparent';
 
@@ -98,6 +102,14 @@ class MooniWidget {
 
   }
 
+
+  private getAppUrl() {
+    let appUrl = this.appUrl;
+    if(this.customToken) {
+      appUrl += `?token=${this.customToken}`;
+    }
+    return appUrl;
+  }
 
   private forwardWeb3Message(rawmessage: string, callback: any) {
     const message = JSON.parse(JSON.stringify(rawmessage));

@@ -1,13 +1,13 @@
 {
   "name": "@mooni/burner-wallet",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "private": true,
   "dependencies": {
     "@burner-wallet/assets": "^1.0.0",
     "@burner-wallet/core": "^1.0.0",
     "@burner-wallet/exchange": "^1.0.0",
     "@burner-wallet/modern-ui": "^1.0.0",
-    "@mooni/burner-plugin": "^1.0.8",
+    "@mooni/burner-plugin": "^1.0.10",
     "@types/node": "12.0.4",
     "@types/react": "*",
     "@types/react-dom": "16.8.4",
@@ -18,7 +18,8 @@
     "typescript": "3.5.1"
   },
   "scripts": {
-    "start-burner": "react-scripts start",
+    "start": "react-scripts start",
+    "start:burner": "yarn start",
     "build": "react-scripts build"
   },
   "browserslist": {

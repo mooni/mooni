@@ -43,6 +43,8 @@ Instanciate a Mooni widget.
 
 `opts.web3Provider`: Use your own connected web3 provider.
 
+`opts.token`: Add a custom token to the list of input currencies. This must be the address of the contract and the token must be available on Uniswap.
+
 #### If used as a modal:
 - `mooni.open()`  
 Opens the Mooni widget modal.
