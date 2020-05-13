@@ -15,9 +15,10 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}'",
     "start": "yarn run start:app",
     "start:app": "lerna run --scope @mooni/app start",
-    "start:burner": "lerna run --parallel start-burner",
+    "start:example-host": "CI=true lerna run --parallel start:example-host",
+    "start:burner": "lerna run --parallel start:burner",
     "build:app": "lerna run --scope @mooni/app build",
-    "build:burner": "lerna run --scope @mooni/burner-wallet buuild"
+    "build:burner": "lerna run --scope @mooni/burner-wallet build"
   },
   "workspaces": [
     "packages/*"

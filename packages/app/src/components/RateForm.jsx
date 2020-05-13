@@ -3,6 +3,7 @@ import BN from 'bignumber.js';
 
 import { Typography, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector } from 'react-redux';
 
 import { LoadingRing, textStyle } from '@aragon/ui'
 import styled from 'styled-components';
@@ -15,9 +16,10 @@ import { isNotZero } from '../lib/numbers';
 import { TradeExact } from '../lib/types';
 import { logError } from '../lib/log';
 
+import { getInputCurrencies } from '../redux/ui/selectors';
+
 import {
-  INPUT_CURRENCIES as inputCurrencies,
-  OUTPUT_CURRENCIES as outputCurrencies,
+  FIAT_CURRENCIES,
   SIGNIFICANT_DIGITS,
 } from '../lib/currencies';
 
@@ -41,6 +43,8 @@ const useStyles = makeStyles(theme => ({
 
 function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequest }) {
   const classes = useStyles();
+  const inputCurrencies = useSelector(getInputCurrencies);
+  const outputCurrencies = FIAT_CURRENCIES;
 
   const [rateDetails, setRateDetails] = useState({
     inputCurrencyId: 0,
@@ -59,7 +63,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
 
   useEffect(() => {
     if(defaultRateRequest) {
-      const newRateDetails = {
+      setRateDetails({
         inputCurrencyId: inputCurrencies.indexOf(defaultRateRequest.inputCurrency),
         inputCurrency: defaultRateRequest.inputCurrency,
         outputCurrencyId: outputCurrencies.indexOf(defaultRateRequest.outputCurrency),
@@ -67,8 +71,7 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
         inputAmount: defaultRateRequest.tradeExact === TradeExact.INPUT ? defaultRateRequest.amount : null,
         outputAmount: defaultRateRequest.tradeExact === TradeExact.OUTPUT ? defaultRateRequest.amount : null,
         tradeExact: defaultRateRequest.tradeExact,
-      };
-      setRateDetails(newRateDetails);
+      });
       setRateRequest({
         inputCurrency: defaultRateRequest.inputCurrency,
         outputCurrency: defaultRateRequest.outputCurrency,

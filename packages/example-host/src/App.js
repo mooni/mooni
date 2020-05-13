@@ -3,7 +3,9 @@ import './App.css';
 
 import MooniWidget from '@mooni/widget';
 
-const mooni = new MooniWidget();
+const mooni = new MooniWidget({
+  token: '0xb683D83a532e2Cb7DFa5275eED3698436371cc9f',
+});
 
 function App() {
 

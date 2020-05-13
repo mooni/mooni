@@ -81,10 +81,8 @@ export const initETH = (ethereum) => async function (dispatch)  {
   } catch(error) {
     dispatch(logout());
 
-    if(error.message === 'eth_smart_account_not_supported') {
-      throw new Error('eth_smart_account_not_supported');
-    } else if(error.message === 'eth_wrong_network_id') {
-      throw new Error('eth_wrong_network_id');
+    if(error.message === 'eth_smart_account_not_supported' || error.message === 'eth_wrong_network_id') {
+      throw error;
     } else {
       logError('Unable to open ethereum wallet', error);
       throw new Error('unknown_error');
