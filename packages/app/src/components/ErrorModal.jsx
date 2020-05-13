@@ -7,6 +7,12 @@ import { Button, IconCaution, useTheme } from '@aragon/ui'
 import { getModalError } from '../redux/ui/selectors';
 import { setModalError } from '../redux/ui/actions';
 
+const networkName = {
+  1: 'Mainnet',
+  3: 'Ropsten',
+  4: 'Rinkeby',
+  42: 'Kovan',
+};
 
 function getErrorTitle(error) {
   switch(error?.message) {
@@ -26,7 +32,7 @@ function getErrorContent(error) {
     case 'eth_smart_account_not_supported':
       return 'We currently do not support smart account wallets such as Argent or Gnosis Safe.';
     case 'eth_wrong_network_id':
-      return 'Your wallet must be using Mainnet network, please switch.';
+      return `Your wallet is on a wrong network. Please switch to ${networkName[error.networkId]}.`;
     case 'no_ethereum_provider':
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
     case 'unknown_error':

@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { getWalletProvider } from './web3Providers';
 
 import config from '../config';
+import MetaError from './errors';
 
 const { CHAIN_ID } = config;
 
@@ -41,7 +42,7 @@ export default class ETHManager extends EventEmitter {
 
     if(await this.getNetworkId() !== CHAIN_ID) {
       this.close();
-      throw new Error('eth_wrong_network_id');
+      throw new MetaError('eth_wrong_network_id', { networkId: CHAIN_ID });
     }
   }
 
