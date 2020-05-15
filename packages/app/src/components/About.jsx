@@ -41,7 +41,7 @@ export default function AboutPage() {
       </Header>
       <Content>
         It is possible to integrate Mooni into any applications. Please refer to
-        <Link href="https://github.com/pakokrew/mooni#-Frontend-integration" external style={{ textDecoration: 'none' }}>
+        <Link href="https://doc.mooni.tech" external style={{ textDecoration: 'none' }}>
           &nbsp;the documentation&nbsp;
         </Link>
         for more informations.

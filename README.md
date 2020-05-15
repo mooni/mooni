@@ -6,6 +6,8 @@ Easily transfer funds from your crypto wallet to your bank account.
 
 [🚀 Web Application](https://app.mooni.tech)
 
+[📒 Documentation](https://doc.mooni.tech)
+
 [🔮 Frontend integration](#-frontend-integration)
 
 [📎 Burner Wallet Plugin](#-burner-wallet-plugin)
