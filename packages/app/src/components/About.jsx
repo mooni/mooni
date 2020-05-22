@@ -35,6 +35,7 @@ export default function AboutPage() {
       </Header>
       <Content>
         Mooni can only transfer funds in Euro (EUR) and Swiss Franc (CHF) to bank accounts in the <Link href="https://www.ecb.europa.eu/paym/integration/retail/sepa/html/index.en.html" style={{ textDecoration: 'none' }} external>SEPA network</Link>.
+        <br/>The following banks are known to refuse payments from our service: <i style={{color: '#881111'}}>Payoneer, Transferwise</i>
       </Content>
       <Header>
         Integration

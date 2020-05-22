@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 
 import Fortmatic from 'fortmatic';
@@ -10,7 +11,8 @@ import createLedgerSubprovider from '@ledgerhq/web3-subprovider';
 import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 
 import config from '../config';
-import { ethers } from 'ethers';
+import { logError } from './log';
+
 const { CHAIN_ID, infuraId, portisAppId, fortmaticId } = config;
 
 const networks = {
@@ -97,11 +99,12 @@ export function detectIframeWeb3Provider() {
 
 export function detectWalletError(error) {
   if(
-    error.code === 4001 ||  // Metamask
-    error.message.includes('User canceled') // Trust wallet
+    error?.code === 4001 ||  // Metamask
+    error && error.message && String(error.message).includes('User canceled') // Trust wallet
   )
     return new Error('user-rejected-transaction');
-  return null;
+  logError(error);
+  return error;
 }
 
 const providerOptions = {

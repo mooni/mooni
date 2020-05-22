@@ -3,18 +3,21 @@ import { useLocation }  from 'react-router-dom';
 import ReactGA from 'react-ga';
 import LogRocket from 'logrocket';
 
+import config from '../config';
+
 if(process.env.NODE_ENV === 'production') {
   LogRocket.init(
-    '282s2e/mooni',
+    config.logRocketId,
     {
       network: {
         isEnabled: false,
       },
     }
   );
-  ReactGA.initialize('UA-68373171-8');
+  ReactGA.initialize(config.gtagId);
   ReactGA.event({
-    category: 'app',
+    category: 'source',
+    action: 'app',
   });
   LogRocket.getSessionURL(function (sessionURL) {
     ReactGA.event({
