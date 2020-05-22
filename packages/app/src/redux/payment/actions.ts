@@ -178,7 +178,7 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
     }));
   } catch(error) {
 
-    let capturedError = detectWalletError(error) || error;
+    let capturedError = detectWalletError(error);
     dispatch(updatePaymentStep({
       id: stepId,
       status: PaymentStepStatus.ERROR,
