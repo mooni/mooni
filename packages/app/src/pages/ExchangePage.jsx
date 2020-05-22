@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box as ABox } from '@aragon/ui'
 
 import RequireConnection from '../components/RequireConnection';
+import StepNotice from '../components/StepNotice';
 import StepRecipient from '../components/StepRecipient';
 import StepPaymentDetail from '../components/StepPaymentDetail';
 import StepAmount from '../components/StepAmount';
@@ -43,7 +44,7 @@ export default function ExchangePage() {
     dispatch(setExchangeStep(stepId + 1));
   }
   function handleBack() {
-    if(stepId === 3) {
+    if(stepId === 4) {
       dispatch(resetOrder());
     }
     dispatch(setExchangeStep(Math.max(0, stepId - 1)));
@@ -57,11 +58,12 @@ export default function ExchangePage() {
     history.push('/status');
   }
 
-  const steps = ['Amount', 'Recipient', 'Payment Details', 'Order summary'];
+  const steps = ['Amount', 'Recipient', 'Payment Details', 'Notice', 'Order summary'];
   const stepElements = [
     <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
-    <StepPaymentDetail onComplete={onPrepareRecap} />,
+    <StepPaymentDetail onComplete={handleNext} />,
+    <StepNotice onComplete={onPrepareRecap} />,
     <StepRecap onComplete={onSend} />,
   ];
 

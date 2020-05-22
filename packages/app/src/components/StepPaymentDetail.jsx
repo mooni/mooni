@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
 
-import { Button, GU, IconCheck, textStyle } from '@aragon/ui'
+import { Button, GU, IconArrowRight, textStyle } from '@aragon/ui'
 
 import { setReference } from '../redux/payment/actions';
 import { getReference } from '../redux/payment/selectors';
@@ -56,7 +56,7 @@ function StepPaymentDetail({ onComplete }) {
           errorMessage="Invalid reference, please only use regular letters and numbers"
           placeholder="Bill A2313"
         />
-        <Button mode="strong" onClick={onSubmit} wide icon={<IconCheck/>} label="Create order" disabled={hasErrors} />
+        <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
       </form>
     </Box>
   )
