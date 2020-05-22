@@ -254,7 +254,9 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   const bityInputAmount = order.bityOrder.input.amount;
   const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
+
   log('PAYMENT: bity order id', order.bityOrder.id);
+  log('PAYMENT: ETH address', ethManager.getAddress());
 
   try {
     if(order.path === ExchangePath.DEX_BITY) {
