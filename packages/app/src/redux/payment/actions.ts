@@ -178,7 +178,7 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
     }));
   } catch(error) {
 
-    let capturedError = detectWalletError(error) || error;
+    let capturedError = detectWalletError(error);
     dispatch(updatePaymentStep({
       id: stepId,
       status: PaymentStepStatus.ERROR,
@@ -254,7 +254,9 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   const bityInputAmount = order.bityOrder.input.amount;
   const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
+
   log('PAYMENT: bity order id', order.bityOrder.id);
+  log('PAYMENT: ETH address', ethManager.getAddress());
 
   try {
     if(order.path === ExchangePath.DEX_BITY) {

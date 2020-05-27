@@ -68,10 +68,19 @@ const StatusListItem = styled(ListItem)`
 function PaymentOngoingInfo({ payment }) {
   const ongoing = payment.status === PaymentStatus.ONGOING;
   const bityStep = payment.steps.find(s => s.id === PaymentStepId.BITY);
+  const waitingBity = bityStep && bityStep.status === PaymentStepStatus.RECEIVED;
+  const miningStep = payment.steps.find(s => s.status === PaymentStepStatus.MINING);
 
   return (
     <Box>
-      {ongoing && bityStep.status === PaymentStepStatus.RECEIVED ?
+      {miningStep &&
+      <Box mb={2}>
+        <Info mode="info">
+          Your transaction is validating. Please <b>do not speed up</b> the transaction in your wallet.
+        </Info>
+      </Box>
+      }
+      {ongoing && waitingBity ?
         <Hint>
           Your payment have been received and the bank transfer is being sent. This process can take up to 10 minutes.
         </Hint>

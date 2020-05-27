@@ -62,7 +62,7 @@ function StepRecipient({ onComplete }) {
         <BoxModal visible={showBoxModal} onClose={() => setShowBoxModal(false)}/>
 
         <Hint>
-          Please provide details about the recipient
+          Please provide your bank account informations
         </Hint>
 
         <RecipientForm
@@ -81,7 +81,7 @@ function StepRecipient({ onComplete }) {
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
               </label>*/}
-              <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
+              <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
             </>
           )}
         />
