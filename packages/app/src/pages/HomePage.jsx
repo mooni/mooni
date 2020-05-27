@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import { Box, Typography } from '@material-ui/core';
-import { Info } from '@aragon/ui'
 
 import StepAmount from '../components/StepAmount';
 import { setExchangeStep } from '../redux/payment/actions';
@@ -27,11 +26,6 @@ export default function HomePage() {
           </Typography>
         </Box>
         <StepAmount onComplete={onGoToExchange} />
-        <Box pt={2}>
-          <Info mode="error">
-            Mooni is unaudited, please proceed with caution.
-          </Info>
-        </Box>
       </Box>
     </SmallWidth>
   );
