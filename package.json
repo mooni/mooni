@@ -9,15 +9,14 @@
   "license": "GPL-3.0",
   "private": true,
   "scripts": {
-    "install": "lerna bootstrap",
+    "install": "lerna bootstrap && yarn --cwd app",
     "build": "lerna run build",
     "publish": "lerna publish",
     "lint": "eslint '*/**/*.{js,ts,tsx}'",
-    "start": "yarn run start:app",
-    "start:app": "lerna run --scope @mooni/app start",
+    "start:app": "yarn start --cwd app",
     "start:example-host": "CI=true lerna run --parallel start:example-host",
     "start:burner": "lerna run --parallel start:burner",
-    "build:app": "lerna run --scope @mooni/app build",
+    "build:app": "yarn build --cwd app",
     "build:burner": "lerna run --scope @mooni/burner-wallet build"
   },
   "workspaces": [
