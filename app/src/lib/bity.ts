@@ -178,24 +178,37 @@ const Bity = {
   },
 
   async getOrderDetails(orderId: string): Promise<BityOrderResponse> {
-    const { data } = await instance({
-      method: 'get',
-      url: `/v2/orders/${orderId}`,
-      withCredentials: true,
-    });
+    try {
 
-    let orderStatus: BityOrderStatus = BityOrderStatus.WAITING;
-    if(data.timestamp_cancelled) {
-      orderStatus = BityOrderStatus.CANCELLED;
-    } else if(data.timestamp_executed) {
-      orderStatus = BityOrderStatus.EXECUTED;
-    } else if(data.timestamp_payment_received) {
-      orderStatus = BityOrderStatus.RECEIVED;
+      const { data } = await instance({
+        method: 'get',
+        url: `/v2/orders/${orderId}`,
+        withCredentials: true,
+      });
+
+      let orderStatus: BityOrderStatus = BityOrderStatus.WAITING;
+      if(data.timestamp_cancelled) {
+        orderStatus = BityOrderStatus.CANCELLED;
+      } else if(data.timestamp_executed) {
+        orderStatus = BityOrderStatus.EXECUTED;
+      } else if(data.timestamp_payment_received) {
+        orderStatus = BityOrderStatus.RECEIVED;
+      }
+
+      data.orderStatus = orderStatus;
+
+      return data;
+
+    } catch(error) {
+
+        if(error.response && error.response.status === 404) {
+          throw new Error('not-found');
+        } else {
+          throw new Error('unexpected-server-error-bity');
+        }
+
     }
 
-    data.orderStatus = orderStatus;
-
-    return data;
   },
 
   getOrderStatusPageURL(orderId: string) {
