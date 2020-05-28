@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { getWalletProvider } from './web3Providers';
 
 import config from '../config';
-import MetaError from './errors';
+import { MetaError } from './errors';
 
 const { CHAIN_ID } = config;
 
@@ -81,14 +81,7 @@ export default class ETHManager extends EventEmitter {
   }
 
   async getNetworkId() {
-    return new Promise((res, rej) => {
-      this.ethereum.sendAsync({
-        method: 'net_version'
-      }, (error, data) => {
-        if (error) return rej(error);
-        res(Number(data.result));
-      });
-    });
+    return this.provider.send('net_version').then(Number);
   }
 
   async waitForConfirmedTransaction(hash) {
