@@ -6,6 +6,7 @@ import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
 import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
+import { MetaError } from '../../lib/errors';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -85,7 +86,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
       throw error;
     } else {
       logError('Unable to open ethereum wallet', error);
-      throw new Error('unknown_error');
+      throw new MetaError('unable_open_wallet', { error });
     }
   }
 };

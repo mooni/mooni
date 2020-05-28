@@ -26,6 +26,7 @@ const useStyles = makeStyles(theme => ({
   },
   logo: {
     marginRight: theme.spacing(1),
+    height: '30px',
   },
   appName: {
     fontFamily: `'Montserrat', sans-serif`,
@@ -53,7 +54,7 @@ export default function Header() {
   return (
     <Box className={classes.root}>
       <Link to="/" component={RouterLink} className={`${classes.element} ${classes.appLink} noselect`}>
-        <span role="img" aria-label="mooni-logo" className={classes.logo}>🌚</span>
+        <img src="logo192.png" alt="mooni-logo" className={classes.logo} />
         <h1 className={classes.appName}>
           MOONI
         </h1>

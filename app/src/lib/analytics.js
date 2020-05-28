@@ -4,6 +4,7 @@ import ReactGA from 'react-ga';
 import LogRocket from 'logrocket';
 
 import config from '../config';
+import { serializeError } from './errors';
 
 if(process.env.NODE_ENV === 'production') {
   LogRocket.init(
@@ -42,7 +43,11 @@ export function sendEvent(category, action, label, value) {
 
 export function captureError(message, error) {
   LogRocket.captureMessage(message);
-  LogRocket.captureException(error);
+  LogRocket.captureException(error, {
+    extra: {
+      serialized: serializeError(error),
+    },
+  });
 }
 
 export function usePageViews() {

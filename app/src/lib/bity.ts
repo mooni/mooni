@@ -1,3 +1,4 @@
+import BN from 'bignumber.js';
 import axios from 'axios';
 import {
   BityOrderResponse,
@@ -8,8 +9,6 @@ import {
   RateResult,
   TradeExact,
 } from './types';
-import BN from "bignumber.js";
-import {SIGNIFICANT_DIGITS} from "./currencies";
 
 const API_URL = 'https://exchange.api.bity.com';
 
@@ -33,7 +32,7 @@ function extractFees(order: any): { amount: string, currency: string}  {
   let feesCurrency = order.price_breakdown.customer_trading_fee.currency;
 
   if(feesCurrency === order.input.currency) {
-    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).sd(SIGNIFICANT_DIGITS).toFixed();
+    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).toFixed();
     feesCurrency = order.output.currency;
   }
 
@@ -159,7 +158,7 @@ const Bity = {
       withCredentials: true,
     });
 
-    let orderStatus: BityOrderStatus= BityOrderStatus.WAITING;
+    let orderStatus: BityOrderStatus = BityOrderStatus.WAITING;
     if(data.timestamp_cancelled) {
       orderStatus = BityOrderStatus.CANCELLED;
     } else if(data.timestamp_executed) {

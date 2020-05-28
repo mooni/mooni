@@ -19,6 +19,7 @@ function getErrorTitle(error) {
     case 'eth_smart_account_not_supported':
     case 'eth_wrong_network_id':
     case 'no_ethereum_provider':
+    case 'unable_open_wallet':
       return 'Unable to connect wallet.';
     case 'invalid-custom-token':
       return 'Invalid token';
@@ -32,11 +33,11 @@ function getErrorContent(error) {
     case 'eth_smart_account_not_supported':
       return 'We currently do not support smart account wallets such as Argent or Gnosis Safe.';
     case 'eth_wrong_network_id':
-      return `Your wallet is on a wrong network. Please switch to ${networkName[error.networkId]}.`;
+      return `Your wallet is on a wrong network. Please switch to ${networkName[error.meta.networkId]}.`;
     case 'no_ethereum_provider':
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
-    case 'unknown_error':
-      return 'The wallet you are trying to connect with seems incompatible. Please report this problem to our support.';
+    case 'unable_open_wallet':
+      return `The wallet you are trying to connect with seems incompatible. Please report this problem to our support.`;
     case 'invalid-custom-token':
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
     default:
