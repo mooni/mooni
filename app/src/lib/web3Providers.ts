@@ -100,7 +100,7 @@ export function detectIframeWeb3Provider() {
 export function detectWalletError(error) {
   if(
     error?.code === 4001 ||  // Metamask
-    error && error.message && String(error.message).includes('User canceled') // Trust wallet
+    (error && error.message && String(error.message).includes('User canceled')) // Trust wallet
   )
     return new Error('user-rejected-transaction');
   logError(error);
