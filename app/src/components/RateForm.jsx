@@ -10,7 +10,8 @@ import styled from 'styled-components';
 
 import AmountRow from './AmountRow';
 
-import { useDebounce } from '../lib/hooks';
+import { useDebounce } from '../hooks/utils';
+import { useBalance } from '../hooks/balance';
 import { getRate } from '../lib/exchange';
 import { isNotZero } from '../lib/numbers';
 import { TradeExact } from '../lib/types';
@@ -60,6 +61,9 @@ function RateForm({ onChange = () => null, onValid = () => null, defaultRateRequ
   const [rateRequest, setRateRequest] = useState(null);
   const [fees, setFees] = useState(null);
   const debouncedRateRequest = useDebounce(rateRequest, 1000);
+
+  const balance = useBalance(rateDetails.inputCurrency);
+  console.log(balance);
 
   useEffect(() => {
     if(defaultRateRequest) {
