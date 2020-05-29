@@ -27,14 +27,12 @@ const defaultRateForm = initialRequest => {
 
   return {
     loading: true,
-    valid: true,
-    errors: {
-      lowBalance: false,
-      lowAmount: false,
-    },
+    errors: null,
     values,
   };
 };
+
+const LOW_OUTPUT_AMOUNT = 10;
 
 export function useRate(initialRequest) {
   const [rateForm, setRateForm] = useState(() => defaultRateForm(initialRequest));
@@ -45,31 +43,29 @@ export function useRate(initialRequest) {
     setRateForm(defaultRateForm(initialRequest));
   }, [initialRequest]);
 
-  const estimate = useCallback(async (rateForm) => {
-    if(!rateForm.loading) return;
+  const estimate = useCallback(async (_rateForm, _balance) => {
+    if(!_rateForm.loading) return;
 
     const currentRequest = {
-      inputCurrency: rateForm.values.inputCurrency,
-      outputCurrency: rateForm.values.outputCurrency,
-      tradeExact: rateForm.values.tradeExact,
-      amount: rateForm.values.tradeExact === TradeExact.INPUT ? rateForm.values.inputAmount : rateForm.values.outputAmount,
+      inputCurrency: _rateForm.values.inputCurrency,
+      outputCurrency: _rateForm.values.outputCurrency,
+      tradeExact: _rateForm.values.tradeExact,
+      amount: _rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
 
-    if(currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(balance)) {
+    if(_balance !== null && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_balance)) {
       setRateForm(r => ({
         ...r,
         loading: false,
-        valid: false,
         errors: {
           lowBalance: true,
         },
       }));
       return;
-    } else if(currentRequest.tradeExact === TradeExact.OUTPUT && new BN(currentRequest.amount).lt(10)) {
+    } else if(currentRequest.tradeExact === TradeExact.OUTPUT && new BN(currentRequest.amount).lt(LOW_OUTPUT_AMOUNT)) {
       setRateForm(r => ({
         ...r,
         loading: false,
-        valid: false,
         errors: {
           lowAmount: true,
         },
@@ -81,21 +77,22 @@ export function useRate(initialRequest) {
 
     const updateRateForm = {
       loading: false,
-      valid: true,
       fees: res.fees,
       values: {
-        ...rateForm.values,
+        ..._rateForm.values,
       },
-      errors: {},
+      errors: null,
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
       updateRateForm.values.outputAmount = new BN(res.outputAmount).toFixed();
+      if(new BN(res.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
+        updateRateForm.errors = { lowAmount: true };
+      }
     }
     if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       updateRateForm.values.inputAmount = new BN(res.inputAmount).toFixed();
-      if(new BN(res.inputAmount).gt(balance)) {
-        updateRateForm.valid = false;
-        updateRateForm.errors.lowBalance = true;
+      if(_balance !== null && new BN(res.inputAmount).gt(_balance)) {
+        updateRateForm.errors = { lowBalance: true };
       }
     }
 
@@ -104,13 +101,13 @@ export function useRate(initialRequest) {
       ...updateRateForm,
     }));
 
-    if(updateRateForm.valid) {
+    if(!updateRateForm.errors) {
       setRateRequest(currentRequest);
     } else {
       setRateRequest(null);
     }
 
-  }, [balance]);
+  }, []);
 
   const onChangeCurrency = useCallback(tradeExact => currency => {
     const currencyKey = tradeExact === TradeExact.INPUT ? 'inputCurrency' : 'outputCurrency';
@@ -141,13 +138,20 @@ export function useRate(initialRequest) {
 
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
-    estimate(debouncedRateForm).catch(console.error);
-  }, [debouncedRateForm, estimate]);
+    estimate(debouncedRateForm, balance).catch(console.error);
+  }, [debouncedRateForm, balance]);
+  useEffect(() => {
+    setRateForm(r => ({
+      ...r,
+      loading: true,
+    }));
+  }, [balance]);
 
   return {
     rateForm,
     rateRequest,
     onChangeCurrency,
     onChangeAmount,
+    LOW_OUTPUT_AMOUNT,
   };
 }

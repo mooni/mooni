@@ -19,6 +19,7 @@ import {
   SIGNIFICANT_DIGITS,
 } from '../lib/currencies';
 import { useRate } from '../hooks/rates';
+import { getETHManager } from '../redux/eth/selectors';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -43,7 +44,8 @@ const outputCurrencies = FIAT_CURRENCIES;
 function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }) {
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
-  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest } = useRate(initialRateRequest);
+  const ethManager = useSelector(getETHManager);
+  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT } = useRate(initialRateRequest);
 
   let rate, feeAmount;
   if(rateForm) {
@@ -58,8 +60,10 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
     }
   }
 
+  const valid = !(rateForm.loading || rateForm.errors);
+
   function submit() {
-    if(!rateForm.valid || rateForm.loading) return;
+    if(!valid) return;
     onSubmit(rateRequest);
   }
 
@@ -86,7 +90,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
 
       <Box className={classes.additionalInfo}>
         {!rateForm.loading ?
-          rateForm.valid ?
+          !rateForm.errors ?
             <Typography variant="caption">
               <b>Rate:</b> {rate} {rateForm.values.outputCurrency}/{rateForm.values.inputCurrency}
               {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees.currency}</span>}
@@ -95,13 +99,13 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
             <InvalidMessage>
               {rateForm.errors.lowBalance && 'Insufficient balance'}
               {rateForm.errors.lowBalance && rateForm.errors.lowAmount && <br/>}
-              {rateForm.errors.lowAmount && 'Output amount too low'}
+              {rateForm.errors.lowAmount && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
             </InvalidMessage>
           :
           <LoadingRing/>
         }
       </Box>
-      <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!rateForm.valid || rateForm.loading} />
+      <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!valid} />
     </Box>
   );
 }

@@ -8,15 +8,17 @@ import { fetchTokenBalance } from '../lib/currencies';
 
 import { getETHManager } from '../redux/eth/selectors';
 
+// TODO optimise queries
 export function useBalance(symbol) {
   const ethManager = useSelector(getETHManager);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState(null);
   const [balanceLoading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
 
     if(!ethManager) {
+      setBalance(null);
       return;
     }
     const ethAddress = ethManager.getAddress();
@@ -24,7 +26,7 @@ export function useBalance(symbol) {
     if(symbol === ETH) {
 
       function updateBalance(res) {
-        setBalance(ethers.utils.formatEther(res))
+        setBalance(ethers.utils.formatEther(res));
         setLoading(false);
       }
 
