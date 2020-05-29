@@ -1,52 +1,48 @@
 import BN from 'bignumber.js';
 import { useState, useEffect, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import { TradeExact } from '../lib/types';
-import { getInputCurrencies } from '../redux/ui/selectors';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/currencies';
 import { getRate } from '../lib/exchange';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 
-const defaultRateForm = {
-  loading: true,
-  valid: true,
-  errors: {
-    lowBalance: false,
-    lowAmount: false,
-  },
-  values: {
-    inputCurrency: DEFAULT_INPUT_CURRENCY,
-    outputCurrency: DEFAULT_OUTPUT_CURRENCY,
-    inputAmount: null,
-    outputAmount: 100,
-    tradeExact: TradeExact.OUTPUT,
-    fees: 0,
-  },
+const defaultRateForm = initialRequest => {
+  let values = initialRequest ?
+    {
+      inputCurrency: initialRequest.inputCurrency,
+      outputCurrency: initialRequest.outputCurrency,
+      inputAmount: initialRequest.tradeExact === TradeExact.INPUT ? initialRequest.amount : null,
+      outputAmount: initialRequest.tradeExact === TradeExact.OUTPUT ? initialRequest.amount : null,
+      tradeExact: initialRequest.tradeExact,
+    }
+    :
+    {
+      inputCurrency: DEFAULT_INPUT_CURRENCY,
+      outputCurrency: DEFAULT_OUTPUT_CURRENCY,
+      inputAmount: null,
+      outputAmount: 100,
+      tradeExact: TradeExact.OUTPUT,
+      fees: 0,
+    };
+
+  return {
+    loading: true,
+    valid: true,
+    errors: {
+      lowBalance: false,
+      lowAmount: false,
+    },
+    values,
+  };
 };
 
 export function useRate(initialRequest) {
-
-  const [rateForm, setRateForm] = useState(defaultRateForm);
+  const [rateForm, setRateForm] = useState(() => defaultRateForm(initialRequest));
   const [rateRequest, setRateRequest] = useState(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
-    if(initialRequest) {
-      setRateForm({
-        ...defaultRateForm,
-        values: {
-          ...defaultRateForm.values,
-          inputCurrency: initialRequest.inputCurrency,
-          outputCurrency: initialRequest.outputCurrency,
-          inputAmount: initialRequest.tradeExact === TradeExact.INPUT ? initialRequest.amount : null,
-          outputAmount: initialRequest.tradeExact === TradeExact.OUTPUT ? initialRequest.amount : null,
-          tradeExact: initialRequest.tradeExact,
-        },
-      });
-    } else {
-      setRateForm(defaultRateForm);
-    }
+    setRateForm(defaultRateForm(initialRequest));
   }, [initialRequest]);
 
   const estimate = useCallback(async (rateForm) => {
