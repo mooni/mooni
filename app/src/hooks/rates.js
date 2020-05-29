@@ -5,6 +5,7 @@ import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/currenci
 import { getRate } from '../lib/exchange';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
+import { logError } from '../lib/log';
 
 const defaultRateForm = initialRequest => {
   let values = initialRequest ?
@@ -138,7 +139,9 @@ export function useRate(initialRequest) {
 
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
-    estimate(debouncedRateForm, balance).catch(console.error);
+    estimate(debouncedRateForm, balance).catch(error => {
+      logError('unable to fetch rates', error);
+    });
   }, [debouncedRateForm, balance]);
   useEffect(() => {
     setRateForm(r => ({
