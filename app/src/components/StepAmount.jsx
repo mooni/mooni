@@ -2,6 +2,7 @@ import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import { Box } from '@material-ui/core';
+import { IconArrowRight } from '@aragon/ui'
 
 import RateForm from '../components/RateForm';
 
@@ -18,8 +19,8 @@ export default function StepAmount({ onComplete }) {
   };
 
   return (
-    <Box width={1}>
-      <RateForm onSubmit={onSubmit} initialRateRequest={initialRateRequest}/>
+    <Box width={1} py={1}>
+      <RateForm onSubmit={onSubmit} initialRateRequest={initialRateRequest} buttonIcon={<IconArrowRight/>} buttonLabel="Next"/>
     </Box>
   )
 }

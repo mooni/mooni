@@ -68,7 +68,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
   }
 
   return (
-    <Box py={1}>
+    <>
       <AmountRow
         value={rateForm.values.inputAmount}
         currencies={inputCurrencies}
@@ -105,8 +105,10 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
           <LoadingRing/>
         }
       </Box>
+      {ethManager &&
       <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!valid} />
-    </Box>
+      }
+    </>
   );
 }
 
