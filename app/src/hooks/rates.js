@@ -22,7 +22,7 @@ const defaultRateForm = initialRequest => {
       inputAmount: null,
       outputAmount: 100,
       tradeExact: TradeExact.OUTPUT,
-      fees: 0,
+      fees: null,
     };
 
   return {
@@ -77,9 +77,9 @@ export function useRate(initialRequest) {
 
     const updateRateForm = {
       loading: false,
-      fees: res.fees,
       values: {
         ..._rateForm.values,
+        fees: res.fees,
       },
       errors: null,
     };

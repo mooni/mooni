@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(3),
   },
   additionalInfo: {
-    height: 46,
+    height: 56,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
