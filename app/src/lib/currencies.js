@@ -68,11 +68,20 @@ export async function addToken(tokenAddress) {
   return [symbol, checksumAddress];
 }
 
-export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
+const getTokenContract = memoize((tokenSymbol) => {
   const tokenAddress = getTokenAddress(tokenSymbol);
-  const tokenContract = new ethers.Contract(tokenAddress, ERC20, defaultProvider);
+  return new ethers.Contract(tokenAddress, ERC20, defaultProvider);
+});
+
+const getTokenDecimals = memoize(async (tokenSymbol) => {
+  const tokenContract = getTokenContract(tokenSymbol);
+  return tokenContract.decimals();
+});
+
+export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
+  const tokenContract = getTokenContract(tokenSymbol);
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
-  const tokenDecimals = await tokenContract.decimals();
+  const tokenDecimals = await getTokenDecimals(tokenSymbol);
 
   return new BN(tokenBalance).div(10 ** tokenDecimals).toFixed();
 }

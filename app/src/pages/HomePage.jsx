@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Box, Typography } from '@material-ui/core';
 import { Button, IconEthereum } from '@aragon/ui'
 
-import StepAmount from '../components/StepAmount';
 import { setExchangeStep, setRateRequest } from '../redux/payment/actions';
 import { SmallWidth } from '../components/StyledComponents';
 import { getETHManager } from '../redux/eth/selectors';
