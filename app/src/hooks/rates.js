@@ -6,6 +6,7 @@ import { getRate } from '../lib/exchange';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
+import { isNotZero } from '../lib/numbers';
 
 const defaultRateForm = initialRequest => {
   let values = initialRequest ?
@@ -53,6 +54,17 @@ export function useRate(initialRequest) {
       tradeExact: _rateForm.values.tradeExact,
       amount: _rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
+
+    if(!isNotZero(currentRequest.amount)) {
+      setRateForm(r => ({
+        ...r,
+        loading: false,
+        errors: {
+          lowAmount: true,
+        },
+      }));
+      return;
+    }
 
     if(_balance !== null && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_balance)) {
       setRateForm(r => ({
@@ -142,7 +154,7 @@ export function useRate(initialRequest) {
     estimate(debouncedRateForm, balance).catch(error => {
       logError('unable to fetch rates', error);
     });
-  }, [debouncedRateForm, balance]);
+  }, [debouncedRateForm, balance, estimate]);
   useEffect(() => {
     setRateForm(r => ({
       ...r,
