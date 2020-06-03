@@ -35,6 +35,7 @@ const defaultRateForm = initialRequest => {
 };
 
 const LOW_OUTPUT_AMOUNT = 10;
+const HIGH_OUTPUT_AMOUNT = 5000;
 
 export function useRate(initialRequest) {
   const [rateForm, setRateForm] = useState(() => defaultRateForm(initialRequest));
@@ -75,15 +76,27 @@ export function useRate(initialRequest) {
         },
       }));
       return;
-    } else if(currentRequest.tradeExact === TradeExact.OUTPUT && new BN(currentRequest.amount).lt(LOW_OUTPUT_AMOUNT)) {
-      setRateForm(r => ({
-        ...r,
-        loading: false,
-        errors: {
-          lowAmount: true,
-        },
-      }));
-      return;
+    } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
+      if(new BN(currentRequest.amount).lt(LOW_OUTPUT_AMOUNT)) {
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            lowAmount: true,
+          },
+        }));
+        return;
+      }
+      if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            highAmount: true,
+          },
+        }));
+        return;
+      }
     }
 
     const res = await getRate(currentRequest);
@@ -101,8 +114,11 @@ export function useRate(initialRequest) {
       if(new BN(res.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { lowAmount: true };
       }
+      if(new BN(res.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+        updateRateForm.errors = { highAmount: true };
+      }
     }
-    if(currentRequest.tradeExact === TradeExact.OUTPUT) {
+    else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       updateRateForm.values.inputAmount = new BN(res.inputAmount).toFixed();
       if(_balance !== null && new BN(res.inputAmount).gt(_balance)) {
         updateRateForm.errors = { lowBalance: true };
@@ -168,5 +184,6 @@ export function useRate(initialRequest) {
     onChangeCurrency,
     onChangeAmount,
     LOW_OUTPUT_AMOUNT,
+    HIGH_OUTPUT_AMOUNT,
   };
 }

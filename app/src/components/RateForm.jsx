@@ -45,7 +45,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
-  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT } = useRate(initialRateRequest);
+  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialRateRequest);
 
   let rate, feeAmount;
   if(rateForm) {
@@ -61,6 +61,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
   }
 
   const valid = !(rateForm.loading || rateForm.errors);
+  const errors = rateForm.errors && Object.keys(rateForm.errors);
 
   function submit() {
     if(!valid) return;
@@ -76,6 +77,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
         onChangeCurrency={onChangeCurrency(TradeExact.INPUT)}
         onChangeValue={onChangeAmount(TradeExact.INPUT)}
         active={rateForm.values.tradeExact === TradeExact.INPUT}
+        error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.INPUT && !!errors}
         caption="Send"
       />
       <AmountRow
@@ -85,22 +87,25 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
         onChangeCurrency={onChangeCurrency(TradeExact.OUTPUT)}
         onChangeValue={onChangeAmount(TradeExact.OUTPUT)}
         active={rateForm.values.tradeExact === TradeExact.OUTPUT}
+        error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.OUTPUT && !!errors}
         caption="Receive"
       />
 
       <Box className={classes.additionalInfo}>
         {!rateForm.loading ?
-          !rateForm.errors ?
+          !errors ?
             <Typography variant="caption">
               <b>Rate:</b> {rate} {rateForm.values.outputCurrency}/{rateForm.values.inputCurrency}
               {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees.currency}</span>}
             </Typography>
             :
-            <InvalidMessage>
-              {rateForm.errors.lowBalance && 'Insufficient balance'}
-              {rateForm.errors.lowBalance && rateForm.errors.lowAmount && <br/>}
-              {rateForm.errors.lowAmount && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
-            </InvalidMessage>
+            errors.map(errorType =>
+              <InvalidMessage key={errorType}>
+                {errorType === 'lowBalance' && 'Insufficient balance'}
+                {errorType === 'lowAmount' && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+                {errorType === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+              </InvalidMessage>
+            )
           :
           <LoadingRing/>
         }

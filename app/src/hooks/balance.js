@@ -8,7 +8,6 @@ import { fetchTokenBalance } from '../lib/currencies';
 
 import { getETHManager } from '../redux/eth/selectors';
 
-// TODO optimise queries
 export function useBalance(symbol) {
   const ethManager = useSelector(getETHManager);
   const [balance, setBalance] = useState(null);

@@ -32,6 +32,9 @@ const useStyles = makeStyles(theme => ({
   activeRow: {
     borderColor: '#9edbe4',
   },
+  errorRow: {
+    borderColor: '#e3a79f',
+  },
   disabledRow: {
     backgroundColor: theme.palette.background.default,
   },
@@ -73,7 +76,7 @@ function CurrencyItem({ symbol }) {
   );
 }
 
-export default function AmountRow({ value, currency, onChangeValue, onChangeCurrency, currencies, active, valueDisabled, currencyDisabled, caption }) {
+export default function AmountRow({ value, currency, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
@@ -87,7 +90,7 @@ export default function AmountRow({ value, currency, onChangeValue, onChangeCurr
           {caption}
         </Typography>
       </Box>
-      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow].join(' ')}>
+      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow, error && classes.errorRow].join(' ')}>
         <Box flex={1}>
           <input
             type="number"
