@@ -1,4 +1,5 @@
 import { memoize } from 'lodash';
+import BN from 'bignumber.js';
 
 import { ETH, SUPPORTED_CHAIN_ID, getTokenReserves } from '@uniswap/sdk';
 import config from '../config';
@@ -65,4 +66,22 @@ export async function addToken(tokenAddress) {
   const symbol = await fetchTokenSymbol(checksumAddress);
   TOKENS[symbol] = checksumAddress;
   return [symbol, checksumAddress];
+}
+
+const getTokenContract = memoize((tokenSymbol) => {
+  const tokenAddress = getTokenAddress(tokenSymbol);
+  return new ethers.Contract(tokenAddress, ERC20, defaultProvider);
+});
+
+const getTokenDecimals = memoize(async (tokenSymbol) => {
+  const tokenContract = getTokenContract(tokenSymbol);
+  return tokenContract.decimals();
+});
+
+export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
+  const tokenContract = getTokenContract(tokenSymbol);
+  const tokenBalance = await tokenContract.balanceOf(tokenHolder);
+  const tokenDecimals = await getTokenDecimals(tokenSymbol);
+
+  return new BN(tokenBalance).div(10 ** tokenDecimals).toFixed();
 }

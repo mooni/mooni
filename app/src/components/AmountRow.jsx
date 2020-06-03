@@ -32,6 +32,9 @@ const useStyles = makeStyles(theme => ({
   activeRow: {
     borderColor: '#9edbe4',
   },
+  errorRow: {
+    borderColor: '#e3a79f',
+  },
   disabledRow: {
     backgroundColor: theme.palette.background.default,
   },
@@ -73,12 +76,12 @@ function CurrencyItem({ symbol }) {
   );
 }
 
-export default function AmountRow({ value, currencyId, onChangeValue, onChangeCurrency, currencies, active, valueDisabled, currencyDisabled, caption }) {
+export default function AmountRow({ value, currency, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
     (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
-  : 0;
+  : '';
 
   return (
     <Box className={classes.root}>
@@ -87,9 +90,9 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
           {caption}
         </Typography>
       </Box>
-      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow].join(' ')}>
+      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow, error && classes.errorRow].join(' ')}>
         <Box flex={1}>
-          {value !== null && <input
+          <input
             type="number"
             className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}
             value={displayedValue}
@@ -97,13 +100,12 @@ export default function AmountRow({ value, currencyId, onChangeValue, onChangeCu
             readOnly={valueDisabled}
             min={0}
           />
-          }
         </Box>
         <Box className={classes.currencySelector}>
           <DropDown
             items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
-            selected={currencyId}
-            onChange={onChangeCurrency}
+            selected={currencies.indexOf(currency)}
+            onChange={i => onChangeCurrency(currencies[i])}
             disabled={currencyDisabled}
             className={classes.currencyButton}
             wide

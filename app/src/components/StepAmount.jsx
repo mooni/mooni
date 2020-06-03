@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import { Box } from '@material-ui/core';
+import { IconArrowRight } from '@aragon/ui'
 
-import { Button, IconRefresh } from '@aragon/ui'
 import RateForm from '../components/RateForm';
 
 import { setRateRequest } from '../redux/payment/actions';
@@ -11,19 +11,16 @@ import { getRateRequest } from '../redux/payment/selectors';
 
 export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();
-  const defaultRateRequest = useSelector(getRateRequest);
-  const [localRateRequest, setLocalRateRequest] = useState(null);
-  const [rateValid, setRateValid] = useState(false);
+  const initialRateRequest = useSelector(getRateRequest);
 
-  const onSubmit = () => {
-    dispatch(setRateRequest(localRateRequest));
+  const onSubmit = (rateRequest) => {
+    dispatch(setRateRequest(rateRequest));
     onComplete();
   };
 
   return (
-    <Box width={1}>
-      <RateForm onChange={setLocalRateRequest} onValid={setRateValid} defaultRateRequest={defaultRateRequest}/>
-      <Button mode="strong" onClick={onSubmit} wide icon={<IconRefresh />} label="Exchange" disabled={!rateValid} />
+    <Box width={1} py={1}>
+      <RateForm onSubmit={onSubmit} initialRateRequest={initialRateRequest} buttonIcon={<IconArrowRight/>} buttonLabel="Next"/>
     </Box>
   )
 }
