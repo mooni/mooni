@@ -154,7 +154,8 @@ export function useRate(initialRequest) {
       loading: true,
       values: {
         ...r.values,
-        [currencyKey]: currency
+        [currencyKey]: currency,
+        [r.values.tradeExact === TradeExact.INPUT ? 'outputAmount' : 'inputAmount']: null,
       }
     }))
   },[]);
