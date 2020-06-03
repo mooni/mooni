@@ -37,6 +37,8 @@ const defaultRateForm = initialRequest => {
 const LOW_OUTPUT_AMOUNT = 10;
 const HIGH_OUTPUT_AMOUNT = 5000;
 
+let nonce = 0;
+
 export function useRate(initialRequest) {
   const [rateForm, setRateForm] = useState(() => defaultRateForm(initialRequest));
   const [rateRequest, setRateRequest] = useState(null);
@@ -46,7 +48,7 @@ export function useRate(initialRequest) {
     setRateForm(defaultRateForm(initialRequest));
   }, [initialRequest]);
 
-  const estimate = useCallback(async (_rateForm, _balance) => {
+  const estimate = useCallback(async (_rateForm, _balance, _nonce) => {
     if(!_rateForm.loading) return;
 
     const currentRequest = {
@@ -101,10 +103,13 @@ export function useRate(initialRequest) {
 
     const res = await getRate(currentRequest);
 
+    if(_nonce !== nonce) {
+      return;
+    }
+
     const updateRateForm = {
       loading: false,
       values: {
-        ..._rateForm.values,
         fees: res.fees,
       },
       errors: null,
@@ -128,6 +133,10 @@ export function useRate(initialRequest) {
     setRateForm(r => ({
       ...r,
       ...updateRateForm,
+      values: {
+        ...r.values,
+        ...updateRateForm.values,
+      },
     }));
 
     if(!updateRateForm.errors) {
@@ -167,7 +176,8 @@ export function useRate(initialRequest) {
 
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
-    estimate(debouncedRateForm, balance).catch(error => {
+    nonce++;
+    estimate(debouncedRateForm, balance, nonce).catch(error => {
       logError('unable to fetch rates', error);
     });
   }, [debouncedRateForm, balance, estimate]);
