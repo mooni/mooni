@@ -9,6 +9,7 @@ import { Box } from '@material-ui/core';
 import { Button, IconArrowRight, DropDown, Link } from '@aragon/ui';
 
 import FormField from './FormField';
+import { FieldError } from './StyledComponents';
 
 const fields = {
   name: {
@@ -52,6 +53,17 @@ const fields = {
 const countriesList = Object.keys(COUNTRIES);
 const countriesLabels = Object.values(COUNTRIES);
 
+const errorMessages = {
+  iban: 'Invalid IBAN',
+  bic_swift: 'Invalid BIC',
+  email: 'Invalid email',
+  'owner.name': 'Please enter your name',
+  'owner.address': 'Invalid address',
+  'owner.zip': 'Invalid Zip/Code',
+  'owner.city': 'Invalid city',
+  'owner.country': 'Invalid country',
+};
+
 const defaultEndComponent = ({ submit, hasErrors }) => (
   <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
 );
@@ -89,8 +101,8 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   return (
     <form onSubmit={submit}>
 
-      <FormField label="Full Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessage="Please enter your name" required />
-      <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessage="Invalid IBAN" required />
+      <FormField label="Full Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessages={errorMessages} required />
+      <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessages={errorMessages} required />
 
       <Box mb={2}>
         <Link onClick={() => setMore(!more)}>
@@ -98,14 +110,26 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         </Link>
       </Box>
 
-      <Box display={more ? 'block' : 'none'}>
-        <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessage="Invalid BIC" />
-        <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessage="Invalid email" />
-        <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessage="Invalid address" />
-        <FormField label="Zip/Postal code" name="owner.zip" ref={register(fields.zip)} errors={errors} errorMessage="Invalid Zip/Code" />
-        <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessage="Invalid city" />
+      <Box display={more ? 'none' : 'block'} mb={2}>
+        <FieldError>{
+          Object.keys(errors)
+            .filter(s => s !== 'owner.name' && s !== "iban")
+            .map(errorField =>
+              errorMessages[errorField]
+            )
+            .join(', ')
+        }
+        </FieldError>
+      </Box>
 
-        <FormField label="Country" name="owner.country" errors={errors} errorMessage="Invalid country">
+      <Box display={more ? 'block' : 'none'}>
+        <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessages={errorMessages} />
+        <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessages={errorMessages} />
+        <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessages={errorMessages} />
+        <FormField label="Zip/Postal code" name="owner.zip" ref={register(fields.zip)} errors={errors} errorMessages={errorMessages} />
+        <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} />
+
+        <FormField label="Country" name="owner.country" errors={errors} errorMessages={errorMessages}>
           <DropDown
             items={countriesLabels}
             selected={selectedCountry}
