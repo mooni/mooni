@@ -77,6 +77,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
         onChangeCurrency={onChangeCurrency(TradeExact.INPUT)}
         onChangeValue={onChangeAmount(TradeExact.INPUT)}
         active={rateForm.values.tradeExact === TradeExact.INPUT}
+        currencyDisabled={rateForm.values.tradeExact === TradeExact.OUTPUT && rateForm.loading}
         valueDisabled={rateForm.values.tradeExact === TradeExact.OUTPUT && rateForm.loading}
         error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.INPUT && !!errors}
         caption="Send"
@@ -88,6 +89,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
         onChangeCurrency={onChangeCurrency(TradeExact.OUTPUT)}
         onChangeValue={onChangeAmount(TradeExact.OUTPUT)}
         active={rateForm.values.tradeExact === TradeExact.OUTPUT}
+        currencyDisabled={rateForm.values.tradeExact === TradeExact.INPUT && rateForm.loading}
         valueDisabled={rateForm.values.tradeExact === TradeExact.INPUT && rateForm.loading}
         error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.OUTPUT && !!errors}
         caption="Receive"
