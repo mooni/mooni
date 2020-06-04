@@ -9,6 +9,7 @@ interface IConfig {
   fortmaticId: string,
   logRocketId: string,
   gtagId: string,
+  bityClientId: string,
 }
 
 function parseEnv<T>(v: any, type: string): T | null {
@@ -27,6 +28,7 @@ const config: IConfig = {
   fortmaticId: parseEnv<string>(process.env.REACT_APP_FORTMATIC_ID, 'string') || 'pk_live_362BC03A6D2421B4',
   logRocketId: parseEnv<string>(process.env.REACT_APP_LOG_ROCKET_ID, 'string') || '282s2e/mooni',
   gtagId: parseEnv<string>(process.env.REACT_APP_FORTMATIC_ID, 'string') || 'UA-68373171-8',
+  bityClientId: parseEnv<string>(process.env.REACT_APP_BITY_CLIENT_ID, 'string') || '',
 };
 
 export default config;

@@ -9,12 +9,19 @@ import {
   RateResult,
   TradeExact,
 } from './types';
+import config from '../config';
 
 const API_URL = 'https://exchange.api.bity.com';
+
+const { bityClientId } = config;
 
 const instance = axios.create({
   baseURL: API_URL,
   timeout: 5000,
+  headers: bityClientId !== '' ?
+    {'X-Client-Id': bityClientId }
+    :
+    {},
 });
 
 function removeEmptyStrings(data: object = {}) {
