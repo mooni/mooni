@@ -32,7 +32,7 @@ const ErrorMessage = styled.p`
   margin-right: 5px;
 `;
 
-const FormField = React.forwardRef(({ label, name, required, children, errors, errorMessage, placeholder }, ref) =>{
+const FormField = React.forwardRef(({ label, name, required, children, errors, errorMessages, placeholder }, ref) =>{
   return (
     <Field label={label} style={fieldStyle} required={required}>
       {children ?
@@ -45,7 +45,7 @@ const FormField = React.forwardRef(({ label, name, required, children, errors, e
           data-private
         />
       }
-      {errors[name] && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      {errors[name] && <ErrorMessage>{errorMessages[name]}</ErrorMessage>}
     </Field>
   )
 });

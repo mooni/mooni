@@ -18,8 +18,6 @@ export function FieldError({ text, children }) {
     <p style={{
       color: theme.negative,
       fontSize: '10pt',
-      marginTop: '5px',
-      marginLeft: '13px',
     }}>
       {text || children}
     </p>
