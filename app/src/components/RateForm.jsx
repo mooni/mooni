@@ -103,7 +103,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
             :
             errors.map(errorType =>
               <InvalidMessage key={errorType}>
-                {errorType === 'lowBalance' && 'Insufficient balance'}
+                {errorType === 'lowBalance' && 'You do not have enough funds'}
                 {errorType === 'lowAmount' && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
                 {errorType === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
               </InvalidMessage>
