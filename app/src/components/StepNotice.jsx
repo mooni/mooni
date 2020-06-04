@@ -31,8 +31,8 @@ export default function StepNotice({ onComplete }) {
       </Hint>
       <Title>Experimental software</Title>
       <Info>
-        You are using an early stage software. Our service is working, but may be subject to bugs or unknown behaviours.
-        <br/>Use at your own risk, <b>try with small amounts</b>!
+        You are using an early stage software.
+        If you encounter any bugs, you can reach out our support to find a solution.
       </Info>
       <Title>Transfer recipient</Title>
       <Info>
