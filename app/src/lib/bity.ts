@@ -13,13 +13,13 @@ import config from '../config';
 
 const API_URL = 'https://exchange.api.bity.com';
 
-const { bityClientId } = config;
+const { bityClientId, bityPartnerFee } = config;
 
 const instance = axios.create({
   baseURL: API_URL,
   timeout: 5000,
   headers: bityClientId !== '' ?
-    {'X-Client-Id': bityClientId }
+    { 'X-Client-Id': bityClientId }
     :
     {},
 });
@@ -60,7 +60,12 @@ const Bity = {
       output: {
         currency: outputCurrency,
       },
+      partner_fee: { factor: bityPartnerFee }
     };
+
+    if(bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee };
+    }
 
     if(tradeExact === TradeExact.INPUT)
       body.input.amount = String(amount); else
@@ -102,6 +107,10 @@ const Bity = {
         reference: reference,
       },
     };
+
+    if(bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee };
+    }
 
     if(recipient.bic_swift) {
       body.output.bic_swift = recipient.bic_swift;
