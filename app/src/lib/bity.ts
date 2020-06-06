@@ -9,12 +9,20 @@ import {
   RateResult,
   TradeExact,
 } from './types';
+import config from '../config';
+import { MetaError } from './errors';
 
 const API_URL = 'https://exchange.api.bity.com';
+
+const { bityClientId, bityPartnerFee } = config;
 
 const instance = axios.create({
   baseURL: API_URL,
   timeout: 5000,
+  headers: bityClientId !== '' ?
+    { 'X-Client-Id': bityClientId }
+    :
+    {},
 });
 
 function removeEmptyStrings(data: object = {}) {
@@ -28,17 +36,26 @@ function removeEmptyStrings(data: object = {}) {
 }
 
 function extractFees(order: any): { amount: string, currency: string}  {
-  let feesAmount = order.price_breakdown.customer_trading_fee.amount;
-  let feesCurrency = order.price_breakdown.customer_trading_fee.currency;
+  const inputCurrency = order.input.currency;
+  const outputCurrency = order.output.currency;
 
-  if(feesCurrency === order.input.currency) {
-    feesAmount = new BN(feesAmount).times(order.output.amount).div(order.input.amount).toFixed();
-    feesCurrency = order.output.currency;
+  const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
+  const sameCurrencies = new Set(fees.map(f => f.currency).concat(inputCurrency)).size === 1;
+
+  if(!sameCurrencies) {
+    throw new MetaError('Incompatible fee currencies', order);
   }
 
+  const totalAmountInputCurrency = fees
+    .map(f => f.amount)
+    .reduce((acc, a) => acc.plus(a), new BN(0));
+
+  const totalAmountOutputCurrency = totalAmountInputCurrency
+    .times(order.output.amount).div(order.input.amount).toFixed();
+
   return {
-    amount: feesAmount,
-    currency: feesCurrency,
+    amount: totalAmountOutputCurrency,
+    currency: outputCurrency,
   };
 }
 
@@ -53,7 +70,12 @@ const Bity = {
       output: {
         currency: outputCurrency,
       },
+      partner_fee: { factor: bityPartnerFee }
     };
+
+    if(bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee };
+    }
 
     if(tradeExact === TradeExact.INPUT)
       body.input.amount = String(amount); else
@@ -95,6 +117,10 @@ const Bity = {
         reference: reference,
       },
     };
+
+    if(bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee };
+    }
 
     if(recipient.bic_swift) {
       body.output.bic_swift = recipient.bic_swift;
