@@ -1855,10 +1855,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@mooni/widget@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@mooni/widget/-/widget-1.0.5.tgz#a2572eba26bd9741bb3e776be8f5be159520c1fd"
-  integrity sha512-2ttfhuDW4DyZuyxJ0ppvNX6G7hVXlzONcTrkXbUD71KKmxemIGsW011ndlgn5OtyAUvIxwgPE0RG5VEuOlc1Mg==
+"@mooni/widget@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@mooni/widget/-/widget-1.0.8.tgz#0f1a93afcf0cfaaea6b44bce5aa0369cea00b2df"
+  integrity sha512-gcU9o4g5ywdifId12Flfd6ujctThwmQcDlk3EAgR5e7xT9iRIwVfs2+GXrWP4+nvi2OdOoWatXQPYO9ibuuUfQ==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -11373,9 +11373,9 @@ websocket-driver@>=0.5.1:
     websocket-extensions ">=0.1.1"
 
 websocket-extensions@>=0.1.1:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.3.tgz#5d2ff22977003ec687a4b87073dfbbac146ccf29"
-  integrity sha512-nqHUnMXmBzT0w570r2JpJxfiSD1IzoI+HGVdd3aZ0yNi3ngvQ4jv1dtHt5VGxfI2yj5yqImPhOK4vmIh2xMbGg==
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.4.tgz#7f8473bc839dfd87608adb95d7eb075211578a42"
+  integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
 whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3, whatwg-encoding@^1.0.5:
   version "1.0.5"
