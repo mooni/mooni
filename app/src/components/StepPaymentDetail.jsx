@@ -13,7 +13,7 @@ import FormField from './FormField';
 
 const fields = {
   reference: {
-    pattern: /^[0-9A-Za-z ]*$/,
+    pattern: /^[0-9A-Za-z .,:+-]*$/,
   },
 };
 
