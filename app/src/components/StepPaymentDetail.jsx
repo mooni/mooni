@@ -13,7 +13,7 @@ import FormField from './FormField';
 
 const fields = {
   reference: {
-    pattern: /^[0-9A-Za-z ]*$/,
+    pattern: /^[0-9A-Za-z .,:+-]*$/,
   },
 };
 
@@ -53,7 +53,7 @@ function StepPaymentDetail({ onComplete }) {
           name="reference"
           ref={register(fields.reference)}
           errors={errors}
-          errorMessage="Invalid reference, please only use regular letters and numbers"
+          errorMessages={{ reference: 'Invalid reference, please only use regular letters and numbers' }}
           placeholder="Bill A2313"
         />
         <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
