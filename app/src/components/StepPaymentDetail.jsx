@@ -53,7 +53,7 @@ function StepPaymentDetail({ onComplete }) {
           name="reference"
           ref={register(fields.reference)}
           errors={errors}
-          errorMessage="Invalid reference, please only use regular letters and numbers"
+          errorMessages={{ reference: 'Invalid reference, please only use regular letters and numbers' }}
           placeholder="Bill A2313"
         />
         <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
