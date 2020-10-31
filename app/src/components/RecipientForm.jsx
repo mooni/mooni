@@ -26,19 +26,22 @@ const fields = {
   address: {
     minLength: 2,
     maxLength: 50,
+    required: true,
   },
   zip: {
+    required: true,
     minLength: 2,
     maxLength: 10,
   },
   city: {
+    required: true,
     minLength: 2,
-    maxLength: 10,
+    maxLength: 30,
   },
   country: {
+    required: true,
     minLength: 2,
     maxLength: 2,
-    pattern: /^[A-Z]{2}$/,
   },
   bic_swift: {
     minLength: 8,
@@ -57,7 +60,7 @@ const errorMessages = {
   iban: 'Invalid IBAN',
   bic_swift: 'Invalid BIC',
   email: 'Invalid email',
-  'owner.name': 'Please enter your name',
+  'owner.name': 'Invalid name',
   'owner.address': 'Invalid address',
   'owner.zip': 'Invalid Zip/Code',
   'owner.city': 'Invalid city',
@@ -103,6 +106,20 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
       <FormField label="Full Name" name="owner.name" ref={register(fields.name)} errors={errors} errorMessages={errorMessages} required />
       <FormField label="IBAN" name="iban" ref={register(fields.iban)} errors={errors} errorMessages={errorMessages} required />
+      <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessages={errorMessages} required />
+      <FormField label="Zip/Postal code" name="owner.zip" ref={register(fields.zip)} errors={errors} errorMessages={errorMessages} required />
+      <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} required />
+
+      <FormField label="Country" name="owner.country" errors={errors} errorMessages={errorMessages} required >
+        <DropDown
+          items={countriesLabels}
+          selected={selectedCountry}
+          onChange={setCountry}
+          placeholder="Please select a country"
+          wide
+          data-private
+        />
+      </FormField>
 
       <Box mb={2}>
         <Link onClick={() => setMore(!more)}>
@@ -125,21 +142,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
       <Box display={more ? 'block' : 'none'}>
         <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessages={errorMessages} />
         <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessages={errorMessages} />
-        <FormField label="Address" name="owner.address" ref={register(fields.address)} errors={errors} errorMessages={errorMessages} />
-        <FormField label="Zip/Postal code" name="owner.zip" ref={register(fields.zip)} errors={errors} errorMessages={errorMessages} />
-        <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} />
-
-        <FormField label="Country" name="owner.country" errors={errors} errorMessages={errorMessages}>
-          <DropDown
-            items={countriesLabels}
-            selected={selectedCountry}
-            onChange={setCountry}
-            placeholder="Please select a country"
-            wide
-            data-private
-          />
-        </FormField>
-      </Box>
+       </Box>
 
       {endComponent({ submit, hasErrors })}
     </form>
