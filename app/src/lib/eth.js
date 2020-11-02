@@ -30,6 +30,7 @@ export default class ETHManager extends EventEmitter {
       this.ethereum.on('chainChanged', reloadPage);
       this.ethereum.on('stop', () => this.emit('stop'));
       this.ethereum.on('close', () => this.emit('stop'));
+      this.ethereum.on('disconnect', () => this.emit('stop'));
     }
 
     this.signer = this.provider.getSigner();
