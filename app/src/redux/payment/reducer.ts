@@ -62,7 +62,7 @@ const initialMockStateMinimum: State = {
       iban: 'NL84INGB1679475908',
     },
     rateRequest: {
-      inputCurrency: 'DAI',
+      inputCurrency: 'ETH',
       outputCurrency: 'EUR',
       amount: '10',
       tradeExact: TradeExact.OUTPUT,

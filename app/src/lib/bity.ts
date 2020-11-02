@@ -1,5 +1,6 @@
 import BN from 'bignumber.js';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
+import qs from 'qs';
 import {
   BityOrderResponse,
   BityOrderStatus,
@@ -13,17 +14,9 @@ import config from '../config';
 import { MetaError } from './errors';
 
 const API_URL = 'https://exchange.api.bity.com';
+const AUTH_URL = 'https://connect.bity.com/oauth2/token';
 
-const { bityClientId, bityPartnerFee } = config;
-
-const instance = axios.create({
-  baseURL: API_URL,
-  timeout: 5000,
-  headers: bityClientId !== '' ?
-    { 'X-Client-Id': bityClientId }
-    :
-    {},
-});
+const { bityPartnerFee } = config;
 
 function removeEmptyStrings(data: object = {}) {
   return Object.keys(data).reduce((acc, prop) => {
@@ -59,7 +52,48 @@ function extractFees(order: any): { amount: string, currency: string}  {
   };
 }
 
-const Bity = {
+class Bity {
+  instance: AxiosInstance;
+  withCredentials: boolean;
+
+  constructor({ bityClientId }: {bityClientId?: string, token?: string} = {}) {
+    const headers = {};
+    this.withCredentials = false;
+
+    if(bityClientId) {
+      headers['X-Client-Id'] = bityClientId;
+      this.withCredentials = true;
+    }
+
+    this.instance = axios.create({
+      baseURL: API_URL,
+      timeout: 5000,
+      headers,
+    });
+  }
+
+  async initializeAuth(client_id: string, client_secret: string) {
+    const { data } = await axios({
+      method: 'post',
+      url: AUTH_URL,
+      data: qs.stringify({
+        grant_type: 'client_credentials',
+        scope: 'https://auth.bity.com/scopes/reporting.exchange',
+        client_id,
+        client_secret,
+      }),
+    });
+    const { access_token } = data;
+
+    this.instance = axios.create({
+      baseURL: API_URL,
+      timeout: 5000,
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+      },
+    });
+  }
+
   async estimate(rateRequest: RateRequest): Promise<RateResult> {
     const { inputCurrency, outputCurrency, amount, tradeExact } = rateRequest;
 
@@ -84,7 +118,7 @@ const Bity = {
     else
       throw new Error('invalid TRADE_EXACT');
 
-    const { data } = await instance({
+    const { data } = await this.instance({
       method: 'post',
       url: '/v2/orders/estimate',
       data: body,
@@ -98,7 +132,7 @@ const Bity = {
       tradeExact,
       fees: extractFees(data),
     };
-  },
+  }
 
   async order(orderRequest: OrderRequest, fromAddress: string): Promise<BityOrderResponse> {
     const { recipient, reference, rateRequest } = orderRequest;
@@ -140,17 +174,17 @@ const Bity = {
     }
 
     try {
-      const { headers } = await instance({
+      const { headers } = await this.instance({
         method: 'post',
         url: '/v2/orders',
         data: body,
-        withCredentials: true,
+        withCredentials: this.withCredentials,
       });
 
-      const { data } = await instance({
+      const { data } = await this.instance({
         method: 'get',
         url: headers.location,
-        withCredentials: true,
+        withCredentials: this.withCredentials,
       });
 
       if(!data.input) {
@@ -175,15 +209,15 @@ const Bity = {
         throw error;
       }
     }
-  },
+  }
 
   async getOrderDetails(orderId: string): Promise<BityOrderResponse> {
     try {
 
-      const { data } = await instance({
+      const { data } = await this.instance({
         method: 'get',
         url: `/v2/orders/${orderId}`,
-        withCredentials: true,
+        withCredentials: this.withCredentials,
       });
 
       let orderStatus: BityOrderStatus = BityOrderStatus.WAITING;
@@ -201,7 +235,7 @@ const Bity = {
 
     } catch(error) {
 
-        if(error.response && error.response.status === 404) {
+        if(error.response?.status === 404) {
           throw new Error('not-found');
         } else {
           throw new Error('unexpected-server-error-bity');
@@ -209,11 +243,15 @@ const Bity = {
 
     }
 
-  },
+  }
 
-  getOrderStatusPageURL(orderId: string) {
+  static getOrderStatusPageURL(orderId: string) {
     return `https://go.bity.com/order-status?id=${orderId}`;
   }
-};
+}
+
+const bityDefaultInstance = new Bity();
+
+export { bityDefaultInstance };
 
 export default Bity;

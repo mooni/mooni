@@ -8,3 +8,6 @@ build
 react-app-env.d.ts
 
 .now
+
+.vercel
+.env

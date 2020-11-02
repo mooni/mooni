@@ -11,6 +11,10 @@ interface IConfig {
   gtagId: string,
   bityClientId: string,
   bityPartnerFee: number,
+  private: {
+    bityClientId: string,
+    bityClientSecret: string,
+  },
 }
 
 function parseEnv<T>(v: any, type: string, defaultValue: T): T {
@@ -22,6 +26,7 @@ function parseEnv<T>(v: any, type: string, defaultValue: T): T {
   return v as T;
 }
 
+console.log(process.env);
 const config: IConfig = {
   CHAIN_ID: parseEnv<SUPPORTED_CHAIN_ID>(process.env.REACT_APP_CHAIN_ID, 'number', SUPPORTED_CHAIN_ID.Mainnet),
   infuraId: parseEnv<string>(process.env.REACT_APP_INFURA_ID, 'string', 'd118ed6a19594e16893c0c29d09a2536'),
@@ -31,6 +36,10 @@ const config: IConfig = {
   gtagId: parseEnv<string>(process.env.REACT_APP_FORTMATIC_ID, 'string', 'UA-68373171-8'),
   bityClientId: parseEnv<string>(process.env.REACT_APP_BITY_CLIENT_ID, 'string', ''),
   bityPartnerFee: parseEnv<number>(process.env.REACT_APP_BITY_FEE, 'number', 0),
+  private: {
+    bityClientId: parseEnv<string>(process.env.PRIVATE_BITY_CLIENT_ID, 'string', ''),
+    bityClientSecret: parseEnv<string>(process.env.PRIVATE_BITY_CLIENT_SECRET, 'string', ''),
+  },
 };
 
 export default config;

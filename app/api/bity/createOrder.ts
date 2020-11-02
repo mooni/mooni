@@ -1,7 +1,10 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../src/lib/bity';
-import { BityOrderResponse, OrderError, OrderRequest } from '../src/lib/types';
+import Bity from '../../src/lib/bity';
+import { BityOrderResponse, OrderRequest } from '../../src/lib/types';
+import config from '../../src/config';
+
+const bityInstance = new Bity();
 
 export default async (req: NowRequest, res: NowResponse) => {
   if(!req.body) {
@@ -17,8 +20,10 @@ export default async (req: NowRequest, res: NowResponse) => {
     return;
   }
 
+  await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
+
   try {
-    const orderDetails = (await Bity.order(orderRequest, fromAddress)) as BityOrderResponse;
+    const orderDetails = (await bityInstance.order(orderRequest, fromAddress)) as BityOrderResponse;
     res.json(orderDetails)
 
   } catch(error) {
