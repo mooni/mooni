@@ -112,7 +112,15 @@ const providerOptions = {
     package: WalletConnectProvider,
     options: {
       infuraId,
-    }
+      qrcodeModalOptions: {
+        mobileLinks: [
+          'rainbow',
+          'metamask',
+          'trust',
+          'pillar',
+        ],
+      },
+    },
   },
   portis: {
     package: Portis,
