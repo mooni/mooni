@@ -78,7 +78,14 @@ export const initETH = (ethereum) => async function (dispatch)  {
     await ethManager.init();
 
     const address = ethManager.getAddress();
-    const token = await DIDManager.getJWS(ethManager.provider);
+    let token;
+    try {
+      token = await DIDManager.getJWS(ethManager.provider);
+    } catch(error) {
+      if(error.code === 4001) {
+        throw new Error('eth_signature_rejected');
+      }
+    }
 
     dispatch(setETHManager(ethManager));
     dispatch(setAddress(address));
@@ -86,8 +93,14 @@ export const initETH = (ethereum) => async function (dispatch)  {
     dispatch(setETHManagerLoading(false));
 
     ethManager.on('accountsChanged', () => {
-      dispatch(setAddress(ethManager.getAddress()));
-      // TODO const token = await DIDManager.getJWS(ethManager.provider);
+      dispatch(setETHManagerLoading(true));
+      DIDManager.getJWS(ethManager.provider)
+        .then(token => {
+          dispatch(setAddress(ethManager.getAddress()));
+          dispatch(setJWS(token));
+          dispatch(setETHManagerLoading(false));
+        })
+        .catch(() => dispatch(logout()));
     });
     ethManager.on('stop', () => {
       dispatch(logout());
@@ -98,7 +111,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
   } catch(error) {
     dispatch(logout());
 
-    if(error.message === 'eth_smart_account_not_supported' || error.message === 'eth_wrong_network_id') {
+    if(error.message === 'eth_smart_account_not_supported' || error.message === 'eth_signature_rejected' || error.message === 'eth_wrong_network_id') {
       throw error;
     } else {
       logError('Unable to open ethereum wallet', error);

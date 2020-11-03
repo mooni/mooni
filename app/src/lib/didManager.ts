@@ -1,6 +1,7 @@
 import { providers, utils } from 'ethers';
 import { Base64 } from 'js-base64';
 import { v4 as uuidv4 } from 'uuid';
+import store from 'store2';
 
 const tokenDuration = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -20,7 +21,17 @@ export type Token = {
 
 const DIDManager = {
   async getJWS(provider: providers.Web3Provider) {
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    const existingJWS = store.get(`jws:${address}`);
+    if(existingJWS) {
+      const token = DIDManager.decodeToken(existingJWS);
+      if(token.claim.exp > new Date) {
+        return existingJWS;
+      }
+    }
     const token = await DIDManager.createToken(provider);
+    store.set(`jws:${address}`, token);
     return token;
   },
 

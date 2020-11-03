@@ -19,7 +19,7 @@ import {
   SIGNIFICANT_DIGITS,
 } from '../lib/currencies';
 import { useRate } from '../hooks/rates';
-import { getETHManager } from '../redux/eth/selectors';
+import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -45,6 +45,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
+  const ethManagerLoading = useSelector(getETHManagerLoading);
   const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialRateRequest);
 
   let rate, feeAmount;
@@ -114,7 +115,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
           <LoadingRing/>
         }
       </Box>
-      {ethManager &&
+      {(ethManager && !ethManagerLoading) &&
       <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!valid} />
       }
     </>

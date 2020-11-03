@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, EthIdenticon, AddressField, IconWallet, IconPower, useViewport } from '@aragon/ui'
+import { Button, EthIdenticon, AddressField, IconWallet, IconPower, IconClose, useViewport } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
 import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
@@ -20,7 +20,11 @@ function Account() {
 
   if(ethManagerLoading)
     return (
-      <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
+      <>
+        <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
+        <Box width={10}/>
+        <Button icon={<IconClose/>} size="medium" display="icon" label="logout" mode="negative" onClick={onLogout} />
+      </>
     );
 
   if(!address) {
