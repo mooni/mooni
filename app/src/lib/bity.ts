@@ -15,6 +15,7 @@ import { MetaError } from './errors';
 
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
+const TIMEOUT = 10 * 1000;
 
 const { bityPartnerFee } = config;
 
@@ -67,7 +68,7 @@ class Bity {
 
     this.instance = axios.create({
       baseURL: API_URL,
-      timeout: 5000,
+      timeout: TIMEOUT,
       headers,
     });
   }
@@ -87,7 +88,7 @@ class Bity {
 
     this.instance = axios.create({
       baseURL: API_URL,
-      timeout: 5000,
+      timeout: TIMEOUT,
       headers: {
         'Authorization': `Bearer ${access_token}`,
       },

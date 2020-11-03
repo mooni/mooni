@@ -5,15 +5,18 @@ const API_URL = '/api';
 
 const instance = axios.create({
   baseURL: API_URL,
-  timeout: 5000,
+  timeout: 10000,
 });
 
 const MooniAPI = {
-  async bityCreateOrder(orderRequest: OrderRequest, fromAddress: string): Promise<BityOrderResponse> {
+  async bityCreateOrder(orderRequest: OrderRequest, fromAddress: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const { data } = await instance({
         method: 'post',
         url: 'bity/createOrder',
+        headers: {
+          'Authorization': `Bearer ${jwsToken}`,
+        },
         data: {
           orderRequest,
           fromAddress,
@@ -32,11 +35,14 @@ const MooniAPI = {
       }
     }
   },
-  async bityGetOrder(orderId: string): Promise<BityOrderResponse> {
+  async bityGetOrder(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const {data} = await instance({
         method: 'post',
         url: 'bity/getOrder',
+        headers: {
+          'Authorization': `Bearer ${jwsToken}`,
+        },
         data: {
           orderId,
         },

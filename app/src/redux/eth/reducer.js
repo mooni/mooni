@@ -5,6 +5,7 @@ export const STATE_NAME = 'ETH';
 const initialState = {
   ethManager: null,
   address: null,
+  jwsToken: null,
   loginModalOpen: false,
   providerFromIframe: false,
 };
@@ -37,6 +38,13 @@ export default function(state = initialState, action) {
       return {
         ...state,
         address,
+      };
+    }
+    case actions.SET_JWS: {
+      const { jwsToken } = action.payload;
+      return {
+        ...state,
+        jwsToken,
       };
     }
     case actions.SET_PROVIDER_FROM_IFRAME: {

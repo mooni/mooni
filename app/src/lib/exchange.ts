@@ -91,7 +91,7 @@ export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
   return rateResult;
 }
 
-export async function createOrder(orderRequest: OrderRequest, fromAddress: string): Promise<Order> {
+export async function createOrder(orderRequest: OrderRequest, fromAddress: string, jwsToken: string): Promise<Order> {
 
   if(orderRequest.rateRequest.inputCurrency === ETH) {
 
@@ -101,7 +101,8 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
         rateRequest: orderRequest.rateRequest,
         reference: orderRequest.reference,
       },
-      fromAddress
+      fromAddress,
+      jwsToken,
     );
 
     return {
@@ -143,7 +144,8 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
           },
           reference: orderRequest.reference,
         },
-        fromAddress
+        fromAddress,
+        jwsToken,
       );
 
       return {
@@ -174,7 +176,8 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
           },
           reference: orderRequest.reference,
         },
-        fromAddress
+        fromAddress,
+        jwsToken,
       );
 
       const { inputAmount: estimatedInput, tradeDetails } = await rateTokenToETH({

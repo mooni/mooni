@@ -7,11 +7,13 @@ import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
 import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 import { MetaError } from '../../lib/errors';
+import DIDManager from '../../lib/didManager';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
 export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
 export const SET_ADDRESS = 'SET_ADDRESS';
+export const SET_JWS = 'SET_JWS';
 export const SET_PROVIDER_FROM_IFRAME = 'SET_PROVIDER_FROM_IFRAME';
 
 export const setETHManager = (ethManager) => ({
@@ -41,6 +43,14 @@ export const setAddress = (address) => ({
     address,
   }
 });
+
+export const setJWS = (jwsToken) => ({
+  type: SET_JWS,
+  payload: {
+    jwsToken,
+  }
+});
+
 export const setProviderFromIframe = (providerFromIframe) => ({
   type: SET_PROVIDER_FROM_IFRAME,
   payload: {
@@ -55,6 +65,7 @@ export const resetETHManager = () => function (dispatch, getState) {
   }
   dispatch(setETHManager(null));
   dispatch(setAddress(null));
+  dispatch(setJWS(null));
   dispatch(setETHManagerLoading(false));
   dispatch(setProviderFromIframe(false));
 };
@@ -66,12 +77,17 @@ export const initETH = (ethereum) => async function (dispatch)  {
     const ethManager = new ETHManager(ethereum);
     await ethManager.init();
 
+    const address = ethManager.getAddress();
+    const token = await DIDManager.getJWS(ethManager.provider);
+
     dispatch(setETHManager(ethManager));
-    dispatch(setAddress(ethManager.getAddress()));
+    dispatch(setAddress(address));
+    dispatch(setJWS(token));
     dispatch(setETHManagerLoading(false));
 
     ethManager.on('accountsChanged', () => {
       dispatch(setAddress(ethManager.getAddress()));
+      // TODO const token = await DIDManager.getJWS(ethManager.provider);
     });
     ethManager.on('stop', () => {
       dispatch(logout());
