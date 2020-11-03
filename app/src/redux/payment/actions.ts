@@ -3,7 +3,7 @@ import {getAddress, getETHManager} from '../eth/selectors';
 import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '../../lib/exchange';
 import {BityOrderStatus, ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
-import MooniAPI from '../../lib/api';
+import BityProxy from '../../lib/bityProxy';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Providers';
@@ -199,7 +199,7 @@ function watchBityOrder(dispatch, orderId) {
   }));
 
   function fetchNewData() {
-    MooniAPI.bityGetOrder(orderId)
+    BityProxy.getOrder(orderId)
       .then(orderDetails => {
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {

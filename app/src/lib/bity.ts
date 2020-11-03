@@ -56,7 +56,7 @@ class Bity {
   instance: AxiosInstance;
   withCredentials: boolean;
 
-  constructor({ bityClientId }: {bityClientId?: string, token?: string} = {}) {
+  constructor({ bityClientId }: {bityClientId?: string} = {}) {
     const headers = {};
     this.withCredentials = false;
 

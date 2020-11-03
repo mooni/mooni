@@ -13,7 +13,7 @@ import {ethers} from 'ethers';
 import ERC20_ABI from './abis/ERC20.json';
 import { getTokenAddress } from './currencies';
 import { bityDefaultInstance as bity } from './bity';
-import MooniAPI from './api';
+import BityProxy from './bityProxy';
 
 import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
 import {defaultProvider} from './web3Providers';
@@ -95,7 +95,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
   if(orderRequest.rateRequest.inputCurrency === ETH) {
 
-    const bityOrder = await MooniAPI.bityCreateOrder(
+    const bityOrder = await BityProxy.createOrder(
       {
         recipient: orderRequest.recipient,
         rateRequest: orderRequest.rateRequest,
@@ -132,7 +132,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
         tradeExact: TradeExact.OUTPUT,
       });
 
-      const bityOrder = await MooniAPI.bityCreateOrder(
+      const bityOrder = await BityProxy.createOrder(
         {
           recipient: orderRequest.recipient,
           rateRequest: {
@@ -163,7 +163,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
     } else {
 
-      const bityOrder = await MooniAPI.bityCreateOrder(
+      const bityOrder = await BityProxy.createOrder(
         {
           recipient: orderRequest.recipient,
           rateRequest: {

@@ -11,34 +11,41 @@ interface IConfig {
   gtagId: string,
   bityClientId: string,
   bityPartnerFee: number,
+  useAPI: boolean,
   private: {
     bityClientId: string,
     bityClientSecret: string,
   },
 }
 
-function parseEnv<T>(v: any, type: string, defaultValue: T): T {
+function parseEnv<T extends string | number | boolean>(
+  v: any,
+  defaultValue: T
+): T {
   if(!v) return defaultValue;
 
-  if(type === 'number') {
-    return (Number(v) as any) as T;
+  if(typeof defaultValue === 'number') {
+    return Number(v) as T;
+  }
+  if(typeof defaultValue === 'boolean') {
+    return Boolean(v) as T;
   }
   return v as T;
 }
 
-console.log(process.env);
 const config: IConfig = {
-  CHAIN_ID: parseEnv<SUPPORTED_CHAIN_ID>(process.env.REACT_APP_CHAIN_ID, 'number', SUPPORTED_CHAIN_ID.Mainnet),
-  infuraId: parseEnv<string>(process.env.REACT_APP_INFURA_ID, 'string', 'd118ed6a19594e16893c0c29d09a2536'),
-  portisAppId: parseEnv<string>(process.env.REACT_APP_PORTIS_APP_ID, 'string', 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2'),
-  fortmaticId: parseEnv<string>(process.env.REACT_APP_FORTMATIC_ID, 'string', 'pk_live_362BC03A6D2421B4'),
-  logRocketId: parseEnv<string>(process.env.REACT_APP_LOG_ROCKET_ID, 'string', '282s2e/mooni'),
-  gtagId: parseEnv<string>(process.env.REACT_APP_FORTMATIC_ID, 'string', 'UA-68373171-8'),
-  bityClientId: parseEnv<string>(process.env.REACT_APP_BITY_CLIENT_ID, 'string', ''),
-  bityPartnerFee: parseEnv<number>(process.env.REACT_APP_BITY_FEE, 'number', 0),
+  CHAIN_ID: parseEnv(process.env.REACT_APP_CHAIN_ID, SUPPORTED_CHAIN_ID.Mainnet),
+  infuraId: parseEnv(process.env.REACT_APP_INFURA_ID, 'd118ed6a19594e16893c0c29d09a2536'),
+  portisAppId: parseEnv(process.env.REACT_APP_PORTIS_APP_ID, 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2'),
+  fortmaticId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'pk_live_362BC03A6D2421B4'),
+  logRocketId: parseEnv(process.env.REACT_APP_LOG_ROCKET_ID, '282s2e/mooni'),
+  gtagId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'UA-68373171-8'),
+  bityClientId: parseEnv(process.env.REACT_APP_BITY_CLIENT_ID, ''),
+  bityPartnerFee: parseEnv(process.env.REACT_APP_BITY_FEE, 0),
+  useAPI: parseEnv(process.env.REACT_APP_USE_API, false),
   private: {
-    bityClientId: parseEnv<string>(process.env.PRIVATE_BITY_CLIENT_ID, 'string', ''),
-    bityClientSecret: parseEnv<string>(process.env.PRIVATE_BITY_CLIENT_SECRET, 'string', ''),
+    bityClientId: parseEnv(process.env.PRIVATE_BITY_CLIENT_ID, ''),
+    bityClientSecret: parseEnv(process.env.PRIVATE_BITY_CLIENT_SECRET, ''),
   },
 };
 
