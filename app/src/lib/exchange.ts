@@ -12,7 +12,8 @@ import {ethers} from 'ethers';
 
 import ERC20_ABI from './abis/ERC20.json';
 import { getTokenAddress } from './currencies';
-import Bity from './bity';
+import { bityDefaultInstance as bity } from './bity';
+import BityProxy from './bityProxy';
 
 import {DexTrade, ExchangePath, Order, OrderRequest, RateRequest, RateResult, TradeExact} from './types';
 import {defaultProvider} from './web3Providers';
@@ -48,7 +49,7 @@ export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
       ethInputAmount = tokenRate.outputAmount;
     }
 
-    const bityRate = await Bity.estimate({
+    const bityRate = await bity.estimate({
       inputCurrency: ETH,
       outputCurrency: rateRequest.outputCurrency,
       amount: ethInputAmount,
@@ -61,7 +62,7 @@ export async function getRate(rateRequest: RateRequest): Promise<RateResult> {
 
   } else if(rateRequest.tradeExact === TradeExact.OUTPUT) {
 
-    const bityRate = await Bity.estimate({
+    const bityRate = await bity.estimate({
       inputCurrency: ETH,
       outputCurrency: rateRequest.outputCurrency,
       amount: rateRequest.amount,
@@ -94,7 +95,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
   if(orderRequest.rateRequest.inputCurrency === ETH) {
 
-    const bityOrder = await Bity.order(
+    const bityOrder = await BityProxy.createOrder(
       {
         recipient: orderRequest.recipient,
         rateRequest: orderRequest.rateRequest,
@@ -131,7 +132,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
         tradeExact: TradeExact.OUTPUT,
       });
 
-      const bityOrder = await Bity.order(
+      const bityOrder = await BityProxy.createOrder(
         {
           recipient: orderRequest.recipient,
           rateRequest: {
@@ -162,7 +163,7 @@ export async function createOrder(orderRequest: OrderRequest, fromAddress: strin
 
     } else {
 
-      const bityOrder = await Bity.order(
+      const bityOrder = await BityProxy.createOrder(
         {
           recipient: orderRequest.recipient,
           rateRequest: {
