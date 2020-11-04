@@ -8,7 +8,7 @@ import DIDManager, { Token } from "../../src/lib/didManager";
 
 const bityInstance = new Bity();
 
-function getHeaderToken(req: Request): string | null {
+function getHeaderToken(req: NowRequest): string | null {
   const authHeader = req.headers.authorization;
   if (!authHeader) return null;
   const token = authHeader.replace('Bearer ', '');
@@ -22,7 +22,7 @@ export default async (req: NowRequest, res: NowResponse) => {
   if(!orderId) {
     return res.status(400).send('wrong body');
   }
-  const jwsToken: string = getHeaderToken(req);
+  const jwsToken = getHeaderToken(req);
   if(!jwsToken) {
     return res.status(401).send('authorization required');
   }
