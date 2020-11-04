@@ -253,6 +253,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
   const order = getOrder(state);
   const ethManager = getETHManager(state);
+  const signer = ethManager.provider.getSigner();
 
   const bityInputAmount = order.bityOrder.input.amount;
   const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
@@ -270,7 +271,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => checkTradeAllowance(tradeDetails, ethManager.signer).then(tx => tx?.hash)
+        paymentFunction: async () => checkTradeAllowance(tradeDetails, signer).then(tx => tx?.hash)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -282,7 +283,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
         paymentFunction: async () => executeTrade(
           tradeDetails,
           undefined,
-          ethManager.signer,
+          signer,
         ).then(tx => tx.hash)
       });
       log('PAYMENT: trade ok');

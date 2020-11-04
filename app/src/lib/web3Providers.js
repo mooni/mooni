@@ -13,7 +13,7 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 import config from '../config';
 import { logError } from './log';
 
-const { CHAIN_ID, infuraId, portisAppId, fortmaticId } = config;
+const { chainId, infuraId, portisAppId, fortmaticId } = config;
 
 const networks = {
   1: 'homestead',
@@ -21,7 +21,7 @@ const networks = {
   4: 'rinkeby',
   42: 'kovan',
 };
-export const defaultProvider = new ethers.providers.InfuraProvider(networks[CHAIN_ID], infuraId);
+export const defaultProvider = new ethers.providers.InfuraProvider(networks[chainId], infuraId);
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
