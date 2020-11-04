@@ -8,6 +8,7 @@ import { logError } from '../../lib/log';
 import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 import { MetaError } from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
+import config from '../../config';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -70,6 +71,24 @@ export const resetETHManager = () => function (dispatch, getState) {
   dispatch(setProviderFromIframe(false));
 };
 
+const onAccountChanged = () => (dispatch, getState) => {
+  const ethManager = getETHManager(getState());
+
+  dispatch(setETHManagerLoading(true));
+  if(config.useAPI) {
+    DIDManager.getJWS(ethManager.provider)
+      .then(token => {
+        dispatch(setAddress(ethManager.getAddress()));
+        dispatch(setJWS(token));
+        dispatch(setETHManagerLoading(false));
+      })
+      .catch(() => dispatch(logout()));
+  } else {
+    dispatch(setAddress(ethManager.getAddress()));
+    dispatch(setETHManagerLoading(false));
+  }
+};
+
 export const initETH = (ethereum) => async function (dispatch)  {
   dispatch(setETHManagerLoading(true));
   try {
@@ -79,28 +98,25 @@ export const initETH = (ethereum) => async function (dispatch)  {
 
     const address = ethManager.getAddress();
     let token;
-    try {
-      token = await DIDManager.getJWS(ethManager.provider);
-    } catch(error) {
-      if(error.code === 4001) {
-        throw new Error('eth_signature_rejected');
+    if(config.useAPI) {
+      try {
+        token = await DIDManager.getJWS(ethManager.provider);
+        dispatch(setJWS(token));
+      } catch(error) {
+        if(error.code === 4001) {
+          throw new Error('eth_signature_rejected');
+        } else {
+          throw error;
+        }
       }
     }
 
     dispatch(setETHManager(ethManager));
     dispatch(setAddress(address));
-    dispatch(setJWS(token));
     dispatch(setETHManagerLoading(false));
 
     ethManager.on('accountsChanged', () => {
-      dispatch(setETHManagerLoading(true));
-      DIDManager.getJWS(ethManager.provider)
-        .then(token => {
-          dispatch(setAddress(ethManager.getAddress()));
-          dispatch(setJWS(token));
-          dispatch(setETHManagerLoading(false));
-        })
-        .catch(() => dispatch(logout()));
+      dispatch(onAccountChanged());
     });
     ethManager.on('stop', () => {
       dispatch(logout());
