@@ -23,6 +23,8 @@ function getErrorTitle(error) {
       return 'Unable to connect wallet.';
     case 'invalid-custom-token':
       return 'Invalid token';
+    case 'eth_signature_rejected':
+      return 'Requires authentification';
     default:
       return 'Unknown error';
   }
@@ -38,6 +40,8 @@ function getErrorContent(error) {
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
     case 'unable_open_wallet':
       return `The wallet you are trying to connect with seems incompatible. Please report this problem to our support.`;
+    case 'eth_signature_rejected':
+      return 'You need to sign the message in order to authenticate in the app. Please retry and accept the signature in your wallet.';
     case 'invalid-custom-token':
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
     default:

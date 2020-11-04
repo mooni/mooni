@@ -58,13 +58,17 @@ const initialMockStateMinimum: State = {
     recipient: {
       owner: {
         name: 'Alice Martin',
+        country: 'NL',
+        address: 'dfsfdsfq',
+        zip: 'fdsqfqs',
+        city: 'dsfqs'
       },
       iban: 'NL84INGB1679475908',
     },
     rateRequest: {
       inputCurrency: 'ETH',
       outputCurrency: 'EUR',
-      amount: '10',
+      amount: '15',
       tradeExact: TradeExact.OUTPUT,
     },
     reference: '',
@@ -131,7 +135,7 @@ const initialMockStateComplete: State = {
         amount: '0.080414513629301225',
         currency: 'ETH',
         type: 'crypto_address',
-        crypto_address: '0x4194ce73ac3fbbece8ffa878c2b5a8c90333e724'
+        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19'
       },
       output: {
         amount: '10',
@@ -190,7 +194,7 @@ const initialMockStateComplete: State = {
 };
 
 const initialState = initialEmptyState;
-// const initialState = initialMockStateComplete;
+// const initialState = initialMockStateMinimum;
 
 export default function(state : State = initialState, action: { type: string, payload?: any }): State {
   switch (action.type) {

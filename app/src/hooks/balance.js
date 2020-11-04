@@ -6,10 +6,11 @@ import { useSelector } from 'react-redux';
 
 import { fetchTokenBalance } from '../lib/currencies';
 
-import { getETHManager } from '../redux/eth/selectors';
+import { getETHManager, getAddress } from '../redux/eth/selectors';
 
 export function useBalance(symbol) {
   const ethManager = useSelector(getETHManager);
+  const address = useSelector(getAddress);
   const [balance, setBalance] = useState(null);
   const [balanceLoading, setLoading] = useState(true);
 
@@ -29,7 +30,8 @@ export function useBalance(symbol) {
         setLoading(false);
       }
 
-      ethManager.signer.getBalance().then(updateBalance);
+      const signer = ethManager.provider.getSigner();
+      signer.getBalance().then(updateBalance);
       ethManager.provider.on(ethAddress, updateBalance);
 
       return () => ethManager.provider.removeListener(ethAddress, updateBalance);
@@ -49,7 +51,7 @@ export function useBalance(symbol) {
       return () => ethManager.provider.removeListener('block', updateBalance);
 
     }
-  }, [symbol, ethManager]);
+  }, [symbol, ethManager, address]);
 
   return { balanceLoading, balance };
 }

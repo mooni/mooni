@@ -16,23 +16,19 @@ export default async (req: NowRequest, res: NowResponse) => {
   const fromAddress: string = req.body.fromAddress as string;
 
   if(!orderRequest || !fromAddress) {
-    res.status(400).send('wrong body');
-    return;
+    return res.status(400).send('wrong body');
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
   try {
     const orderDetails = (await bityInstance.order(orderRequest, fromAddress)) as BityOrderResponse;
-    res.json(orderDetails)
-
+    return res.json(orderDetails)
   } catch(error) {
     if(error.message === 'api_error') {
-      res.status(400).json({ errors: error.errors });
-      return;
+      return res.status(400).json({ errors: error.errors });
     } else {
-      res.status(500).send('Unexpected server error');
-      return;
+      return res.status(500).send('Unexpected server error');
     }
   }
 
