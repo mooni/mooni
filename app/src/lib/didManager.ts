@@ -26,7 +26,7 @@ const DIDManager = {
     const existingJWS = store.get(`jws:${address}`);
     if(existingJWS) {
       const token = DIDManager.decodeToken(existingJWS);
-      if(token.claim.exp > new Date) {
+      if(token.claim.exp > new Date()) {
         return existingJWS;
       }
     }
