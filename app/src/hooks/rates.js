@@ -34,7 +34,7 @@ const defaultRateForm = initialRequest => {
   };
 };
 
-const LOW_OUTPUT_AMOUNT = 10;
+const LOW_OUTPUT_AMOUNT = 15;
 const HIGH_OUTPUT_AMOUNT = 5000;
 
 let nonce = 0;

@@ -7,11 +7,14 @@ import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
 import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
 import { MetaError } from '../../lib/errors';
+import DIDManager from '../../lib/didManager';
+import config from '../../config';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
 export const OPEN_LOGIN_MODAL = 'OPEN_LOGIN_MODAL';
 export const SET_ADDRESS = 'SET_ADDRESS';
+export const SET_JWS = 'SET_JWS';
 export const SET_PROVIDER_FROM_IFRAME = 'SET_PROVIDER_FROM_IFRAME';
 
 export const setETHManager = (ethManager) => ({
@@ -41,6 +44,14 @@ export const setAddress = (address) => ({
     address,
   }
 });
+
+export const setJWS = (jwsToken) => ({
+  type: SET_JWS,
+  payload: {
+    jwsToken,
+  }
+});
+
 export const setProviderFromIframe = (providerFromIframe) => ({
   type: SET_PROVIDER_FROM_IFRAME,
   payload: {
@@ -55,8 +66,27 @@ export const resetETHManager = () => function (dispatch, getState) {
   }
   dispatch(setETHManager(null));
   dispatch(setAddress(null));
+  dispatch(setJWS(null));
   dispatch(setETHManagerLoading(false));
   dispatch(setProviderFromIframe(false));
+};
+
+const onAccountChanged = () => (dispatch, getState) => {
+  const ethManager = getETHManager(getState());
+
+  dispatch(setETHManagerLoading(true));
+  if(config.useAPI) {
+    DIDManager.getJWS(ethManager.provider)
+      .then(token => {
+        dispatch(setAddress(ethManager.getAddress()));
+        dispatch(setJWS(token));
+        dispatch(setETHManagerLoading(false));
+      })
+      .catch(() => dispatch(logout()));
+  } else {
+    dispatch(setAddress(ethManager.getAddress()));
+    dispatch(setETHManagerLoading(false));
+  }
 };
 
 export const initETH = (ethereum) => async function (dispatch)  {
@@ -66,12 +96,27 @@ export const initETH = (ethereum) => async function (dispatch)  {
     const ethManager = new ETHManager(ethereum);
     await ethManager.init();
 
+    const address = ethManager.getAddress();
+    let token;
+    if(config.useAPI) {
+      try {
+        token = await DIDManager.getJWS(ethManager.provider);
+        dispatch(setJWS(token));
+      } catch(error) {
+        if(error.code === 4001) {
+          throw new Error('eth_signature_rejected');
+        } else {
+          throw error;
+        }
+      }
+    }
+
     dispatch(setETHManager(ethManager));
-    dispatch(setAddress(ethManager.getAddress()));
+    dispatch(setAddress(address));
     dispatch(setETHManagerLoading(false));
 
     ethManager.on('accountsChanged', () => {
-      dispatch(setAddress(ethManager.getAddress()));
+      dispatch(onAccountChanged());
     });
     ethManager.on('stop', () => {
       dispatch(logout());
@@ -82,7 +127,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
   } catch(error) {
     dispatch(logout());
 
-    if(error.message === 'eth_smart_account_not_supported' || error.message === 'eth_wrong_network_id') {
+    if(error.message === 'eth_smart_account_not_supported' || error.message === 'eth_signature_rejected' || error.message === 'eth_wrong_network_id') {
       throw error;
     } else {
       logError('Unable to open ethereum wallet', error);

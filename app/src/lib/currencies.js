@@ -26,7 +26,7 @@ const CURRENCIES_DATA = {
 };
 
 export { ETH };
-export const TOKENS = CURRENCIES_DATA.networks[config.CHAIN_ID].tokens;
+export const TOKENS = CURRENCIES_DATA.networks[config.chainId].tokens;
 
 export const FIAT_CURRENCIES = ['EUR', 'CHF'];
 

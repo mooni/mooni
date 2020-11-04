@@ -6,7 +6,7 @@ import { getWalletProvider } from './web3Providers';
 import config from '../config';
 import { MetaError } from './errors';
 
-const { CHAIN_ID } = config;
+const { chainId } = config;
 
 function reloadPage() {
   window.location.reload()
@@ -33,17 +33,15 @@ export default class ETHManager extends EventEmitter {
       this.ethereum.on('disconnect', () => this.emit('stop'));
     }
 
-    this.signer = this.provider.getSigner();
-
     await this.checkIsContract();
     if(this.isContract) {
       this.close();
       throw new Error('eth_smart_account_not_supported');
     }
 
-    if(await this.getNetworkId() !== CHAIN_ID) {
+    if(await this.getNetworkId() !== chainId) {
       this.close();
-      throw new MetaError('eth_wrong_network_id', { networkId: CHAIN_ID });
+      throw new MetaError('eth_wrong_network_id', { networkId: chainId });
     }
   }
 
@@ -72,7 +70,8 @@ export default class ETHManager extends EventEmitter {
       to,
       value: ethers.utils.parseEther(amount),
     };
-    const transactionResponse = await this.signer.sendTransaction(transactionRequest);
+    const signer = this.provider.getSigner();
+    const transactionResponse = await signer.sendTransaction(transactionRequest);
 
     return transactionResponse;
   }
