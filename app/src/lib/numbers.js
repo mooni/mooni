@@ -1,3 +1,6 @@
+import { JSBI } from '@uniswap/sdk';
+export { JSBI };
+
 export function isValue(v) {
   return (
     v !== null &&
