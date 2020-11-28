@@ -9,7 +9,7 @@ const bityInstance = new Bity({ bityClientId });
 
 interface IBityProxy {
   estimateOrder(TradeRequest): Promise<BityTrade>;
-  createOrder(TradeRequest, BankInfo, ethInfo: ETHInfo, jwsToken?: string): Promise<BityTrade>;
+  createOrder(t: TradeRequest, b: BankInfo, e: ETHInfo, jwsToken?: string): Promise<BityTrade>;
   getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
 }
 
