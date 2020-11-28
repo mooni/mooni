@@ -15,7 +15,6 @@ function StepRecap({ onComplete }) {
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
   const orderErrors = useSelector(getOrderErrors);
-  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
 
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -38,7 +37,7 @@ function StepRecap({ onComplete }) {
   }
 
   const now = new Date();
-
+  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const orderExpireDate = new Date(bityTrade.bityOrderResponse.timestamp_price_guaranteed);
 
   if(orderExpireDate < now) {

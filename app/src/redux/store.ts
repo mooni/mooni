@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
+import thunk from 'redux-thunk';
 
 import rootReducer from './reducers';
 import { logRocketMiddleware } from '../lib/analytics';
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logRocketMiddleware),
+  middleware: [thunk, logRocketMiddleware] as const,
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logRocketMiddleware),
 });
 
 export type RootState = ReturnType<typeof rootReducer>

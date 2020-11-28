@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Box } from '@material-ui/core';
 import { IconArrowRight } from '@aragon/ui'
 
-import RateForm from '../components/RateForm';
+import RateForm from './RateForm';
 
 import { setTradeRequest } from '../redux/payment/actions';
 import { getMultiTradeRequest } from '../redux/payment/selectors';

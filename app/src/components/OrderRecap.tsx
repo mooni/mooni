@@ -146,12 +146,12 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
         {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
       </Box>
 
-      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
-      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" />
+      <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
+      <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
       <Box textAlign="center">
         <Typography variant="caption">
-          <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
+          <b>Rate:</b> ~{rate} {outputCurrency.symbol}/{inputCurrency.symbol}
         </Typography><br/>
         <Typography variant="caption">
           {/* TODO fees <b>Fees:</b> {multiTrade.bityOrder.fees.amount} {multiTrade.bityOrder.fees.currency}*/}

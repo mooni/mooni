@@ -20,6 +20,7 @@ import {
 } from '../lib/currencies';
 import { useRate } from '../hooks/rates';
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
+import {TradeRequest} from "../lib/trading/types";
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -41,7 +42,14 @@ const useStyles = makeStyles(theme => ({
 
 const outputCurrencies = FIAT_CURRENCIES;
 
-function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }) {
+interface RateFormParams {
+ onSubmit: (TradeRequest?) => void;
+  initialTradeRequest: TradeRequest;
+  buttonLabel?: string,
+  buttonIcon?: any,
+}
+
+function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }: RateFormParams) {
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
@@ -74,7 +82,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
       <AmountRow
         value={rateForm.values.inputAmount}
         currencies={inputCurrencies}
-        currency={rateForm.values.inputCurrency}
+        selectedSymbol={rateForm.values.inputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.INPUT)}
         onChangeValue={onChangeAmount(TradeExact.INPUT)}
         active={rateForm.values.tradeExact === TradeExact.INPUT}
@@ -86,7 +94,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
       <AmountRow
         value={rateForm.values.outputAmount}
         currencies={outputCurrencies}
-        currency={rateForm.values.outputCurrency}
+        selectedSymbol={rateForm.values.outputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.OUTPUT)}
         onChangeValue={onChangeAmount(TradeExact.OUTPUT)}
         active={rateForm.values.tradeExact === TradeExact.OUTPUT}
@@ -101,7 +109,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
           !errors ?
             <Typography variant="caption">
               <b>Rate:</b> {rate} {rateForm.values.outputCurrency}/{rateForm.values.inputCurrency}
-              {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees.currency}</span>}
+              {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees?.currency}</span>}
             </Typography>
             :
             errors.map(errorType =>

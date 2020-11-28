@@ -76,7 +76,7 @@ function CurrencyItem({ symbol }) {
   );
 }
 
-export default function AmountRow({ value, currency, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
+export default function AmountRow({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
@@ -104,7 +104,7 @@ export default function AmountRow({ value, currency, onChangeValue, onChangeCurr
         <Box className={classes.currencySelector}>
           <DropDown
             items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
-            selected={currencies.indexOf(currency)}
+            selected={currencies.indexOf(selectedSymbol)}
             onChange={i => onChangeCurrency(currencies[i])}
             disabled={currencyDisabled}
             className={classes.currencyButton}

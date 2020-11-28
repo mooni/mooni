@@ -1,4 +1,4 @@
-import {BityTrade, MultiTrade, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType,} from "./types";
+import {MultiTrade, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
 import {CurrencyType, ETHER} from './currencies';
 import BityProxy from "./bityProxy";
 import {TradeExact} from "../types";
@@ -17,7 +17,7 @@ function findPath(tradeRequest: TradeRequest): TradePath {
   } else if(
     tradeRequest.inputCurrency.type === CurrencyType.ERC20
     &&
-    tradeRequest.outputCurrency.type === CurrencyType.CRYPTO && tradeRequest.outputCurrency.symbol === ETHER.symbol
+    tradeRequest.outputCurrency.equals(ETHER)
   ) {
     return [
       TradeType.DEX,
@@ -61,7 +61,6 @@ async function createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiT
   }
   const tradeType = path[0];
   if(tradeType === TradeType.BITY) {
-    // TODO token
     if(!multiTradeRequest.bankInfo || !multiTradeRequest.ethInfo) {
       throw new Error('missing bank or eth info on multiTradeRequest');
     }
@@ -140,23 +139,74 @@ export async function estimateMultiTrade(multiTradeRequest: MultiTradeRequest): 
 }
 
 export async function createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade> {
-  if(!multiTradeRequest.bankInfo) {
+  if (!multiTradeRequest.bankInfo) {
     throw new Error('Bity requires bank info')
   }
-  if(!multiTradeRequest.ethInfo) {
+  if (!multiTradeRequest.ethInfo) {
     throw new Error('Bity requires eth info')
   }
 
+  const {tradeRequest} = multiTradeRequest;
   const path = findPath(multiTradeRequest.tradeRequest);
 
   const trades: Trade[] = [];
 
-  if(path.length === 1 && path[0] === TradeType.BITY) {
+  if (path.length === 1 && path[0] === TradeType.BITY) {
 
-    const { tradeRequest } = multiTradeRequest;
     const bityTrade = await createTrade(tradeRequest, multiTradeRequest, jwsToken);
 
     trades.push(bityTrade);
+
+  }
+  else if (path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
+
+    if (tradeRequest.tradeExact === TradeExact.INPUT) {
+      const {outputAmount: ethAmount} = await createTrade({
+        inputCurrency: tradeRequest.inputCurrency,
+        outputCurrency: ETHER,
+        amount: tradeRequest.amount,
+        tradeExact: TradeExact.INPUT,
+      }, multiTradeRequest, jwsToken);
+
+      const dexTrade = await createTrade({
+        inputCurrency: tradeRequest.inputCurrency,
+        outputCurrency: ETHER,
+        amount: ethAmount,
+        tradeExact: TradeExact.OUTPUT,
+      }, multiTradeRequest, jwsToken);
+
+      const bityTrade = await createTrade({
+        inputCurrency: ETHER,
+        outputCurrency: tradeRequest.outputCurrency,
+        amount: ethAmount,
+        tradeExact: TradeExact.INPUT,
+      }, multiTradeRequest, jwsToken);
+
+      trades.push(dexTrade);
+      trades.push(bityTrade);
+
+    }
+    else if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
+      const bityTrade = await createTrade({
+        inputCurrency: ETHER,
+        outputCurrency: tradeRequest.outputCurrency,
+        amount: tradeRequest.amount,
+        tradeExact: TradeExact.OUTPUT,
+      }, multiTradeRequest, jwsToken);
+
+      const dexTrade = await createTrade({
+        inputCurrency: tradeRequest.inputCurrency,
+        outputCurrency: ETHER,
+        amount: bityTrade.inputAmount,
+        tradeExact: TradeExact.OUTPUT,
+      }, multiTradeRequest, jwsToken);
+
+      trades.push(dexTrade);
+      trades.push(bityTrade);
+    }
+    else {
+      throw new Error('invalid TRADE_EXACT');
+    }
   }
   else {
     throw new Error('Unsupported path');
@@ -169,5 +219,5 @@ export async function createMultiTrade(multiTradeRequest: MultiTradeRequest, jws
     outputAmount: trades[trades.length - 1].outputAmount,
     path: path,
   };
-  // TODO fees
+// TODO fees
 }

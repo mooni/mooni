@@ -57,7 +57,7 @@ let nonce = 0;
 
 export function useRate(initialTradeRequest: TradeRequest) {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
-  const [rateRequest, setRateRequest] = useState<TradeRequest|null>(null);
+  const [tradeRequest, setTradeRequest] = useState<TradeRequest|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
@@ -158,9 +158,9 @@ export function useRate(initialTradeRequest: TradeRequest) {
     }));
 
     if(!updateRateForm.errors) {
-      setRateRequest(currentRequest);
+      setTradeRequest(currentRequest);
     } else {
-      setRateRequest(null);
+      setTradeRequest(null);
     }
 
   }, []);
@@ -209,7 +209,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
 
   return {
     rateForm,
-    rateRequest,
+    tradeRequest,
     onChangeCurrency,
     onChangeAmount,
     LOW_OUTPUT_AMOUNT,
