@@ -1,6 +1,6 @@
 import {getOrder, getOrderRequest} from './selectors';
 import {getAddress, getETHManager, getJWS} from '../eth/selectors';
-import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '../../lib/exchange';
+import { createOrder as libCreateOrder} from '../../lib/exchange';
 import {BityOrderStatus, ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
 import BityProxy from '../../lib/bityProxy';
@@ -271,7 +271,9 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => checkTradeAllowance(tradeDetails, signer).then(tx => tx?.hash)
+        // TODO Migrate
+        paymentFunction: async () => true
+        //paymentFunction: async () => checkTradeAllowance(tradeDetails, signer).then(tx => tx?.hash)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -280,11 +282,13 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.TRADE,
-        paymentFunction: async () => executeTrade(
+        // TODO migrate
+        paymentFunction: async () => true,
+        /*paymentFunction: async () => executeTrade(
           tradeDetails,
           undefined,
           signer,
-        ).then(tx => tx.hash)
+        ).then(tx => tx.hash)*/
       });
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');

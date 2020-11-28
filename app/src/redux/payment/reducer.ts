@@ -1,7 +1,7 @@
 import {
   DEFAULT_INPUT_CURRENCY,
   DEFAULT_OUTPUT_CURRENCY,
-} from '../../lib/currencies';
+} from '../../lib/trading/currencies';
 import {
   ExchangePath,
   Order,

@@ -1,16 +1,10 @@
-import BN from 'bignumber.js';
-import axios, { AxiosInstance } from 'axios';
+import axios, {AxiosInstance} from 'axios';
 import qs from 'qs';
-import {
-  BankInfo,
-  Trade,
-  TradeExact, TradeRequest,
-  ETHInfo,
-  Fee
-} from './types';
+import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,} from './types';
 import config from '../../config';
-import { MetaError } from '../errors';
-import { JSBI } from '@uniswap/sdk';
+import {BN} from '../numbers';
+import {MetaError} from '../errors';
+import {Currency} from "./currencies";
 
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
@@ -28,12 +22,13 @@ function removeEmptyStrings(data: object = {}) {
     {});
 }
 
-function extractFees(order: any, currency): Fee  {
-  const inputCurrency = order.input.currency;
+function extractFees(order: any, inCurrency: Currency): Fee  {
+  const inputSymbol = order.input.currency;
+  const outputSymbol = order.output.currency;
 
   const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
   // expect the fees to be in the currency of the input
-  const sameCurrencies = new Set(fees.map(f => f.currency).concat(inputCurrency)).size === 1;
+  const sameCurrencies = new Set(fees.map(f => f.currency).concat(inputSymbol)).size === 1;
 
   if(!sameCurrencies) {
     throw new MetaError('Incompatible fee currencies', order);
@@ -41,22 +36,24 @@ function extractFees(order: any, currency): Fee  {
 
   const totalAmountInputCurrency = fees
     .map(f => f.amount)
-    .reduce((acc, a) => acc.plus(a), JSBI.BigInt(0));
+    .reduce((acc, a) => acc.plus(a), new BN(0));
 
-  if(currency.symbol === inputCurrency) {
+  if(inCurrency.symbol === inputSymbol) {
     return {
       amount: totalAmountInputCurrency,
-      currency: currency,
+      currency: inCurrency,
     }
-  } else {
+  } else if(inCurrency.symbol === outputSymbol) {
+
     const totalAmountOutputCurrency = totalAmountInputCurrency
-      .times(order.output.amount).div(order.input.amount);
+      .times(order.output.amount).div(order.input.amount).toFixed();
 
     return {
       amount: totalAmountOutputCurrency,
-      currency: currency,
+      currency: inCurrency,
     };
-
+  } else {
+    throw new Error('bity fees are in a special currency')
   }
 }
 
@@ -102,7 +99,7 @@ class Bity {
     });
   }
 
-  async estimate(tradeRequest: TradeRequest): Promise<Trade> {
+  async estimate(tradeRequest: TradeRequest): Promise<BityTrade> {
     const { inputCurrency, outputCurrency, amount, tradeExact } = tradeRequest;
 
     const body: any = {
@@ -136,11 +133,13 @@ class Bity {
       tradeRequest,
       inputAmount: data.input.amount,
       outputAmount: data.output.amount,
+      tradeType: TradeType.BITY,
+      bityOrderResponse: data,
       fee: extractFees(data, outputCurrency),
     };
   }
 
-  async order(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse> {
+  async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse> {
     const { recipient, reference } = bankInfo;
 
     const body: any = {
@@ -313,6 +312,5 @@ export class BityOrderError extends Error {
     this.errors = errors;
   }
 }
-
 
 export default Bity;

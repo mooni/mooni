@@ -1,14 +1,31 @@
-import BN from 'bignumber.js';
 import { useState, useEffect, useCallback } from 'react';
 import { TradeExact } from '../lib/types';
-import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/currencies';
-import { getRate } from '../lib/exchange';
+import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY, getCurrency } from '../lib/trading/currencies';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
-import { isNotZero } from '../lib/numbers';
+import {isNotZero, BN} from '../lib/numbers';
+import {TradeRequest} from "../lib/trading/types";
+import {estimateMultiTrade} from "../lib/trading/trader";
 
-const defaultRateForm = initialRequest => {
+interface RateForm {
+  loading: boolean,
+  errors?: {
+    lowBalance?: boolean
+    lowAmount?: boolean
+    highAmount?: boolean
+  },
+  values: {
+    inputCurrency: string,
+    outputCurrency: string,
+    inputAmount: string,
+    outputAmount: string,
+    tradeExact: TradeExact,
+    fees?: { amount: string, currency: string } // TODO
+  },
+}
+
+function defaultRateForm(initialRequest): RateForm {
   let values = initialRequest ?
     {
       inputCurrency: initialRequest.inputCurrency,
@@ -24,15 +41,14 @@ const defaultRateForm = initialRequest => {
       inputAmount: null,
       outputAmount: 100,
       tradeExact: TradeExact.OUTPUT,
-      fees: null,
     };
 
   return {
     loading: true,
-    errors: null,
+    errors: undefined,
     values,
   };
-};
+}
 
 const LOW_OUTPUT_AMOUNT = 15;
 const HIGH_OUTPUT_AMOUNT = 5000;
@@ -40,8 +56,8 @@ const HIGH_OUTPUT_AMOUNT = 5000;
 let nonce = 0;
 
 export function useRate(initialRequest) {
-  const [rateForm, setRateForm] = useState(() => defaultRateForm(initialRequest));
-  const [rateRequest, setRateRequest] = useState(null);
+  const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialRequest));
+  const [rateRequest, setRateRequest] = useState<TradeRequest|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
@@ -51,11 +67,11 @@ export function useRate(initialRequest) {
   const estimate = useCallback(async (_rateForm, _balance, _nonce) => {
     if(!_rateForm.loading) return;
 
-    const currentRequest = {
-      inputCurrency: _rateForm.values.inputCurrency,
-      outputCurrency: _rateForm.values.outputCurrency,
-      tradeExact: _rateForm.values.tradeExact,
-      amount: _rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
+    const currentRequest: TradeRequest = {
+      inputCurrency: getCurrency(_rateForm.values.inputCurrency),
+      outputCurrency: getCurrency(_rateForm.values.outputCurrency),
+      tradeExact: _rateForm.values.tradeExact as TradeExact,
+      amount: rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
 
     if(!isNotZero(currentRequest.amount)) {
@@ -101,31 +117,33 @@ export function useRate(initialRequest) {
       }
     }
 
-    const res = await getRate(currentRequest);
+    const multiTrade = await estimateMultiTrade({
+      tradeRequest: currentRequest,
+    });
 
     if(_nonce !== nonce) {
       return;
     }
 
-    const updateRateForm = {
+    const updateRateForm: any = {
       loading: false,
       values: {
-        fees: res.fees,
+        fees: {amount: '1', currency: 'ETH' } // TODO
       },
       errors: null,
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
-      updateRateForm.values.outputAmount = new BN(res.outputAmount).toFixed();
-      if(new BN(res.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
+      updateRateForm.values.outputAmount = new BN(multiTrade.outputAmount).toFixed();
+      if(new BN(multiTrade.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { lowAmount: true };
       }
-      if(new BN(res.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+      if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { highAmount: true };
       }
     }
     else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      updateRateForm.values.inputAmount = new BN(res.inputAmount).toFixed();
-      if(_balance !== null && new BN(res.inputAmount).gt(_balance)) {
+      updateRateForm.values.inputAmount = new BN(multiTrade.inputAmount).toFixed();
+      if(_balance !== null && new BN(multiTrade.inputAmount).gt(_balance)) {
         updateRateForm.errors = { lowBalance: true };
       }
     }

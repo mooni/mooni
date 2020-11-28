@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import {ethers} from 'ethers';
-import { ETH } from '@uniswap/sdk';
+import { ETHER } from '../lib/trading/currencies';
 import { useSelector } from 'react-redux';
 
 import { fetchTokenBalance } from '../lib/currencies';
@@ -23,7 +23,7 @@ export function useBalance(symbol) {
     }
     const ethAddress = ethManager.getAddress();
 
-    if(symbol === ETH) {
+    if(symbol === ETHER.symbol) {
 
       function updateBalance(res) {
         setBalance(ethers.utils.formatEther(res));

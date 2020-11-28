@@ -17,13 +17,13 @@ export abstract class Currency {
   public readonly type: CurrencyType;
   public readonly decimals: number;
   public readonly symbol: string;
-  public readonly name?: string;
+  private readonly _name?: string;
 
   constructor(type, decimals, symbol, name?) {
     this.type = type;
     this.decimals = decimals;
     this.symbol = symbol;
-    this.name = name;
+    this._name = name;
   }
 
   equals(currency: Currency) {
@@ -31,6 +31,10 @@ export abstract class Currency {
       this.type === currency.type &&
       this.symbol === currency.symbol
     );
+  }
+
+  get name(): string {
+    return this._name || this.symbol;
   }
 }
 
@@ -141,4 +145,12 @@ export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
   const tokenDecimals = await getTokenDecimals(tokenSymbol);
 
   return new BN(tokenBalance).div(10 ** tokenDecimals).toFixed();
+}
+
+export function getCurrency(symbol: string): Currency {
+  const c = currencies.find(c => c.symbol === symbol);
+  if(!c) {
+    throw new Error('unknown currency');
+  }
+  return c;
 }

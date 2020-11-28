@@ -1,7 +1,7 @@
 import { memoize } from 'lodash';
 import BN from 'bignumber.js';
 
-import { ETH, SUPPORTED_CHAIN_ID, getTokenReserves } from '@uniswap/sdk';
+import { ChainId } from '@uniswap/sdk';
 import config from '../config';
 import { ethers } from 'ethers';
 import { defaultProvider } from './web3Providers';
@@ -9,7 +9,7 @@ import ERC20 from './abis/ERC20';
 
 const CURRENCIES_DATA = {
   networks: {
-    [SUPPORTED_CHAIN_ID.Mainnet]: {
+    [ChainId.MAINNET]: {
       tokens: {
         DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
@@ -17,7 +17,7 @@ const CURRENCIES_DATA = {
         // BTU: '0xb683D83a532e2Cb7DFa5275eED3698436371cc9f',
       }
     },
-    [SUPPORTED_CHAIN_ID.Rinkeby]: {
+    [ChainId.RINKEBY]: {
       tokens: {
         DAI: '0x2448eE2641d78CC42D7AD76498917359D961A783',
       }
@@ -25,6 +25,7 @@ const CURRENCIES_DATA = {
   }
 };
 
+const ETH = 'ETH';
 export { ETH };
 export const TOKENS = CURRENCIES_DATA.networks[config.chainId].tokens;
 
@@ -54,9 +55,6 @@ export function getTokenAddress(symbol) {
 }
 
 export async function fetchTokenSymbol(tokenAddress) {
-  const reserves = await getTokenReserves(tokenAddress, defaultProvider);
-  if(!reserves.exchange.address) throw new Error('token has no exchange available')
-
   let contract = new ethers.Contract(tokenAddress, ERC20, defaultProvider);
   return contract.symbol();
 }

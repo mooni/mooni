@@ -1,4 +1,4 @@
-import { JSBI } from '../numbers';
+import { BN } from '../numbers';
 
 import { Recipient } from "../types";
 import { BityOrderResponse } from "./bity";
@@ -19,7 +19,7 @@ export type TradePath = TradeType[];
 export interface TradeRequest {
   inputCurrency: Currency;
   outputCurrency: Currency;
-  amount: JSBI;
+  amount: string;
   tradeExact: TradeExact;
 }
 export interface MultiTradeRequest {
@@ -35,14 +35,15 @@ export interface MultiTrade {
   multiTradeRequest: MultiTradeRequest,
   trades: Trade[],
   path: TradePath;
-  inputAmount: JSBI,
-  outputAmount: JSBI,
+  inputAmount: string,
+  outputAmount: string,
 }
 
 export interface Trade {
   tradeRequest: TradeRequest,
-  inputAmount: JSBI,
-  outputAmount: JSBI,
+  tradeType: TradeType,
+  inputAmount: string,
+  outputAmount: string,
   fee?: Fee,
 }
 
@@ -64,6 +65,6 @@ export interface ETHInfo {
 }
 
 export interface Fee {
-  amount: JSBI,
+  amount: string,
   currency: Currency,
 }

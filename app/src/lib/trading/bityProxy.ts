@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from '../../config';
-import {BankInfo, ETHInfo, TradeRequest} from './types';
+import {BankInfo, BityTrade, ETHInfo, TradeRequest} from './types';
 import Bity, { BityOrderResponse, BityOrderError } from './bity';
 
 const { useAPI } = config;
@@ -8,6 +8,7 @@ const { bityClientId } = config;
 const bityInstance = new Bity({ bityClientId });
 
 interface IBityProxy {
+  estimateOrder(tradeRequest: TradeRequest): Promise<BityTrade>;
   createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse>;
   getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
 }
@@ -19,6 +20,9 @@ const instance = axios.create({
 });
 
 const BityProxy: IBityProxy = {
+  estimateOrder(tradeRequest: TradeRequest) {
+    return bityInstance.estimate(tradeRequest)
+  },
   createOrder: useAPI ?
     async function(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse> {
       try {
@@ -48,7 +52,7 @@ const BityProxy: IBityProxy = {
       }
     }
     :
-    bityInstance.order.bind(bityInstance),
+    bityInstance.createOrder.bind(bityInstance),
 
   getOrder: useAPI ?
     async function(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
