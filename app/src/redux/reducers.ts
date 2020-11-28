@@ -1,4 +1,5 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from '@reduxjs/toolkit';
+
 import eth, {STATE_NAME as ETH_STATE_NAME} from './eth/reducer';
 import box, {STATE_NAME as BOX_STATE_NAME} from './box/reducer';
 import contacts, {STATE_NAME as CONTACT_STATE_NAME} from './contacts/reducer';
@@ -13,7 +14,4 @@ const rootReducer = combineReducers({
   [UI_STATE_NAME]: ui,
 });
 
-export type RootState = ReturnType<typeof rootReducer>
-
 export default rootReducer;
-

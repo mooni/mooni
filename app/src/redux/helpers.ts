@@ -1,5 +1,5 @@
 import { get, isArray } from 'lodash';
-import {RootState} from "./reducers";
+import {RootState} from './store';
 
 export function selectProperty(path, defaultValue = null) {
   let stringPath = path;

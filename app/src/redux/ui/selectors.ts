@@ -1,5 +1,5 @@
 import { STATE_NAME } from './reducer';
-import { RootState } from "../reducers";
+import { RootState } from "../store";
 
 export const getInputCurrencies = (state: RootState) => state[STATE_NAME].inputCurrencies;
 export const getInfoPanel = (state: RootState) => state[STATE_NAME].panelType;

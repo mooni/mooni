@@ -1,5 +1,5 @@
 import { STATE_NAME } from './reducer';
-import { RootState } from '../reducers';
+import { RootState } from '../store';
 
 export const getMultiTradeRequest = (state: RootState) => state[STATE_NAME].multiTradeRequest;
 export const getRecipient = (state: RootState) => state[STATE_NAME].multiTradeRequest?.bankInfo?.recipient;
