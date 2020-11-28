@@ -5,15 +5,17 @@ import { Box } from '@material-ui/core';
 import { Button, Info, IconCoin, Checkbox, Link } from '@aragon/ui'
 
 import Loader from '../components/Loader';
-import OrderRecap from '../components/OrderRecap';
+import OrderRecap from './OrderRecap';
 
-import { getOrder, getOrderErrors } from '../redux/payment/selectors';
+import { getMultiTrade, getOrderErrors } from '../redux/payment/selectors';
 import { setInfoPanel } from '../redux/ui/actions';
+import {BityTrade, TradeType} from "../lib/trading/types";
 
 function StepRecap({ onComplete }) {
   const dispatch = useDispatch();
-  const order = useSelector(getOrder);
+  const multiTrade = useSelector(getMultiTrade);
   const orderErrors = useSelector(getOrderErrors);
+  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
 
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -29,14 +31,15 @@ function StepRecap({ onComplete }) {
     );
   }
 
-  if(!order) {
+  if(!multiTrade) {
     return (
       <Loader text="Creating order ..." />
     );
   }
 
   const now = new Date();
-  const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
+
+  const orderExpireDate = new Date(bityTrade.bityOrderResponse.timestamp_price_guaranteed);
 
   if(orderExpireDate < now) {
     return (
@@ -50,7 +53,7 @@ function StepRecap({ onComplete }) {
 
   return (
     <Box width={1}>
-      <OrderRecap order={order} />
+      <OrderRecap multiTrade={multiTrade} />
       <Box py={2} display="flex" justifyContent="center">
         <label>
           <Checkbox

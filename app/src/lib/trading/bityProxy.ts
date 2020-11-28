@@ -8,8 +8,8 @@ const { bityClientId } = config;
 const bityInstance = new Bity({ bityClientId });
 
 interface IBityProxy {
-  estimateOrder(tradeRequest: TradeRequest): Promise<BityTrade>;
-  createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse>;
+  estimateOrder(TradeRequest): Promise<BityTrade>;
+  createOrder(TradeRequest, BankInfo, ethInfo: ETHInfo, jwsToken?: string): Promise<BityTrade>;
   getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
 }
 
@@ -24,7 +24,7 @@ const BityProxy: IBityProxy = {
     return bityInstance.estimate(tradeRequest)
   },
   createOrder: useAPI ?
-    async function(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse> {
+    async function(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityTrade> {
       try {
         const { data } = await instance({
           method: 'post',

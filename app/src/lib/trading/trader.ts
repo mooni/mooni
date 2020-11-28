@@ -38,7 +38,7 @@ function findPath(tradeRequest: TradeRequest): TradePath {
   }
 }
 
-async function estimateTrade(tradeRequest): Promise<Trade> {
+async function estimateTrade(tradeRequest: TradeRequest): Promise<Trade> {
   const path = findPath(tradeRequest);
   if(path.length !== 1) {
     throw new Error('can only estimate direct trade');
@@ -46,6 +46,23 @@ async function estimateTrade(tradeRequest): Promise<Trade> {
   const tradeType = path[0];
   if(tradeType === TradeType.BITY) {
     return BityProxy.estimateOrder(tradeRequest);
+  }
+  else if(tradeType === TradeType.DEX) {
+    return DexProxy.getRate(tradeRequest);
+  } else {
+    throw new Error(`Estimation not available for TradeType ${tradeType}'`);
+  }
+}
+
+async function createTrade(multiTradeRequest: MultiTradeRequest): Promise<Trade> {
+  const path = findPath(tradeRequest);
+  if(path.length !== 1) {
+    throw new Error('can only estimate direct trade');
+  }
+  const tradeType = path[0];
+  if(tradeType === TradeType.BITY) {
+    // TODO token
+    return BityProxy.createOrder(multiTradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
   }
   else if(tradeType === TradeType.DEX) {
     return DexProxy.getRate(tradeRequest);
@@ -134,17 +151,9 @@ export async function createMultiTrade(multiTradeRequest: MultiTradeRequest, jws
   if(path.length === 1 && path[0] === TradeType.BITY) {
 
     const { tradeRequest, bankInfo, ethInfo } = multiTradeRequest;
-    const bityOrderResponse = await BityProxy.createOrder(
+    const bityTrade = await BityProxy.createOrder(
       tradeRequest, bankInfo, ethInfo, jwsToken
     );
-    const bityTrade: BityTrade = {
-      tradeRequest,
-      tradeType: TradeType.BITY,
-      inputAmount: bityOrderResponse.input.amount,
-      outputAmount: bityOrderResponse.output.amount,
-      bityOrderResponse,
-    };
-
     trades.push(bityTrade);
   }
   else {

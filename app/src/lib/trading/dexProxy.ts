@@ -9,10 +9,14 @@ const paraswapAxios = axios.create({
 });
 
 interface IDexProxy {
-  isTokenExchangeable(token: Token): Promise<boolean>;
-  getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
-  checkAllowance(tokenA: Token, amount: string): Promise<boolean>;
-  executeTrade(tokenA: Token, amount: string): Promise<boolean>;
+  isTokenExchangeable(Token): Promise<boolean>;
+  getRate(TradeRequest): Promise<DexTrade>;
+  checkAllowance(DexTrade, any): Promise<TX | null>;
+  executeTrade(DexTrade, any): Promise<TX>;
+}
+
+interface TX {
+  hash: string;
 }
 
 const DexProxy: IDexProxy = {
@@ -49,13 +53,15 @@ const DexProxy: IDexProxy = {
     };
   },
 
-  async checkAllowance(tokenA: Token, amount: string): Promise<boolean> {
-    return true;
+  async checkAllowance(dexTrade: DexTrade, signer): Promise<TX | null> {
+    //TODO
+    return {hash: 'XX'};
   },
 
 
-  async executeTrade(tokenA: Token, amount: string): Promise<boolean> {
-    return true;
+  async executeTrade(dexTrade: DexTrade, signer): Promise<TX> {
+    //TODO
+    return {hash: 'XX'};
   },
 };
 

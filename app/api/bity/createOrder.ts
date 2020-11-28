@@ -1,8 +1,8 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/bity';
-import { BityOrderResponse, OrderRequest } from '../../src/lib/types';
+import Bity from '../../src/lib/trading/bity';
 import config from '../../src/config';
+import {TradeRequest, BankInfo, ETHInfo} from "../../src/lib/trading/types";
 
 const bityInstance = new Bity();
 
@@ -12,18 +12,20 @@ export default async (req: NowRequest, res: NowResponse) => {
     return;
   }
 
-  const orderRequest: OrderRequest = req.body.orderRequest as OrderRequest;
-  const fromAddress: string = req.body.fromAddress as string;
+  const tradeRequest: TradeRequest = req.body.tradeRequest as TradeRequest;
+  const bankInfo: BankInfo = req.body.bankInfo as BankInfo;
+  const ethInfo: ETHInfo = req.body.ethInfo as ETHInfo;
 
-  if(!orderRequest || !fromAddress) {
+  if(!tradeRequest || !bankInfo || !ethInfo) {
     return res.status(400).send('wrong body');
   }
 
+  // TODO check auth
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
   try {
-    const orderDetails = (await bityInstance.order(orderRequest, fromAddress)) as BityOrderResponse;
-    return res.json(orderDetails)
+    const bityTrade = await bityInstance.createOrder(tradeRequest, bankInfo, ethInfo);
+    return res.json(bityTrade)
   } catch(error) {
     if(error.message === 'api_error') {
       return res.status(400).json({ errors: error.errors });

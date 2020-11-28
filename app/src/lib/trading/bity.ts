@@ -139,7 +139,7 @@ class Bity {
     };
   }
 
-  async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityOrderResponse> {
+  async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo): Promise<BityTrade> {
     const { recipient, reference } = bankInfo;
 
     const body: any = {
@@ -200,8 +200,12 @@ class Bity {
       }
 
       return {
-        ...data,
-        fees: extractFees(data, tradeRequest.outputCurrency),
+        tradeRequest,
+        inputAmount: data.input.amount,
+        outputAmount: data.output.amount,
+        tradeType: TradeType.BITY,
+        bityOrderResponse: data,
+        fee: extractFees(data, tradeRequest.outputCurrency),
       };
 
     } catch(error) {
@@ -240,11 +244,11 @@ class Bity {
 
     } catch(error) {
 
-        if(error.response?.status === 404) {
-          throw new Error('not-found');
-        } else {
-          throw new Error('unexpected-server-error-bity');
-        }
+      if(error.response?.status === 404) {
+        throw new Error('not-found');
+      } else {
+        throw new Error('unexpected-server-error-bity');
+      }
 
     }
 

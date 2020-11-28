@@ -28,8 +28,8 @@ interface RateForm {
 function defaultRateForm(initialRequest): RateForm {
   let values = initialRequest ?
     {
-      inputCurrency: initialRequest.inputCurrency,
-      outputCurrency: initialRequest.outputCurrency,
+      inputCurrency: initialRequest.inputCurrency.symbol,
+      outputCurrency: initialRequest.outputCurrency.symbol,
       inputAmount: initialRequest.tradeExact === TradeExact.INPUT ? initialRequest.amount : null,
       outputAmount: initialRequest.tradeExact === TradeExact.OUTPUT ? initialRequest.amount : null,
       tradeExact: initialRequest.tradeExact,
@@ -55,14 +55,14 @@ const HIGH_OUTPUT_AMOUNT = 5000;
 
 let nonce = 0;
 
-export function useRate(initialRequest) {
-  const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialRequest));
+export function useRate(initialTradeRequest: TradeRequest) {
+  const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [rateRequest, setRateRequest] = useState<TradeRequest|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
-    setRateForm(defaultRateForm(initialRequest));
-  }, [initialRequest]);
+    setRateForm(defaultRateForm(initialTradeRequest));
+  }, [initialTradeRequest]);
 
   const estimate = useCallback(async (_rateForm, _balance, _nonce) => {
     if(!_rateForm.loading) return;

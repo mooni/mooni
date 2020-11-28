@@ -1,6 +1,6 @@
 import { ETH, TOKENS, addToken } from '../../lib/currencies';
-import { setRateRequest } from '../payment/actions';
-import { getRateRequest } from '../payment/selectors';
+import { setTradeRequest } from '../payment/actions';
+import {getMultiTradeRequest} from '../payment/selectors';
 
 export const SET_INPUT_CURRENCIES = 'SET_INPUT_CURRENCIES';
 export const SET_INFO_PANEL = 'SET_INFO_PANEL';
@@ -36,11 +36,13 @@ export const initTokens = () => (dispatch, getState) => {
   if(token) {
     addToken(token).then(addedToken => {
       dispatch(setInputCurrencies([ETH].concat(Object.keys(TOKENS))));
-      const rateRequest = getRateRequest(getState());
-      dispatch(setRateRequest({
-        ...rateRequest,
-        inputCurrency: addedToken[0],
-      }));
+      const multiTradeRequest = getMultiTradeRequest(getState());
+      if(multiTradeRequest) {
+        dispatch(setTradeRequest({
+          ...multiTradeRequest.tradeRequest,
+          inputCurrency: addedToken[0],
+        }));
+      }
     }).catch(() => {
       dispatch(setModalError(new Error('invalid-custom-token')))
     })

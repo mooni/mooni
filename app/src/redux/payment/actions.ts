@@ -1,21 +1,29 @@
-import {getOrder, getOrderRequest} from './selectors';
+import {getMultiTrade, getMultiTradeRequest} from './selectors';
 import {getAddress, getETHManager, getJWS} from '../eth/selectors';
-import { createOrder as libCreateOrder} from '../../lib/exchange';
-import {BityOrderStatus, ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
+import {
+  BityOrderStatus,
+  Payment,
+  PaymentStatus,
+  PaymentStepId,
+  PaymentStepStatus, Recipient
+} from '../../lib/types';
 import {sendEvent} from '../../lib/analytics';
-import BityProxy from '../../lib/bityProxy';
+import BityProxy from '../../lib/trading/bityProxy';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Providers';
+import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
+import {createMultiTrade} from "../../lib/trading/trader";
+import DexProxy from "../../lib/trading/dexProxy";
 
-export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
+export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 
 export const SET_EXCHANGE_STEP = 'SET_EXCHANGE_STEP';
 
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_REFERENCE = 'SET_REFERENCE';
 
-export const SET_ORDER = 'SET_ORDER';
+export const SET_MULTITRADE = 'SET_MULTITRADE';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 
@@ -24,39 +32,40 @@ export const SET_PAYMENT = 'SET_PAYMENT';
 export const UPDATE_PAYMENT_STEP = 'UPDATE_PAYMENT_STEP';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 
-export const setRateRequest = (rateRequest) => ({
-  type: SET_RATE_REQUEST,
+export const setTradeRequest = (tradeRequest: TradeRequest) => ({
+  type: SET_TRADE_REQUEST,
   payload: {
-    rateRequest,
+    tradeRequest,
   }
 });
 
-export const setExchangeStep = (stepId) => ({
+export const setExchangeStep = (stepId: number) => ({
   type: SET_EXCHANGE_STEP,
   payload: {
     stepId,
   }
 });
 
-export const setRecipient = (recipient) => ({
+export const setRecipient = (recipient: Recipient) => ({
   type: SET_RECIPIENT,
   payload: {
     recipient,
   }
 });
-export const setReference = (reference) => ({
+export const setReference = (reference: string) => ({
   type: SET_REFERENCE,
   payload: {
     reference,
   }
 });
 
-export const setOrder = (order) => ({
-  type: SET_ORDER,
+export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
+  type: SET_MULTITRADE,
   payload: {
-    order,
+    multiTrade,
   }
 });
+
 export const setOrderErrors = (errors) => ({
   type: SET_ORDER_ERRORS,
   payload: {
@@ -87,13 +96,17 @@ export const setPaymentStatus = (status: PaymentStatus) => ({
   payload: { status },
 });
 
-export const createPayment = (order) => (dispatch) => {
+export const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
   const payment: Payment = {
     steps: [],
     status: PaymentStatus.ONGOING,
   };
 
-  if(order.path === ExchangePath.DEX_BITY) {
+  const dexTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as DexTrade[];
+  if(dexTrades.length > 1) {
+    throw new Error('Only one dex exchange is supported per payment');
+  }
+  if(multiTrade.path.includes(TradeType.DEX)) {
     payment.steps.push({
       id: PaymentStepId.ALLOWANCE,
       status: PaymentStepStatus.QUEUED,
@@ -104,6 +117,10 @@ export const createPayment = (order) => (dispatch) => {
     });
   }
 
+  const bityTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as BityTrade[];
+  if(bityTrades.length !== 1) {
+    throw new Error('Payments must pass through bity');
+  }
   payment.steps.push({
     id: PaymentStepId.PAYMENT,
     status: PaymentStepStatus.QUEUED,
@@ -111,7 +128,7 @@ export const createPayment = (order) => (dispatch) => {
   payment.steps.push({
     id: PaymentStepId.BITY,
     status: PaymentStepStatus.QUEUED,
-    bityOrderId: order.bityOrder.id,
+    bityOrderId: bityTrades[0].bityOrderResponse.id,
   });
 
   dispatch(setPayment(payment));
@@ -123,24 +140,24 @@ export const createOrder = () => async function (dispatch, getState)  {
   sendEvent('order', 'create', 'init');
 
   const state = getState();
-  const fromAddress = getAddress(state);
-  const orderRequest = getOrderRequest(state);
+  const multiTradeRequest = getMultiTradeRequest(state);
+  if(!multiTradeRequest) throw new Error('Missing multiTradeRequest');
+
+  multiTradeRequest.ethInfo = {
+    fromAddress: getAddress(state),
+  };
+
   const jwsToken = getJWS(state);
   try {
 
-    const order = await libCreateOrder({
-      recipient: orderRequest.recipient,
-      rateRequest: orderRequest.rateRequest,
-      reference: orderRequest.reference,
-    }, fromAddress, jwsToken);
-
-    dispatch(setOrder(order));
-    dispatch(createPayment(order));
+    const multiTrade = await createMultiTrade(multiTradeRequest, jwsToken);
+    dispatch(setMultiTrade(multiTrade));
+    dispatch(createPayment(multiTrade));
 
     sendEvent('order', 'create', 'done');
 
   } catch(error) {
-    dispatch(setOrder(null));
+    dispatch(setMultiTrade(null));
 
     sendEvent('order', 'create', 'error');
 
@@ -251,29 +268,28 @@ export const sendPayment = () => async function (dispatch, getState)  {
   sendEvent('payment', 'send', 'init');
 
   const state = getState();
-  const order = getOrder(state);
+  const multiTrade = getMultiTrade(state);
+  if(!multiTrade) throw new Error('Missing multitrade');
+
   const ethManager = getETHManager(state);
   const signer = ethManager.provider.getSigner();
 
-  const bityInputAmount = order.bityOrder.input.amount;
-  const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
+  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
+  const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
 
-  log('PAYMENT: bity order id', order.bityOrder.id);
+  const bityOrderId = bityTrade.bityOrderResponse.id;
+  log('PAYMENT: bity order id', bityOrderId);
   log('PAYMENT: ETH address', ethManager.getAddress());
 
   try {
-    if(order.path === ExchangePath.DEX_BITY) {
-
-      if(!order.tradeData) throw new Error('missing trade data');
-      const tradeDetails = order.tradeData.tradeDetails;
+    if(dexTrade) {
+      if(!dexTrade.dexMetadata) throw new Error('missing dex meta data');
 
       // Allowance
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        // TODO Migrate
-        paymentFunction: async () => true
-        //paymentFunction: async () => checkTradeAllowance(tradeDetails, signer).then(tx => tx?.hash)
+        paymentFunction: async () => DexProxy.checkAllowance(dexTrade, signer).then(tx => tx?.hash)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -282,13 +298,10 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.TRADE,
-        // TODO migrate
-        paymentFunction: async () => true,
-        /*paymentFunction: async () => executeTrade(
-          tradeDetails,
-          undefined,
+        paymentFunction: async () => DexProxy.executeTrade(
+          dexTrade,
           signer,
-        ).then(tx => tx.hash)*/
+        ).then(tx => tx.hash)
       });
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');
@@ -296,6 +309,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
     }
 
     // Payment
+    const bityInputAmount = bityTrade.inputAmount;
+    const bityDepositAddress = bityTrade.bityOrderResponse.payment_details.crypto_address;
     await sendPaymentStep({
       dispatch, ethManager,
       stepId: PaymentStepId.PAYMENT,
@@ -304,7 +319,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
 
-    watchBityOrder(state, dispatch, order.bityOrder.id);
+    // TODO dispatch this
+    watchBityOrder(state, dispatch, bityOrderId);
 
   } catch(error) {
 

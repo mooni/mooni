@@ -1,3 +1,5 @@
+import {MultiTrade, MultiTradeRequest} from "./trading/types";
+
 export enum TradeExact {
   INPUT = 'INPUT',
   OUTPUT = 'OUTPUT',
@@ -63,12 +65,6 @@ export class OrderError extends Error {
   }
 }
 
-export interface OrderRequest {
-  recipient: Recipient;
-  rateRequest: RateRequest;
-  reference?: string;
-}
-
 export enum BityOrderStatus {
   WAITING = 'WAITING',
   CANCELLED = 'CANCELLED',
@@ -112,7 +108,7 @@ export type BityOrderResponse = {
 };
 
 export interface Order {
-  orderRequest: OrderRequest;
+  multiTrade: MultiTrade;
   estimatedRates: {
     inputAmount: string;
     inputCurrency: string;

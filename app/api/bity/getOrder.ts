@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/bity';
+import Bity from '../../src/lib/trading/bity';
 import { BityOrderResponse } from '../../src/lib/types';
 
 import config from '../../src/config';

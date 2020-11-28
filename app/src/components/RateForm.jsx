@@ -41,12 +41,12 @@ const useStyles = makeStyles(theme => ({
 
 const outputCurrencies = FIAT_CURRENCIES;
 
-function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }) {
+function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }) {
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
-  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialRateRequest);
+  const { rateForm, tradeRequest, onChangeAmount, onChangeCurrency, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
 
   let rate, feeAmount;
   if(rateForm) {
@@ -66,7 +66,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
 
   function submit() {
     if(!valid) return;
-    onSubmit(rateRequest);
+    onSubmit(tradeRequest);
   }
 
   return (
