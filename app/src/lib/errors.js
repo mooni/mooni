@@ -9,7 +9,7 @@ export function serializeError(error = {}) {
   const obj = {
     message: error.message,
     code: error.code,
-    stack: error.stack.toString(),
+    stack: error.stack?.toString(),
     ...error,
   };
   const ser = JSON.stringify(obj, null, 2);

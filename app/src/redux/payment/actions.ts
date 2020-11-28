@@ -272,7 +272,6 @@ export const sendPayment = () => async function (dispatch, getState)  {
   if(!multiTrade) throw new Error('Missing multitrade');
 
   const ethManager = getETHManager(state);
-  const signer = ethManager.provider.getSigner();
 
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
@@ -289,7 +288,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => DexProxy.checkAllowance(dexTrade, signer).then(tx => tx?.hash)
+        paymentFunction: async () => DexProxy.checkAllowance(dexTrade, ethManager.provider)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -300,8 +299,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
         stepId: PaymentStepId.TRADE,
         paymentFunction: async () => DexProxy.executeTrade(
           dexTrade,
-          signer,
-        ).then(tx => tx.hash)
+          ethManager.provider,
+        )
       });
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');

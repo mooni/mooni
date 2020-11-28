@@ -1,22 +1,26 @@
 import axios from 'axios';
-import {Token} from './currencies';
-import {amountToDecimal, amountToInt} from '../numbers';
+import {ParaSwap, APIError, Transaction} from 'paraswap';
+import { CurrencyType, ETHER, Token} from './currencies';
+import {amountToDecimal, amountToInt, BN} from '../numbers';
 import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
+import { providers } from 'ethers';
+import { defaultProvider } from '../web3Providers';
 
+const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
   baseURL: 'https://api.paraswap.io/v2',
   timeout: 10000,
 });
 
+// (async () => {
+//   console.log(await paraSwap.getSpender());
+// })();
+
 interface IDexProxy {
   isTokenExchangeable(Token): Promise<boolean>;
   getRate(TradeRequest): Promise<DexTrade>;
-  checkAllowance(DexTrade, any): Promise<TX | null>;
-  executeTrade(DexTrade, any): Promise<TX>;
-}
-
-interface TX {
-  hash: string;
+  checkAllowance(DexTrade, any): Promise<string | null>;
+  executeTrade(DexTrade, any): Promise<string>;
 }
 
 const DexProxy: IDexProxy = {
@@ -53,15 +57,57 @@ const DexProxy: IDexProxy = {
     };
   },
 
-  async checkAllowance(dexTrade: DexTrade, signer): Promise<TX | null> {
+  async checkAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     //TODO
-    return {hash: 'XX'};
+    const signer = provider.getSigner();
+    const senderAddress = await signer.getAddress();
+    const tokenAddress = (dexTrade.tradeRequest.inputCurrency as Token).address;
+
+    const intAmount = amountToInt(dexTrade.inputAmount, dexTrade.tradeRequest.inputCurrency.decimals);
+    // const paraSwapSigned = new ParaSwap().setWeb3Provider(provider);
+    // const spenderAddress = await paraSwap.getSpender();
+    // if((<APIError>spenderAddress).message)  throw new Error((<APIError>spenderAddress).message)
+
+    const allowanceRes = await paraSwap.getAllowance(senderAddress, tokenAddress);
+    if((<APIError>allowanceRes).message) throw new Error((<APIError>allowanceRes).message);
+
+    const allowance = (<any>allowanceRes).allowance;
+    if(new BN(intAmount).gt(allowance)) {
+
+      const txHash = await paraSwap.approveToken(intAmount, senderAddress, tokenAddress);
+      return txHash;
+    }
+
+    return null;
   },
 
 
-  async executeTrade(dexTrade: DexTrade, signer): Promise<TX> {
-    //TODO
-    return {hash: 'XX'};
+  async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
+    const { priceRoute } = dexTrade.dexMetadata;
+
+    const signer = provider.getSigner();
+    function getTokenAddress(currency) {
+      if(currency.equals(ETHER)) {
+        return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+      } else if(currency.type === CurrencyType.ERC20) {
+        return (currency as Token).address;
+      } else {
+        throw new Error('impossible token address');
+      }
+    }
+    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrency);
+    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrency);
+    const srcAmount = dexTrade.dexMetadata.priceRoute.srcAmount;
+    const destAmount = dexTrade.dexMetadata.priceRoute.destAmount;
+    const senderAddress = await signer.getAddress();
+    const receiver = undefined;
+    const referrer = 'mooni';
+
+    const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
+    if((<APIError>txParams).message) throw new Error((<APIError>txParams).message);
+
+    const tx = await signer.sendTransaction(<Transaction>txParams);
+    return <string>tx.hash;
   },
 };
 
