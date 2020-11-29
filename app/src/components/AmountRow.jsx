@@ -1,6 +1,6 @@
 import React from 'react';
 import BN from 'bignumber.js';
-
+import {useImage} from 'react-image';
 import { Box, Typography} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -64,14 +64,25 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+function CurrencyLogo({symbol}) {
+  const {src} = useImage({
+    srcList: [
+      getCurrencyLogoAddress(symbol),
+      'https://img.paraswap.network/token.png',
+    ],
+    useSuspense: false,
+  });
+
+  return <img
+    src={src}
+    alt={`coin-icon-${symbol}`}
+    width={20}
+  />
+}
 function CurrencyItem({ symbol }) {
   return (
     <Box display="flex" alignItems="center">
-      <img
-        src={getCurrencyLogoAddress(symbol)}
-        alt={`coin-icon-${symbol}`}
-        width={20}
-      />
+      <CurrencyLogo symbol={symbol}/>
       <Box ml={1}>{symbol}</Box>
     </Box>
   );
