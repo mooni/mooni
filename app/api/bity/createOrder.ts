@@ -27,8 +27,12 @@ export default async (req: NowRequest, res: NowResponse) => {
     const bityTrade = await bityInstance.createOrder(tradeRequest, bankInfo, ethInfo);
     return res.json(bityTrade)
   } catch(error) {
-    if(error.message === 'api_error') {
-      return res.status(400).json({ errors: error.errors });
+    if(error._orderError) {
+      return res.status(400).json({
+        message: error.message,
+        _orderError: error._orderError,
+        errors: error.errors
+      });
     } else {
       return res.status(500).send('Unexpected server error');
     }

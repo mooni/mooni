@@ -129,6 +129,17 @@ class Bity {
       data: body,
     });
 
+    if(
+      data.input.amount === data.input.minimum_amount
+      ||
+      data.output.amount === data.output.minimum_amount
+    ) {
+      throw new BityOrderError(
+        'bity_amount_too_low',
+        [{ minimumOutputAmount: data.output.amount}]
+      )
+    }
+
     return {
       tradeRequest,
       inputAmount: data.input.amount,
@@ -197,6 +208,17 @@ class Bity {
           'api_error',
           [{code: 'cookie', message: 'your browser does not support cookies'}]
         );
+      }
+
+      if(
+        data.input.amount === data.input.minimum_amount
+        ||
+        data.output.amount === data.output.minimum_amount
+      ) {
+        throw new BityOrderError(
+          'bity_amount_too_low',
+          [{ minimumOutputAmount: data.output.amount}]
+        )
       }
 
       return {

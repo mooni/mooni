@@ -121,7 +121,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
           ...r,
           loading: false,
           errors: {
-            lowAmount: error.meta.minimumAmount,
+            lowAmount: error.errors[0].minimumOutputAmount,
           },
         }));
         setTradeRequest(null);

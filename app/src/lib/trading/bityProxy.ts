@@ -41,11 +41,9 @@ const BityProxy: IBityProxy = {
 
         return data;
       } catch(error) {
-        if(error.response?.status === 400 && error.response?.data?.errors) {
-          throw new BityOrderError(
-            'api_error',
-            error.response.data.errors
-          );
+        const data = error.response?.data;
+        if(error.response?.status === 400 && data?._orderError) {
+          throw new BityOrderError(data.message, data.errors);
         } else {
           throw error;
         }
