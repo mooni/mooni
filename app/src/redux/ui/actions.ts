@@ -1,4 +1,4 @@
-import { ETH, TOKENS, addToken } from '../../lib/currencies';
+import { ETHER, tokenSymbols, addToken } from '../../lib/trading/currencies';
 import { setTradeRequest } from '../payment/actions';
 import {getMultiTradeRequest} from '../payment/selectors';
 
@@ -28,14 +28,14 @@ export const setModalError = (error) => ({
 });
 
 export const initTokens = () => (dispatch, getState) => {
-  dispatch(setInputCurrencies([ETH].concat(Object.keys(TOKENS))));
+  dispatch(setInputCurrencies([ETHER.symbol].concat(tokenSymbols)));
 
   const query = new URLSearchParams(window.location.search);
   const token = query.get('token');
 
   if(token) {
     addToken(token).then(addedToken => {
-      dispatch(setInputCurrencies([ETH].concat(Object.keys(TOKENS))));
+      dispatch(setInputCurrencies([ETHER.symbol].concat(tokenSymbols)));
       const multiTradeRequest = getMultiTradeRequest(getState());
       if(multiTradeRequest) {
         dispatch(setTradeRequest({

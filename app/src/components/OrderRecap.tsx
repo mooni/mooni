@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
 import { Link, textStyle, Field, GU, Info, Timer } from '@aragon/ui';
 
-import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/trading/currencies';
 
 import bityLogo from '../assets/bity_logo_blue.svg';
 import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";

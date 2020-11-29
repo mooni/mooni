@@ -15,9 +15,9 @@ import { TradeExact } from '../lib/trading/types';
 import { getInputCurrencies } from '../redux/ui/selectors';
 
 import {
-  FIAT_CURRENCIES,
   SIGNIFICANT_DIGITS,
-} from '../lib/currencies';
+  fiatSymbols,
+} from '../lib/trading/currencies';
 import { useRate } from '../hooks/rates';
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 import {TradeRequest} from "../lib/trading/types";
@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const outputCurrencies = FIAT_CURRENCIES;
+const outputCurrencies: string[] = fiatSymbols;
 
 interface RateFormParams {
  onSubmit: (TradeRequest?) => void;

@@ -107,6 +107,7 @@ export const getCurrencyLogoAddress = memoize((symbol) => {
 });
 
 export function getTokenAddress(symbol) {
+  console.log(symbol, tokenCurrencies);
   const token = tokenCurrencies.find(t => t.symbol === symbol);
   if(!token) {
     throw new Error('unknown-token');
