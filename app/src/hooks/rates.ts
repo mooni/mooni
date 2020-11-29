@@ -60,6 +60,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
   const [tradeRequest, setTradeRequest] = useState<TradeRequest|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
+
   useEffect(() => {
     setRateForm(defaultRateForm(initialTradeRequest));
   }, [initialTradeRequest]);
@@ -71,7 +72,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
       inputCurrency: getCurrency(_rateForm.values.inputCurrency),
       outputCurrency: getCurrency(_rateForm.values.outputCurrency),
       tradeExact: _rateForm.values.tradeExact as TradeExact,
-      amount: rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
+      amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
 
     if(!isNotZero(currentRequest.amount)) {
@@ -105,7 +106,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
         }));
         return;
       }
-      if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
+      else if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
         setRateForm(r => ({
           ...r,
           loading: false,
@@ -137,7 +138,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
       if(new BN(multiTrade.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { lowAmount: true };
       }
-      if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+      else if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { highAmount: true };
       }
     }
