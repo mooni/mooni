@@ -136,7 +136,7 @@ const getTokenContract = memoize((tokenSymbol) => {
 
 const getTokenDecimals = memoize(async (tokenSymbol) => {
   const tokenContract = getTokenContract(tokenSymbol);
-  return tokenContract.decimals();
+  return tokenContract.decimals().toNumber();
 });
 
 export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
@@ -144,7 +144,7 @@ export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
   const tokenDecimals = await getTokenDecimals(tokenSymbol);
 
-  return new BN(tokenBalance).div(10 ** tokenDecimals).toFixed();
+  return new BN(tokenBalance.toString()).div(10 ** tokenDecimals).toFixed();
 }
 
 export function getCurrency(symbol: string): Currency {

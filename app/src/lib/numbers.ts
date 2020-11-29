@@ -20,9 +20,9 @@ export function isNotZero(v: any): boolean {
 }
 
 export function amountToInt(amount: string, decimals: number): string {
-  return new BN(amount).times(10 ** decimals).dp(0).toString();
+  return new BN(amount).times(10 ** decimals).dp(0).toFixed();
 }
 
 export function amountToDecimal(amount: string, decimals: number): string {
-  return new BN(amount).div(10 ** decimals).toString();
+  return new BN(amount).div(10 ** decimals).toFixed();
 }

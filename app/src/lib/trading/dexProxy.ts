@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { ethers, providers, BigNumber } from 'ethers';
 import {ParaSwap, APIError, Transaction} from 'paraswap';
+
 import { CurrencyType, ETHER, Token} from './currencies';
 import {amountToDecimal, amountToInt, BN} from '../numbers';
 import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
-import { providers } from 'ethers';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import AUGUSTUS_ABI from '../abis/augustus.json';
@@ -90,20 +90,20 @@ const DexProxy: IDexProxy = {
   {
     const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, defaultProvider);
     const allowance = await tokenContract.allowance(senderAddress, spenderAddress);
-    return allowance;
+    return allowance.toString();
   },
 
   async approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
 
-    const estimatedGas = await tokenContract.estimate.approve(spenderAddress, intAmount);
+    const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, intAmount);
     const gasLimit = calculatedGasMargin(estimatedGas);
     const tx = await tokenContract.approve(
       spenderAddress,
-      intAmount,
+      BigNumber.from(intAmount),
       {
-        gasLimit,
+        gasLimit: BigNumber.from(gasLimit),
       }
     );
     return tx.hash;
@@ -117,8 +117,7 @@ const DexProxy: IDexProxy = {
     const spenderAddress = await DexProxy.getSpender(dexTrade);
     const intAmount = amountToInt(dexTrade.inputAmount, dexTrade.tradeRequest.inputCurrency.decimals);
 
-    const allowanceRes = await DexProxy.getAllowance(tokenAddress, senderAddress, spenderAddress);
-    const allowance = allowanceRes.toString();
+    const allowance = await DexProxy.getAllowance(tokenAddress, senderAddress, spenderAddress);
     if(new BN(intAmount).gt(allowance)) {
       const txHash = await DexProxy.approve(tokenAddress, senderAddress, spenderAddress, intAmount, provider);
       return txHash;
@@ -152,7 +151,17 @@ const DexProxy: IDexProxy = {
     const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
     if((<APIError>txParams).message) throw new Error((<APIError>txParams).message);
 
-    const tx = await signer.sendTransaction(<Transaction>txParams);
+    const transactionRequest = {
+      to: (<any>txParams).to,
+      from: (<any>txParams).from,
+      gasLimit: BigNumber.from((<any>txParams).gas),
+      gasPrice: BigNumber.from((<any>txParams).gasPrice),
+      data: (<any>txParams).data,
+      value: BigNumber.from((<any>txParams).value),
+      chainId: (<any>txParams).chainId,
+    };
+
+    const tx = await signer.sendTransaction(transactionRequest);
     return <string>tx.hash;
   },
 };
