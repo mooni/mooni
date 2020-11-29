@@ -136,7 +136,7 @@ const getTokenContract = memoize((tokenSymbol) => {
 
 const getTokenDecimals = memoize(async (tokenSymbol) => {
   const tokenContract = getTokenContract(tokenSymbol);
-  return tokenContract.decimals().toNumber();
+  return tokenContract.decimals();
 });
 
 export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
