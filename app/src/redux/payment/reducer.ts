@@ -65,7 +65,7 @@ const initialMockStateMinimum: PaymentState = {
       reference: '',
     },
     tradeRequest: {
-      inputCurrency: getCurrency('ETH'),
+      inputCurrency: getCurrency('DAI'),
       outputCurrency: getCurrency('EUR'),
       amount: '15',
       tradeExact: TradeExact.OUTPUT,

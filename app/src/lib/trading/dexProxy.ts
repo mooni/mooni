@@ -1,26 +1,35 @@
 import axios from 'axios';
+import { ethers } from 'ethers';
 import {ParaSwap, APIError, Transaction} from 'paraswap';
 import { CurrencyType, ETHER, Token} from './currencies';
 import {amountToDecimal, amountToInt, BN} from '../numbers';
 import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
 import { providers } from 'ethers';
 import { defaultProvider } from '../web3Providers';
+import ERC20_ABI from '../abis/ERC20.json';
+import AUGUSTUS_ABI from '../abis/augustus.json';
+import config from '../../config';
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
   baseURL: 'https://api.paraswap.io/v2',
   timeout: 10000,
 });
+let paraswapAdapters: any | null = null;
 
-// (async () => {
-//   console.log(await paraSwap.getSpender());
-// })();
+function calculatedGasMargin(gas) {
+  const offset = gas.mul(1000).div(10000);
+  return gas.add(offset);
+}
 
 interface IDexProxy {
-  isTokenExchangeable(Token): Promise<boolean>;
-  getRate(TradeRequest): Promise<DexTrade>;
-  checkAllowance(DexTrade, any): Promise<string | null>;
-  executeTrade(DexTrade, any): Promise<string>;
+  isTokenExchangeable(token: Token): Promise<boolean>;
+  getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
+  getSpender(dexTrade: DexTrade): Promise<string>;
+  getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>;
+  approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string>;
+  checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null>;
+  executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string>;
 }
 
 const DexProxy: IDexProxy = {
@@ -57,24 +66,61 @@ const DexProxy: IDexProxy = {
     };
   },
 
-  async checkAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
-    //TODO
+  async getSpender(_dexTrade: DexTrade): Promise<string> {
+
+    if(!paraswapAdapters) {
+      const { data } = await paraswapAxios({
+        method: 'get',
+        url: `/adapters/${config.chainId}`,
+      });
+      paraswapAdapters = data;
+    }
+    const augustusAddress = paraswapAdapters.augustus.exchange;
+    const augustusContract = new ethers.Contract(
+      augustusAddress,
+      AUGUSTUS_ABI,
+      defaultProvider
+    );
+
+    const spender = await augustusContract.getTokenTransferProxy();
+    return spender;
+  },
+
+  async getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>
+  {
+    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, defaultProvider);
+    const allowance = await tokenContract.allowance(senderAddress, spenderAddress);
+    return allowance;
+  },
+
+  async approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
-    const senderAddress = await signer.getAddress();
+    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+
+    const estimatedGas = await tokenContract.estimate.approve(spenderAddress, intAmount);
+    const gasLimit = calculatedGasMargin(estimatedGas);
+    const tx = await tokenContract.approve(
+      spenderAddress,
+      intAmount,
+      {
+        gasLimit,
+      }
+    );
+    return tx.hash;
+  },
+
+  async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
+    const signer = provider.getSigner();
+
     const tokenAddress = (dexTrade.tradeRequest.inputCurrency as Token).address;
-
+    const senderAddress = await signer.getAddress();
+    const spenderAddress = await DexProxy.getSpender(dexTrade);
     const intAmount = amountToInt(dexTrade.inputAmount, dexTrade.tradeRequest.inputCurrency.decimals);
-    // const paraSwapSigned = new ParaSwap().setWeb3Provider(provider);
-    // const spenderAddress = await paraSwap.getSpender();
-    // if((<APIError>spenderAddress).message)  throw new Error((<APIError>spenderAddress).message)
 
-    const allowanceRes = await paraSwap.getAllowance(senderAddress, tokenAddress);
-    if((<APIError>allowanceRes).message) throw new Error((<APIError>allowanceRes).message);
-
-    const allowance = (<any>allowanceRes).allowance;
+    const allowanceRes = await DexProxy.getAllowance(tokenAddress, senderAddress, spenderAddress);
+    const allowance = allowanceRes.toString();
     if(new BN(intAmount).gt(allowance)) {
-
-      const txHash = await paraSwap.approveToken(intAmount, senderAddress, tokenAddress);
+      const txHash = await DexProxy.approve(tokenAddress, senderAddress, spenderAddress, intAmount, provider);
       return txHash;
     }
 

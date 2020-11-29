@@ -288,7 +288,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => DexProxy.checkAllowance(dexTrade, ethManager.provider)
+        paymentFunction: async () => DexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');

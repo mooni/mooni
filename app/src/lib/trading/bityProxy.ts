@@ -8,8 +8,8 @@ const { bityClientId } = config;
 const bityInstance = new Bity({ bityClientId });
 
 interface IBityProxy {
-  estimateOrder(TradeRequest): Promise<BityTrade>;
-  createOrder(t: TradeRequest, b: BankInfo, e: ETHInfo, jwsToken?: string): Promise<BityTrade>;
+  estimateOrder(tradeRequest: TradeRequest): Promise<BityTrade>;
+  createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken?: string): Promise<BityTrade>;
   getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
 }
 
