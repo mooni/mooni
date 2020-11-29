@@ -1,7 +1,7 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/trading/bity';
-import { BityOrderResponse } from '../../src/lib/types';
+import Bity from '../../src/lib/wrappers/bity';
+import { BityOrderResponse } from '../../src/lib/wrappers/bityTypes';
 
 import config from '../../src/config';
 import DIDManager, { Token } from "../../src/lib/didManager";

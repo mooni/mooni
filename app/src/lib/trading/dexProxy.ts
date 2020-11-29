@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ethers, providers, BigNumber } from 'ethers';
-import {ParaSwap, APIError, Transaction} from 'paraswap';
+import {ParaSwap, APIError} from 'paraswap';
 
 import { CurrencyType, ETHER, Token} from './currencies';
 import {amountToDecimal, amountToInt, BN} from '../numbers';
@@ -149,20 +149,20 @@ const DexProxy: IDexProxy = {
     const referrer = 'mooni';
 
     const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
-    if((<APIError>txParams).message) throw new Error((<APIError>txParams).message);
+    if((txParams as APIError).message) throw new Error((txParams as APIError).message);
 
     const transactionRequest = {
-      to: (<any>txParams).to,
-      from: (<any>txParams).from,
-      gasLimit: BigNumber.from((<any>txParams).gas),
-      gasPrice: BigNumber.from((<any>txParams).gasPrice),
-      data: (<any>txParams).data,
-      value: BigNumber.from((<any>txParams).value),
-      chainId: (<any>txParams).chainId,
+      to: (txParams as any).to,
+      from: (txParams as any).from,
+      gasLimit: BigNumber.from((txParams as any).gas),
+      gasPrice: BigNumber.from((txParams as any).gasPrice),
+      data: (txParams as any).data,
+      value: BigNumber.from((txParams as any).value),
+      chainId: (txParams as any).chainId,
     };
 
     const tx = await signer.sendTransaction(transactionRequest);
-    return <string>tx.hash;
+    return tx.hash as string;
   },
 };
 

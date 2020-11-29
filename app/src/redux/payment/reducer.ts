@@ -7,8 +7,8 @@ import {
   PaymentStepId,
   PaymentStepStatus,
   Recipient,
-  TradeExact
 } from '../../lib/types';
+import { TradeExact } from '../../lib/trading/types';
 
 import * as actions from './actions';
 import {BankInfo, BityTrade, MultiTrade, MultiTradeRequest, TradeRequest, TradeType} from "../../lib/trading/types";
@@ -23,6 +23,7 @@ interface PaymentState {
   payment: Payment | null;
 }
 
+// eslint-disable-next-line
 const initialEmptyState: PaymentState = {
   exchangeStep: 0,
   multiTradeRequest: {

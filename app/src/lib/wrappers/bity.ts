@@ -1,11 +1,12 @@
 import axios, {AxiosInstance} from 'axios';
 import qs from 'qs';
-import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,} from './types';
+import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,} from '../trading/types';
 import config from '../../config';
 import {BN} from '../numbers';
 import {MetaError} from '../errors';
-import {Currency} from "./currencies";
+import {Currency} from "../trading/currencies";
 
+import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
 const TIMEOUT = 10 * 1000;
@@ -278,66 +279,6 @@ class Bity {
 
   static getOrderStatusPageURL(orderId: string) {
     return `https://go.bity.com/order-status?id=${orderId}`;
-  }
-}
-
-const bityDefaultInstance = new Bity();
-
-export { bityDefaultInstance };
-
-export enum BityOrderStatus {
-  WAITING = 'WAITING',
-  CANCELLED = 'CANCELLED',
-  EXECUTED = 'EXECUTED',
-  RECEIVED = 'RECEIVED',
-}
-
-export type BityOrderResponse = {
-  input: {
-    amount: string,
-    minimum_amount?: string,
-    currency: string,
-    type: string,
-    crypto_address: string
-  },
-  output: {
-    amount: string,
-    minimum_amount?: string,
-    currency: string,
-    type: string,
-    iban: string,
-    reference: string
-  },
-  id: string,
-  timestamp_created: string,
-  timestamp_awaiting_payment_since: string,
-  timestamp_price_guaranteed: string,
-  payment_details: {
-    crypto_address: string,
-    type: string
-  },
-  price_breakdown: {
-    customer_trading_fee: {
-      amount: string,
-      currency: string
-    }
-  },
-  fees: {
-    amount: string,
-    currency: string
-  },
-  orderStatus?: BityOrderStatus;
-};
-
-export type BityOrderErrors = any[];
-
-export class BityOrderError extends Error {
-  errors: BityOrderErrors;
-  _orderError: boolean;
-  constructor(message: string, errors: BityOrderErrors = []) {
-    super(message);
-    this._orderError = true;
-    this.errors = errors;
   }
 }
 

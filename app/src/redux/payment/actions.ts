@@ -1,12 +1,14 @@
 import {getMultiTrade, getMultiTradeRequest} from './selectors';
 import {getAddress, getETHManager, getJWS} from '../eth/selectors';
 import {
-  BityOrderStatus,
   Payment,
   PaymentStatus,
   PaymentStepId,
   PaymentStepStatus, Recipient
 } from '../../lib/types';
+import {
+  BityOrderStatus,
+} from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
 import BityProxy from '../../lib/trading/bityProxy';
 import { track } from '../../lib/analytics';

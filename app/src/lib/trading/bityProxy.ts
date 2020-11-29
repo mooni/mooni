@@ -1,7 +1,8 @@
 import axios from 'axios';
 import config from '../../config';
 import {BankInfo, BityTrade, ETHInfo, TradeRequest} from './types';
-import Bity, { BityOrderResponse, BityOrderError } from './bity';
+import Bity from '../wrappers/bity';
+import { BityOrderResponse, BityOrderError } from '../wrappers/bityTypes';
 
 const { useAPI } = config;
 const { bityClientId } = config;

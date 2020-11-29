@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TradeExact } from '../lib/types';
+import { TradeExact } from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY, getCurrency } from '../lib/trading/currencies';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';

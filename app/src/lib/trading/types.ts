@@ -1,7 +1,5 @@
-import { BN } from '../numbers';
-
 import { Recipient } from "../types";
-import { BityOrderResponse } from "./bity";
+import { BityOrderResponse } from "../wrappers/bityTypes";
 import { Currency } from "./currencies";
 
 export enum TradeExact {
@@ -28,9 +26,6 @@ export interface MultiTradeRequest {
   bankInfo?: BankInfo,
 }
 
-export interface DexTradeRequest extends TradeRequest {}
-export interface BityTradeRequest extends TradeRequest {}
-
 export interface MultiTrade {
   multiTradeRequest: MultiTradeRequest,
   trades: Trade[],
@@ -53,7 +48,6 @@ export interface DexTrade extends Trade {
 export interface BityTrade extends Trade {
   bityOrderResponse: BityOrderResponse,
 }
-
 
 export interface BankInfo {
   recipient: Recipient;

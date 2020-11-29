@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, IconClose, useViewport, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getETHManager, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
+import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
 import { logout } from '../redux/eth/actions';
+import { defaultProvider } from '../lib/web3Providers';
 
 const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
@@ -13,7 +14,6 @@ const IDENTICON_SIZE = 6 * GU;
 function Account() {
   const address = useSelector(getAddress);
   const [ens, setENS] = useState();
-  const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
   const providerFromIframe = useSelector(getProviderFromIframe);
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ function Account() {
   useEffect(() => {
     if(address) {
       (async () => {
-        const ens = await ethManager.provider.lookupAddress(address);
+        const ens = await defaultProvider.lookupAddress(address);
         setENS(ens);
       })().catch(console.error);
     }

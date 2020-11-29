@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import AmountRow from './AmountRow';
 
-import { TradeExact } from '../lib/types';
+import { TradeExact } from '../lib/trading/types';
 
 import { getInputCurrencies } from '../redux/ui/selectors';
 

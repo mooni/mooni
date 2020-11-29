@@ -1,7 +1,7 @@
 import {MultiTrade, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
 import {CurrencyType, ETHER} from './currencies';
 import BityProxy from "./bityProxy";
-import {TradeExact} from "../types";
+import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 
 function findPath(tradeRequest: TradeRequest): TradePath {

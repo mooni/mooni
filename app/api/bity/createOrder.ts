@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/trading/bity';
+import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
 import {TradeRequest, BankInfo, ETHInfo} from "../../src/lib/trading/types";
 
