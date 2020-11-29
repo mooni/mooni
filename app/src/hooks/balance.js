@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 
-import { ETHER } from '../lib/trading/currencies';
+import { ETHER } from '../lib/trading/currencyList';
 import { useSelector } from 'react-redux';
 
-import { fetchTokenBalance } from '../lib/trading/currencies';
+import { fetchTokenBalance } from '../lib/trading/currencyHelpers';
 
 import { getETHManager, getAddress } from '../redux/eth/selectors';
 import { amountToDecimal } from '../lib/numbers';

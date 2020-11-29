@@ -4,7 +4,7 @@ import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,}
 import config from '../../config';
 import {BN} from '../numbers';
 import {MetaError} from '../errors';
-import {Currency} from "../trading/currencies";
+import {Currency} from "../trading/currencyTypes";
 
 import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
 const API_URL = 'https://exchange.api.bity.com';

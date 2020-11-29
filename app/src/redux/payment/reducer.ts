@@ -1,4 +1,5 @@
-import {DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY, getCurrency} from '../../lib/trading/currencies';
+import {DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY} from '../../lib/trading/currencyList';
+import {getCurrency} from '../../lib/trading/currencyHelpers';
 import {
   OrderErrors,
   Payment,

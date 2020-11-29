@@ -26,3 +26,5 @@ export function amountToInt(amount: string, decimals: number): string {
 export function amountToDecimal(amount: string, decimals: number): string {
   return new BN(amount).div(10 ** decimals).toFixed();
 }
+
+export const SIGNIFICANT_DIGITS = 7;

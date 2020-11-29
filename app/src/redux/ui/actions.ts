@@ -1,6 +1,8 @@
-import { ETHER, tokenSymbols, addToken } from '../../lib/trading/currencies';
-import { setTradeRequest } from '../payment/actions';
+import {addToken, getCurrenciesSymbols} from '../../lib/trading/currencyHelpers';
+import {ETHER} from '../../lib/trading/currencyList';
+import {setTradeRequest} from '../payment/actions';
 import {getMultiTradeRequest} from '../payment/selectors';
+import {CurrencyType} from "../../lib/trading/currencyTypes";
 
 export const SET_INPUT_CURRENCIES = 'SET_INPUT_CURRENCIES';
 export const SET_INFO_PANEL = 'SET_INFO_PANEL';
@@ -28,19 +30,22 @@ export const setModalError = (error) => ({
 });
 
 export const initTokens = () => (dispatch, getState) => {
-  dispatch(setInputCurrencies([ETHER.symbol].concat(tokenSymbols)));
+  const tokenSymbols = getCurrenciesSymbols(CurrencyType.ERC20);
+  const inputCurrencies = [ETHER.symbol].concat(tokenSymbols);
+  dispatch(setInputCurrencies(inputCurrencies));
 
   const query = new URLSearchParams(window.location.search);
-  const token = query.get('token');
+  const tokenAddress = query.get('token');
 
-  if(token) {
-    addToken(token).then(addedToken => {
+  if(tokenAddress) {
+    addToken(tokenAddress).then(token => {
+      const tokenSymbols = getCurrenciesSymbols(CurrencyType.ERC20);
       dispatch(setInputCurrencies([ETHER.symbol].concat(tokenSymbols)));
       const multiTradeRequest = getMultiTradeRequest(getState());
       if(multiTradeRequest) {
         dispatch(setTradeRequest({
           ...multiTradeRequest.tradeRequest,
-          inputCurrency: addedToken[0],
+          inputCurrency: token,
         }));
       }
     }).catch(() => {

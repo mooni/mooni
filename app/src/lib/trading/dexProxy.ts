@@ -2,7 +2,8 @@ import axios from 'axios';
 import { ethers, providers, BigNumber } from 'ethers';
 import {ParaSwap, APIError} from 'paraswap';
 
-import { CurrencyType, ETHER, Token} from './currencies';
+import { CurrencyType, Token} from './currencyTypes';
+import { ETHER } from './currencyList';
 import {amountToDecimal, amountToInt, BN} from '../numbers';
 import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
 import { defaultProvider } from '../web3Providers';

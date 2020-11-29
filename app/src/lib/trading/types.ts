@@ -1,6 +1,6 @@
 import { Recipient } from "../types";
 import { BityOrderResponse } from "../wrappers/bityTypes";
-import { Currency } from "./currencies";
+import { Currency } from "./currencyTypes";
 
 export enum TradeExact {
   INPUT = 'INPUT',

@@ -1,5 +1,6 @@
 import {MultiTrade, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
-import {CurrencyType, ETHER} from './currencies';
+import {CurrencyType} from './currencyTypes';
+import {ETHER} from './currencyList';
 import BityProxy from "./bityProxy";
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TradeExact } from '../lib/trading/types';
-import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY, getCurrency } from '../lib/trading/currencies';
+import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
+import { getCurrency } from '../lib/trading/currencyHelpers';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
@@ -59,7 +60,6 @@ export function useRate(initialTradeRequest: TradeRequest) {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
-
 
   useEffect(() => {
     setRateForm(defaultRateForm(initialTradeRequest));
