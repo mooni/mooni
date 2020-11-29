@@ -3,6 +3,7 @@ import {CurrencyType, ETHER} from './currencies';
 import BityProxy from "./bityProxy";
 import {TradeExact} from "../types";
 import DexProxy from "./dexProxy";
+import {MetaError} from "../errors";
 
 function findPath(tradeRequest: TradeRequest): TradePath {
   if(
@@ -45,7 +46,15 @@ async function estimateTrade(tradeRequest: TradeRequest): Promise<Trade> {
   }
   const tradeType = path[0];
   if(tradeType === TradeType.BITY) {
-    return BityProxy.estimateOrder(tradeRequest);
+    const bityTrade = await BityProxy.estimateOrder(tradeRequest);
+    if(
+      bityTrade.bityOrderResponse.input.amount === bityTrade.bityOrderResponse.input.minimum_amount
+    ||
+      bityTrade.bityOrderResponse.output.amount === bityTrade.bityOrderResponse.output.minimum_amount
+    ) {
+      throw new MetaError('bity_amount_too_low', { minimumAmount: bityTrade.bityOrderResponse.output.amount})
+    }
+    return bityTrade;
   }
   else if(tradeType === TradeType.DEX) {
     return DexProxy.getRate(tradeRequest);
@@ -64,7 +73,15 @@ async function createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiT
     if(!multiTradeRequest.bankInfo || !multiTradeRequest.ethInfo) {
       throw new Error('missing bank or eth info on multiTradeRequest');
     }
-    return BityProxy.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo, jwsToken);
+    const bityTrade = await BityProxy.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo, jwsToken);
+    if(
+      bityTrade.bityOrderResponse.input.amount === bityTrade.bityOrderResponse.input.minimum_amount
+      ||
+      bityTrade.bityOrderResponse.output.amount === bityTrade.bityOrderResponse.output.minimum_amount
+    ) {
+      throw new MetaError('bity_amount_too_low', { minimumAmount: bityTrade.bityOrderResponse.output.amount})
+    }
+    return bityTrade;
   }
   else if(tradeType === TradeType.DEX) {
     return DexProxy.getRate(tradeRequest);

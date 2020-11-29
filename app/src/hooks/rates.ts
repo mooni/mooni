@@ -5,14 +5,15 @@ import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
-import {TradeRequest} from "../lib/trading/types";
+import {MultiTrade, TradeRequest} from "../lib/trading/types";
 import {estimateMultiTrade} from "../lib/trading/trader";
 
 interface RateForm {
   loading: boolean,
   errors?: {
     lowBalance?: boolean
-    lowAmount?: boolean
+    zeroAmount?: boolean
+    lowAmount?: string
     highAmount?: boolean
   },
   values: {
@@ -50,7 +51,6 @@ function defaultRateForm(initialRequest): RateForm {
   };
 }
 
-const LOW_OUTPUT_AMOUNT = 15;
 const HIGH_OUTPUT_AMOUNT = 5000;
 
 let nonce = 0;
@@ -80,7 +80,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
         ...r,
         loading: false,
         errors: {
-          lowAmount: true,
+          zeroAmount: true,
         },
       }));
       return;
@@ -94,19 +94,10 @@ export function useRate(initialTradeRequest: TradeRequest) {
           lowBalance: true,
         },
       }));
+      setTradeRequest(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      if(new BN(currentRequest.amount).lt(LOW_OUTPUT_AMOUNT)) {
-        setRateForm(r => ({
-          ...r,
-          loading: false,
-          errors: {
-            lowAmount: true,
-          },
-        }));
-        return;
-      }
-      else if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
+      if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
         setRateForm(r => ({
           ...r,
           loading: false,
@@ -114,13 +105,31 @@ export function useRate(initialTradeRequest: TradeRequest) {
             highAmount: true,
           },
         }));
+        setTradeRequest(null);
         return;
       }
     }
 
-    const multiTrade = await estimateMultiTrade({
-      tradeRequest: currentRequest,
-    });
+    let multiTrade: MultiTrade;
+    try {
+      multiTrade = await estimateMultiTrade({
+        tradeRequest: currentRequest,
+      });
+    } catch(error) {
+      if(error.message === 'bity_amount_too_low') {
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            lowAmount: error.meta.minimumAmount,
+          },
+        }));
+        setTradeRequest(null);
+        return;
+      } else {
+        throw error;
+      }
+    }
 
     if(_nonce !== nonce) {
       return;
@@ -135,10 +144,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
       updateRateForm.values.outputAmount = new BN(multiTrade.outputAmount).toFixed();
-      if(new BN(multiTrade.outputAmount).lt(LOW_OUTPUT_AMOUNT)) {
-        updateRateForm.errors = { lowAmount: true };
-      }
-      else if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+      if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { highAmount: true };
       }
     }
@@ -213,7 +219,6 @@ export function useRate(initialTradeRequest: TradeRequest) {
     tradeRequest,
     onChangeCurrency,
     onChangeAmount,
-    LOW_OUTPUT_AMOUNT,
     HIGH_OUTPUT_AMOUNT,
   };
 }

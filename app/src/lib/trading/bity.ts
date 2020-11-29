@@ -273,12 +273,14 @@ export enum BityOrderStatus {
 export type BityOrderResponse = {
   input: {
     amount: string,
+    minimum_amount?: string,
     currency: string,
     type: string,
     crypto_address: string
   },
   output: {
     amount: string,
+    minimum_amount?: string,
     currency: string,
     type: string,
     iban: string,

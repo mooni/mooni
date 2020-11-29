@@ -54,7 +54,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
-  const { rateForm, tradeRequest, onChangeAmount, onChangeCurrency, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
+  const { rateForm, tradeRequest, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
 
   let rate, feeAmount;
   if(rateForm) {
@@ -70,7 +70,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   }
 
   const valid = !(rateForm.loading || rateForm.errors);
-  const errors = rateForm.errors && Object.keys(rateForm.errors);
+  const errors = rateForm.errors;
 
   function submit() {
     if(!valid) return;
@@ -112,11 +112,12 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
               {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees?.currency}</span>}
             </Typography>
             :
-            errors.map(errorType =>
-              <InvalidMessage key={errorType}>
-                {errorType === 'lowBalance' && 'You do not have enough funds'}
-                {errorType === 'lowAmount' && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
-                {errorType === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+            Object.entries(errors).map(([key, value]) =>
+              <InvalidMessage key={key}>
+                {key === 'lowBalance' && 'You do not have enough funds'}
+                {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
+                {key === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+                {key === 'zeroAmount' && `Amount can't be zero`}
               </InvalidMessage>
             )
           :
