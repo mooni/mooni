@@ -52,7 +52,10 @@ export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string
   return amountToDecimal(tokenBalance, token.decimals);
 }
 
-export async function addToken(tokenAddress): Promise<Token> {
+export async function addTokenFromAddress(tokenAddress: string): Promise<Token> {
+  const c = getCurrencies().find(c => c.type === CurrencyType.ERC20 && (c as Token).address.toLowerCase() === tokenAddress.toLowerCase());
+  if(c) return c as Token;
+
   const token = await DexProxy.isTokenExchangeable(tokenAddress);
   if(!token) {
     throw new Error('Token not available for exchange');
@@ -65,4 +68,9 @@ export async function addToken(tokenAddress): Promise<Token> {
   */
   tokenCurrencies.push(token);
   return token;
+}
+
+export function replaceTokens(tokens: Token[]): void {
+  tokenCurrencies.splice(0, tokenCurrencies.length);
+  tokenCurrencies.push(...tokens);
 }

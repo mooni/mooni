@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import BN from 'bignumber.js';
 import {useImage} from 'react-image';
 import { Box, Typography} from '@material-ui/core';
@@ -6,8 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { DropDown } from '@aragon/ui'
 
-import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
+import { getCurrency, getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
 import { SIGNIFICANT_DIGITS } from '../lib/numbers';
+import tokenDefaultImage  from '../assets/token_default.png';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -65,24 +66,37 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function CurrencyLogo({symbol}) {
+  const currency = getCurrency(symbol);
   const {src} = useImage({
     srcList: [
+      currency.img,
       getCurrencyLogoAddress(symbol),
-      'https://img.paraswap.network/token.png',
+      tokenDefaultImage,
     ],
-    useSuspense: false,
   });
 
-  return <img
-    src={src}
-    alt={`coin-icon-${symbol}`}
-    width={20}
-  />
+  return (
+      <img
+        src={src}
+        alt={`coin-icon-${symbol}`}
+        width={20}
+      />
+  );
 }
 function CurrencyItem({ symbol }) {
   return (
     <Box display="flex" alignItems="center">
-      <CurrencyLogo symbol={symbol}/>
+      <Suspense
+        fallback={
+          <img
+            src={tokenDefaultImage}
+            alt={`coin-icon-${symbol}`}
+            width={20}
+          />
+        }
+      >
+        <CurrencyLogo symbol={symbol}/>
+      </Suspense>
       <Box ml={1}>{symbol}</Box>
     </Box>
   );
@@ -93,7 +107,7 @@ export default function AmountRow({ value, selectedSymbol, onChangeValue, onChan
 
   const displayedValue = value !== null ?
     (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
-  : '';
+    : '';
 
   return (
     <Box className={classes.root}>

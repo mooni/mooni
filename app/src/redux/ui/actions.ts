@@ -1,8 +1,9 @@
-import {addToken, getCurrenciesSymbols} from '../../lib/trading/currencyHelpers';
+import {addTokenFromAddress, replaceTokens, getCurrenciesSymbols} from '../../lib/trading/currencyHelpers';
 import {ETHER} from '../../lib/trading/currencyList';
 import {setTradeRequest} from '../payment/actions';
 import {getMultiTradeRequest} from '../payment/selectors';
 import {CurrencyType} from "../../lib/trading/currencyTypes";
+import ParaswapWrapper from "../../lib/wrappers/paraswap";
 
 export const SET_INPUT_CURRENCIES = 'SET_INPUT_CURRENCIES';
 export const SET_INFO_PANEL = 'SET_INFO_PANEL';
@@ -29,16 +30,24 @@ export const setModalError = (error) => ({
   }
 });
 
-export const initTokens = () => (dispatch, getState) => {
+export const initTokens = () => async (dispatch, getState) => {
+ dispatch(initTokenFromDefaultList());
+ // dispatch(initTokenFromParaswap());
+ dispatch(detectCustomToken());
+};
+
+export const initTokenFromDefaultList = () => async (dispatch, getState) => {
   const tokenSymbols = getCurrenciesSymbols(CurrencyType.ERC20);
   const inputCurrencies = [ETHER.symbol].concat(tokenSymbols);
   dispatch(setInputCurrencies(inputCurrencies));
+};
 
+export const detectCustomToken = () => async (dispatch, getState) => {
   const query = new URLSearchParams(window.location.search);
   const tokenAddress = query.get('token');
 
   if(tokenAddress) {
-    addToken(tokenAddress).then(token => {
+    addTokenFromAddress(tokenAddress).then(token => {
       const tokenSymbols = getCurrenciesSymbols(CurrencyType.ERC20);
       dispatch(setInputCurrencies([ETHER.symbol].concat(tokenSymbols)));
       const multiTradeRequest = getMultiTradeRequest(getState());
@@ -52,4 +61,12 @@ export const initTokens = () => (dispatch, getState) => {
       dispatch(setModalError(new Error('invalid-custom-token')))
     })
   }
+};
+
+export const initTokenFromParaswap = () => async (dispatch, getState) => {
+  const pTokens = await ParaswapWrapper.getTokenList();
+  replaceTokens(pTokens);
+  const tokenSymbols = getCurrenciesSymbols(CurrencyType.ERC20);
+  const inputCurrencies = [ETHER.symbol].concat(tokenSymbols);
+  dispatch(setInputCurrencies(inputCurrencies));
 };
