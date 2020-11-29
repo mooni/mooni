@@ -1,22 +1,11 @@
-import axios from 'axios';
 import { ethers, providers, BigNumber } from 'ethers';
-import {ParaSwap, APIError} from 'paraswap';
 
-import { CurrencyType, Token} from './currencyTypes';
-import { ETHER } from './currencyList';
+import { Token} from './currencyTypes';
 import {amountToDecimal, amountToInt, BN} from '../numbers';
 import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
-import AUGUSTUS_ABI from '../abis/augustus.json';
-import config from '../../config';
-
-const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
-const paraswapAxios = axios.create({
-  baseURL: 'https://api.paraswap.io/v2',
-  timeout: 10000,
-});
-let paraswapAdapters: any | null = null;
+import Paraswap from '../wrappers/paraswap';
 
 function calculatedGasMargin(gas) {
   const offset = gas.mul(1000).div(10000);
@@ -24,7 +13,7 @@ function calculatedGasMargin(gas) {
 }
 
 interface IDexProxy {
-  isTokenExchangeable(token: Token): Promise<boolean>;
+  isTokenExchangeable(tokenAddress: string): Promise<Token | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
   getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>;
@@ -35,8 +24,10 @@ interface IDexProxy {
 
 const DexProxy: IDexProxy = {
   // TODO when add new token
-  async isTokenExchangeable(token: Token) {
-    return true;
+  async isTokenExchangeable(tokenAddress: string) {
+    const tokens = await Paraswap.getTokenList();
+    const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+    return foundToken || null;
   },
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
@@ -44,47 +35,22 @@ const DexProxy: IDexProxy = {
     const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? tradeRequest.inputCurrency : tradeRequest.outputCurrency;
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
 
-    const { data } = await paraswapAxios({
-      method: 'get',
-      url: '/prices',
-      params: {
-        from: tradeRequest.inputCurrency.symbol,
-        to: tradeRequest.outputCurrency.symbol,
-        amount: intAmount,
-        side: swapSide
-      },
-    });
+    const dexMetadata = await Paraswap.getRate(tradeRequest.inputCurrency.symbol, tradeRequest.outputCurrency.symbol, intAmount, swapSide);
 
-    const inputAmount = amountToDecimal(data.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
-    const outputAmount = amountToDecimal(data.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
+    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
+    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
 
     return {
       tradeRequest,
       inputAmount,
       outputAmount,
       tradeType: TradeType.DEX,
-      dexMetadata: data,
+      dexMetadata,
     };
   },
 
   async getSpender(_dexTrade: DexTrade): Promise<string> {
-
-    if(!paraswapAdapters) {
-      const { data } = await paraswapAxios({
-        method: 'get',
-        url: `/adapters/${config.chainId}`,
-      });
-      paraswapAdapters = data;
-    }
-    const augustusAddress = paraswapAdapters.augustus.exchange;
-    const augustusContract = new ethers.Contract(
-      augustusAddress,
-      AUGUSTUS_ABI,
-      defaultProvider
-    );
-
-    const spender = await augustusContract.getTokenTransferProxy();
-    return spender;
+    return Paraswap.getSpender();
   },
 
   async getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>
@@ -129,39 +95,9 @@ const DexProxy: IDexProxy = {
 
 
   async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
-    const { priceRoute } = dexTrade.dexMetadata;
-
     const signer = provider.getSigner();
-    function getTokenAddress(currency) {
-      if(currency.equals(ETHER)) {
-        return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
-      } else if(currency.type === CurrencyType.ERC20) {
-        return (currency as Token).address;
-      } else {
-        throw new Error('impossible token address');
-      }
-    }
-    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrency);
-    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrency);
-    const srcAmount = dexTrade.dexMetadata.priceRoute.srcAmount;
-    const destAmount = dexTrade.dexMetadata.priceRoute.destAmount;
     const senderAddress = await signer.getAddress();
-    const receiver = undefined;
-    const referrer = 'mooni';
-
-    const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
-    if((txParams as APIError).message) throw new Error((txParams as APIError).message);
-
-    const transactionRequest = {
-      to: (txParams as any).to,
-      from: (txParams as any).from,
-      gasLimit: BigNumber.from((txParams as any).gas),
-      gasPrice: BigNumber.from((txParams as any).gasPrice),
-      data: (txParams as any).data,
-      value: BigNumber.from((txParams as any).value),
-      chainId: (txParams as any).chainId,
-    };
-
+    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
   },

@@ -1,12 +1,9 @@
-import {ethers} from 'ethers';
 import {memoize} from 'lodash';
 import {Currency, CurrencyType, Token} from "./currencyTypes";
-import ERC20_ABI from '../abis/ERC20.json';
-import {defaultProvider} from "../web3Providers";
-import config from "../../config";
 
 import {cryptoCurrencies, ETHER, fiatCurrencies, tokenCurrencies} from "./currencyList";
 import {amountToDecimal} from "../numbers";
+import DexProxy from "./dexProxy";
 
 export function getCurrencies(type?: CurrencyType): Currency[] {
   const currencies = ([] as Currency[]).concat(fiatCurrencies).concat(cryptoCurrencies).concat(tokenCurrencies);
@@ -26,7 +23,7 @@ export function getCurrency(symbol: string): Currency {
   return c;
 }
 
-export const getCurrencyLogoAddress = memoize((symbol) => {
+export const getCurrencyLogoAddress = memoize((symbol: string): string => {
   const currency = getCurrency(symbol);
   if(currency.equals(ETHER)) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
@@ -38,7 +35,7 @@ export const getCurrencyLogoAddress = memoize((symbol) => {
   }
 });
 
-export function getTokenAddress(symbol) {
+export function getTokenAddress(symbol: string): string {
   const token = getCurrency(symbol) as Token;
   if(!token) {
     throw new Error('unknown-token');
@@ -46,7 +43,7 @@ export function getTokenAddress(symbol) {
   return token.address;
 }
 
-export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
+export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string): Promise<string> {
   const token = getCurrency(tokenSymbol) as Token;
 
   const tokenContract = token.getContract();
@@ -55,12 +52,17 @@ export async function fetchTokenBalance(tokenSymbol, tokenHolder) {
   return amountToDecimal(tokenBalance, token.decimals);
 }
 
-export async function addToken(tokenAddress) {
-  const checksumAddress = ethers.utils.getAddress(tokenAddress);
+export async function addToken(tokenAddress): Promise<Token> {
+  const token = await DexProxy.isTokenExchangeable(tokenAddress);
+  if(!token) {
+    throw new Error('Token not available for exchange');
+  }
+  /*
   let contract = new ethers.Contract(checksumAddress, ERC20_ABI, defaultProvider);
   const decimals = await contract.decimals();
   const symbol = await contract.symbol();
   const token = new Token(decimals, checksumAddress, config.chainId, symbol);
+  */
   tokenCurrencies.push(token);
   return token;
 }

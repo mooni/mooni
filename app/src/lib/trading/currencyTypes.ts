@@ -49,12 +49,14 @@ export class CryptoCurrency extends Currency {
 export class Token extends Currency {
   public readonly address: string;
   public readonly chainId: ChainId;
+  public readonly img: string;
   private contract?: ethers.Contract;
 
-  constructor(decimals, address, chainId, symbol, name?) {
+  constructor(decimals, address, chainId, symbol, name?, img?) {
     super(CurrencyType.ERC20, decimals, symbol, name);
-    this.address = address;
+    this.address = ethers.utils.getAddress(address);
     this.chainId = chainId;
+    this.img = img;
   }
 
   equals(token: Token) {
