@@ -11,6 +11,7 @@ import { SIGNIFICANT_DIGITS } from '../lib/numbers';
 
 import bityLogo from '../assets/bity_logo_blue.svg';
 import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
+import RateAmount from "./RateAmount";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -150,14 +151,7 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
       <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
       <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
-      <Box textAlign="center">
-        <Typography variant="caption">
-          <b>Rate:</b> ~{rate} {outputCurrency.symbol}/{inputCurrency.symbol}
-        </Typography><br/>
-        <Typography variant="caption">
-          {/* TODO fees <b>Fees:</b> {multiTrade.bityOrder.fees.amount} {multiTrade.bityOrder.fees.currency}*/}
-        </Typography>
-      </Box>
+      <RateAmount multiTrade={multiTrade}/>
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
         <PoweredBy>Powered by </PoweredBy>

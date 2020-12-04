@@ -4,9 +4,10 @@ import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,}
 import config from '../../config';
 import {BN} from '../numbers';
 import {MetaError} from '../errors';
-import {Currency} from "../trading/currencyTypes";
 
 import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
+import {getCurrency} from "../trading/currencyHelpers";
+
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
 const TIMEOUT = 10 * 1000;
@@ -23,38 +24,24 @@ function removeEmptyStrings(data: object = {}) {
     {});
 }
 
-function extractFees(order: any, inCurrency: Currency): Fee  {
-  const inputSymbol = order.input.currency;
-  const outputSymbol = order.output.currency;
-
+function extractFees(order: any): Fee  {
   const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
-  // expect the fees to be in the currency of the input
-  const sameCurrencies = new Set(fees.map(f => f.currency).concat(inputSymbol)).size === 1;
 
+  // expect the fees to be in the same currency
+  const sameCurrencies = new Set(fees.map(f => f.currency)).size === 1;
   if(!sameCurrencies) {
     throw new MetaError('Incompatible fee currencies', order);
   }
 
   const totalAmountInputCurrency = fees
     .map(f => f.amount)
-    .reduce((acc, a) => acc.plus(a), new BN(0));
+    .reduce((acc, a) => acc.plus(a), new BN(0))
+    .toFixed();
+  const currency = getCurrency(fees[0].currency);
 
-  if(inCurrency.symbol === inputSymbol) {
-    return {
-      amount: totalAmountInputCurrency,
-      currency: inCurrency,
-    }
-  } else if(inCurrency.symbol === outputSymbol) {
-
-    const totalAmountOutputCurrency = totalAmountInputCurrency
-      .times(order.output.amount).div(order.input.amount).toFixed();
-
-    return {
-      amount: totalAmountOutputCurrency,
-      currency: inCurrency,
-    };
-  } else {
-    throw new Error('bity fees are in a special currency')
+  return {
+    amount: totalAmountInputCurrency,
+    currency: currency,
   }
 }
 
@@ -124,30 +111,30 @@ class Bity {
     else
       throw new Error('invalid TRADE_EXACT');
 
-    const { data } = await this.instance({
+    const { data: bityOrderResponse } = await this.instance({
       method: 'post',
       url: '/v2/orders/estimate',
       data: body,
     });
 
     if(
-      data.input.amount === data.input.minimum_amount
+      bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
       ||
-      data.output.amount === data.output.minimum_amount
+      bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
     ) {
       throw new BityOrderError(
         'bity_amount_too_low',
-        [{ minimumOutputAmount: data.output.amount}]
+        [{ minimumOutputAmount: bityOrderResponse.output.amount}]
       )
     }
 
     return {
       tradeRequest,
-      inputAmount: data.input.amount,
-      outputAmount: data.output.amount,
+      inputAmount: bityOrderResponse.input.amount,
+      outputAmount: bityOrderResponse.output.amount,
       tradeType: TradeType.BITY,
-      bityOrderResponse: data,
-      fee: extractFees(data, outputCurrency),
+      bityOrderResponse,
+      fee: extractFees(bityOrderResponse),
     };
   }
 
@@ -198,13 +185,13 @@ class Bity {
         withCredentials: this.withCredentials,
       });
 
-      const { data } = await this.instance({
+      const { data: bityOrderResponse } = await this.instance({
         method: 'get',
         url: headers.location,
         withCredentials: this.withCredentials,
       });
 
-      if(!data.input) {
+      if(!bityOrderResponse.input) {
         throw new BityOrderError(
           'api_error',
           [{code: 'cookie', message: 'your browser does not support cookies'}]
@@ -212,23 +199,23 @@ class Bity {
       }
 
       if(
-        data.input.amount === data.input.minimum_amount
+        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
         ||
-        data.output.amount === data.output.minimum_amount
+        bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
       ) {
         throw new BityOrderError(
           'bity_amount_too_low',
-          [{ minimumOutputAmount: data.output.amount}]
+          [{ minimumOutputAmount: bityOrderResponse.output.amount}]
         )
       }
 
       return {
         tradeRequest,
-        inputAmount: data.input.amount,
-        outputAmount: data.output.amount,
+        inputAmount: bityOrderResponse.input.amount,
+        outputAmount: bityOrderResponse.output.amount,
         tradeType: TradeType.BITY,
-        bityOrderResponse: data,
-        fee: extractFees(data, tradeRequest.outputCurrency),
+        bityOrderResponse,
+        fee: extractFees(bityOrderResponse),
       };
 
     } catch(error) {

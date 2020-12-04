@@ -23,7 +23,6 @@ interface RateForm {
     inputAmount: string,
     outputAmount: string,
     tradeExact: TradeExact,
-    fees?: { amount: string, currency: string } // TODO
   },
 }
 
@@ -59,6 +58,7 @@ let nonce = 0;
 export function useRate(initialTradeRequest: TradeRequest) {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest|null>(null);
+  const [multiTrade, setMultiTrade] = useState<MultiTrade|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
@@ -83,6 +83,8 @@ export function useRate(initialTradeRequest: TradeRequest) {
           zeroAmount: true,
         },
       }));
+      setTradeRequest(null);
+      setMultiTrade(null);
       return;
     }
 
@@ -95,6 +97,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
         },
       }));
       setTradeRequest(null);
+      setMultiTrade(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
@@ -106,6 +109,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
           },
         }));
         setTradeRequest(null);
+        setMultiTrade(null);
         return;
       }
     }
@@ -125,6 +129,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
           },
         }));
         setTradeRequest(null);
+        setMultiTrade(null);
         return;
       } else {
         throw error;
@@ -137,10 +142,8 @@ export function useRate(initialTradeRequest: TradeRequest) {
 
     const updateRateForm: any = {
       loading: false,
-      values: {
-        fees: {amount: '1', currency: 'ETH' } // TODO
-      },
       errors: null,
+      values: {},
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
       updateRateForm.values.outputAmount = new BN(multiTrade.outputAmount).toFixed();
@@ -166,8 +169,10 @@ export function useRate(initialTradeRequest: TradeRequest) {
 
     if(!updateRateForm.errors) {
       setTradeRequest(currentRequest);
+      setMultiTrade(multiTrade);
     } else {
       setTradeRequest(null);
+      setMultiTrade(null);
     }
 
   }, []);
@@ -217,6 +222,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
   return {
     rateForm,
     tradeRequest,
+    multiTrade,
     onChangeCurrency,
     onChangeAmount,
     HIGH_OUTPUT_AMOUNT,
