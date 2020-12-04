@@ -15,6 +15,7 @@ function calculatedGasMargin(gas) {
 interface IDexProxy {
   getTokenFromExchange(tokenAddress: string): Promise<Token | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
+  createTrade(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
   getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>;
   approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string>;
@@ -31,6 +32,10 @@ const DexProxy: IDexProxy = {
   },
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
+    return Paraswap.getRate(tradeRequest);
+  },
+
+  async createTrade(tradeRequest: TradeRequest): Promise<DexTrade> {
     return Paraswap.getRate(tradeRequest);
   },
 

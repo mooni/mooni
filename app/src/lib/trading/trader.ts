@@ -68,7 +68,7 @@ async function createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiT
     return BityProxy.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo, jwsToken);
   }
   else if(tradeType === TradeType.DEX) {
-    return DexProxy.getRate(tradeRequest);
+    return DexProxy.createTrade(tradeRequest);
   } else {
     throw new Error(`Estimation not available for TradeType ${tradeType}'`);
   }

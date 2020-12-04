@@ -43,7 +43,6 @@ const ParaswapWrapper = {
       },
     });
 
-
     const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
     const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
 

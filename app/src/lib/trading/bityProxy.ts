@@ -15,7 +15,7 @@ interface IBityProxy {
 }
 
 const API_URL = '/api';
-const instance = axios.create({
+const mooniAPI = axios.create({
   baseURL: API_URL,
   timeout: 10000,
 });
@@ -27,7 +27,7 @@ const BityProxy: IBityProxy = {
   createOrder: useAPI ?
     async function(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo, jwsToken: string): Promise<BityTrade> {
       try {
-        const { data } = await instance({
+        const { data } = await mooniAPI({
           method: 'post',
           url: 'bity/createOrder',
           headers: {
@@ -56,7 +56,7 @@ const BityProxy: IBityProxy = {
   getOrder: useAPI ?
     async function(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
       try {
-        const {data} = await instance({
+        const {data} = await mooniAPI({
           method: 'post',
           url: 'bity/getOrder',
           headers: {
