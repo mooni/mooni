@@ -1,8 +1,8 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
 import { Token} from './currencyTypes';
-import {amountToDecimal, amountToInt, BN} from '../numbers';
-import {DexTrade, TradeExact, TradeRequest, TradeType} from './types';
+import {amountToInt, BN} from '../numbers';
+import {DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
@@ -13,7 +13,7 @@ function calculatedGasMargin(gas) {
 }
 
 interface IDexProxy {
-  isTokenExchangeable(tokenAddress: string): Promise<Token | null>;
+  getTokenFromExchange(tokenAddress: string): Promise<Token | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
   getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>;
@@ -24,29 +24,14 @@ interface IDexProxy {
 
 const DexProxy: IDexProxy = {
   // TODO when add new token
-  async isTokenExchangeable(tokenAddress: string) {
+  async getTokenFromExchange(tokenAddress: string): Promise<Token | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
     return foundToken || null;
   },
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
-    const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
-    const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? tradeRequest.inputCurrency : tradeRequest.outputCurrency;
-    const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
-
-    const dexMetadata = await Paraswap.getRate(tradeRequest.inputCurrency.symbol, tradeRequest.outputCurrency.symbol, intAmount, swapSide);
-
-    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
-    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
-
-    return {
-      tradeRequest,
-      inputAmount,
-      outputAmount,
-      tradeType: TradeType.DEX,
-      dexMetadata,
-    };
+    return Paraswap.getRate(tradeRequest);
   },
 
   async getSpender(_dexTrade: DexTrade): Promise<string> {

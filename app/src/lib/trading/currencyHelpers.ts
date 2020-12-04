@@ -10,6 +10,9 @@ export function getCurrencies(type?: CurrencyType): Currency[] {
   const res = currencies.filter(c => !type || c.type === type);
   return res;
 }
+export function getTokens(): Token[] {
+  return getCurrencies(CurrencyType.ERC20) as Token[];
+}
 
 export function getCurrenciesSymbols(type?: CurrencyType): string[] {
   return getCurrencies(type).map(c => c.symbol);
@@ -21,6 +24,13 @@ export function getCurrency(symbol: string): Currency {
     throw new Error('unknown currency');
   }
   return c;
+}
+export function getTokenFromAddress(address: string): Token {
+  const t = getTokens().find(t => t.address.toLowerCase() === address.toLowerCase());
+  if(!t) {
+    throw new Error('unknown token');
+  }
+  return t;
 }
 
 export const getCurrencyLogoAddress = memoize((symbol: string): string => {
@@ -53,19 +63,13 @@ export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string
 }
 
 export async function addTokenFromAddress(tokenAddress: string): Promise<Token> {
-  const c = getCurrencies().find(c => c.type === CurrencyType.ERC20 && (c as Token).address.toLowerCase() === tokenAddress.toLowerCase());
-  if(c) return c as Token;
+  const t = getTokenFromAddress(tokenAddress);
+  if(t) return t;
 
-  const token = await DexProxy.isTokenExchangeable(tokenAddress);
+  const token = await DexProxy.getTokenFromExchange(tokenAddress);
   if(!token) {
     throw new Error('Token not available for exchange');
   }
-  /*
-  let contract = new ethers.Contract(checksumAddress, ERC20_ABI, defaultProvider);
-  const decimals = await contract.decimals();
-  const symbol = await contract.symbol();
-  const token = new Token(decimals, checksumAddress, config.chainId, symbol);
-  */
   tokenCurrencies.push(token);
   return token;
 }

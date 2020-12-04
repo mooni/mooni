@@ -61,7 +61,7 @@ export class Token extends Currency {
 
   equals(token: Token) {
     return super.equals(token) && (
-      this.address === token.address &&
+      this.address.toLowerCase() === token.address.toLowerCase() &&
       this.chainId === token.chainId
     );
   }

@@ -3,11 +3,12 @@ import {ethers, BigNumber} from "ethers";
 import {ParaSwap, APIError} from 'paraswap';
 
 import {defaultProvider} from "../web3Providers";
-import {DexTrade} from "../trading/types";
+import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
 import {CurrencyType, Token} from "../trading/currencyTypes";
+import {amountToDecimal, amountToInt} from "../numbers";
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -22,20 +23,37 @@ const ParaswapWrapper = {
       method: 'get',
       url: '/tokens',
     });
-    return data.tokens.map(t => new Token(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img));
+    return data.tokens.map(t =>
+      new Token(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
+    );
   },
-  async getRate(inputSymbol, outputSymbol, amount, swapSide): Promise<any> {
-    const { data } = await paraswapAxios({
+  async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
+    const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
+    const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? tradeRequest.inputCurrency : tradeRequest.outputCurrency;
+    const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
+
+    const { data: dexMetadata } = await paraswapAxios({
       method: 'get',
       url: '/prices',
       params: {
-        from: inputSymbol,
-        to: outputSymbol,
-        amount: amount,
+        from: tradeRequest.inputCurrency.symbol,
+        to: tradeRequest.outputCurrency.symbol,
+        amount: intAmount,
         side: swapSide
       },
     });
-    return data;
+
+
+    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
+    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
+
+    return {
+      tradeRequest,
+      inputAmount,
+      outputAmount,
+      tradeType: TradeType.DEX,
+      dexMetadata,
+    };
   },
   async getSpender(): Promise<string> {
     if(!paraswapAdapters) {
