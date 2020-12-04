@@ -1,11 +1,9 @@
 import ETHManager from '../../lib/eth';
-import { detectIframeWeb3Provider } from '../../lib/web3Providers';
-
 import { setModalError } from '../ui/actions';
 import { getETHManager } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
-import { web3Modal, getWalletProvider } from '../../lib/web3Providers';
+import { detectIframeWeb3Provider, web3Modal, getWalletProvider } from '../../lib/web3Wallets';
 import { MetaError } from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import config from '../../config';

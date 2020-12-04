@@ -4,6 +4,7 @@ import {Currency, CurrencyType, Token} from "./currencyTypes";
 import {cryptoCurrencies, ETHER, fiatCurrencies, tokenCurrencies} from "./currencyList";
 import {amountToDecimal} from "../numbers";
 import DexProxy from "./dexProxy";
+import {defaultProvider} from "../web3Providers";
 
 export function getCurrencies(type?: CurrencyType): Currency[] {
   const currencies = ([] as Currency[]).concat(fiatCurrencies).concat(cryptoCurrencies).concat(tokenCurrencies);
@@ -56,7 +57,7 @@ export function getTokenAddress(symbol: string): string {
 export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string): Promise<string> {
   const token = getCurrency(tokenSymbol) as Token;
 
-  const tokenContract = token.getContract();
+  const tokenContract = token.getContract(defaultProvider);
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
 
   return amountToDecimal(tokenBalance, token.decimals);

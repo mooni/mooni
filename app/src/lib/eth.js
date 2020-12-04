@@ -1,8 +1,6 @@
 import EventEmitter from 'events';
 import { ethers } from 'ethers';
 
-import { getWalletProvider } from './web3Providers';
-
 import config from '../config';
 import { MetaError } from './errors';
 
@@ -88,18 +86,6 @@ export default class ETHManager extends EventEmitter {
     const receipt = await this.provider.waitForTransaction(hash);
     if(receipt.status === 0) {
       throw new Error('transaction-fail');
-    }
-  }
-
-  static async createETHManager(walletType = 'injected') {
-    const ethereum = await getWalletProvider(walletType);
-
-    if (ethereum) {
-      const ethManager = new ETHManager(ethereum);
-      await ethManager.init();
-      return ethManager;
-    } else {
-      throw new Error('no_ethereum_provider');
     }
   }
 }

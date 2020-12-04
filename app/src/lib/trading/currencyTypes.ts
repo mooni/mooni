@@ -1,6 +1,5 @@
 import {ChainId} from '@uniswap/sdk';
 import {ethers} from "ethers";
-import {defaultProvider} from "../web3Providers";
 import ERC20_ABI from '../abis/ERC20.json';
 
 export enum CurrencyType {
@@ -66,9 +65,9 @@ export class Token extends Currency {
     );
   }
 
-  getContract() {
+  getContract(provider: ethers.providers.BaseProvider) {
     if(!this.contract) {
-      this.contract = new ethers.Contract(this.address, ERC20_ABI, defaultProvider);
+      this.contract = new ethers.Contract(this.address, ERC20_ABI, provider);
     }
     return this.contract;
   }

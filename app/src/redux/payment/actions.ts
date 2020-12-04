@@ -13,7 +13,7 @@ import {sendEvent} from '../../lib/analytics';
 import BityProxy from '../../lib/trading/bityProxy';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
-import { detectWalletError } from '../../lib/web3Providers';
+import { detectWalletError } from '../../lib/web3Wallets';
 import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
 import {createMultiTrade} from "../../lib/trading/trader";
 import DexProxy from "../../lib/trading/dexProxy";
