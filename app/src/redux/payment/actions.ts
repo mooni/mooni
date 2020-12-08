@@ -302,6 +302,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
         paymentFunction: async () => DexProxy.executeTrade(
           dexTrade,
           ethManager.provider,
+          0.01, // TODO let user choose that
         )
       });
       log('PAYMENT: trade ok');

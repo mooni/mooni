@@ -1,6 +1,6 @@
 import axios from 'axios';
-import {ethers, BigNumber} from "ethers";
-import {ParaSwap, APIError} from 'paraswap';
+import {BigNumber, ethers} from "ethers";
+import {APIError, ParaSwap} from 'paraswap';
 
 import {defaultProvider} from "../web3Providers";
 import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
@@ -8,7 +8,7 @@ import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
 import {CurrencyType, Token} from "../trading/currencyTypes";
-import {amountToDecimal, amountToInt} from "../numbers";
+import {amountToDecimal, amountToInt, BN} from "../numbers";
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -16,6 +16,10 @@ const paraswapAxios = axios.create({
   timeout: 10000,
 });
 let paraswapAdapters: any | null = null;
+
+function applySlippage(amount: string, maxSlippage: number): string {
+  return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
+}
 
 const ParaswapWrapper = {
   async getTokenList(): Promise<Token[]> {
@@ -72,7 +76,7 @@ const ParaswapWrapper = {
     const spender = await augustusContract.getTokenTransferProxy();
     return spender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string): Promise<any> {
+  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number): Promise<any> {
     function getTokenAddress(currency) {
       if(currency.equals(ETHER)) {
         return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
@@ -86,8 +90,8 @@ const ParaswapWrapper = {
 
     const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrency);
     const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrency);
-    const srcAmount = dexTrade.dexMetadata.priceRoute.srcAmount;
-    const destAmount = dexTrade.dexMetadata.priceRoute.destAmount;
+    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : maxSlippage);
+    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -maxSlippage);
     const receiver = undefined;
     const referrer = 'mooni';
 

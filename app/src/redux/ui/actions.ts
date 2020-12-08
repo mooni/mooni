@@ -56,7 +56,8 @@ export const detectCustomToken = () => async (dispatch, getState) => {
           inputCurrency: token,
         }));
       }
-    }).catch(() => {
+    }).catch(e => {
+      console.error(e);
       dispatch(setModalError(new Error('invalid-custom-token')))
     })
   }

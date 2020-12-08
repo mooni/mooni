@@ -26,12 +26,9 @@ export function getCurrency(symbol: string): Currency {
   }
   return c;
 }
-export function getTokenFromAddress(address: string): Token {
+export function getTokenFromAddress(address: string): Token | null {
   const t = getTokens().find(t => t.address.toLowerCase() === address.toLowerCase());
-  if(!t) {
-    throw new Error('unknown token');
-  }
-  return t;
+  return t || null;
 }
 
 export const getCurrencyLogoAddress = memoize((symbol: string): string => {

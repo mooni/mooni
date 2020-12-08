@@ -20,11 +20,10 @@ interface IDexProxy {
   getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>;
   approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string>;
   checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null>;
-  executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string>;
+  executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider, maxSlippage: number): Promise<string>;
 }
 
 const DexProxy: IDexProxy = {
-  // TODO when add new token
   async getTokenFromExchange(tokenAddress: string): Promise<Token | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
@@ -84,10 +83,10 @@ const DexProxy: IDexProxy = {
   },
 
 
-  async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
+  async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider, maxSlippage: number): Promise<string> {
     const signer = provider.getSigner();
     const senderAddress = await signer.getAddress();
-    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress);
+    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, maxSlippage);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
   },
