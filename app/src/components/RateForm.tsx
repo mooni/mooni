@@ -1,25 +1,23 @@
 import React from 'react';
-import BN from 'bignumber.js';
 
-import { Typography, Box } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { useSelector } from 'react-redux';
+import {Box} from '@material-ui/core';
+import {makeStyles} from '@material-ui/core/styles';
+import {useSelector} from 'react-redux';
 
-import { LoadingRing, textStyle, Button, IconRefresh } from '@aragon/ui'
+import {Button, IconRefresh, LoadingRing, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
 import AmountRow from './AmountRow';
 
-import { TradeExact } from '../lib/types';
+import {TradeExact, TradeRequest} from '../lib/trading/types';
 
-import { getInputCurrencies } from '../redux/ui/selectors';
+import {getInputCurrencies} from '../redux/ui/selectors';
 
-import {
-  FIAT_CURRENCIES,
-  SIGNIFICANT_DIGITS,
-} from '../lib/currencies';
-import { useRate } from '../hooks/rates';
-import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
+import {getCurrenciesSymbols} from '../lib/trading/currencyHelpers';
+import {useRate} from '../hooks/rates';
+import {getETHManager, getETHManagerLoading} from '../redux/eth/selectors';
+import {CurrencyType} from "../lib/trading/currencyTypes";
+import RateAmount from "./RateAmount";
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -31,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(3),
   },
   additionalInfo: {
-    height: 56,
+    minHeight: 56,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -39,34 +37,28 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const outputCurrencies = FIAT_CURRENCIES;
+const outputCurrencies: string[] = getCurrenciesSymbols(CurrencyType.FIAT);
 
-function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }) {
+interface RateFormParams {
+ onSubmit: (TradeRequest?) => void;
+  initialTradeRequest: TradeRequest;
+  buttonLabel?: string,
+  buttonIcon?: any,
+}
+
+function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }: RateFormParams) {
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
-  const { rateForm, onChangeAmount, onChangeCurrency, rateRequest, LOW_OUTPUT_AMOUNT, HIGH_OUTPUT_AMOUNT } = useRate(initialRateRequest);
-
-  let rate, feeAmount;
-  if(rateForm) {
-    rate = new BN(rateForm.values.outputAmount).div(rateForm.values.inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
-  }
-
-  if(rateForm.values.fees) {
-    if(outputCurrencies.includes(rateForm.values.fees.currency)) {
-      feeAmount = new BN(rateForm.values.fees.amount).dp(2).toFixed();
-    } else {
-      feeAmount = new BN(rateForm.values.fees.amount).sd(SIGNIFICANT_DIGITS).toFixed();
-    }
-  }
+  const { rateForm, tradeRequest, multiTrade, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
 
   const valid = !(rateForm.loading || rateForm.errors);
-  const errors = rateForm.errors && Object.keys(rateForm.errors);
+  const errors = rateForm.errors;
 
   function submit() {
     if(!valid) return;
-    onSubmit(rateRequest);
+    onSubmit(tradeRequest);
   }
 
   return (
@@ -74,7 +66,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
       <AmountRow
         value={rateForm.values.inputAmount}
         currencies={inputCurrencies}
-        currency={rateForm.values.inputCurrency}
+        selectedSymbol={rateForm.values.inputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.INPUT)}
         onChangeValue={onChangeAmount(TradeExact.INPUT)}
         active={rateForm.values.tradeExact === TradeExact.INPUT}
@@ -86,7 +78,7 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
       <AmountRow
         value={rateForm.values.outputAmount}
         currencies={outputCurrencies}
-        currency={rateForm.values.outputCurrency}
+        selectedSymbol={rateForm.values.outputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.OUTPUT)}
         onChangeValue={onChangeAmount(TradeExact.OUTPUT)}
         active={rateForm.values.tradeExact === TradeExact.OUTPUT}
@@ -99,16 +91,14 @@ function RateForm({ onSubmit = () => null, initialRateRequest, buttonLabel = 'Ex
       <Box className={classes.additionalInfo}>
         {!rateForm.loading ?
           !errors ?
-            <Typography variant="caption">
-              <b>Rate:</b> {rate} {rateForm.values.outputCurrency}/{rateForm.values.inputCurrency}
-              {feeAmount && <span><br/><b>Fees:</b> {feeAmount} {rateForm.values.fees.currency}</span>}
-            </Typography>
+            (multiTrade && <RateAmount multiTrade={multiTrade}/>)
             :
-            errors.map(errorType =>
-              <InvalidMessage key={errorType}>
-                {errorType === 'lowBalance' && 'You do not have enough funds'}
-                {errorType === 'lowAmount' && `Minimum amount is ${LOW_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
-                {errorType === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+            Object.entries(errors).map(([key, value]) =>
+              <InvalidMessage key={key}>
+                {key === 'lowBalance' && 'You do not have enough funds'}
+                {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
+                {key === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+                {key === 'zeroAmount' && `Amount can't be zero`}
               </InvalidMessage>
             )
           :

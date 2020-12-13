@@ -1,109 +1,88 @@
+import {DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY} from '../../lib/trading/currencyList';
+import {getCurrency} from '../../lib/trading/currencyHelpers';
 import {
-  DEFAULT_INPUT_CURRENCY,
-  DEFAULT_OUTPUT_CURRENCY,
-} from '../../lib/currencies';
-import {
-  ExchangePath,
-  Order,
   OrderErrors,
-  OrderRequest,
   Payment,
   PaymentStatus,
   PaymentStep,
   PaymentStepId,
   PaymentStepStatus,
-  RateRequest,
   Recipient,
-  TradeExact
 } from '../../lib/types';
+import { TradeExact } from '../../lib/trading/types';
 
 import * as actions from './actions';
+import {BankInfo, BityTrade, MultiTrade, MultiTradeRequest, TradeRequest, TradeType} from "../../lib/trading/types";
 
 export const STATE_NAME = 'PAYMENT';
 
-export interface State {
+interface PaymentState {
   exchangeStep: number;
-  orderRequest?: OrderRequest;
-  order?: Order;
-  orderErrors?: OrderErrors;
-  payment?: Payment;
+  multiTradeRequest: MultiTradeRequest | null;
+  multiTrade: MultiTrade | null;
+  orderErrors: OrderErrors | null;
+  payment: Payment | null;
 }
 
-const initialEmptyState: State = {
+// eslint-disable-next-line
+const initialEmptyState: PaymentState = {
   exchangeStep: 0,
-  orderRequest: {
-    recipient: {
-      owner: {
-        name: '',
+  multiTradeRequest: {
+    bankInfo: {
+      recipient: {
+        owner: {
+          name: '',
+        },
+        iban: '',
       },
-      iban: '',
+      reference: '',
     },
-    rateRequest: {
-      inputCurrency: DEFAULT_INPUT_CURRENCY,
-      outputCurrency: DEFAULT_OUTPUT_CURRENCY,
+    tradeRequest: {
+      inputCurrency: getCurrency(DEFAULT_INPUT_CURRENCY),
+      outputCurrency: getCurrency(DEFAULT_OUTPUT_CURRENCY),
       amount: '100',
       tradeExact: TradeExact.OUTPUT,
     },
-    reference: '',
   },
-  order: undefined,
-  orderErrors: undefined,
-  payment: undefined,
+  multiTrade: null,
+  orderErrors: null,
+  payment: null,
 };
 
 // eslint-disable-next-line
-const initialMockStateMinimum: State = {
+const initialMockStateMinimum: PaymentState = {
   exchangeStep: 0,
-  orderRequest: {
-    recipient: {
-      owner: {
-        name: 'Alice Martin',
-        country: 'NL',
-        address: 'dfsfdsfq',
-        zip: 'fdsqfqs',
-        city: 'dsfqs'
+  multiTradeRequest: {
+    bankInfo: {
+      recipient: {
+        owner: {
+          name: 'Alice Martin',
+          country: 'NL',
+          address: 'dfsfdsfq',
+          zip: 'fdsqfqs',
+          city: 'dsfqs'
+        },
+        iban: 'NL84INGB1679475908',
       },
-      iban: 'NL84INGB1679475908',
+      reference: '',
     },
-    rateRequest: {
-      inputCurrency: 'ETH',
-      outputCurrency: 'EUR',
-      amount: '15',
+    tradeRequest: {
+      inputCurrency: getCurrency('DAI'),
+      outputCurrency: getCurrency('EUR'),
+      amount: '30',
       tradeExact: TradeExact.OUTPUT,
     },
-    reference: '',
   },
-  order: undefined,
-  orderErrors: undefined,
-  payment: undefined,
+  multiTrade: null,
+  orderErrors: null,
+  payment: null,
 };
 
 // eslint-disable-next-line
-const initialMockStateComplete: State = {
+const initialMockStateComplete: PaymentState = {
   exchangeStep: 0,
-  orderRequest: {
-    recipient: {
-      owner: {
-        country: 'NL',
-        name: 'fdsfsd',
-        address: 'dfsfdsfq',
-        zip: 'fdsqfqs',
-        city: 'dsfqs'
-      },
-      iban: 'NL84INGB1679475908',
-      bic_swift: 'CMCIFR2A',
-      email: 'dfd@fez.fr'
-    },
-    rateRequest: {
-      inputCurrency: 'ETH',
-      outputCurrency: 'EUR',
-      amount: '10',
-      tradeExact: TradeExact.OUTPUT
-    },
-    reference: 'ref'
-  },
-  order: {
-    orderRequest: {
+  multiTradeRequest: {
+    bankInfo: {
       recipient: {
         owner: {
           country: 'NL',
@@ -116,56 +95,88 @@ const initialMockStateComplete: State = {
         bic_swift: 'CMCIFR2A',
         email: 'dfd@fez.fr'
       },
-      rateRequest: {
-        inputCurrency: 'ETH',
-        outputCurrency: 'EUR',
+      reference: 'ref'
+    },
+    tradeRequest: {
+      inputCurrency: getCurrency('ETH'),
+      outputCurrency: getCurrency('EUR'),
+      amount: '10',
+      tradeExact: TradeExact.OUTPUT
+    },
+  },
+  multiTrade: {
+    multiTradeRequest: {
+      bankInfo: {
+        recipient: {
+          owner: {
+            country: 'NL',
+            name: 'fdsfsd',
+            address: 'dfsfdsfq',
+            zip: 'fdsqfqs',
+            city: 'dsfqs'
+          },
+          iban: 'NL84INGB1679475908',
+          bic_swift: 'CMCIFR2A',
+          email: 'dfd@fez.fr'
+        },
+        reference: 'ref'
+      },
+      tradeRequest: {
+        inputCurrency: getCurrency('ETH'),
+        outputCurrency: getCurrency('EUR'),
         amount: '10',
         tradeExact: TradeExact.OUTPUT
       },
-      reference: 'ref'
     },
-    estimatedRates: {
-      inputCurrency: 'ETH',
-      outputCurrency: 'EUR',
+    trades: [{
+      tradeRequest: {
+        inputCurrency: getCurrency('ETH'),
+        outputCurrency: getCurrency('EUR'),
+        amount: '10',
+        tradeExact: TradeExact.OUTPUT,
+      },
+      tradeType: TradeType.BITY,
       inputAmount: '0.1',
       outputAmount: '10',
-    },
-    bityOrder: {
-      input: {
-        amount: '0.080414513629301225',
-        currency: 'ETH',
-        type: 'crypto_address',
-        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19'
-      },
-      output: {
-        amount: '10',
-        currency: 'EUR',
-        type: 'bank_account',
-        iban: 'NL91ABNA9326322815',
-        reference: 'ceferfs'
-      },
-      id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
-      timestamp_created: '2020-03-25T13:31:28.948Z',
-      timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
-      timestamp_price_guaranteed: '2021-03-25T13:41:31.831Z',
-      payment_details: {
-        crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
-        type: 'crypto_address'
-      },
-      price_breakdown: {
-        customer_trading_fee: {
+      bityOrderResponse: {
+        input: {
+          amount: '0.080414513629301225',
+          currency: 'ETH',
+          type: 'crypto_address',
+          crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19'
+        },
+        output: {
+          amount: '10',
+          currency: 'EUR',
+          type: 'bank_account',
+          iban: 'NL91ABNA9326322815',
+          reference: 'ceferfs'
+        },
+        id: '5daa7e15-e0ad-41c4-89aa-bc83bb346d73',
+        timestamp_created: '2020-03-25T13:31:28.948Z',
+        timestamp_awaiting_payment_since: '2020-03-25T13:31:31.831Z',
+        timestamp_price_guaranteed: '2021-03-25T13:41:31.831Z',
+        payment_details: {
+          crypto_address: '0x90f227b0fbda2a4e788410afb758fa5bfe42be19',
+          type: 'crypto_address'
+        },
+        price_breakdown: {
+          customer_trading_fee: {
+            amount: '0.000635986164121',
+            currency: 'ETH'
+          }
+        },
+        fees: {
           amount: '0.000635986164121',
           currency: 'ETH'
         }
-      },
-      fees: {
-        amount: '0.000635986164121',
-        currency: 'ETH'
       }
-    },
-    path: ExchangePath.BITY,
+    } as BityTrade],
+    path: [TradeType.BITY],
+    inputAmount: '0.1',
+    outputAmount: '10',
   },
-  orderErrors: undefined,
+  orderErrors: null,
   payment: {
     status: PaymentStatus.ERROR,
     steps: [
@@ -193,19 +204,19 @@ const initialMockStateComplete: State = {
   },
 };
 
-const initialState = initialEmptyState;
-// const initialState = initialMockStateMinimum;
+// const initialState = initialEmptyState;
+const initialState = initialMockStateMinimum;
 
-export default function(state : State = initialState, action: { type: string, payload?: any }): State {
+export default function(state : PaymentState = initialState, action: { type: string, payload?: any }): PaymentState {
   switch (action.type) {
-    case actions.SET_RATE_REQUEST: {
-      const { rateRequest }: { rateRequest: RateRequest } = action.payload;
+    case actions.SET_TRADE_REQUEST: {
+      const { tradeRequest }: { tradeRequest: TradeRequest } = action.payload;
 
       return {
         ...state,
-        orderRequest: {
-          ...(state.orderRequest as OrderRequest),
-          rateRequest,
+        multiTradeRequest: {
+          ...(state.multiTradeRequest as MultiTradeRequest),
+          tradeRequest,
         },
       };
     }
@@ -213,9 +224,12 @@ export default function(state : State = initialState, action: { type: string, pa
       const { recipient }: { recipient: Recipient } = action.payload;
       return {
         ...state,
-        orderRequest: {
-          ...(state.orderRequest as OrderRequest),
-          recipient,
+        multiTradeRequest: {
+          ...(state.multiTradeRequest as MultiTradeRequest),
+          bankInfo: {
+            ...state.multiTradeRequest?.bankInfo,
+            recipient,
+          },
         },
       };
     }
@@ -223,17 +237,20 @@ export default function(state : State = initialState, action: { type: string, pa
       const { reference }: { reference: string } = action.payload;
       return {
         ...state,
-        orderRequest: {
-          ...(state.orderRequest as OrderRequest),
-          reference,
+        multiTradeRequest: {
+          ...(state.multiTradeRequest as MultiTradeRequest),
+          bankInfo: {
+            ...(state.multiTradeRequest?.bankInfo as BankInfo),
+            reference,
+          },
         },
       };
     }
-    case actions.SET_ORDER: {
-      const { order }: { order: Order } = action.payload;
+    case actions.SET_MULTITRADE: {
+      const { multiTrade }: { multiTrade: MultiTrade } = action.payload;
       return {
         ...state,
-        order,
+        multiTrade,
       };
     }
     case actions.SET_ORDER_ERRORS: {
@@ -246,8 +263,8 @@ export default function(state : State = initialState, action: { type: string, pa
     case actions.RESET_ORDER: {
       return {
         ...state,
-        order: undefined,
-        orderErrors: undefined,
+        multiTrade: null,
+        orderErrors: null,
       };
     }
     case actions.SET_EXCHANGE_STEP: {
@@ -260,7 +277,7 @@ export default function(state : State = initialState, action: { type: string, pa
     case actions.RESET_PAYMENT: {
       return {
         ...state,
-        payment: undefined,
+        payment: null,
       };
     }
     case actions.SET_PAYMENT: {

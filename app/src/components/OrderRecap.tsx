@@ -6,9 +6,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
 import { Link, textStyle, Field, GU, Info, Timer } from '@aragon/ui';
 
-import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
+import { SIGNIFICANT_DIGITS } from '../lib/numbers';
 
 import bityLogo from '../assets/bity_logo_blue.svg';
+import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
+import RateAmount from "./RateAmount";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -84,7 +87,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={BN(value).sd(SIGNIFICANT_DIGITS).toFixed()}
+            value={new BN(value).sd(SIGNIFICANT_DIGITS).toFixed()}
             readOnly
             className={classes.amountInput}
           />
@@ -104,8 +107,10 @@ function AmountRow({ value, symbol, caption }) {
   );
 }
 
-export default function OrderRecap({ order }) {
-  const recipient = order.orderRequest.recipient;
+export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
+  const bankInfo = multiTrade.multiTradeRequest.bankInfo;
+  if(!bankInfo) throw new Error('missing bank info in OrderRecap');
+  const {recipient, reference} = bankInfo;
 
   let fullAddress = '';
   if(recipient.owner?.address) {
@@ -121,13 +126,13 @@ export default function OrderRecap({ order }) {
     fullAddress += ', ' + recipient.owner.country;
   }
 
-  const inputAmount = order.estimatedRates.inputAmount;
-  const inputCurrency = order.estimatedRates.inputCurrency;
-  const outputAmount = order.estimatedRates.outputAmount;
-  const outputCurrency = order.estimatedRates.outputCurrency;
+  const inputAmount = multiTrade.inputAmount;
+  const outputAmount = multiTrade.outputAmount;
+  const inputCurrency = multiTrade.multiTradeRequest.tradeRequest.inputCurrency;
+  const outputCurrency = multiTrade.multiTradeRequest.tradeRequest.outputCurrency;
 
-  const rate = BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
-  const orderExpireDate = new Date(order.bityOrder.timestamp_price_guaranteed);
+  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
+  const orderExpireDate = new Date(bityTrade.bityOrderResponse.timestamp_price_guaranteed);
 
   return (
     <Box>
@@ -137,21 +142,14 @@ export default function OrderRecap({ order }) {
 
         <RecipientRow label="IBAN" value={recipient.iban}/>
         {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
-        {order.orderRequest.reference && <RecipientRow label="Reference" value={order.orderRequest.reference}/>}
+        {reference && <RecipientRow label="Reference" value={reference}/>}
         {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
       </Box>
 
-      <AmountRow value={inputAmount} symbol={inputCurrency} caption="You send" />
-      <AmountRow value={outputAmount} symbol={outputCurrency} caption="You receive" />
+      <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
+      <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
-      <Box textAlign="center">
-        <Typography variant="caption">
-          <b>Rate:</b> ~{rate} {outputCurrency}/{inputCurrency}
-        </Typography><br/>
-        <Typography variant="caption">
-          <b>Fees:</b> {order.bityOrder.fees.amount} {order.bityOrder.fees.currency}
-        </Typography>
-      </Box>
+      <RateAmount multiTrade={multiTrade}/>
 
       <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
         <PoweredBy>Powered by </PoweredBy>

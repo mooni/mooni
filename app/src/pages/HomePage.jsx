@@ -5,26 +5,26 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Box, Typography } from '@material-ui/core';
 import { Button, IconEthereum, IconWallet } from '@aragon/ui'
 
-import { setExchangeStep, setRateRequest } from '../redux/payment/actions';
+import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
 import { SmallWidth } from '../components/StyledComponents';
 import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
 import { openWeb3Modal } from '../redux/eth/actions';
 import RateForm from '../components/RateForm';
-import { getRateRequest } from '../redux/payment/selectors';
+import { getMultiTradeRequest } from '../redux/payment/selectors';
 
 export default function HomePage() {
   const history = useHistory();
   const dispatch = useDispatch();
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
-  const initialRateRequest = useSelector(getRateRequest);
+  const { tradeRequest } = useSelector(getMultiTradeRequest);
 
   function connectWallet() {
     dispatch(openWeb3Modal());
   }
 
-  const onSubmit = (rateRequest) => {
-    dispatch(setRateRequest(rateRequest));
+  const onSubmit = (tradeRequest) => {
+    dispatch(setTradeRequest(tradeRequest));
     dispatch(setExchangeStep(1));
     history.push('/exchange');
   };
@@ -37,7 +37,7 @@ export default function HomePage() {
             Transfer funds from your crypto wallet to your bank account.
           </Typography>
         </Box>
-        <RateForm onSubmit={onSubmit} initialRateRequest={initialRateRequest}/>
+        <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest}/>
         {(!ethManager && !ethManagerLoading) &&
         <Button mode="positive" onClick={connectWallet} wide icon={<IconEthereum/>} label="Connect wallet" />
         }

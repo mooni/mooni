@@ -1,9 +1,9 @@
 import {
-  SUPPORTED_CHAIN_ID,
+  ChainId,
 } from '@uniswap/sdk';
 
 interface IConfig {
-  chainId: SUPPORTED_CHAIN_ID,
+  chainId: ChainId,
   infuraId: string,
   portisAppId: string,
   fortmaticId: string,
@@ -34,7 +34,7 @@ function parseEnv<T extends string | number | boolean>(
 }
 
 const config: IConfig = {
-  chainId: parseEnv(process.env.REACT_APP_CHAIN_ID, SUPPORTED_CHAIN_ID.Mainnet),
+  chainId: parseEnv(process.env.REACT_APP_CHAIN_ID, ChainId.MAINNET),
   infuraId: parseEnv(process.env.REACT_APP_INFURA_ID, 'd118ed6a19594e16893c0c29d09a2536'),
   portisAppId: parseEnv(process.env.REACT_APP_PORTIS_APP_ID, 'dd65a1a7-e0dc-4a9a-acc6-ae5ed5e48dc2'),
   fortmaticId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'pk_live_362BC03A6D2421B4'),

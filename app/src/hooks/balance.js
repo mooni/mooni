@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 
-import {ethers} from 'ethers';
-import { ETH } from '@uniswap/sdk';
+import { ETHER } from '../lib/trading/currencyList';
 import { useSelector } from 'react-redux';
 
-import { fetchTokenBalance } from '../lib/currencies';
+import { fetchTokenBalance } from '../lib/trading/currencyHelpers';
 
 import { getETHManager, getAddress } from '../redux/eth/selectors';
+import { amountToDecimal } from '../lib/numbers';
 
 export function useBalance(symbol) {
   const ethManager = useSelector(getETHManager);
@@ -23,10 +23,11 @@ export function useBalance(symbol) {
     }
     const ethAddress = ethManager.getAddress();
 
-    if(symbol === ETH) {
+    if(symbol === ETHER.symbol) {
 
       function updateBalance(res) {
-        setBalance(ethers.utils.formatEther(res));
+        const balanceEth = amountToDecimal(res.toString(), ETHER.decimals);
+        setBalance(balanceEth);
         setLoading(false);
       }
 

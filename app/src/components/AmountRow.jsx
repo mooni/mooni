@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import BN from 'bignumber.js';
-
+import {useImage} from 'react-image';
 import { Box, Typography} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { DropDown } from '@aragon/ui'
 
-import { getCurrencyLogoAddress, SIGNIFICANT_DIGITS } from '../lib/currencies';
+import { getCurrency, getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
+import { SIGNIFICANT_DIGITS } from '../lib/numbers';
+import tokenDefaultImage  from '../assets/token_default.png';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,25 +65,49 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function CurrencyItem({ symbol }) {
+function CurrencyLogo({symbol}) {
+  const currency = getCurrency(symbol);
+  const {src} = useImage({
+    srcList: [
+      currency.img,
+      getCurrencyLogoAddress(symbol),
+      tokenDefaultImage,
+    ],
+  });
+
   return (
-    <Box display="flex" alignItems="center">
       <img
-        src={getCurrencyLogoAddress(symbol)}
+        src={src}
         alt={`coin-icon-${symbol}`}
         width={20}
       />
+  );
+}
+function CurrencyItem({ symbol }) {
+  return (
+    <Box display="flex" alignItems="center">
+      <Suspense
+        fallback={
+          <img
+            src={tokenDefaultImage}
+            alt={`coin-icon-${symbol}`}
+            width={20}
+          />
+        }
+      >
+        <CurrencyLogo symbol={symbol}/>
+      </Suspense>
       <Box ml={1}>{symbol}</Box>
     </Box>
   );
 }
 
-export default function AmountRow({ value, currency, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
+export default function AmountRow({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
     (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
-  : '';
+    : '';
 
   return (
     <Box className={classes.root}>
@@ -104,7 +130,7 @@ export default function AmountRow({ value, currency, onChangeValue, onChangeCurr
         <Box className={classes.currencySelector}>
           <DropDown
             items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
-            selected={currencies.indexOf(currency)}
+            selected={currencies.indexOf(selectedSymbol)}
             onChange={i => onChangeCurrency(currencies[i])}
             disabled={currencyDisabled}
             className={classes.currencyButton}

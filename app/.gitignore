@@ -11,3 +11,4 @@ react-app-env.d.ts
 
 .vercel
 .env
+.env.backup

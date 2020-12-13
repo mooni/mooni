@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 
 import Fortmatic from 'fortmatic';
@@ -13,15 +12,7 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 import config from '../config';
 import { logError } from './log';
 
-const { chainId, infuraId, portisAppId, fortmaticId } = config;
-
-const networks = {
-  1: 'homestead',
-  3: 'ropsten',
-  4: 'rinkeby',
-  42: 'kovan',
-};
-export const defaultProvider = new ethers.providers.InfuraProvider(networks[chainId], infuraId);
+const { infuraId, portisAppId, fortmaticId } = config;
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;

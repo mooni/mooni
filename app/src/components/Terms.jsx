@@ -34,7 +34,7 @@ function Terms() {
         1.3 Third parties
       </SubTitle>
       <Content>
-        Mooni make the use of the following third party services: <Link href="https://bity.com" external>Bity</Link>, <Link href="https://uniswap.org" external>Uniswap</Link>, <Link href="https://3box.io" external>3Box</Link>.<br/>
+        Mooni make the use of the following third party services: <Link href="https://bity.com" external>Bity</Link>, <Link href="https://paraswap.io" external>Paraswap</Link>, <Link href="https://3box.io" external>3Box</Link>.<br/>
         By accepting this terms, the user also accept all the terms of the third party services, notably the <Link href="https://bity.com/legal/" external>terms of Bity</Link>, which is responsible of the crypto-to-fiat exchange. <br/>
         Notably, the user acknowledge that the financial transactions executed are legally acceptable. This acceptability is determined by Bity own rules.
       </Content>

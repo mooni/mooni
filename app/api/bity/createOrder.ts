@@ -1,35 +1,45 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/bity';
-import { BityOrderResponse, OrderRequest } from '../../src/lib/types';
+import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
+import {TradeRequest, BankInfo, ETHInfo} from "../../src/lib/trading/types";
+import { Token } from "../../src/lib/didManager";
+import {authMiddleware} from "../../src/lib/api/auth";
 
 const bityInstance = new Bity();
 
-export default async (req: NowRequest, res: NowResponse) => {
+export default authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
   if(!req.body) {
     res.status(400).send('no body');
     return;
   }
 
-  const orderRequest: OrderRequest = req.body.orderRequest as OrderRequest;
-  const fromAddress: string = req.body.fromAddress as string;
+  const tradeRequest: TradeRequest = req.body.tradeRequest as TradeRequest;
+  const bankInfo: BankInfo = req.body.bankInfo as BankInfo;
+  const ethInfo: ETHInfo = req.body.ethInfo as ETHInfo;
 
-  if(!orderRequest || !fromAddress) {
+  if(!tradeRequest || !bankInfo || !ethInfo) {
     return res.status(400).send('wrong body');
+  }
+  if(ethInfo.fromAddress.toLowerCase() !== token.claim.iss.toLowerCase()) {
+    return res.status(400).send('different ethereum address used for order and authentication');
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
   try {
-    const orderDetails = (await bityInstance.order(orderRequest, fromAddress)) as BityOrderResponse;
-    return res.json(orderDetails)
+    const bityTrade = await bityInstance.createOrder(tradeRequest, bankInfo, ethInfo);
+    return res.json(bityTrade)
   } catch(error) {
-    if(error.message === 'api_error') {
-      return res.status(400).json({ errors: error.errors });
+    if(error._orderError) {
+      return res.status(400).json({
+        message: error.message,
+        _orderError: error._orderError,
+        errors: error.errors
+      });
     } else {
       return res.status(500).send('Unexpected server error');
     }
   }
 
-}
+})
