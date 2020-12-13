@@ -1,4 +1,4 @@
-import EventEmitter from 'events';
+import events from 'events';
 import { ethers } from 'ethers';
 
 import config from '../config';
@@ -10,7 +10,12 @@ function reloadPage() {
   window.location.reload()
 }
 
-export default class ETHManager extends EventEmitter {
+export default class ETHManager extends events.EventEmitter {
+  ethereum: any;
+  provider: any;
+  isContract: any;
+  accounts: any;
+
   constructor(ethereum) {
     super();
     this.ethereum = ethereum;

@@ -32,7 +32,7 @@ export function track(eventName) {
   LogRocket.track(eventName);
 }
 
-export function sendEvent(category, action, label, value) {
+export function sendEvent(category: string, action: string, label?: string, value?: number) {
   ReactGA.event({
     category,
     action,
