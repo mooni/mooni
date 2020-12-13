@@ -1,42 +1,23 @@
 import { NowRequest, NowResponse } from '@now/node'
 
 import Bity from '../../src/lib/wrappers/bity';
-import { BityOrderResponse } from '../../src/lib/wrappers/bityTypes';
-
 import config from '../../src/config';
-import DIDManager, { Token } from "../../src/lib/didManager";
+import { Token } from "../../src/lib/didManager";
+import {authMiddleware} from "../../src/lib/api/auth";
 
 const bityInstance = new Bity();
 
-function getHeaderToken(req: NowRequest): string | null {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return null;
-  const token = authHeader.replace('Bearer ', '');
-  if (token.length === 0) return null;
-  return token;
-}
-
-export default async (req: NowRequest, res: NowResponse) => {
+export default authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
   const orderId: string = req.body?.orderId as string;
 
   if(!orderId) {
     return res.status(400).send('wrong body');
   }
-  const jwsToken = getHeaderToken(req);
-  if(!jwsToken) {
-    return res.status(401).send('authorization required');
-  }
-  let token: Token;
-  try {
-    token = DIDManager.decodeToken(jwsToken);
-  } catch(error) {
-    return res.status(401).send('invalid token');
-  }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
   try {
-    const orderDetails = (await bityInstance.getOrderDetails(orderId)) as BityOrderResponse;
+    const orderDetails = await bityInstance.getOrderDetails(orderId);
     if(orderDetails.input.crypto_address.toLowerCase() !== token.claim.iss.toLowerCase()) {
       return res.status(401).send('unauthorized');
     }
@@ -49,4 +30,4 @@ export default async (req: NowRequest, res: NowResponse) => {
     }
   }
 
-}
+})

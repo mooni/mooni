@@ -3,10 +3,12 @@ import { NowRequest, NowResponse } from '@now/node'
 import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
 import {TradeRequest, BankInfo, ETHInfo} from "../../src/lib/trading/types";
+import { Token } from "../../src/lib/didManager";
+import {authMiddleware} from "../../src/lib/api/auth";
 
 const bityInstance = new Bity();
 
-export default async (req: NowRequest, res: NowResponse) => {
+export default authMiddleware(async (req: NowRequest, res: NowResponse, _token: Token): Promise<NowResponse | void> => {
   if(!req.body) {
     res.status(400).send('no body');
     return;
@@ -20,7 +22,6 @@ export default async (req: NowRequest, res: NowResponse) => {
     return res.status(400).send('wrong body');
   }
 
-  // TODO check auth
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
   try {
@@ -38,4 +39,4 @@ export default async (req: NowRequest, res: NowResponse) => {
     }
   }
 
-}
+})

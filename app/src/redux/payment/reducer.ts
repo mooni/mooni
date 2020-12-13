@@ -69,7 +69,7 @@ const initialMockStateMinimum: PaymentState = {
     tradeRequest: {
       inputCurrency: getCurrency('DAI'),
       outputCurrency: getCurrency('EUR'),
-      amount: '15',
+      amount: '30',
       tradeExact: TradeExact.OUTPUT,
     },
   },
@@ -204,8 +204,8 @@ const initialMockStateComplete: PaymentState = {
   },
 };
 
-const initialState = initialEmptyState;
-// const initialState = initialMockStateMinimum;
+// const initialState = initialEmptyState;
+const initialState = initialMockStateMinimum;
 
 export default function(state : PaymentState = initialState, action: { type: string, payload?: any }): PaymentState {
   switch (action.type) {
