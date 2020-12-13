@@ -131,8 +131,6 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
   const inputCurrency = multiTrade.multiTradeRequest.tradeRequest.inputCurrency;
   const outputCurrency = multiTrade.multiTradeRequest.tradeRequest.outputCurrency;
 
-  const rate = new BN(outputAmount).div(inputAmount).sd(SIGNIFICANT_DIGITS).toFixed();
-
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const orderExpireDate = new Date(bityTrade.bityOrderResponse.timestamp_price_guaranteed);
 

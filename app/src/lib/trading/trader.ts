@@ -136,7 +136,6 @@ export async function estimateMultiTrade(multiTradeRequest: MultiTradeRequest): 
     inputAmount: trades[0].inputAmount,
     outputAmount: trades[trades.length - 1].outputAmount,
   };
-  // TODO total fees
 }
 
 export async function createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade> {
@@ -220,5 +219,4 @@ export async function createMultiTrade(multiTradeRequest: MultiTradeRequest, jws
     outputAmount: trades[trades.length - 1].outputAmount,
     path: path,
   };
-// TODO fees
 }

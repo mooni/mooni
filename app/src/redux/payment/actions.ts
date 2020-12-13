@@ -208,11 +208,9 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
   }
 }
 
-function watchBityOrder(state, dispatch, orderId) {
+function watchBityOrder(jwsToken, dispatch, orderId) {
   const POLL_INTERVAL = 5000;
   let intervalId;
-
-  const jwsToken = getJWS(state);
 
   dispatch(updatePaymentStep({
     id: PaymentStepId.BITY,
@@ -321,8 +319,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
 
-    // TODO dispatch this
-    watchBityOrder(state, dispatch, bityOrderId);
+    const jwsToken = getJWS(state);
+    watchBityOrder(jwsToken, dispatch, bityOrderId);
 
   } catch(error) {
 

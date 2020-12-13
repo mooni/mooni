@@ -11,8 +11,8 @@ const store = configureStore({
   // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logRocketMiddleware),
 });
 
-export type RootState = ReturnType<typeof rootReducer>
-export type AppDispatch = typeof store.dispatch
-export const useAppDispatch = () => useDispatch<AppDispatch>() // Export a hook that can be reused to resolve types
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 export default store;
