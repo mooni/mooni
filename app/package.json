@@ -20,7 +20,7 @@
     "@material-ui/core": "^4.9.7",
     "@material-ui/icons": "^4.9.1",
     "@now/node": "^1.6.1",
-    "@portis/web3": "^2.0.0-beta.54",
+    "@portis/web3": "2.0.0-beta.59",
     "@reduxjs/toolkit": "^1.4.0",
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.0",
