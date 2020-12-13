@@ -57,7 +57,7 @@ export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string
   const tokenContract = token.getContract(defaultProvider);
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
 
-  return amountToDecimal(tokenBalance, token.decimals);
+  return amountToDecimal(tokenBalance.toString(), token.decimals);
 }
 
 export async function addTokenFromAddress(tokenAddress: string): Promise<Token> {
