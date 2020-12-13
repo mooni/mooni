@@ -8,7 +8,7 @@ import {authMiddleware} from "../../src/lib/api/auth";
 
 const bityInstance = new Bity();
 
-export default authMiddleware(async (req: NowRequest, res: NowResponse, _token: Token): Promise<NowResponse | void> => {
+export default authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
   if(!req.body) {
     res.status(400).send('no body');
     return;
@@ -20,6 +20,9 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, _token: 
 
   if(!tradeRequest || !bankInfo || !ethInfo) {
     return res.status(400).send('wrong body');
+  }
+  if(ethInfo.fromAddress.toLowerCase() !== token.claim.iss.toLowerCase()) {
+    return res.status(400).send('different ethereum address used for order and authentication');
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
