@@ -91,8 +91,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
   dispatch(setETHManagerLoading(true));
   try {
 
-    const ethManager = new ETHManager(ethereum);
-    await ethManager.init();
+    const ethManager = await ETHManager.create(ethereum);
 
     const address = ethManager.getAddress();
     let token;
@@ -113,10 +112,10 @@ export const initETH = (ethereum) => async function (dispatch)  {
     dispatch(setAddress(address));
     dispatch(setETHManagerLoading(false));
 
-    ethManager.on('accountsChanged', () => {
+    ethManager.events.on('accountsChanged', () => {
       dispatch(onAccountChanged());
     });
-    ethManager.on('stop', () => {
+    ethManager.events.on('stop', () => {
       dispatch(logout());
     });
 

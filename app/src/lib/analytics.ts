@@ -28,7 +28,7 @@ if(process.env.NODE_ENV === 'production') {
   });
 }
 
-export function track(eventName) {
+export function track(eventName: string) {
   LogRocket.track(eventName);
 }
 
@@ -41,7 +41,7 @@ export function sendEvent(category: string, action: string, label?: string, valu
   });
 }
 
-export function captureError(message, error) {
+export function captureError(message: string, error: Error) {
   LogRocket.captureMessage(message);
   LogRocket.captureException(error, {
     extra: {

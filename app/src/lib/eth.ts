@@ -1,8 +1,9 @@
-import events from 'events';
+import { EventEmitter } from 'events';
 import { ethers } from 'ethers';
 
 import config from '../config';
 import { MetaError } from './errors';
+import {BN} from "./numbers";
 
 const { chainId } = config;
 
@@ -10,42 +11,44 @@ function reloadPage() {
   window.location.reload()
 }
 
-export default class ETHManager extends events.EventEmitter {
+export default class ETHManager {
   ethereum: any;
-  provider: any;
-  isContract: any;
-  accounts: any;
+  provider: ethers.providers.Web3Provider;
+  isContract: boolean= false;
+  accounts: string[] = [];
+  events: EventEmitter;
 
   constructor(ethereum) {
-    super();
+    this.events = new EventEmitter();
     this.ethereum = ethereum;
+    this.provider = new ethers.providers.Web3Provider(this.ethereum);
   }
 
-  async init() {
-    await this.ethereum.enable();
-
-    this.provider = new ethers.providers.Web3Provider(this.ethereum);
-    await this.updateAccounts();
-
-    if (this.ethereum.on) {
-      this.ethereum.on('accountsChanged', this.updateAccounts.bind(this));
-      this.ethereum.on('networkChanged', reloadPage);
-      this.ethereum.on('chainChanged', reloadPage);
-      this.ethereum.on('stop', () => this.emit('stop'));
-      this.ethereum.on('close', () => this.emit('stop'));
-      this.ethereum.on('disconnect', () => this.emit('stop'));
+  static async create(ethereum) {
+    if(!new BN(ethereum.chainId).eq(chainId)) {
+      throw new MetaError('eth_wrong_network_id', { networkId: chainId });
     }
 
-    await this.checkIsContract();
-    if(this.isContract) {
-      this.close();
+    const ethManager = new ETHManager(ethereum);
+    await ethManager.ethereum.enable();
+    await ethManager.updateAccounts();
+
+    await ethManager.checkIsContract();
+    if(ethManager.isContract) {
+      ethManager.close();
       throw new Error('eth_smart_account_not_supported');
     }
 
-    if(await this.getNetworkId() !== chainId) {
-      this.close();
-      throw new MetaError('eth_wrong_network_id', { networkId: chainId });
+    if (ethManager.ethereum.on) {
+      ethManager.ethereum.on('accountsChanged', ethManager.updateAccounts.bind(ethManager));
+      ethManager.ethereum.on('networkChanged', reloadPage);
+      ethManager.ethereum.on('chainChanged', reloadPage);
+      ethManager.ethereum.on('stop', () => ethManager.events.emit('stop'));
+      ethManager.ethereum.on('close', () => ethManager.events.emit('stop'));
+      ethManager.ethereum.on('disconnect', () => ethManager.events.emit('stop'));
     }
+
+    return ethManager;
   }
 
   async checkIsContract() {
@@ -54,8 +57,8 @@ export default class ETHManager extends events.EventEmitter {
   }
 
   async updateAccounts() {
-    this.accounts = await this.provider.send('eth_accounts', []);
-    this.emit('accountsChanged', this.accounts);
+    this.accounts = await this.provider.send('eth_requestAccounts', []);
+    this.events.emit('accountsChanged', this.accounts);
   }
 
   close() {
@@ -65,7 +68,7 @@ export default class ETHManager extends events.EventEmitter {
     if(this.ethereum.close) {
       this.ethereum.close();
     }
-    this.removeAllListeners();
+    this.events.removeAllListeners();
   }
 
   async send(to, amount) {
@@ -81,10 +84,6 @@ export default class ETHManager extends events.EventEmitter {
 
   getAddress() {
     return this.accounts[0];
-  }
-
-  async getNetworkId() {
-    return this.provider.send('net_version').then(Number);
   }
 
   async waitForConfirmedTransaction(hash) {

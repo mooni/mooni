@@ -7,7 +7,7 @@ export class MetaError extends Error {
   }
 }
 
-export function serializeError(error: any = {}) {
+export function serializeError(error: any) {
   const obj = {
     message: error.message,
     code: error.code,
