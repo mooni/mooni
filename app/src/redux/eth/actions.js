@@ -100,6 +100,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
         token = await DIDManager.getJWS(ethManager.provider);
         dispatch(setJWS(token));
       } catch(error) {
+        DIDManager.removeStore(address);
         if(error.code === 4001) {
           throw new Error('eth_signature_rejected');
         } else {

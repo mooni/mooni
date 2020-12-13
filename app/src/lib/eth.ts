@@ -30,7 +30,7 @@ export default class ETHManager {
     }
 
     const ethManager = new ETHManager(ethereum);
-    await ethManager.ethereum.enable();
+    await ethManager.provider.send('eth_requestAccounts', []);
     await ethManager.updateAccounts();
 
     await ethManager.checkIsContract();
@@ -57,7 +57,7 @@ export default class ETHManager {
   }
 
   async updateAccounts() {
-    this.accounts = await this.provider.send('eth_requestAccounts', []);
+    this.accounts = await this.provider.send('eth_accounts', []);
     this.events.emit('accountsChanged', this.accounts);
   }
 
