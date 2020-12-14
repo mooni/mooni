@@ -55,7 +55,7 @@ const DIDManager = {
       tid: uuidv4(),
     };
 
-    const serializedClaim = Base64.encode(JSON.stringify(claim));
+    const serializedClaim = JSON.stringify(claim);
     const signature = await signer.signMessage(serializedClaim);
 
     return Base64.encode(JSON.stringify([signature, serializedClaim]));
@@ -66,7 +66,7 @@ const DIDManager = {
 
     try {
       [signature, serializedClaim] = JSON.parse(Base64.decode(serializedToken));
-      claim = JSON.parse(Base64.decode(serializedClaim));
+      claim = JSON.parse(serializedClaim);
     } catch (error) {
       throw new Error('invalid token');
     }
