@@ -1,6 +1,6 @@
 import ETHManager from '../../lib/eth';
 import { setModalError } from '../ui/actions';
-import { getETHManager } from './selectors';
+import { getETHManager, getAddress } from './selectors';
 import { initBoxIfLoggedIn, resetBox } from '../box/actions';
 import { logError } from '../../lib/log';
 import { detectIframeWeb3Provider, web3Modal, getWalletProvider } from '../../lib/web3Wallets';
@@ -157,7 +157,11 @@ export const autoConnect = () => async (dispatch) => {
   dispatch(setETHManagerLoading(false));
 };
 
-export const logout = () => (dispatch) => {
+export const logout = () => (dispatch, getState) => {
+  const address = getAddress(getState());
+  if(address) {
+    DIDManager.removeStore(address);
+  }
   web3Modal.clearCachedProvider();
   dispatch(resetETHManager());
   dispatch(resetBox());
