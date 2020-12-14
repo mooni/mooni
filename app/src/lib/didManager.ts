@@ -1,7 +1,7 @@
 import { providers, utils } from 'ethers';
 import { Base64 } from 'js-base64';
 import { v4 as uuidv4 } from 'uuid';
-import store from 'store2';
+import { store } from './store'
 
 const tokenDuration = 1000 * 60 * 60 * 24 * 7; // 7 days
 

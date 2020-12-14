@@ -6,6 +6,7 @@ import { logError } from '../../lib/log';
 import { detectIframeWeb3Provider, web3Modal, getWalletProvider } from '../../lib/web3Wallets';
 import { MetaError } from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
+import { store } from '../../lib/store';
 import config from '../../config';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -163,6 +164,7 @@ export const logout = () => (dispatch, getState) => {
     DIDManager.removeStore(address);
   }
   web3Modal.clearCachedProvider();
+  store.clear();
   dispatch(resetETHManager());
   dispatch(resetBox());
 };
