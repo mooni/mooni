@@ -2,13 +2,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box, Dialog } from '@material-ui/core';
-import { textStyle, Button, LoadingRing } from '@aragon/ui'
+import { textStyle, Button } from '@aragon/ui'
 
 import { logout } from '../redux/eth/actions';
 import { getETHManagerLoading } from '../redux/eth/selectors';
 import { useAppDispatch } from '../redux/store';
 import styled from 'styled-components';
-
 
 const Title = styled.p`
   ${textStyle('title4')};

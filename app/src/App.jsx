@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { Main } from '@aragon/ui';
+import { ThemeProvider } from '@material-ui/core';
+import { theme } from './theme';
 
 import './App.css';
 
@@ -16,8 +18,8 @@ import { store } from './redux/store';
 import { autoConnect } from './redux/eth/actions';
 import { initTokens } from './redux/ui/actions';
 
-export default function App() {
 
+export default function App() {
   useEffect(() => {
     store.dispatch(autoConnect()).catch(console.error);
     store.dispatch(initTokens());
@@ -32,12 +34,14 @@ export default function App() {
           layout={false}
           scrollView={false}
         >
-          <AppContainer>
-            <InfoPanel />
-            <WalletModal />
-            <ErrorModal />
-            <Routes/>
-          </AppContainer>
+          <ThemeProvider theme={theme}>
+            <AppContainer>
+              <InfoPanel />
+              <WalletModal />
+              <ErrorModal />
+              <Routes/>
+            </AppContainer>
+          </ThemeProvider>
         </Main>
       </Router>
     </Provider>

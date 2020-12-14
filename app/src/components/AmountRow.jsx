@@ -3,7 +3,7 @@ import BN from 'bignumber.js';
 import {useImage} from 'react-image';
 import { Box, Typography} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-
+import styled from 'styled-components';
 import { DropDown } from '@aragon/ui'
 
 import { getCurrency, getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
@@ -11,9 +11,6 @@ import { SIGNIFICANT_DIGITS } from '../lib/numbers';
 import tokenDefaultImage  from '../assets/token_default.png';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    paddingBottom: theme.spacing(1),
-  },
   caption: {
     paddingLeft: 22,
     color: theme.palette.text.secondary,
@@ -102,6 +99,12 @@ function CurrencyItem({ symbol }) {
   );
 }
 
+const Container = styled.div`
+& + & {
+  margin-top: 10px;
+}
+`;
+
 export default function AmountRow({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
   const classes = useStyles();
 
@@ -110,7 +113,7 @@ export default function AmountRow({ value, selectedSymbol, onChangeValue, onChan
     : '';
 
   return (
-    <Box className={classes.root}>
+    <Container>
       <Box className={classes.caption}>
         <Typography variant="caption">
           {caption}
@@ -138,6 +141,6 @@ export default function AmountRow({ value, selectedSymbol, onChangeValue, onChan
           />
         </Box>
       </Box>
-    </Box>
+    </Container>
   );
 }

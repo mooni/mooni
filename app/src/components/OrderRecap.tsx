@@ -3,11 +3,10 @@ import styled from 'styled-components';
 
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import BN from 'bignumber.js';
 import { textStyle, Field, Info, Timer } from '@aragon/ui';
 
 import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
-import { SIGNIFICANT_DIGITS } from '../lib/numbers';
+import {truncateNumber} from '../lib/numbers';
 
 import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
 import RateAmount from "./RateAmount";
@@ -81,7 +80,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={new BN(value).sd(SIGNIFICANT_DIGITS).toFixed()}
+            value={truncateNumber(value)}
             readOnly
             className={classes.amountInput}
           />
@@ -143,7 +142,9 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
       <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
       <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
-      <RateAmount multiTrade={multiTrade}/>
+      <Box display="flex" justifyContent="center">
+        <RateAmount multiTrade={multiTrade}/>
+      </Box>
 
       <Box pt={1}>
         <Info title="Price guaranteed for" mode="warning">
