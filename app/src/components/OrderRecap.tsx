@@ -4,12 +4,11 @@ import styled from 'styled-components';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import BN from 'bignumber.js';
-import { Link, textStyle, Field, GU, Info, Timer } from '@aragon/ui';
+import { textStyle, Field, Info, Timer } from '@aragon/ui';
 
 import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
 import { SIGNIFICANT_DIGITS } from '../lib/numbers';
 
-import bityLogo from '../assets/bity_logo_blue.svg';
 import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
 import RateAmount from "./RateAmount";
 
@@ -56,11 +55,6 @@ const useStyles = makeStyles(theme => ({
 
 const Value = styled.p`
   ${textStyle('body3')};
-`;
-
-const PoweredBy = styled.span`
-  ${textStyle('label2')};
-  margin-right: ${0.5 * GU}px;
 `;
 
 function RecipientRow({ label, value }) {
@@ -150,11 +144,6 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
       <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
       <RateAmount multiTrade={multiTrade}/>
-
-      <Box display="flex" justifyContent="center" alignItems="center" mt={1}>
-        <PoweredBy>Powered by </PoweredBy>
-        <Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link>
-      </Box>
 
       <Box pt={1}>
         <Info title="Price guaranteed for" mode="warning">

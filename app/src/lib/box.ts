@@ -3,6 +3,9 @@ import Box from '3box';
 import { log } from './log';
 
 class BoxManager {
+  box: any;
+  space: any;
+
   constructor({ box, space }) {
     this.box = box;
     this.space = space;

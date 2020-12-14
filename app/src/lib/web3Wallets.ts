@@ -19,7 +19,7 @@ function getInfuraUrl(infuraId) {
 }
 
 function defaultProviderEnable(_) {
-  return async () => null;
+  return async () => [];
 }
 
 export async function getWalletProvider(walletType) {
@@ -94,7 +94,7 @@ export function detectWalletError(error) {
     (error && error.message && String(error.message).includes('User canceled')) // Trust wallet
   )
     return new Error('user-rejected-transaction');
-  logError(error);
+  logError('wallet-error', error);
   return error;
 }
 

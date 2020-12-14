@@ -16,13 +16,13 @@ export type Claim = {
 export type Token = {
   claim: Claim;
   signature: string;
-  data: string;
+  serializedToken: string;
 }
 
 const DIDManager = {
   async getJWS(provider: providers.Web3Provider) {
     const signer = provider.getSigner();
-    const address = await signer.getAddress();
+    const address = (await signer.getAddress()).toLowerCase();
     const existingJWS = store.get(`jws:${address}`);
     if(existingJWS) {
       const token = DIDManager.decodeToken(existingJWS);
@@ -33,6 +33,10 @@ const DIDManager = {
     const token = await DIDManager.createToken(provider);
     store.set(`jws:${address}`, token);
     return token;
+  },
+
+  removeStore(address) {
+    store.remove(`jws:${address.toLowerCase()}`);
   },
 
   async createToken(
@@ -51,35 +55,37 @@ const DIDManager = {
       tid: uuidv4(),
     };
 
-    const serializedClaim = JSON.stringify(claim);
+    const serializedClaim = Base64.encode(JSON.stringify(claim));
     const signature = await signer.signMessage(serializedClaim);
 
     return Base64.encode(JSON.stringify([signature, serializedClaim]));
   },
 
-  decodeToken: function (token: string): Token {
-    let signature: string, rawClaim: string, claim: Claim;
+  decodeToken: function (serializedToken: string): Token {
+    let signature: string, serializedClaim: string, claim: Claim;
 
     try {
-      const rawToken = Base64.decode(token);
-      [signature, rawClaim] = JSON.parse(rawToken);
-      claim = JSON.parse(rawClaim);
+      [signature, serializedClaim] = JSON.parse(Base64.decode(serializedToken));
+      claim = JSON.parse(Base64.decode(serializedClaim));
     } catch (error) {
       throw new Error('invalid token');
     }
+    let signerAddress;
     try {
-      const signerAddress = utils.verifyMessage(rawClaim, signature);
-      if (signerAddress !== claim.iss) {
-        throw new Error('invalid signer address');
-      }
+      signerAddress = utils.verifyMessage(serializedClaim, signature);
     } catch (error) {
+      console.error(error);
       throw new Error('invalid signature');
+    }
+
+    if (signerAddress !== claim.iss) {
+      throw new Error('invalid signer address');
     }
 
     return {
       claim,
       signature,
-      data: token,
+      serializedToken,
     };
   },
 

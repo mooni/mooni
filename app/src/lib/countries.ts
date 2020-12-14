@@ -39,7 +39,6 @@ const COUNTRIES_NON_EEA = {
   GI: 'Gibraltar',
   JE: 'Jersey',
   MC: 'Monaco',
-
 }
 
 export const COUNTRIES = {
