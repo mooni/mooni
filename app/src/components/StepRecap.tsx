@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
-import { Button, Info, IconCoin, Checkbox, Link, textStyle } from '@aragon/ui'
+import { Button, Info, IconCoin, Checkbox, Link } from '@aragon/ui'
 
 import Loader from '../components/Loader';
 import OrderRecap from './OrderRecap';
@@ -11,12 +10,6 @@ import OrderRecap from './OrderRecap';
 import { getMultiTrade, getOrderErrors } from '../redux/payment/selectors';
 import { setInfoPanel } from '../redux/ui/actions';
 import {BityTrade, TradeType} from "../lib/trading/types";
-import bityLogo from "../assets/bity_logo_blue.svg";
-import paraswapLogo from "../assets/paraswap_logo.png";
-
-const PoweredBy = styled.span`
-  ${textStyle('label2')};
-`;
 
 function StepRecap({ onComplete }) {
   const dispatch = useDispatch();
@@ -60,11 +53,6 @@ function StepRecap({ onComplete }) {
   return (
     <Box width={1}>
       <OrderRecap multiTrade={multiTrade} />
-      <Box display="flex" justifyContent="center" alignItems="center" flexDirection="column" mt={1}>
-        <Box><PoweredBy>Powered by</PoweredBy></Box>
-        {multiTrade.path.includes(TradeType.BITY) && <Box><Link external href="https://bity.com"><img src={bityLogo} alt="bity" width={70} /></Link></Box>}
-        {multiTrade.path.includes(TradeType.DEX) && <Box><Link external href="https://paraswap.io"><img src={paraswapLogo} alt="paraswap" width={80} /></Link></Box>}
-      </Box>
       <Box py={2} display="flex" justifyContent="center">
         <Checkbox
           checked={termsAccepted}

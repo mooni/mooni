@@ -142,7 +142,9 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
       <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
       <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
 
-      <RateAmount multiTrade={multiTrade}/>
+      <Box display="flex" justifyContent="center">
+        <RateAmount multiTrade={multiTrade}/>
+      </Box>
 
       <Box pt={1}>
         <Info title="Price guaranteed for" mode="warning">
