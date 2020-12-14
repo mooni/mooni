@@ -9,9 +9,10 @@ import './App.css';
 import AppContainer from './components/AppContainer';
 import InfoPanel from './components/InfoPanel';
 import ErrorModal from './components/ErrorModal';
+import WalletModal from './components/WalletModal';
 import Routes from './Routes';
 
-import store from './redux/store';
+import { store } from './redux/store';
 import { autoConnect } from './redux/eth/actions';
 import { initTokens } from './redux/ui/actions';
 
@@ -33,6 +34,7 @@ export default function App() {
         >
           <AppContainer>
             <InfoPanel />
+            <WalletModal />
             <ErrorModal />
             <Routes/>
           </AppContainer>
