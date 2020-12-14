@@ -84,7 +84,7 @@ export default function ErrorModal() {
             </Box>
 
             <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
-              <a href="https://t.me/moonidapp" target="_blank">
+              <a href="https://t.me/moonidapp" target="_blank" rel="noopener noreferrer">
                 Contact support
               </a>
             </Box>
