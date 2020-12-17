@@ -2,6 +2,7 @@ import {ChainId} from '@uniswap/sdk';
 
 import config from '../../config';
 import {CryptoCurrency, Token, FiatCurrency} from './currencyTypes';
+import {CurrencySymbol} from "./types";
 
 export const ETHER = new CryptoCurrency(18, 'ETH', 'Ether');
 
@@ -20,5 +21,5 @@ export const tokenCurrenciesAllNetwork = [
 ];
 export const tokenCurrencies = tokenCurrenciesAllNetwork.filter(t => t.chainId === config.chainId) as Token[];
 
-export const DEFAULT_INPUT_CURRENCY = 'DAI';
-export const DEFAULT_OUTPUT_CURRENCY = 'EUR';
+export const DEFAULT_INPUT_CURRENCY: CurrencySymbol = 'DAI';
+export const DEFAULT_OUTPUT_CURRENCY: CurrencySymbol = 'EUR';

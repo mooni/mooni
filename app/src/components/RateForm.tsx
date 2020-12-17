@@ -51,6 +51,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
+
   const { rateForm, tradeRequest, multiTrade, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
 
   const valid = !(rateForm.loading || rateForm.errors);

@@ -10,12 +10,11 @@ import {
   BityOrderStatus,
 } from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
-import BityProxy from '../../lib/trading/bityProxy';
+import Api from '../../lib/trading/api';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
-import {createMultiTrade} from "../../lib/trading/trader";
 import DexProxy from "../../lib/trading/dexProxy";
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
@@ -152,7 +151,7 @@ export const createOrder = () => async function (dispatch, getState)  {
   const jwsToken = getJWS(state);
   try {
 
-    const multiTrade = await createMultiTrade(multiTradeRequest, jwsToken);
+    const multiTrade = await Api.createMultiTrade(multiTradeRequest, jwsToken);
     dispatch(setMultiTrade(multiTrade));
     dispatch(createPayment(multiTrade));
 
@@ -218,7 +217,7 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
   }));
 
   function fetchNewData() {
-    BityProxy.getOrder(orderId, jwsToken)
+    Api.getOrder(orderId, jwsToken)
       .then(orderDetails => {
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {

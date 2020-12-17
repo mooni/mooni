@@ -53,7 +53,7 @@ export const detectCustomToken = () => async (dispatch, getState) => {
       if(multiTradeRequest) {
         dispatch(setTradeRequest({
           ...multiTradeRequest.tradeRequest,
-          inputCurrency: token,
+          inputCurrencySymbol: token.symbol,
         }));
       }
     }).catch(e => {

@@ -1,6 +1,7 @@
 import {ChainId} from '@uniswap/sdk';
 import {ethers} from "ethers";
 import ERC20_ABI from '../abis/ERC20.json';
+import {CurrencySymbol} from "./types";
 
 export enum CurrencyType {
   FIAT = 'FIAT',
@@ -11,7 +12,7 @@ export enum CurrencyType {
 export abstract class Currency {
   public readonly type: CurrencyType;
   public readonly decimals: number;
-  public readonly symbol: string;
+  public readonly symbol: CurrencySymbol;
   private readonly _name?: string;
 
   constructor(type, decimals, symbol, name?) {

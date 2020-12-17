@@ -6,6 +6,7 @@ import {DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
+import {getCurrency} from "./currencyHelpers";
 
 function calculatedGasMargin(gas) {
   const offset = gas.mul(1000).div(10000);
@@ -68,14 +69,14 @@ const DexProxy: IDexProxy = {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const tokenAddress = (dexTrade.tradeRequest.inputCurrency as Token).address;
+    const inputToken = getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as Token;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade);
-    const intAmount = amountToInt(dexTrade.inputAmount, dexTrade.tradeRequest.inputCurrency.decimals);
+    const intAmount = amountToInt(dexTrade.inputAmount, inputToken.decimals);
 
-    const allowance = await DexProxy.getAllowance(tokenAddress, senderAddress, spenderAddress);
+    const allowance = await DexProxy.getAllowance(inputToken.address, senderAddress, spenderAddress);
     if(new BN(intAmount).gt(allowance)) {
-      const txHash = await DexProxy.approve(tokenAddress, senderAddress, spenderAddress, intAmount, provider);
+      const txHash = await DexProxy.approve(inputToken.address, senderAddress, spenderAddress, intAmount, provider);
       return txHash;
     }
 

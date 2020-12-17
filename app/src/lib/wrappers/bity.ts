@@ -6,13 +6,12 @@ import {BN} from '../numbers';
 import {MetaError} from '../errors';
 
 import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
-import {getCurrency} from "../trading/currencyHelpers";
 
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
 const TIMEOUT = 10 * 1000;
 
-const { bityPartnerFee } = config;
+const { bityPartnerFee } = config.private;
 
 function removeEmptyStrings(data: object = {}) {
   return Object.keys(data).reduce((acc, prop) => {
@@ -37,11 +36,11 @@ function extractFees(order: any): Fee  {
     .map(f => f.amount)
     .reduce((acc, a) => acc.plus(a), new BN(0))
     .toFixed();
-  const currency = getCurrency(fees[0].currency);
+  const currencySymbol = fees[0].currency;
 
   return {
     amount: totalAmountInputCurrency,
-    currency: currency,
+    currencySymbol,
   }
 }
 
@@ -88,14 +87,14 @@ class Bity {
   }
 
   async estimate(tradeRequest: TradeRequest): Promise<BityTrade> {
-    const { inputCurrency, outputCurrency, amount, tradeExact } = tradeRequest;
+    const { inputCurrencySymbol, outputCurrencySymbol, amount, tradeExact } = tradeRequest;
 
     const body: any = {
       input: {
-        currency: inputCurrency.symbol,
+        currency: inputCurrencySymbol,
       },
       output: {
-        currency: outputCurrency.symbol,
+        currency: outputCurrencySymbol,
       },
       partner_fee: { factor: bityPartnerFee }
     };
@@ -143,7 +142,7 @@ class Bity {
 
     const body: any = {
       input: {
-        currency: tradeRequest.inputCurrency.symbol,
+        currency: tradeRequest.inputCurrencySymbol,
         type: 'crypto_address',
         crypto_address: ethInfo.fromAddress,
       },
@@ -151,7 +150,7 @@ class Bity {
         type: 'bank_account',
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
-        currency: tradeRequest.outputCurrency.symbol,
+        currency: tradeRequest.outputCurrencySymbol,
         reference: reference,
       },
     };
