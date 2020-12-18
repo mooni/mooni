@@ -1,6 +1,6 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
-import { Token} from './currencyTypes';
+import { TokenCurrency} from './currencyTypes';
 import {amountToInt, BN} from '../numbers';
 import {DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
@@ -14,7 +14,7 @@ function calculatedGasMargin(gas) {
 }
 
 interface IDexProxy {
-  getTokenFromExchange(tokenAddress: string): Promise<Token | null>;
+  getTokenFromExchange(tokenAddress: string): Promise<TokenCurrency | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
   createTrade(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
@@ -25,7 +25,7 @@ interface IDexProxy {
 }
 
 const DexProxy: IDexProxy = {
-  async getTokenFromExchange(tokenAddress: string): Promise<Token | null> {
+  async getTokenFromExchange(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
     return foundToken || null;
@@ -69,7 +69,7 @@ const DexProxy: IDexProxy = {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const inputToken = getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as Token;
+    const inputToken = getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade);
     const intAmount = amountToInt(dexTrade.inputAmount, inputToken.decimals);

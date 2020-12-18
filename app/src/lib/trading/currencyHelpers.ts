@@ -1,5 +1,5 @@
 import {memoize} from 'lodash';
-import {Currency, CurrencyType, Token} from "./currencyTypes";
+import {Currency, CurrencyType, TokenCurrency} from "./currencyTypes";
 
 import {cryptoCurrencies, ETHER, fiatCurrencies, tokenCurrencies} from "./currencyList";
 import {amountToDecimal} from "../numbers";
@@ -11,8 +11,8 @@ export function getCurrencies(type?: CurrencyType): Currency[] {
   const res = currencies.filter(c => !type || c.type === type);
   return res;
 }
-export function getTokens(): Token[] {
-  return getCurrencies(CurrencyType.ERC20) as Token[];
+export function getTokens(): TokenCurrency[] {
+  return getCurrencies(CurrencyType.ERC20) as TokenCurrency[];
 }
 
 export function getCurrenciesSymbols(type?: CurrencyType): string[] {
@@ -26,7 +26,7 @@ export function getCurrency(symbol: string): Currency {
   }
   return c;
 }
-export function getTokenFromAddress(address: string): Token | null {
+export function getTokenFromAddress(address: string): TokenCurrency | null {
   const t = getTokens().find(t => t.address.toLowerCase() === address.toLowerCase());
   return t || null;
 }
@@ -44,7 +44,7 @@ export const getCurrencyLogoAddress = memoize((symbol: string): string => {
 });
 
 export function getTokenAddress(symbol: string): string {
-  const token = getCurrency(symbol) as Token;
+  const token = getCurrency(symbol) as TokenCurrency;
   if(!token) {
     throw new Error('unknown-token');
   }
@@ -52,7 +52,7 @@ export function getTokenAddress(symbol: string): string {
 }
 
 export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string): Promise<string> {
-  const token = getCurrency(tokenSymbol) as Token;
+  const token = getCurrency(tokenSymbol) as TokenCurrency;
 
   const tokenContract = token.getContract(defaultProvider);
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
@@ -60,7 +60,7 @@ export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string
   return amountToDecimal(tokenBalance.toString(), token.decimals);
 }
 
-export async function addTokenFromAddress(tokenAddress: string): Promise<Token> {
+export async function addTokenFromAddress(tokenAddress: string): Promise<TokenCurrency> {
   const t = getTokenFromAddress(tokenAddress);
   if(t) return t;
 
@@ -72,7 +72,7 @@ export async function addTokenFromAddress(tokenAddress: string): Promise<Token> 
   return token;
 }
 
-export function replaceTokens(tokens: Token[]): void {
+export function replaceTokens(tokens: TokenCurrency[]): void {
   tokenCurrencies.splice(0, tokenCurrencies.length);
   tokenCurrencies.push(...tokens);
 }

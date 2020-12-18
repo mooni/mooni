@@ -7,7 +7,7 @@ import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import {CurrencyType, Token} from "../trading/currencyTypes";
+import {CurrencyType, TokenCurrency} from "../trading/currencyTypes";
 import {amountToDecimal, amountToInt, BN} from "../numbers";
 import {getCurrency} from "../trading/currencyHelpers";
 
@@ -23,13 +23,13 @@ function applySlippage(amount: string, maxSlippage: number): string {
 }
 
 const ParaswapWrapper = {
-  async getTokenList(): Promise<Token[]> {
+  async getTokenList(): Promise<TokenCurrency[]> {
     const { data } = await paraswapAxios({
       method: 'get',
       url: '/tokens',
     });
     return data.tokens.map(t =>
-      new Token(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
+      new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
   },
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
@@ -88,7 +88,7 @@ const ParaswapWrapper = {
       if(currency.equals(ETHER)) {
         return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
       } else if(currency.type === CurrencyType.ERC20) {
-        return (currency as Token).address;
+        return (currency as TokenCurrency).address;
       } else {
         throw new Error('impossible token address');
       }
