@@ -16,7 +16,7 @@ async function createMooniOrder(multiTrade: MultiTrade) {
   const bityOrderId = bityTrade && (bityTrade as BityTrade).bityOrderResponse.id;
 
   const rawMooniOrder = {
-    ethAddress: multiTrade.ethInfo.fromAddress,
+    ethAddress: multiTrade.ethInfo.fromAddress.toLowerCase(),
     inputAmount: multiTrade.inputAmount,
     outputAmount: multiTrade.outputAmount,
     inputCurrency: multiTrade.tradeRequest.inputCurrencySymbol,
