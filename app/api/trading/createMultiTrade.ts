@@ -6,6 +6,7 @@ import {MultiTradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
 import { Token } from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/auth";
+import {BityOrderError} from "../../src/lib/wrappers/bityTypes";
 
 const bityInstance = new Bity();
 
@@ -34,13 +35,13 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
     const multiTrade = await trader.createMultiTrade(multiTradeRequest);
     return res.json(multiTrade)
   } catch(error) {
-    if(error._orderError) { // TODO
+    if(error instanceof BityOrderError) {
       return res.status(400).json({
         message: error.message,
-        _orderError: error._orderError,
+        _bityError: error._bityError,
         errors: error.errors
       });
-    } else {
+    } else {  // TODO
       console.log(error);
       return res.status(500).send('Unexpected server error');
     }

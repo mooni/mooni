@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BityOrderResponse } from '../wrappers/bityTypes';
+import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
 import {MultiTrade, MultiTradeRequest, TradeRequest} from "./types";
 
 interface IAPI {
@@ -26,9 +26,11 @@ const API: IAPI = {
       return data;
     }
     catch (error) {
-      if(error.response?.status === 404) { // TODO
-        throw new Error('not-found');
-      } else {
+      const status = error.response?.status;
+      const data = error.response?.data;
+      if(status === 400 && data?._bityError) {
+        throw new BityOrderError(data.message, data.errors);
+      } else { // TODO
         throw new Error('unexpected-server-error');
       }
     }
@@ -47,9 +49,11 @@ const API: IAPI = {
       return data;
     }
     catch (error) {
-      if(error.response?.status === 404) { // TODO
-        throw new Error('not-found');
-      } else {
+      const status = error.response?.status;
+      const data = error.response?.data;
+      if(status === 400 && data?._bityError) {
+        throw new BityOrderError(data.message, data.errors);
+      } else { // TODO
         throw new Error('unexpected-server-error');
       }
     }
@@ -71,7 +75,7 @@ const API: IAPI = {
       return data;
     }
     catch (error) {
-      if(error.response?.status === 404) { // TODO
+      if(error.response?.status === 404) {
         throw new Error('not-found');
       } else {
         throw new Error('unexpected-server-error');

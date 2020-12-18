@@ -47,10 +47,10 @@ export type BityOrderErrors = any[];
 
 export class BityOrderError extends Error {
   errors: BityOrderErrors;
-  _orderError: boolean;
+  _bityError: boolean;
   constructor(message: string, errors: BityOrderErrors = []) {
     super(message);
-    this._orderError = true;
+    this._bityError = true;
     this.errors = errors;
   }
 }
