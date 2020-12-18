@@ -2,7 +2,7 @@ import { ethers, providers, BigNumber } from 'ethers';
 
 import { TokenCurrency} from './currencyTypes';
 import {amountToInt, BN} from '../numbers';
-import {DexTrade, TradeRequest} from './types';
+import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
@@ -14,7 +14,8 @@ function calculatedGasMargin(gas) {
 }
 
 interface IDexProxy {
-  getTokenFromExchange(tokenAddress: string): Promise<TokenCurrency | null>;
+  getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null>;
+  getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
   createTrade(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
@@ -25,9 +26,15 @@ interface IDexProxy {
 }
 
 const DexProxy: IDexProxy = {
-  async getTokenFromExchange(tokenAddress: string): Promise<TokenCurrency | null> {
+  async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+    return foundToken || null;
+  },
+
+  async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
+    const tokens = await Paraswap.getTokenList();
+    const foundToken = tokens.find(t => t.symbol === tokenSymbol);
     return foundToken || null;
   },
 

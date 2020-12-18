@@ -14,7 +14,9 @@ export interface CurrencyObject {
   decimals: number;
   symbol: CurrencySymbol;
   address?: string;
+  name?: string;
   chainId?: ChainId;
+  img?: string;
 }
 
 export abstract class Currency {
@@ -22,11 +24,13 @@ export abstract class Currency {
   public readonly decimals: number;
   public readonly symbol: CurrencySymbol;
   private readonly _name?: string;
+  public readonly img?: string;
 
-  constructor(type, decimals, symbol, name?) {
+  constructor(type, decimals, symbol, name?, img?) {
     this.type = type;
     this.decimals = decimals;
     this.symbol = symbol;
+    this.img = img;
     this._name = name;
   }
 
@@ -46,33 +50,32 @@ export abstract class Currency {
       type: this.type,
       decimals: this.decimals,
       symbol: this.symbol,
+      name: this.name,
     }
   }
 }
 
 export class FiatCurrency extends Currency {
-  constructor(symbol, name?) {
-    super(CurrencyType.FIAT, 2, symbol, name);
+  constructor(decimals, symbol, name?, img?) {
+    super(CurrencyType.FIAT, decimals, symbol, name, img);
   }
 }
 
 export class CryptoCurrency extends Currency {
-  constructor(decimals, symbol, name?) {
-    super(CurrencyType.CRYPTO, decimals, symbol, name);
+  constructor(decimals, symbol, name?, img?) {
+    super(CurrencyType.CRYPTO, decimals, symbol, name, img);
   }
 }
 
 export class TokenCurrency extends Currency {
   public readonly address: string;
   public readonly chainId: ChainId;
-  public readonly img: string;
   private contract?: ethers.Contract;
 
   constructor(decimals, address, chainId, symbol, name?, img?) {
-    super(CurrencyType.ERC20, decimals, symbol, name);
+    super(CurrencyType.ERC20, decimals, symbol, name, img);
     this.address = ethers.utils.getAddress(address);
     this.chainId = chainId;
-    this.img = img;
   }
 
   equals(token: TokenCurrency) {
@@ -90,26 +93,26 @@ export class TokenCurrency extends Currency {
   }
 
   toObject(): CurrencyObject {
-    return {
+    return Object.assign({}, super.toObject(), {
       type: this.type,
       decimals: this.decimals,
       symbol: this.symbol,
       address: this.address,
       chainId: this.chainId,
-    };
+    });
   }
 }
 
 export function createFromCurrencyObject(currencyObject: CurrencyObject): Currency {
   switch(currencyObject.type) {
     case CurrencyType.FIAT:
-      return new FiatCurrency(currencyObject.symbol);
+      return new FiatCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
 
     case CurrencyType.CRYPTO:
-      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol);
+      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
 
     case CurrencyType.ERC20:
-      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol);
+      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img);
 
     default:
       throw new Error('unknown currency type')

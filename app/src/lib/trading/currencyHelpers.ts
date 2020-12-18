@@ -5,6 +5,7 @@ import {cryptoCurrencies, ETHER, fiatCurrencies, tokenCurrencies} from "./curren
 import {amountToDecimal} from "../numbers";
 import DexProxy from "./dexProxy";
 import {defaultProvider} from "../web3Providers";
+import {CurrencySymbol} from "./types";
 
 export function getCurrencies(type?: CurrencyType): Currency[] {
   const currencies = ([] as Currency[]).concat(fiatCurrencies).concat(cryptoCurrencies).concat(tokenCurrencies);
@@ -19,19 +20,15 @@ export function getCurrenciesSymbols(type?: CurrencyType): string[] {
   return getCurrencies(type).map(c => c.symbol);
 }
 
-export function getCurrency(symbol: string): Currency {
+export function getCurrency(symbol: CurrencySymbol): Currency {
   const c = getCurrencies().find(c => c.symbol === symbol);
   if(!c) {
     throw new Error('unknown currency');
   }
   return c;
 }
-export function getTokenFromAddress(address: string): TokenCurrency | null {
-  const t = getTokens().find(t => t.address.toLowerCase() === address.toLowerCase());
-  return t || null;
-}
 
-export const getCurrencyLogoAddress = memoize((symbol: string): string => {
+export const getCurrencyLogoAddress = memoize((symbol: CurrencySymbol): string => {
   const currency = getCurrency(symbol);
   if(currency.equals(ETHER)) {
     return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
@@ -43,7 +40,7 @@ export const getCurrencyLogoAddress = memoize((symbol: string): string => {
   }
 });
 
-export function getTokenAddress(symbol: string): string {
+export function getTokenAddress(symbol: CurrencySymbol): string {
   const token = getCurrency(symbol) as TokenCurrency;
   if(!token) {
     throw new Error('unknown-token');
@@ -51,7 +48,7 @@ export function getTokenAddress(symbol: string): string {
   return token.address;
 }
 
-export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string): Promise<string> {
+export async function fetchTokenBalance(tokenSymbol: CurrencySymbol, tokenHolder: string): Promise<string> {
   const token = getCurrency(tokenSymbol) as TokenCurrency;
 
   const tokenContract = token.getContract(defaultProvider);
@@ -61,10 +58,22 @@ export async function fetchTokenBalance(tokenSymbol: string, tokenHolder: string
 }
 
 export async function addTokenFromAddress(tokenAddress: string): Promise<TokenCurrency> {
-  const t = getTokenFromAddress(tokenAddress);
+  const t = getTokens().find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
   if(t) return t;
 
-  const token = await DexProxy.getTokenFromExchange(tokenAddress);
+  const token = await DexProxy.getTokenFromAddress(tokenAddress);
+  if(!token) {
+    throw new Error('Token not available for exchange');
+  }
+  tokenCurrencies.push(token);
+  return token;
+}
+
+export async function addTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency> {
+  const t = getTokens().find(t => t.symbol === tokenSymbol);
+  if(t) return t;
+
+  const token = await DexProxy.getTokenFromSymbol(tokenSymbol);
   if(!token) {
     throw new Error('Token not available for exchange');
   }

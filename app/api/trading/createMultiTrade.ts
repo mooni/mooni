@@ -29,6 +29,8 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
   const trader = new Trader(bityInstance);
 
   try {
+    await Trader.assertTokenReady(multiTradeRequest.tradeRequest);
+
     const multiTrade = await trader.createMultiTrade(multiTradeRequest);
     return res.json(multiTrade)
   } catch(error) {

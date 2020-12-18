@@ -22,6 +22,8 @@ export default async (req: NowRequest, res: NowResponse): Promise<NowResponse |
   const trader = new Trader(bityInstance);
 
   try {
+    await Trader.assertTokenReady(tradeRequest);
+
     const multiTrade = await trader.estimateMultiTrade(tradeRequest);
     return res.json(multiTrade)
   } catch(error) {

@@ -4,12 +4,11 @@ import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 import Bity from "../wrappers/bity";
-import {getCurrency} from "./currencyHelpers";
+import {addTokenFromSymbol, getCurrency} from "./currencyHelpers";
 
 export class Trader {
   constructor(readonly bityInstance: Bity) {}
 
-  // TODO whatif server doesnt have a custom token
   private static findPath(tradeRequest: TradeRequest): TradePath {
     const inputCurrency = getCurrency(tradeRequest.inputCurrencySymbol)
     const outputCurrency = getCurrency(tradeRequest.outputCurrencySymbol)
@@ -229,4 +228,8 @@ export class Trader {
     };
   }
 
+  static async assertTokenReady(tradeRequest: TradeRequest) {
+    const inputSymbol = tradeRequest.inputCurrencySymbol;
+    await addTokenFromSymbol(inputSymbol);
+  }
 }
