@@ -9,7 +9,7 @@ import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
 
 const API_URL = 'https://exchange.api.bity.com';
 const AUTH_URL = 'https://connect.bity.com/oauth2/token';
-const TIMEOUT = 10 * 1000;
+const TIMEOUT = 15 * 1000;
 
 const { bityPartnerFee } = config.private;
 

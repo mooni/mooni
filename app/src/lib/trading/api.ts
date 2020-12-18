@@ -11,7 +11,7 @@ interface IAPI {
 const API_URL = '/api';
 const mooniAPI = axios.create({
   baseURL: API_URL,
-  timeout: 10000,
+  timeout: 15000,
 });
 
 const API: IAPI = {

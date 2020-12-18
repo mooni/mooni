@@ -13,5 +13,13 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/bity/*.ts": {
+      "maxDuration": 15
+    },
+    "api/trading/*.ts": {
+      "maxDuration": 15
+    }
+  }
 }
