@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
 import {MultiTrade, MultiTradeRequest, TradeRequest} from "./types";
 
@@ -13,6 +13,24 @@ const mooniAPI = axios.create({
   baseURL: API_URL,
   timeout: 10 * 1000,
 });
+const RETRY_ATTEMPTS = 3;
+
+async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) {
+  if(attempt >= RETRY_ATTEMPTS)
+    throw new Error('timeout');
+
+  try {
+    const res = await mooniAPI(config);
+    return res;
+  }
+  catch (error) {
+    if(error.code === 'ECONNABORTED') {
+      console.log('timeout retry', config)
+      return await mooniAPIRetryer(config, attempt+1);
+    }
+    throw error;
+  }
+}
 
 const API: IAPI = {
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade> {
@@ -37,7 +55,7 @@ const API: IAPI = {
   },
   async createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade> {
     try {
-      const {data} = await mooniAPI({
+      const {data} = await mooniAPIRetryer({
         method: 'post',
         url: 'trading/createMultiTrade',
         headers: {
