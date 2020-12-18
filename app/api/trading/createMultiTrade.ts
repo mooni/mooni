@@ -6,7 +6,6 @@ import {BityTrade, MultiTrade, MultiTradeRequest, TradeType} from "../../src/lib
 import {Trader} from "../../src/lib/trading/trader";
 import {Token} from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/auth";
-import {BityOrderError} from "../../src/lib/wrappers/bityTypes";
 import prisma from '../../src/lib/api/prisma'
 
 const bityInstance = new Bity();
@@ -60,7 +59,7 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
     return res.json(multiTrade)
 
   } catch(error) {
-    if(error instanceof BityOrderError) {
+    if(error._bityError) {
       return res.status(400).json({
         message: error.message,
         _bityError: error._bityError,

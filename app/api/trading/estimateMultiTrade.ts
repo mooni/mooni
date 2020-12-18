@@ -3,7 +3,6 @@ import { NowRequest, NowResponse } from '@now/node'
 import Bity from '../../src/lib/wrappers/bity';
 import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
-import {BityOrderError} from "../../src/lib/wrappers/bityTypes";
 
 const bityInstance = new Bity();
 
@@ -28,7 +27,7 @@ export default async (req: NowRequest, res: NowResponse): Promise<NowResponse |
     const multiTrade = await trader.estimateMultiTrade(tradeRequest);
     return res.json(multiTrade)
   } catch(error) {
-    if(error instanceof BityOrderError) {
+    if(error._bityError) {
       return res.status(400).json({
         message: error.message,
         _bityError: error._bityError,
