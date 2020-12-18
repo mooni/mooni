@@ -4,19 +4,17 @@ import {authMiddleware} from "../src/lib/api/auth";
 import {Token} from "../src/lib/didManager";
 
 export default authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
-  const ethAddress = token.claim.iss.toLowerCase();
+  const userData = {
+    ethAddress: token.claim.iss.toLowerCase(),
+  };
 
   let user = await prisma.user.findUnique({
-    where: {
-      ethAddress: ethAddress,
-    },
+    where: userData,
   });
 
   if(!user) {
     user = await prisma.user.create({
-      data: {
-        ethAddress: ethAddress,
-      },
+      data: userData,
     });
   }
 
