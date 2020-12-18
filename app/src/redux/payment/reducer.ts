@@ -26,7 +26,6 @@ interface PaymentState {
 // eslint-disable-next-line
 const initialEmptyState: PaymentState = {
   exchangeStep: 0,
-  // TODO change to some form incomplete request
   multiTradeRequest: {
     bankInfo: {
       recipient: {
