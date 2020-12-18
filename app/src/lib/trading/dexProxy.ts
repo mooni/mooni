@@ -1,11 +1,12 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
-import { Token} from './currencyTypes';
+import { TokenCurrency} from './currencyTypes';
 import {amountToInt, BN} from '../numbers';
-import {DexTrade, TradeRequest} from './types';
+import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
+import {getCurrency} from "./currencyHelpers";
 
 function calculatedGasMargin(gas) {
   const offset = gas.mul(1000).div(10000);
@@ -13,7 +14,8 @@ function calculatedGasMargin(gas) {
 }
 
 interface IDexProxy {
-  getTokenFromExchange(tokenAddress: string): Promise<Token | null>;
+  getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null>;
+  getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null>;
   getRate(tradeRequest: TradeRequest): Promise<DexTrade>;
   createTrade(tradeRequest: TradeRequest): Promise<DexTrade>;
   getSpender(dexTrade: DexTrade): Promise<string>;
@@ -24,9 +26,15 @@ interface IDexProxy {
 }
 
 const DexProxy: IDexProxy = {
-  async getTokenFromExchange(tokenAddress: string): Promise<Token | null> {
+  async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+    return foundToken || null;
+  },
+
+  async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
+    const tokens = await Paraswap.getTokenList();
+    const foundToken = tokens.find(t => t.symbol === tokenSymbol);
     return foundToken || null;
   },
 
@@ -68,14 +76,14 @@ const DexProxy: IDexProxy = {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const tokenAddress = (dexTrade.tradeRequest.inputCurrency as Token).address;
+    const inputToken = getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade);
-    const intAmount = amountToInt(dexTrade.inputAmount, dexTrade.tradeRequest.inputCurrency.decimals);
+    const intAmount = amountToInt(dexTrade.inputAmount, inputToken.decimals);
 
-    const allowance = await DexProxy.getAllowance(tokenAddress, senderAddress, spenderAddress);
+    const allowance = await DexProxy.getAllowance(inputToken.address, senderAddress, spenderAddress);
     if(new BN(intAmount).gt(allowance)) {
-      const txHash = await DexProxy.approve(tokenAddress, senderAddress, spenderAddress, intAmount, provider);
+      const txHash = await DexProxy.approve(inputToken.address, senderAddress, spenderAddress, intAmount, provider);
       return txHash;
     }
 

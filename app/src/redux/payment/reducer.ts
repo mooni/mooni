@@ -1,5 +1,4 @@
 import {DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY} from '../../lib/trading/currencyList';
-import {getCurrency} from '../../lib/trading/currencyHelpers';
 import {
   OrderErrors,
   Payment,
@@ -37,9 +36,12 @@ const initialEmptyState: PaymentState = {
       },
       reference: '',
     },
+    ethInfo: {
+      fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
+    },
     tradeRequest: {
-      inputCurrency: getCurrency(DEFAULT_INPUT_CURRENCY),
-      outputCurrency: getCurrency(DEFAULT_OUTPUT_CURRENCY),
+      inputCurrencySymbol: DEFAULT_INPUT_CURRENCY,
+      outputCurrencySymbol: DEFAULT_OUTPUT_CURRENCY,
       amount: '100',
       tradeExact: TradeExact.OUTPUT,
     },
@@ -66,9 +68,12 @@ const initialMockStateMinimum: PaymentState = {
       },
       reference: '',
     },
+    ethInfo: {
+      fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
+    },
     tradeRequest: {
-      inputCurrency: getCurrency('DAI'),
-      outputCurrency: getCurrency('EUR'),
+      inputCurrencySymbol: DEFAULT_INPUT_CURRENCY,
+      outputCurrencySymbol: DEFAULT_OUTPUT_CURRENCY,
       amount: '30',
       tradeExact: TradeExact.OUTPUT,
     },
@@ -97,41 +102,45 @@ const initialMockStateComplete: PaymentState = {
       },
       reference: 'ref'
     },
+    ethInfo: {
+      fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
+    },
     tradeRequest: {
-      inputCurrency: getCurrency('ETH'),
-      outputCurrency: getCurrency('EUR'),
+      inputCurrencySymbol: 'ETH',
+      outputCurrencySymbol: 'EUR',
       amount: '10',
       tradeExact: TradeExact.OUTPUT
     },
   },
   multiTrade: {
-    multiTradeRequest: {
-      bankInfo: {
-        recipient: {
-          owner: {
-            country: 'NL',
-            name: 'fdsfsd',
-            address: 'dfsfdsfq',
-            zip: 'fdsqfqs',
-            city: 'dsfqs'
-          },
-          iban: 'NL84INGB1679475908',
-          bic_swift: 'CMCIFR2A',
-          email: 'dfd@fez.fr'
+    tradeRequest: {
+      inputCurrencySymbol: 'ETH',
+      outputCurrencySymbol: 'EUR',
+      amount: '10',
+      tradeExact: TradeExact.OUTPUT
+    },
+    bankInfo: {
+      recipient: {
+        owner: {
+          country: 'NL',
+          name: 'fdsfsd',
+          address: 'dfsfdsfq',
+          zip: 'fdsqfqs',
+          city: 'dsfqs'
         },
-        reference: 'ref'
+        iban: 'NL84INGB1679475908',
+        bic_swift: 'CMCIFR2A',
+        email: 'dfd@fez.fr'
       },
-      tradeRequest: {
-        inputCurrency: getCurrency('ETH'),
-        outputCurrency: getCurrency('EUR'),
-        amount: '10',
-        tradeExact: TradeExact.OUTPUT
-      },
+      reference: 'ref'
+    },
+    ethInfo: {
+      fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
     },
     trades: [{
       tradeRequest: {
-        inputCurrency: getCurrency('ETH'),
-        outputCurrency: getCurrency('EUR'),
+        inputCurrencySymbol: 'ETH',
+        outputCurrencySymbol: 'EUR',
         amount: '10',
         tradeExact: TradeExact.OUTPUT,
       },
@@ -298,7 +307,7 @@ export default function(state : PaymentState = initialState, action: { type: str
       const newState = Object.assign({}, state);
       newState.payment = Object.assign({}, state.payment);
       newState.payment.steps = state.payment.steps.map((s,i) =>
-        i === stepIndex ? Object.assign({}, s, paymentStepUpdate) : s
+          i === stepIndex ? Object.assign({}, s, paymentStepUpdate) : s
       );
 
       return newState;

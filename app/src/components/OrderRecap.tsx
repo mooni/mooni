@@ -101,7 +101,7 @@ function AmountRow({ value, symbol, caption }) {
 }
 
 export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
-  const bankInfo = multiTrade.multiTradeRequest.bankInfo;
+  const bankInfo = multiTrade.bankInfo;
   if(!bankInfo) throw new Error('missing bank info in OrderRecap');
   const {recipient, reference} = bankInfo;
 
@@ -121,8 +121,8 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
 
   const inputAmount = multiTrade.inputAmount;
   const outputAmount = multiTrade.outputAmount;
-  const inputCurrency = multiTrade.multiTradeRequest.tradeRequest.inputCurrency;
-  const outputCurrency = multiTrade.multiTradeRequest.tradeRequest.outputCurrency;
+  const inputCurrencySymbol = multiTrade.tradeRequest.inputCurrencySymbol;
+  const outputCurrencySymbol = multiTrade.tradeRequest.outputCurrencySymbol;
 
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const orderExpireDate = new Date(bityTrade.bityOrderResponse.timestamp_price_guaranteed);
@@ -139,8 +139,8 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
         {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
       </Box>
 
-      <AmountRow value={inputAmount} symbol={inputCurrency.symbol} caption="You send" />
-      <AmountRow value={outputAmount} symbol={outputCurrency.symbol} caption="You receive" />
+      <AmountRow value={inputAmount} symbol={inputCurrencySymbol} caption="You send" />
+      <AmountRow value={outputAmount} symbol={outputCurrencySymbol} caption="You receive" />
 
       <Box display="flex" justifyContent="center">
         <RateAmount multiTrade={multiTrade}/>

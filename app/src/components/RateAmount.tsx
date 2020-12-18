@@ -9,6 +9,7 @@ import styled from 'styled-components';
 
 import bityLogo from "../assets/bity_logo_small.png";
 import paraswapLogo from "../assets/paraswap_logo_small.png";
+import { getCurrency } from '../lib/trading/currencyHelpers'
 
 function aggregateFees(multiTrade: MultiTrade): Fee | null {
   const fees = multiTrade.trades.map(t => t.fee).filter(f => !!f) as Fee[];
@@ -19,13 +20,13 @@ function aggregateFees(multiTrade: MultiTrade): Fee | null {
 
   const lastTrade = multiTrade.trades[multiTrade.trades.length-1];
 
-  const expectedFeeCurrency = lastTrade.tradeRequest.inputCurrency;
-  const desiredFeeCurrency = lastTrade.tradeRequest.outputCurrency;
+  const expectedFeeCurrency = getCurrency(lastTrade.tradeRequest.inputCurrencySymbol);
+  const desiredFeeCurrency = getCurrency(lastTrade.tradeRequest.outputCurrencySymbol);
 
   // TODO support multiple fee currencies
   // expect the fees to be ~ETH
   const sameCurrencies = new Set(
-    fees.map(f => f.currency.symbol).concat(expectedFeeCurrency.symbol)
+    fees.map(f => f.currencySymbol).concat(expectedFeeCurrency.symbol)
   ).size === 1;
 
   if(!sameCurrencies) {
@@ -42,7 +43,7 @@ function aggregateFees(multiTrade: MultiTrade): Fee | null {
 
   return {
     amount: feeAmountInOutput,
-    currency: desiredFeeCurrency,
+    currencySymbol: desiredFeeCurrency.symbol,
   };
 }
 
@@ -152,9 +153,9 @@ const TradeLine: React.FC<TradeLineProps> = ({trade, index}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrency.symbol}
+        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrencySymbol}
         <b>{' > '}</b>
-        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrency.symbol}
+        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencySymbol}
       </RouteAmount>
     </Box>
     <Box height={30} display="flex" alignItems="center">
@@ -166,13 +167,14 @@ const TradeLine: React.FC<TradeLineProps> = ({trade, index}) => (
 );
 
 export default function RateAmount({ multiTrade }: {multiTrade: MultiTrade}) {
-  const inputSymbol = multiTrade.multiTradeRequest.tradeRequest.inputCurrency.symbol;
-  const outputSymbol = multiTrade.multiTradeRequest.tradeRequest.outputCurrency.symbol;
+  const inputSymbol = multiTrade.tradeRequest.inputCurrencySymbol;
+  const outputSymbol = multiTrade.tradeRequest.outputCurrencySymbol;
 
   const fee = aggregateFees(multiTrade);
-  let feeAmount;
+  let feeAmount, feeCurrency;
   if(fee) {
-    if(fee.currency.type === CurrencyType.FIAT) {
+    feeCurrency = getCurrency(fee.currencySymbol);
+    if(feeCurrency.type === CurrencyType.FIAT) {
       feeAmount = truncateNumber(fee.amount, 2);
     } else {
       feeAmount = truncateNumber(fee.amount);
@@ -186,7 +188,7 @@ export default function RateAmount({ multiTrade }: {multiTrade: MultiTrade}) {
       <Box px={1}>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {fee &&
-        <BasicLine title="Fees" content={`${feeAmount} ${fee.currency.symbol}`}/>
+        <BasicLine title="Fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>

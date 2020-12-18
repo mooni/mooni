@@ -1,6 +1,5 @@
 import { Recipient } from "../types";
 import { BityOrderResponse } from "../wrappers/bityTypes";
-import { Currency } from "./currencyTypes";
 
 export enum TradeExact {
   INPUT = 'INPUT',
@@ -13,21 +12,24 @@ export enum TradeType {
 }
 
 export type TradePath = TradeType[];
+export type CurrencySymbol = string;
 
 export interface TradeRequest {
-  inputCurrency: Currency;
-  outputCurrency: Currency;
+  inputCurrencySymbol: CurrencySymbol;
+  outputCurrencySymbol: CurrencySymbol;
   amount: string;
   tradeExact: TradeExact;
 }
 export interface MultiTradeRequest {
   tradeRequest: TradeRequest,
-  ethInfo?: ETHInfo,
-  bankInfo?: BankInfo,
+  ethInfo: ETHInfo,
+  bankInfo: BankInfo,
 }
 
 export interface MultiTrade {
-  multiTradeRequest: MultiTradeRequest,
+  tradeRequest: TradeRequest,
+  ethInfo?: ETHInfo,
+  bankInfo?: BankInfo,
   trades: Trade[],
   path: TradePath;
   inputAmount: string,
@@ -60,5 +62,5 @@ export interface ETHInfo {
 
 export interface Fee {
   amount: string,
-  currency: Currency,
+  currencySymbol: CurrencySymbol,
 }

@@ -7,7 +7,6 @@ import { detectIframeWeb3Provider, web3Modal, getWalletProvider } from '../../li
 import { MetaError } from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import { store } from '../../lib/store';
-import config from '../../config';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -74,18 +73,14 @@ const onAccountChanged = () => (dispatch, getState) => {
   const ethManager = getETHManager(getState());
 
   dispatch(setETHManagerLoading(true));
-  if(config.useAPI) {
-    DIDManager.getJWS(ethManager.provider)
-      .then(token => {
-        dispatch(setAddress(ethManager.getAddress()));
-        dispatch(setJWS(token));
-        dispatch(setETHManagerLoading(false));
-      })
-      .catch(() => dispatch(logout()));
-  } else {
-    dispatch(setAddress(ethManager.getAddress()));
-    dispatch(setETHManagerLoading(false));
-  }
+
+  DIDManager.getJWS(ethManager.provider)
+    .then(token => {
+      dispatch(setAddress(ethManager.getAddress()));
+      dispatch(setJWS(token));
+      dispatch(setETHManagerLoading(false));
+    })
+    .catch(() => dispatch(logout()));
 };
 
 export const initETH = (ethereum) => async function (dispatch)  {
@@ -96,17 +91,15 @@ export const initETH = (ethereum) => async function (dispatch)  {
 
     const address = ethManager.getAddress();
     let token;
-    if(config.useAPI) {
-      try {
-        token = await DIDManager.getJWS(ethManager.provider);
-        dispatch(setJWS(token));
-      } catch(error) {
-        DIDManager.removeStore(address);
-        if(error.code === 4001) {
-          throw new Error('eth_signature_rejected');
-        } else {
-          throw error;
-        }
+    try {
+      token = await DIDManager.getJWS(ethManager.provider);
+      dispatch(setJWS(token));
+    } catch(error) {
+      DIDManager.removeStore(address);
+      if(error.code === 4001) {
+        throw new Error('eth_signature_rejected');
+      } else {
+        throw error;
       }
     }
 

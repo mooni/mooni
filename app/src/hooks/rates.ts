@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TradeExact } from '../lib/trading/types';
+import {TradeExact} from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
-import { getCurrency } from '../lib/trading/currencyHelpers';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import {MultiTrade, TradeRequest} from "../lib/trading/types";
-import {estimateMultiTrade} from "../lib/trading/trader";
+import Api from "../lib/trading/api";
 
 interface RateForm {
   loading: boolean,
@@ -29,8 +28,8 @@ interface RateForm {
 function defaultRateForm(initialRequest): RateForm {
   let values = initialRequest ?
     {
-      inputCurrency: initialRequest.inputCurrency.symbol,
-      outputCurrency: initialRequest.outputCurrency.symbol,
+      inputCurrency: initialRequest.inputCurrencySymbol,
+      outputCurrency: initialRequest.outputCurrencySymbol,
       inputAmount: initialRequest.tradeExact === TradeExact.INPUT ? initialRequest.amount : null,
       outputAmount: initialRequest.tradeExact === TradeExact.OUTPUT ? initialRequest.amount : null,
       tradeExact: initialRequest.tradeExact,
@@ -69,8 +68,8 @@ export function useRate(initialTradeRequest: TradeRequest) {
     if(!_rateForm.loading) return;
 
     const currentRequest: TradeRequest = {
-      inputCurrency: getCurrency(_rateForm.values.inputCurrency),
-      outputCurrency: getCurrency(_rateForm.values.outputCurrency),
+      inputCurrencySymbol: _rateForm.values.inputCurrency,
+      outputCurrencySymbol: _rateForm.values.outputCurrency,
       tradeExact: _rateForm.values.tradeExact as TradeExact,
       amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
@@ -116,9 +115,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
 
     let multiTrade: MultiTrade;
     try {
-      multiTrade = await estimateMultiTrade({
-        tradeRequest: currentRequest,
-      });
+      multiTrade = await Api.estimateMultiTrade(currentRequest);
     } catch(error) {
       if(error.message === 'bity_amount_too_low') {
         setRateForm(r => ({

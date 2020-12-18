@@ -7,8 +7,9 @@ import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import {CurrencyType, Token} from "../trading/currencyTypes";
+import {CurrencyType, TokenCurrency} from "../trading/currencyTypes";
 import {amountToDecimal, amountToInt, BN} from "../numbers";
+import {getCurrency} from "../trading/currencyHelpers";
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -22,33 +23,37 @@ function applySlippage(amount: string, maxSlippage: number): string {
 }
 
 const ParaswapWrapper = {
-  async getTokenList(): Promise<Token[]> {
+  async getTokenList(): Promise<TokenCurrency[]> {
     const { data } = await paraswapAxios({
       method: 'get',
       url: '/tokens',
     });
     return data.tokens.map(t =>
-      new Token(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
+      new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
   },
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
-    const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? tradeRequest.inputCurrency : tradeRequest.outputCurrency;
+
+    const inputCurrency = getCurrency(tradeRequest.inputCurrencySymbol);
+    const outputCurrency = getCurrency(tradeRequest.outputCurrencySymbol);
+    const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
+
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
 
     const { data: dexMetadata } = await paraswapAxios({
       method: 'get',
       url: '/prices',
       params: {
-        from: tradeRequest.inputCurrency.symbol,
-        to: tradeRequest.outputCurrency.symbol,
+        from: tradeRequest.inputCurrencySymbol,
+        to: tradeRequest.outputCurrencySymbol,
         amount: intAmount,
         side: swapSide
       },
     });
 
-    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, tradeRequest.inputCurrency.decimals);
-    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, tradeRequest.outputCurrency.decimals);
+    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, inputCurrency.decimals);
+    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, outputCurrency.decimals);
 
     return {
       tradeRequest,
@@ -77,19 +82,21 @@ const ParaswapWrapper = {
     return spender;
   },
   async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number): Promise<any> {
-    function getTokenAddress(currency) {
+    function getTokenAddress(symbol) {
+      const currency = getCurrency(symbol);
+
       if(currency.equals(ETHER)) {
         return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
       } else if(currency.type === CurrencyType.ERC20) {
-        return (currency as Token).address;
+        return (currency as TokenCurrency).address;
       } else {
         throw new Error('impossible token address');
       }
     }
     const { priceRoute } = dexTrade.dexMetadata;
 
-    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrency);
-    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrency);
+    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencySymbol);
+    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencySymbol);
     const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : maxSlippage);
     const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -maxSlippage);
     const receiver = undefined;

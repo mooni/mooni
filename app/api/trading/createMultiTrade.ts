@@ -2,7 +2,8 @@ import { NowRequest, NowResponse } from '@now/node'
 
 import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
-import {TradeRequest, BankInfo, ETHInfo} from "../../src/lib/trading/types";
+import {MultiTradeRequest} from "../../src/lib/trading/types";
+import { Trader } from "../../src/lib/trading/trader";
 import { Token } from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/auth";
 
@@ -14,30 +15,33 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
     return;
   }
 
-  const tradeRequest: TradeRequest = req.body.tradeRequest as TradeRequest;
-  const bankInfo: BankInfo = req.body.bankInfo as BankInfo;
-  const ethInfo: ETHInfo = req.body.ethInfo as ETHInfo;
+  const multiTradeRequest = req.body as MultiTradeRequest;
 
-  if(!tradeRequest || !bankInfo || !ethInfo) {
+  // TODO validate
+  if(!multiTradeRequest) {
     return res.status(400).send('wrong body');
   }
-  if(ethInfo.fromAddress.toLowerCase() !== token.claim.iss.toLowerCase()) {
+  if(multiTradeRequest.ethInfo.fromAddress.toLowerCase() !== token.claim.iss.toLowerCase()) {
     return res.status(400).send('different ethereum address used for order and authentication');
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
+  const trader = new Trader(bityInstance);
 
   try {
-    const bityTrade = await bityInstance.createOrder(tradeRequest, bankInfo, ethInfo);
-    return res.json(bityTrade)
+    await Trader.assertTokenReady(multiTradeRequest.tradeRequest);
+
+    const multiTrade = await trader.createMultiTrade(multiTradeRequest);
+    return res.json(multiTrade)
   } catch(error) {
-    if(error._orderError) {
+    if(error._orderError) { // TODO
       return res.status(400).json({
         message: error.message,
         _orderError: error._orderError,
         errors: error.errors
       });
     } else {
+      console.log(error);
       return res.status(500).send('Unexpected server error');
     }
   }
