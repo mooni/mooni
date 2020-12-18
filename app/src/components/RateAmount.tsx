@@ -116,12 +116,10 @@ const BasicLine: React.FC<BasicLineProps> = ({title, content}) => (
   </Box>
 );
 
-interface TradeLineProps {
-  trade: Trade;
-  index: number;
+interface ServiceLogoProps {
+  tradeType: TradeType;
 }
-
-function ServiceLogo({tradeType}) {
+const ServiceLogo: React.FC<ServiceLogoProps> = ({tradeType}) => {
   const d = {
     [TradeType.BITY]: {
       tooltip: "Bity - Swiss crypto-fiat exchange",
@@ -149,7 +147,10 @@ function ServiceLogo({tradeType}) {
   );
 }
 
-const TradeLine: React.FC<TradeLineProps> = ({trade, index}) => (
+interface TradeLineProps {
+  trade: Trade;
+}
+const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
@@ -166,7 +167,10 @@ const TradeLine: React.FC<TradeLineProps> = ({trade, index}) => (
   </TradeElement>
 );
 
-export default function RateAmount({ multiTrade }: {multiTrade: MultiTrade}) {
+interface RateAmountProps {
+  multiTrade: MultiTrade;
+}
+export const RateAmount: React.FC<RateAmountProps> = ({multiTrade}) => {
   const inputSymbol = multiTrade.tradeRequest.inputCurrencySymbol;
   const outputSymbol = multiTrade.tradeRequest.outputCurrencySymbol;
 
@@ -192,7 +196,7 @@ export default function RateAmount({ multiTrade }: {multiTrade: MultiTrade}) {
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>
-      {multiTrade.trades.map((trade, i) => <TradeLine trade={trade} index={i} />)}
+      {multiTrade.trades.map(trade => <TradeLine trade={trade} key={trade.tradeType} />)}
     </Container>
   );
 }

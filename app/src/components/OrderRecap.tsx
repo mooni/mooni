@@ -9,7 +9,7 @@ import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
 import {truncateNumber} from '../lib/numbers';
 
 import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
-import RateAmount from "./RateAmount";
+import { RateAmount } from "./RateAmount";
 
 const useStyles = makeStyles(theme => ({
   root: {

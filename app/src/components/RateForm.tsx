@@ -17,7 +17,7 @@ import {getCurrenciesSymbols} from '../lib/trading/currencyHelpers';
 import {useRate} from '../hooks/rates';
 import {getETHManager, getETHManagerLoading} from '../redux/eth/selectors';
 import {CurrencyType} from "../lib/trading/currencyTypes";
-import RateAmount from "./RateAmount";
+import { RateAmount } from "./RateAmount";
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
