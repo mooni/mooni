@@ -2,8 +2,10 @@ import { NowRequest, NowResponse } from '@now/node'
 
 import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
-import { Token } from "../../src/lib/didManager";
+import {Token} from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/auth";
+import {BityOrderStatus} from "../../src/lib/wrappers/bityTypes";
+import prisma from '../../src/lib/api/prisma'
 
 const bityInstance = new Bity();
 
@@ -20,6 +22,12 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
     const orderDetails = await bityInstance.getOrderDetails(orderId);
     if(orderDetails.input.crypto_address.toLowerCase() !== token.claim.iss.toLowerCase()) {
       return res.status(401).send('unauthorized');
+    }
+    if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
+      await prisma.mooniOrder.update({
+        where: { bityOrderId: orderDetails.id },
+        data: { status: 'EXECUTED' },
+      });
     }
     return res.json(orderDetails);
   } catch(error) {

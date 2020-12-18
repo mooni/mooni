@@ -52,7 +52,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
 
-  const { rateForm, tradeRequest, multiTrade, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
+  const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
 
   const valid = !(rateForm.loading || rateForm.errors);
   const errors = rateForm.errors;
@@ -92,7 +92,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
       <Box className={classes.additionalInfo}>
         {!rateForm.loading ?
           !errors ?
-            (multiTrade && <RateAmount multiTrade={multiTrade}/>)
+            (multiTradeEstimation && <RateAmount multiTradeEstimation={multiTradeEstimation}/>)
             :
             Object.entries(errors).map(([key, value]) =>
               <InvalidMessage key={key}>

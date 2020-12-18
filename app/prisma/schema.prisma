@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  EXECUTED
+}
+
+model MooniOrder {
+  id              String      @id @default(uuid())
+  createdAt       DateTime    @default(now())
+  executedAt      DateTime?
+  status          OrderStatus @default(PENDING)
+  ethAddress      String
+  inputAmount     String
+  inputCurrency   String
+  outputAmount    String
+  outputCurrency  String
+  ethAmount       String
+  bityOrderId     String?     @unique
+}

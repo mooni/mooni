@@ -1,11 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
-import {MultiTrade, MultiTradeRequest, TradeRequest} from "./types";
+import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./types";
 
 interface IAPI {
   getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
   createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade>;
-  estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade>;
+  estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
 }
 
 const API_URL = '/api';
@@ -33,7 +33,7 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) 
 }
 
 const API: IAPI = {
-  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade> {
+  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     try {
       const {data} = await mooniAPI({
         method: 'post',
@@ -77,7 +77,7 @@ const API: IAPI = {
     }
   },
 
-  getOrder: async function(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
+  async getOrder(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const {data} = await mooniAPI({
         method: 'post',

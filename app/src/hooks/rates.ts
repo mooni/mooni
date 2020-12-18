@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import {TradeExact} from '../lib/trading/types';
+import {MultiTradeEstimation, TradeExact} from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
 import { useDebounce } from './utils';
 import { useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
-import {MultiTrade, TradeRequest} from "../lib/trading/types";
+import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/trading/api";
 
 interface RateForm {
@@ -50,14 +50,23 @@ function defaultRateForm(initialRequest): RateForm {
   };
 }
 
-const HIGH_OUTPUT_AMOUNT = 5000;
+const HIGH_OUTPUT_AMOUNT: number = 5000;
 
 let nonce = 0;
 
-export function useRate(initialTradeRequest: TradeRequest) {
+interface RateResponse {
+  rateForm: RateForm,
+  tradeRequest: TradeRequest,
+  multiTradeEstimation: MultiTradeEstimation | null,
+  onChangeCurrency: any, // TODO
+  onChangeAmount: any,
+  HIGH_OUTPUT_AMOUNT: number,
+}
+
+export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
-  const [tradeRequest, setTradeRequest] = useState<TradeRequest|null>(null);
-  const [multiTrade, setMultiTrade] = useState<MultiTrade|null>(null);
+  const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
+  const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
   const { balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
@@ -82,8 +91,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
           zeroAmount: true,
         },
       }));
-      setTradeRequest(null);
-      setMultiTrade(null);
+      setMultiTradeEstimation(null);
       return;
     }
 
@@ -95,8 +103,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
           lowBalance: true,
         },
       }));
-      setTradeRequest(null);
-      setMultiTrade(null);
+      setMultiTradeEstimation(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
@@ -107,15 +114,14 @@ export function useRate(initialTradeRequest: TradeRequest) {
             highAmount: true,
           },
         }));
-        setTradeRequest(null);
-        setMultiTrade(null);
+        setMultiTradeEstimation(null);
         return;
       }
     }
 
-    let multiTrade: MultiTrade;
+    let multiTradeEstimation: MultiTradeEstimation;
     try {
-      multiTrade = await Api.estimateMultiTrade(currentRequest);
+      multiTradeEstimation = await Api.estimateMultiTrade(currentRequest);
     } catch(error) {
       if(error.message === 'bity_amount_too_low') {
         setRateForm(r => ({
@@ -125,8 +131,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
             lowAmount: error.errors[0].minimumOutputAmount,
           },
         }));
-        setTradeRequest(null);
-        setMultiTrade(null);
+        setMultiTradeEstimation(null);
         return;
       } else {
         throw error;
@@ -143,14 +148,14 @@ export function useRate(initialTradeRequest: TradeRequest) {
       values: {},
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
-      updateRateForm.values.outputAmount = new BN(multiTrade.outputAmount).toFixed();
-      if(new BN(multiTrade.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+      updateRateForm.values.outputAmount = new BN(multiTradeEstimation.outputAmount).toFixed();
+      if(new BN(multiTradeEstimation.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
         updateRateForm.errors = { highAmount: true };
       }
     }
     else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      updateRateForm.values.inputAmount = new BN(multiTrade.inputAmount).toFixed();
-      if(_balance !== null && new BN(multiTrade.inputAmount).gt(_balance)) {
+      updateRateForm.values.inputAmount = new BN(multiTradeEstimation.inputAmount).toFixed();
+      if(_balance !== null && new BN(multiTradeEstimation.inputAmount).gt(_balance)) {
         updateRateForm.errors = { lowBalance: true };
       }
     }
@@ -166,10 +171,9 @@ export function useRate(initialTradeRequest: TradeRequest) {
 
     if(!updateRateForm.errors) {
       setTradeRequest(currentRequest);
-      setMultiTrade(multiTrade);
+      setMultiTradeEstimation(multiTradeEstimation);
     } else {
-      setTradeRequest(null);
-      setMultiTrade(null);
+      setMultiTradeEstimation(null);
     }
 
   }, []);
@@ -219,7 +223,7 @@ export function useRate(initialTradeRequest: TradeRequest) {
   return {
     rateForm,
     tradeRequest,
-    multiTrade,
+    multiTradeEstimation,
     onChangeCurrency,
     onChangeAmount,
     HIGH_OUTPUT_AMOUNT,

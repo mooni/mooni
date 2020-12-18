@@ -119,6 +119,7 @@ const initialMockStateComplete: PaymentState = {
       amount: '10',
       tradeExact: TradeExact.OUTPUT
     },
+    ethAmount: '10',
     bankInfo: {
       recipient: {
         owner: {
