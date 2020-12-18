@@ -29,7 +29,7 @@ function deserializeClaim(serializedClaim: string): Claim {
 }
 
 const DIDManager = {
-  async getJWS(provider: providers.Web3Provider) {
+  async getJWS(provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const address = (await signer.getAddress()).toLowerCase();
     const existingJWS = store.get(`jws:${address}`);
