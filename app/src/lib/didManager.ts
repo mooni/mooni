@@ -77,7 +77,7 @@ const DIDManager = {
       [signature, serializedClaim] = JSON.parse(Base64.decode(serializedToken));
       claim = deserializeClaim(serializedClaim);
     } catch (error) {
-      throw new Error('invalid token');
+      throw new Error('error while deserializing token');
     }
     let signerAddress;
     try {

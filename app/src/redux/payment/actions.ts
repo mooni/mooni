@@ -207,9 +207,13 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
   }
 }
 
-function watchBityOrder(jwsToken, dispatch, orderId) {
-  const POLL_INTERVAL = 5000;
-  let intervalId;
+type Timeout = ReturnType<typeof setTimeout>;
+const watching: Map<string, Timeout> = new Map();
+const POLL_INTERVAL = 5000;
+
+export const watchBityOrder = (orderId) => (dispatch, getState) => {
+  if(watching.get(orderId)) return;
+  const jwsToken = getJWS(getState());
 
   dispatch(updatePaymentStep({
     id: PaymentStepId.BITY,
@@ -219,6 +223,8 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
   function fetchNewData() {
     Api.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
+        if(!watching.has(orderId)) return;
+        const timer = watching.get(orderId) as Timeout;
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
 
@@ -231,7 +237,8 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
@@ -243,7 +250,8 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
@@ -259,7 +267,7 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
       .catch(error => logError('Error while fetching order state', error));
   }
   fetchNewData();
-  intervalId = setInterval(fetchNewData, POLL_INTERVAL);
+  watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {
@@ -317,9 +325,6 @@ export const sendPayment = () => async function (dispatch, getState)  {
     });
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
-
-    const jwsToken = getJWS(state);
-    watchBityOrder(jwsToken, dispatch, bityOrderId);
 
   } catch(error) {
 

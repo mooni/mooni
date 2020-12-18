@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { Box, List, ListItem } from '@material-ui/core';
 import {
@@ -24,6 +25,7 @@ import { SimpleLink } from './StyledComponents';
 import { getEtherscanTxURL } from '../lib/eth';
 import Bity from '../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../lib/types';
+import { watchBityOrder } from '../redux/payment/actions';
 
 const Title = styled.p`
   ${textStyle('title3')};
@@ -182,6 +184,7 @@ function ExternalButton({ url, label }) {
 }
 
 function StatusRow({ id, status, txHash, bityOrderId }) {
+  const dispatch = useDispatch();
   const theme = useTheme();
 
   let color;
@@ -204,6 +207,12 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
 
   let backgroundColor = theme.surface;
   if(status === PaymentStepStatus.DONE) backgroundColor = '#f1fbf8';
+
+  useEffect(() => {
+    if(bityOrderId) {
+      dispatch(watchBityOrder(bityOrderId));
+    }
+  }, [dispatch, bityOrderId]);
 
   return (
     <StatusListItem disableGutters style={{ borderLeftColor, backgroundColor }}>

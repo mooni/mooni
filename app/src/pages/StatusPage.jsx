@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import RequireConnection from '../components/RequireConnection';
 import PaymentStatus from '../components/PaymentStatus';
 import { SmallWidth } from '../components/StyledComponents';
 
@@ -26,8 +27,10 @@ export default function OrderStatusContainer() {
   }
 
   return (
-    <SmallWidth>
-      <PaymentStatus payment={payment} onRestart={onRestart}/>
-    </SmallWidth>
+    <RequireConnection>
+      <SmallWidth>
+        <PaymentStatus payment={payment} onRestart={onRestart}/>
+      </SmallWidth>
+    </RequireConnection>
   );
 }
