@@ -16,10 +16,10 @@
   ],
   "functions": {
     "api/bity/*.ts": {
-      "maxDuration": 15
+      "maxDuration": 10
     },
     "api/trading/*.ts": {
-      "maxDuration": 15
+      "maxDuration": 10
     }
   }
 }
