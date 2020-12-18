@@ -13,15 +13,27 @@ enum OrderStatus {
 }
 
 model MooniOrder {
-  id              String      @id @default(uuid())
-  createdAt       DateTime    @default(now())
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
   executedAt      DateTime?
-  status          OrderStatus @default(PENDING)
+  status          OrderStatus   @default(PENDING)
   ethAddress      String
   inputAmount     String
   inputCurrency   String
   outputAmount    String
   outputCurrency  String
   ethAmount       String
-  bityOrderId     String?     @unique
+  bityOrderId     String?       @unique
+  referalId       String?
+  user            User          @relation(name: "UserOrders", fields: [ethAddress], references: [ethAddress])
+  referalUser     User?          @relation(name: "ReferedOrders", fields: [referalId], references: [referalId])
+}
+
+model User {
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
+  ethAddress      String        @unique
+  referalId       String        @unique @default(cuid())
+  orders          MooniOrder[]  @relation("UserOrders")
+  referals        MooniOrder[]  @relation("ReferedOrders")
 }
