@@ -217,7 +217,7 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
   }));
 
   function fetchNewData() {
-    Api.getOrder(orderId, jwsToken)
+    Api.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {

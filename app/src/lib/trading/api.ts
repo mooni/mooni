@@ -3,9 +3,10 @@ import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./types";
 
 interface IAPI {
-  getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
+  getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
   createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade>;
   estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
+  getOrders(jwsToken: string): Promise<any>;
 }
 
 const API_URL = '/api';
@@ -77,7 +78,7 @@ const API: IAPI = {
     }
   },
 
-  async getOrder(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
+  async getBityOrder(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const {data} = await mooniAPI({
         method: 'post',
@@ -98,6 +99,22 @@ const API: IAPI = {
       } else {
         throw new Error('unexpected-server-error');
       }
+    }
+  },
+  async getOrders(jwsToken: string) {
+    try {
+      const {data} = await mooniAPI({
+        method: 'get',
+        url: 'orders',
+        headers: {
+          'Authorization': `Bearer ${jwsToken}`,
+        },
+      });
+
+      return data;
+    }
+    catch (error) {
+      throw new Error('unexpected-server-error');
     }
   }
 };
