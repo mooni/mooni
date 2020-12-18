@@ -63,6 +63,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "prepare": "copy-aragon-ui-assets ./public",
+    "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev --preview-feature",
     "prisma:migrate:deploy": "prisma migrate deploy --preview-feature",
     "prisma:generate": "prisma generate"
