@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
-import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./types";
+import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
+import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
 
 interface IAPI {
   getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
