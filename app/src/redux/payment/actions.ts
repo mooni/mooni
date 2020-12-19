@@ -165,9 +165,12 @@ export const createOrder = () => async function (dispatch, getState)  {
     if(error._orderError) {
       logError('Bity order creation error', error);
       dispatch(setOrderErrors(error.errors));
+    } else if(error.message === 'timeout') {
+      logError('Bity timeout', error);
+      dispatch(setOrderErrors([{code: 'timeout', message: 'The request could not be executed within the allotted time. Please retry later.'}]));
     } else {
       logError('Bity order creation unknown error', error);
-      dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
+      dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
   }
 };

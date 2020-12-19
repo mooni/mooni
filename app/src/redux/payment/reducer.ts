@@ -108,7 +108,7 @@ const initialMockStateComplete: PaymentState = {
     tradeRequest: {
       inputCurrencySymbol: 'ETH',
       outputCurrencySymbol: 'EUR',
-      amount: '10',
+      amount: '20',
       tradeExact: TradeExact.OUTPUT
     },
   },
@@ -116,7 +116,7 @@ const initialMockStateComplete: PaymentState = {
     tradeRequest: {
       inputCurrencySymbol: 'ETH',
       outputCurrencySymbol: 'EUR',
-      amount: '10',
+      amount: '20',
       tradeExact: TradeExact.OUTPUT
     },
     ethAmount: '10',

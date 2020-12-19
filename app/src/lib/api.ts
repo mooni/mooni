@@ -70,6 +70,9 @@ const API: IAPI = {
       return data;
     }
     catch (error) {
+      if(error.message === 'timeout') {
+        throw error;
+      }
       const status = error.response?.status;
       const data = error.response?.data;
       if(status === 400 && data?._bityError) {
