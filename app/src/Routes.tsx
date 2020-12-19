@@ -14,7 +14,7 @@ import StatusPage from './pages/StatusPage';
 
 import { usePageViews } from './lib/analytics';
 
-export default function Routes() {
+export const Routes: React.FC = () => {
   usePageViews();
 
   return (
