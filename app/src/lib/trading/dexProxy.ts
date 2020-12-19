@@ -1,6 +1,6 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
-import { TokenCurrency} from './currencyTypes';
+import { TokenCurrency } from './currencyTypes';
 import {amountToInt, BN} from '../numbers';
 import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';

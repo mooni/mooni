@@ -1,17 +1,20 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import {BityOrderError, BityOrderResponse} from '../wrappers/bityTypes';
-import {MultiTrade, MultiTradeRequest, TradeRequest} from "./types";
+import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
+import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
+import {MooniOrder, User} from "../types/api";
 
 interface IAPI {
-  getOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
+  getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
   createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade>;
-  estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade>;
+  estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
+  getOrders(jwsToken: string): Promise<MooniOrder[]>;
+  getUser(jwsToken: string): Promise<User>;
 }
 
 const API_URL = '/api';
 const mooniAPI = axios.create({
   baseURL: API_URL,
-  timeout: 10 * 1000,
+  timeout: 9.9 * 1000,
 });
 const RETRY_ATTEMPTS = 3;
 
@@ -20,8 +23,7 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) 
     throw new Error('timeout');
 
   try {
-    const res = await mooniAPI(config);
-    return res;
+    return await mooniAPI(config);
   }
   catch (error) {
     if(error.code === 'ECONNABORTED') {
@@ -33,7 +35,7 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) 
 }
 
 const API: IAPI = {
-  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade> {
+  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     try {
       const {data} = await mooniAPI({
         method: 'post',
@@ -67,6 +69,9 @@ const API: IAPI = {
       return data;
     }
     catch (error) {
+      if(error.message === 'timeout') {
+        throw error;
+      }
       const status = error.response?.status;
       const data = error.response?.data;
       if(status === 400 && data?._bityError) {
@@ -77,7 +82,7 @@ const API: IAPI = {
     }
   },
 
-  getOrder: async function(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
+  async getBityOrder(bityOrderId: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const {data} = await mooniAPI({
         method: 'post',
@@ -86,7 +91,7 @@ const API: IAPI = {
           'Authorization': `Bearer ${jwsToken}`,
         },
         data: {
-          orderId,
+          bityOrderId,
         },
       });
 
@@ -99,6 +104,33 @@ const API: IAPI = {
         throw new Error('unexpected-server-error');
       }
     }
+  },
+  async getOrders(jwsToken: string): Promise<MooniOrder[]> {
+    try {
+      const {data} = await mooniAPI({
+        method: 'get',
+        url: 'orders',
+        headers: {
+          'Authorization': `Bearer ${jwsToken}`,
+        },
+      });
+
+      return data;
+    }
+    catch (error) {
+      throw new Error('unexpected-server-error');
+    }
+  },
+  async getUser(jwsToken: string): Promise<User> {
+    const {data} = await mooniAPI({
+      method: 'get',
+      url: 'user',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
+
+    return data;
   }
 };
 

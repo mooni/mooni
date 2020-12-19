@@ -21,6 +21,7 @@
     "@material-ui/icons": "^4.9.1",
     "@now/node": "^1.6.1",
     "@portis/web3": "2.0.0-beta.59",
+    "@prisma/client": "^2.13.1",
     "@reduxjs/toolkit": "^1.4.0",
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.0",
@@ -61,7 +62,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "prepare": "copy-aragon-ui-assets ./public"
+    "prepare": "copy-aragon-ui-assets ./public",
+    "postinstall": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --preview-feature",
+    "prisma:migrate:deploy": "prisma migrate deploy --preview-feature",
+    "prisma:generate": "prisma generate"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -77,5 +82,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@prisma/cli": "^2.13.1"
   }
 }

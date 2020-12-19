@@ -7,6 +7,7 @@ import { detectIframeWeb3Provider, web3Modal, getWalletProvider } from '../../li
 import { MetaError } from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import { store } from '../../lib/store';
+import Api from '../../lib/api';
 
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
 export const SET_ETH_MANAGER_LOADING = 'SET_ETH_MANAGER_LOADING';
@@ -75,7 +76,8 @@ const onAccountChanged = () => (dispatch, getState) => {
   dispatch(setETHManagerLoading(true));
 
   DIDManager.getJWS(ethManager.provider)
-    .then(token => {
+    .then(async token => {
+      await Api.getUser(token);
       dispatch(setAddress(ethManager.getAddress()));
       dispatch(setJWS(token));
       dispatch(setETHManagerLoading(false));
@@ -93,6 +95,7 @@ export const initETH = (ethereum) => async function (dispatch)  {
     let token;
     try {
       token = await DIDManager.getJWS(ethManager.provider);
+      await Api.getUser(token);
       dispatch(setJWS(token));
     } catch(error) {
       DIDManager.removeStore(address);

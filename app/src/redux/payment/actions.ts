@@ -10,7 +10,7 @@ import {
   BityOrderStatus,
 } from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
-import Api from '../../lib/trading/api';
+import Api from '../../lib/api';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
@@ -165,9 +165,12 @@ export const createOrder = () => async function (dispatch, getState)  {
     if(error._orderError) {
       logError('Bity order creation error', error);
       dispatch(setOrderErrors(error.errors));
+    } else if(error.message === 'timeout') {
+      logError('Bity timeout', error);
+      dispatch(setOrderErrors([{code: 'timeout', message: 'The request could not be executed within the allotted time. Please retry later.'}]));
     } else {
       logError('Bity order creation unknown error', error);
-      dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
+      dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
   }
 };
@@ -207,9 +210,13 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
   }
 }
 
-function watchBityOrder(jwsToken, dispatch, orderId) {
-  const POLL_INTERVAL = 5000;
-  let intervalId;
+type Timeout = ReturnType<typeof setTimeout>;
+const watching: Map<string, Timeout> = new Map();
+const POLL_INTERVAL = 5000;
+
+export const watchBityOrder = (orderId) => (dispatch, getState) => {
+  if(watching.get(orderId)) return;
+  const jwsToken = getJWS(getState());
 
   dispatch(updatePaymentStep({
     id: PaymentStepId.BITY,
@@ -217,8 +224,10 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
   }));
 
   function fetchNewData() {
-    Api.getOrder(orderId, jwsToken)
+    Api.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
+        if(!watching.has(orderId)) return;
+        const timer = watching.get(orderId) as Timeout;
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
 
@@ -231,7 +240,8 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
@@ -243,7 +253,8 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
@@ -259,7 +270,7 @@ function watchBityOrder(jwsToken, dispatch, orderId) {
       .catch(error => logError('Error while fetching order state', error));
   }
   fetchNewData();
-  intervalId = setInterval(fetchNewData, POLL_INTERVAL);
+  watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {
@@ -317,9 +328,6 @@ export const sendPayment = () => async function (dispatch, getState)  {
     });
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
-
-    const jwsToken = getJWS(state);
-    watchBityOrder(jwsToken, dispatch, bityOrderId);
 
   } catch(error) {
 

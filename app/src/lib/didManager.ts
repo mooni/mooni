@@ -29,7 +29,7 @@ function deserializeClaim(serializedClaim: string): Claim {
 }
 
 const DIDManager = {
-  async getJWS(provider: providers.Web3Provider) {
+  async getJWS(provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const address = (await signer.getAddress()).toLowerCase();
     const existingJWS = store.get(`jws:${address}`);
@@ -77,7 +77,7 @@ const DIDManager = {
       [signature, serializedClaim] = JSON.parse(Base64.decode(serializedToken));
       claim = deserializeClaim(serializedClaim);
     } catch (error) {
-      throw new Error('invalid token');
+      throw new Error('error while deserializing token');
     }
     let signerAddress;
     try {

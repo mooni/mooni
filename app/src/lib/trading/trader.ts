@@ -1,4 +1,4 @@
-import {MultiTrade, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
+import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
 import {CurrencyType} from './currencyTypes';
 import {ETHER} from './currencyList';
 import { TradeExact } from './types';
@@ -80,13 +80,16 @@ export class Trader {
     }
   }
 
-  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTrade> {
+  async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     const path = Trader.findPath(tradeRequest);
 
     const trades: Trade[] = [];
+    let ethAmount: string;
 
     if(path.length === 1 && path[0] === TradeType.BITY) {
+
       const bityTrade = await this.estimateTrade(tradeRequest);
+      ethAmount = bityTrade.inputAmount;
       trades.push(bityTrade);
 
     } else if(path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
@@ -104,6 +107,7 @@ export class Trader {
           amount: dexTrade.outputAmount,
           tradeExact: TradeExact.INPUT,
         });
+        ethAmount = bityTrade.inputAmount;
 
         trades.push(dexTrade);
         trades.push(bityTrade);
@@ -115,6 +119,7 @@ export class Trader {
           amount: tradeRequest.amount,
           tradeExact: TradeExact.OUTPUT,
         });
+        ethAmount = bityTrade.inputAmount;
 
         const dexTrade = await this.estimateTrade({
           inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
@@ -140,6 +145,7 @@ export class Trader {
       path,
       inputAmount: trades[0].inputAmount,
       outputAmount: trades[trades.length - 1].outputAmount,
+      ethAmount,
     };
   }
 
@@ -150,6 +156,7 @@ export class Trader {
     if (!multiTradeRequest.ethInfo) {
       throw new Error('Bity requires eth info')
     }
+    let ethAmount: string;
 
     const {tradeRequest, ethInfo, bankInfo} = multiTradeRequest;
     const path = Trader.findPath(multiTradeRequest.tradeRequest);
@@ -159,6 +166,7 @@ export class Trader {
     if (path.length === 1 && path[0] === TradeType.BITY) {
 
       const bityTrade = await this.createTrade(tradeRequest, multiTradeRequest);
+      ethAmount = bityTrade.inputAmount;
 
       trades.push(bityTrade);
 
@@ -166,7 +174,7 @@ export class Trader {
     else if (path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
 
       if (tradeRequest.tradeExact === TradeExact.INPUT) {
-        const {outputAmount: ethAmount} = await this.createTrade({
+        const {outputAmount: intermediateEthAmount} = await this.createTrade({
           inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
           outputCurrencySymbol: ETHER.symbol,
           amount: tradeRequest.amount,
@@ -176,16 +184,17 @@ export class Trader {
         const dexTrade = await this.createTrade({
           inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
           outputCurrencySymbol: ETHER.symbol,
-          amount: ethAmount,
+          amount: intermediateEthAmount,
           tradeExact: TradeExact.OUTPUT,
         }, multiTradeRequest);
 
         const bityTrade = await this.createTrade({
           inputCurrencySymbol: ETHER.symbol,
           outputCurrencySymbol: tradeRequest.outputCurrencySymbol,
-          amount: ethAmount,
+          amount: intermediateEthAmount,
           tradeExact: TradeExact.INPUT,
         }, multiTradeRequest);
+        ethAmount = bityTrade.inputAmount;
 
         trades.push(dexTrade);
         trades.push(bityTrade);
@@ -198,6 +207,7 @@ export class Trader {
           amount: tradeRequest.amount,
           tradeExact: TradeExact.OUTPUT,
         }, multiTradeRequest);
+        ethAmount = bityTrade.inputAmount;
 
         const dexTrade = await this.createTrade({
           inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
@@ -225,6 +235,7 @@ export class Trader {
       inputAmount: trades[0].inputAmount,
       outputAmount: trades[trades.length - 1].outputAmount,
       path: path,
+      ethAmount,
     };
   }
 

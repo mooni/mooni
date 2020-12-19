@@ -1,0 +1,18 @@
+---
+version: '3.6'
+
+services:
+
+  database:
+    image: postgres:12
+    volumes:
+      - database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+volumes:
+  database:

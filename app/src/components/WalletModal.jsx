@@ -2,7 +2,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { Box, Dialog } from '@material-ui/core';
-import { textStyle, Button } from '@aragon/ui'
+import { textStyle, LoadingRing } from '@aragon/ui'
+import { Button } from '@material-ui/core';
 
 import { logout } from '../redux/eth/actions';
 import { getETHManagerLoading } from '../redux/eth/selectors';
@@ -31,7 +32,10 @@ export default function WalletModal() {
             width={1}
             textAlign="center"
           >
-            <Title>Connect Wallet</Title>
+            <Title>Connecting Wallet...</Title>
+          </Box>
+          <Box mt={2}>
+            <LoadingRing mode="half-circle" />
           </Box>
           <Box
             width={1}
@@ -43,7 +47,14 @@ export default function WalletModal() {
               Don't forget to sign the message to be able to access the app.
             </Content>
           </Box>
-          <Button mode="negative" size="small" onClick={() => dispatch(logout())}>Cancel</Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => dispatch(logout())}
+          >
+            Cancel
+          </Button>
         </Box>
       </Box>
     </Dialog>

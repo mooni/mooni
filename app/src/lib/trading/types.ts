@@ -26,10 +26,20 @@ export interface MultiTradeRequest {
   bankInfo: BankInfo,
 }
 
-export interface MultiTrade {
+export interface MultiTradeEstimation {
   tradeRequest: TradeRequest,
-  ethInfo?: ETHInfo,
-  bankInfo?: BankInfo,
+  trades: Trade[],
+  path: TradePath;
+  inputAmount: string,
+  outputAmount: string,
+  ethAmount: string,
+}
+
+
+export interface MultiTrade extends MultiTradeEstimation{
+  tradeRequest: TradeRequest,
+  ethInfo: ETHInfo,
+  bankInfo: BankInfo,
   trades: Trade[],
   path: TradePath;
   inputAmount: string,
