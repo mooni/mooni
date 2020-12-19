@@ -1,12 +1,14 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
+import {User} from "../types/api";
 
 interface IAPI {
   getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
   createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade>;
   estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
   getOrders(jwsToken: string): Promise<any>;
+  getUser(jwsToken: string): Promise<User>;
 }
 
 const API_URL = '/api';
@@ -116,6 +118,17 @@ const API: IAPI = {
     catch (error) {
       throw new Error('unexpected-server-error');
     }
+  },
+  async getUser(jwsToken: string) {
+    const {data} = await mooniAPI({
+      method: 'get',
+      url: 'user',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
+
+    return data;
   }
 };
 
