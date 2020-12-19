@@ -14,7 +14,7 @@ export interface User {
   id: UUID;
   createdAt: Date;
   ethAddress: EthereumAddress;
-  referalId: CUID;
+  referralId: CUID;
 }
 
 export interface MooniOrder {
@@ -29,5 +29,5 @@ export interface MooniOrder {
   outputCurrency: CurrencySymbol;
   ethAmount: CurrencyAmount;
   bityOrderId?: UUID;
-  referalId?: CUID;
+  referralId?: CUID;
 }

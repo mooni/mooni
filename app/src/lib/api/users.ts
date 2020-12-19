@@ -19,14 +19,14 @@ export async function getUser(ethAddress: string): Promise<User> {
   return user;
 }
 
-export async function getUserByReferal(referalId: string): Promise<User | null> {
+export async function getUserByReferral(referralId: string): Promise<User | null> {
   const userData = {
-    referalId,
+    referralId,
   };
 
-  let referedUser = await prisma.user.findUnique({
+  let referredUser = await prisma.user.findUnique({
     where: userData,
   });
 
-  return referedUser;
+  return referredUser;
 }

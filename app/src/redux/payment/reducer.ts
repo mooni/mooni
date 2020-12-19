@@ -256,13 +256,13 @@ export default function(state : PaymentState = initialState, action: { type: str
         },
       };
     }
-    case actions.SET_REFERAL: {
-      const { referalId }: { referalId: string } = action.payload;
+    case actions.SET_REFERRAL: {
+      const { referralId }: { referralId: string } = action.payload;
       return {
         ...state,
         multiTradeRequest: {
           ...(state.multiTradeRequest as MultiTradeRequest),
-          referalId,
+          referralId,
         },
       };
     }

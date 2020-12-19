@@ -8,7 +8,7 @@ import {Token} from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/authMiddleware";
 import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import prisma from '../../src/lib/api/prisma'
-import {getUser, getUserByReferal} from "../../src/lib/api/users";
+import {getUser, getUserByReferral} from "../../src/lib/api/users";
 import {APIError} from "../../src/lib/errors";
 
 const bityInstance = new Bity();
@@ -32,11 +32,11 @@ async function createMooniOrder(multiTrade: MultiTrade) {
         create: { ethAddress },
       },
     },
-    referalUser: (
-      multiTrade.referalId ?
+    referralUser: (
+      multiTrade.referralId ?
         {
           connect: {
-            referalId: multiTrade.referalId,
+            referralId: multiTrade.referralId,
           },
         }
         :
@@ -61,14 +61,14 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
     throw new APIError(400, 'different-addresses', 'different ethereum address used for order and authentication');
   }
 
-  if(multiTradeRequest.referalId) {
+  if(multiTradeRequest.referralId) {
     const user = await getUser(token.claim.iss);
-    if(multiTradeRequest.referalId === user.referalId) {
-      throw new APIError(400, 'self-referal', 'you cannot create an order by referring yourself');
+    if(multiTradeRequest.referralId === user.referralId) {
+      throw new APIError(400, 'self-referral', 'you cannot create an order by referring yourself');
     }
-    const referedUser = await getUserByReferal(multiTradeRequest.referalId);
-    if(!referedUser) {
-      throw new APIError(400, 'unknown-referal', 'The provided referalId is not found');
+    const referredUser = await getUserByReferral(multiTradeRequest.referralId);
+    if(!referredUser) {
+      throw new APIError(400, 'unknown-referral', 'The provided referralId is not found');
     }
   }
 

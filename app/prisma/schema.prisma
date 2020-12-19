@@ -24,16 +24,16 @@ model MooniOrder {
   outputCurrency  String
   ethAmount       String
   bityOrderId     String?       @unique
-  referalId       String?
+  referralId      String?
   user            User          @relation(name: "UserOrders", fields: [ethAddress], references: [ethAddress])
-  referalUser     User?         @relation(name: "ReferedOrders", fields: [referalId], references: [referalId])
+  referralUser     User?         @relation(name: "ReferredOrders", fields: [referralId], references: [referralId])
 }
 
 model User {
   id              String        @id @default(uuid())
   createdAt       DateTime      @default(now())
   ethAddress      String        @unique
-  referalId       String        @unique @default(cuid())
+  referralId      String        @unique @default(cuid())
   orders          MooniOrder[]  @relation("UserOrders")
-  referals        MooniOrder[]  @relation("ReferedOrders")
+  referrals        MooniOrder[]  @relation("ReferredOrders")
 }

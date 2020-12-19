@@ -158,7 +158,7 @@ export class Trader {
     }
     let ethAmount: string;
 
-    const {tradeRequest, ethInfo, bankInfo, referalId} = multiTradeRequest;
+    const {tradeRequest, ethInfo, bankInfo, referralId} = multiTradeRequest;
     const path = Trader.findPath(multiTradeRequest.tradeRequest);
 
     const trades: Trade[] = [];
@@ -236,7 +236,7 @@ export class Trader {
       outputAmount: trades[trades.length - 1].outputAmount,
       path: path,
       ethAmount,
-      referalId,
+      referralId,
     };
   }
 
