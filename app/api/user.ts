@@ -1,5 +1,5 @@
 import { NowRequest, NowResponse } from '@now/node'
-import {authMiddleware} from "../src/lib/api/auth";
+import {authMiddleware} from "../src/lib/api/authMiddleware";
 import {Token} from "../src/lib/didManager";
 import {getUser} from "../src/lib/api/users";
 

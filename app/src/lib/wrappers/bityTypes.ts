@@ -1,3 +1,4 @@
+import {MetaError} from "../errors";
 
 export enum BityOrderStatus {
   WAITING = 'WAITING',
@@ -45,12 +46,18 @@ export type BityOrderResponse = {
 
 export type BityOrderErrors = any[];
 
-export class BityOrderError extends Error {
-  errors: BityOrderErrors;
-  _bityError: boolean;
+export class BityOrderError extends MetaError {
+  readonly _bityError: boolean = true;
+  code: number = 400;
+
   constructor(message: string, errors: BityOrderErrors = []) {
-    super(message);
-    this._bityError = true;
-    this.errors = errors;
+    super(message, { errors });
+  }
+
+  toObject() {
+    return Object.assign({}, super.toObject(), {
+      _bityError: true,
+      code: this.code,
+    });
   }
 }

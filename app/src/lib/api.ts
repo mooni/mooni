@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
 import {MooniOrder, User} from "../types/api";
+import {APIError} from "./errors";
 
 interface IAPI {
   getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
@@ -18,15 +19,34 @@ const mooniAPI = axios.create({
 });
 const RETRY_ATTEMPTS = 3;
 
-async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) {
-  if(attempt >= RETRY_ATTEMPTS)
-    throw new Error('timeout');
-
+async function mooniAPICatcher(config: AxiosRequestConfig) {
   try {
     return await mooniAPI(config);
   }
   catch (error) {
     if(error.code === 'ECONNABORTED') {
+      throw new APIError(502, 'timeout');
+    }
+    if(error.response?.status === 404) {
+      throw new APIError(404, 'not-found');
+    }
+    const data = error.response?.data;
+    if(data?._bityError) {
+      throw new BityOrderError(data.message, data.meta.errors);
+    } else if(data?._apiError) {
+      throw new APIError(data.code, data.message, data.description, data.meta);
+    } else {
+      throw new APIError(500, 'unexpected-server-error', '', error);
+    }
+  }
+}
+
+async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 1) {
+  try {
+    return await mooniAPICatcher(config);
+  }
+  catch (error) {
+    if(error.message === 'timeout' && attempt < RETRY_ATTEMPTS) {
       console.log('timeout retry', config)
       return await mooniAPIRetryer(config, attempt+1);
     }
@@ -36,93 +56,54 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) 
 
 const API: IAPI = {
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
-    try {
-      const {data} = await mooniAPI({
-        method: 'post',
-        url: 'trading/estimateMultiTrade',
-        data: tradeRequest,
-      });
+    const {data} = await mooniAPICatcher({
+      method: 'post',
+      url: 'trading/estimateMultiTrade',
+      data: tradeRequest,
+    });
 
-      return data;
-    }
-    catch (error) {
-      const status = error.response?.status;
-      const data = error.response?.data;
-      if(status === 400 && data?._bityError) {
-        throw new BityOrderError(data.message, data.errors);
-      } else { // TODO
-        throw new Error('unexpected-server-error');
-      }
-    }
+    return data;
   },
   async createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade> {
-    try {
-      const {data} = await mooniAPIRetryer({
-        method: 'post',
-        url: 'trading/createMultiTrade',
-        headers: {
-          'Authorization': `Bearer ${jwsToken}`,
-        },
-        data: multiTradeRequest,
-      });
+    const {data} = await mooniAPIRetryer({
+      method: 'post',
+      url: 'trading/createMultiTrade',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+      data: multiTradeRequest,
+    });
 
-      return data;
-    }
-    catch (error) {
-      if(error.message === 'timeout') {
-        throw error;
-      }
-      const status = error.response?.status;
-      const data = error.response?.data;
-      if(status === 400 && data?._bityError) {
-        throw new BityOrderError(data.message, data.errors);
-      } else { // TODO
-        throw new Error('unexpected-server-error');
-      }
-    }
+    return data;
   },
 
   async getBityOrder(bityOrderId: string, jwsToken: string): Promise<BityOrderResponse> {
-    try {
-      const {data} = await mooniAPI({
-        method: 'post',
-        url: 'bity/getOrder',
-        headers: {
-          'Authorization': `Bearer ${jwsToken}`,
-        },
-        data: {
-          bityOrderId,
-        },
-      });
+    const {data} = await mooniAPICatcher({
+      method: 'post',
+      url: 'bity/getOrder',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+      data: {
+        bityOrderId,
+      },
+    });
 
-      return data;
-    }
-    catch (error) {
-      if(error.response?.status === 404) {
-        throw new Error('not-found');
-      } else {
-        throw new Error('unexpected-server-error');
-      }
-    }
+    return data;
   },
   async getOrders(jwsToken: string): Promise<MooniOrder[]> {
-    try {
-      const {data} = await mooniAPI({
-        method: 'get',
-        url: 'orders',
-        headers: {
-          'Authorization': `Bearer ${jwsToken}`,
-        },
-      });
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      url: 'orders',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
 
-      return data;
-    }
-    catch (error) {
-      throw new Error('unexpected-server-error');
-    }
+    return data;
   },
   async getUser(jwsToken: string): Promise<User> {
-    const {data} = await mooniAPI({
+    const {data} = await mooniAPICatcher({
       method: 'get',
       url: 'user',
       headers: {

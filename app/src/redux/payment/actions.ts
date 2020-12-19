@@ -168,15 +168,20 @@ export const createOrder = () => async function (dispatch, getState)  {
     dispatch(setMultiTrade(null));
 
     sendEvent('order', 'create', 'error');
-
-    if(error._orderError) {
-      logError('Bity order creation error', error);
-      dispatch(setOrderErrors(error.errors));
-    } else if(error.message === 'timeout') {
-      logError('Bity timeout', error);
-      dispatch(setOrderErrors([{code: 'timeout', message: 'The request could not be executed within the allotted time. Please retry later.'}]));
+    if(error.message === 'timeout') {
+      logError('Create order: timeout', error);
+      dispatch(setOrderErrors([{
+        code: 'timeout',
+        message: 'The request could not be executed within the allotted time. Please retry later.'
+      }]));
+    } else if (error._bityError) {
+      logError('Create order: Bity error', error);
+      dispatch(setOrderErrors(error.meta.errors));
+    } else if(error._apiError) {
+      logError('Create order: API error', error);
+      dispatch(setOrderErrors([{code: error.message, message: error.description}]));
     } else {
-      logError('Bity order creation unknown error', error);
+      logError('Create order: unknown error', error);
       dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
   }

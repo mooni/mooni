@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import prisma from "../src/lib/api/prisma";
-import {authMiddleware} from "../src/lib/api/auth";
+import {authMiddleware} from "../src/lib/api/authMiddleware";
 import {Token} from "../src/lib/didManager";
 
 export default authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {

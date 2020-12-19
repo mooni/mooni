@@ -52,10 +52,10 @@ export class Trader {
     }
     const tradeType = path[0];
     if(tradeType === TradeType.BITY) {
-      return this.bityInstance.estimate(tradeRequest);
+      return await this.bityInstance.estimate(tradeRequest);
     }
     else if(tradeType === TradeType.DEX) {
-      return DexProxy.getRate(tradeRequest);
+      return await DexProxy.getRate(tradeRequest);
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }
@@ -71,10 +71,10 @@ export class Trader {
       if(!multiTradeRequest.bankInfo || !multiTradeRequest.ethInfo) {
         throw new Error('missing bank or eth info on multiTradeRequest');
       }
-      return this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
+      return await this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
     }
     else if(tradeType === TradeType.DEX) {
-      return DexProxy.createTrade(tradeRequest);
+      return await DexProxy.createTrade(tradeRequest);
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }
