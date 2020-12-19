@@ -83,7 +83,7 @@ const API: IAPI = {
     }
   },
 
-  async getBityOrder(orderId: string, jwsToken: string): Promise<BityOrderResponse> {
+  async getBityOrder(bityOrderId: string, jwsToken: string): Promise<BityOrderResponse> {
     try {
       const {data} = await mooniAPI({
         method: 'post',
@@ -92,7 +92,7 @@ const API: IAPI = {
           'Authorization': `Bearer ${jwsToken}`,
         },
         data: {
-          orderId,
+          bityOrderId,
         },
       });
 
