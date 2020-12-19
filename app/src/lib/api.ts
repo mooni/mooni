@@ -14,7 +14,7 @@ interface IAPI {
 const API_URL = '/api';
 const mooniAPI = axios.create({
   baseURL: API_URL,
-  timeout: 10 * 1000,
+  timeout: 9.9 * 1000,
 });
 const RETRY_ATTEMPTS = 3;
 
@@ -23,8 +23,7 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 0) 
     throw new Error('timeout');
 
   try {
-    const res = await mooniAPI(config);
-    return res;
+    return await mooniAPI(config);
   }
   catch (error) {
     if(error.code === 'ECONNABORTED') {
