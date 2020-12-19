@@ -23,6 +23,7 @@ export const SET_EXCHANGE_STEP = 'SET_EXCHANGE_STEP';
 
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_REFERENCE = 'SET_REFERENCE';
+export const SET_REFERAL = 'SET_REFERAL';
 
 export const SET_MULTITRADE = 'SET_MULTITRADE';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
@@ -57,6 +58,12 @@ export const setReference = (reference: string) => ({
   type: SET_REFERENCE,
   payload: {
     reference,
+  }
+});
+export const setReferal = (referalId: string) => ({
+  type: SET_REFERAL,
+  payload: {
+    referalId,
   }
 });
 
@@ -335,5 +342,14 @@ export const sendPayment = () => async function (dispatch, getState)  {
     sendEvent('payment', 'send', 'error');
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
 
+  }
+};
+
+export const initReferal = () => async function (dispatch, getState) {
+  const query = new URLSearchParams(window.location.search);
+  const referalId = query.get('referalId');
+
+  if(referalId) {
+    dispatch(setReferal(referalId));
   }
 };

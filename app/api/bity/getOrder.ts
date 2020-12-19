@@ -16,9 +16,9 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
     return res.status(400).send('wrong body');
   }
 
-  await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
-
   try {
+    await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
+
     const mooniOrder = await prisma.mooniOrder.findUnique({
       where: { bityOrderId },
     });

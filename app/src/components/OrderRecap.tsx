@@ -137,6 +137,7 @@ export default function OrderRecap({ multiTrade }: { multiTrade: MultiTrade }) {
         {recipient.bic_swift && <RecipientRow label="BIC" value={recipient.bic_swift}/>}
         {reference && <RecipientRow label="Reference" value={reference}/>}
         {recipient.email && <RecipientRow label="Contact email" value={recipient.email}/>}
+        {multiTrade.referalId && <RecipientRow label="Referal ID" value={multiTrade.referalId}/>}
       </Box>
 
       <AmountRow value={inputAmount} symbol={inputCurrencySymbol} caption="You send" />

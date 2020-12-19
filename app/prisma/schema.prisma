@@ -26,7 +26,7 @@ model MooniOrder {
   bityOrderId     String?       @unique
   referalId       String?
   user            User          @relation(name: "UserOrders", fields: [ethAddress], references: [ethAddress])
-  referalUser     User?          @relation(name: "ReferedOrders", fields: [referalId], references: [referalId])
+  referalUser     User?         @relation(name: "ReferedOrders", fields: [referalId], references: [referalId])
 }
 
 model User {
