@@ -14,14 +14,21 @@ async function createMooniOrder(multiTrade: MultiTrade) {
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY);
   const bityOrderId = bityTrade && (bityTrade as BityTrade).bityOrderResponse.id;
 
+  const ethAddress = multiTrade.ethInfo.fromAddress.toLowerCase();
+
   const rawMooniOrder = {
-    ethAddress: multiTrade.ethInfo.fromAddress.toLowerCase(),
     inputAmount: multiTrade.inputAmount,
     outputAmount: multiTrade.outputAmount,
     inputCurrency: multiTrade.tradeRequest.inputCurrencySymbol,
     outputCurrency: multiTrade.tradeRequest.outputCurrencySymbol,
     bityOrderId,
     ethAmount: multiTrade.ethAmount,
+    user: {
+      connectOrCreate: {
+        where: { ethAddress },
+        create: { ethAddress },
+      },
+    },
   };
 
   await prisma.mooniOrder.create({
