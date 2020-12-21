@@ -9,17 +9,19 @@ function getHeaderToken(req: NowRequest): string | null {
   return token;
 }
 
+type Handler = (req: NowRequest, res: NowResponse) => Promise<NowResponse | void>
 type AuthedHandler = (req: NowRequest, res: NowResponse, token: Token) => Promise<NowResponse | void>
 
-export const authMiddleware = (fn: AuthedHandler) => async (req: NowRequest, res: NowResponse) => {
+export const authMiddleware = (fn: AuthedHandler): Handler => async (req: NowRequest, res: NowResponse) => {
   const jwsToken = getHeaderToken(req);
   if(!jwsToken) {
     return res.status(401).send('authorization required');
   }
+  let token;
   try {
-    const token = DIDManager.decodeToken(jwsToken);
-    return await fn(req, res, token)
+    token = DIDManager.decodeToken(jwsToken);
   } catch(error) {
     return res.status(401).send(`invalid token: ${error.message}`);
   }
+  return await fn(req, res, token)
 };

@@ -15,6 +15,7 @@ import WalletModal from './components/WalletModal';
 import { Routes } from './Routes';
 
 import { store } from './redux/store';
+import { initReferral } from './redux/payment/actions';
 import { autoConnect } from './redux/eth/actions';
 import { initTokens } from './redux/ui/actions';
 
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     store.dispatch(autoConnect());
     store.dispatch(initTokens());
+    store.dispatch(initReferral());
   }, []);
 
   return (

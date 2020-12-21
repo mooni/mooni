@@ -24,6 +24,7 @@ export interface MultiTradeRequest {
   tradeRequest: TradeRequest,
   ethInfo: ETHInfo,
   bankInfo: BankInfo,
+  referralId?: string,
 }
 
 export interface MultiTradeEstimation {
@@ -44,6 +45,7 @@ export interface MultiTrade extends MultiTradeEstimation{
   path: TradePath;
   inputAmount: string,
   outputAmount: string,
+  referralId?: string,
 }
 
 export interface Trade {

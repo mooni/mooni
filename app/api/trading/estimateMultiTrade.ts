@@ -3,42 +3,26 @@ import { NowRequest, NowResponse } from '@now/node'
 import Bity from '../../src/lib/wrappers/bity';
 import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
+import {APIError} from "../../src/lib/errors";
+import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 
 const bityInstance = new Bity();
 
-export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
-  if(!req.body) {
-    res.status(400).send('no body');
-    return;
-  }
+export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
 
   const tradeRequest = req.body as TradeRequest;
 
   // TODO validate
   if(!tradeRequest) {
-    return res.status(400).send('wrong body');
+    throw new APIError(400, 'wrong-body', 'tradeRequest values are invalid');
   }
 
   const trader = new Trader(bityInstance);
 
-  try {
-    await Trader.assertTokenReady(tradeRequest);
+  await Trader.assertTokenReady(tradeRequest);
 
-    const multiTrade = await trader.estimateMultiTrade(tradeRequest);
+  const multiTrade = await trader.estimateMultiTrade(tradeRequest);
 
-    return res.json(multiTrade);
+  return res.json(multiTrade);
 
-  } catch(error) {
-    if(error._bityError) {
-      return res.status(400).json({
-        message: error.message,
-        _bityError: error._bityError,
-        errors: error.errors
-      });
-    } else {  // TODO
-      console.log(error);
-      return res.status(500).send('Unexpected server error');
-    }
-  }
-
-}
+})
