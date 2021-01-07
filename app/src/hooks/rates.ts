@@ -7,6 +7,7 @@ import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/api";
+import {BityOrderError} from "../lib/wrappers/bityTypes";
 
 interface RateForm {
   loading: boolean,
@@ -123,12 +124,13 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     try {
       multiTradeEstimation = await Api.estimateMultiTrade(currentRequest);
     } catch(error) {
-      if(error.message === 'bity_amount_too_low') {
+      if(error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
+        const bityOrderError = error as BityOrderError;
         setRateForm(r => ({
           ...r,
           loading: false,
           errors: {
-            lowAmount: error.errors[0].minimumOutputAmount,
+            lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
         }));
         setMultiTradeEstimation(null);
