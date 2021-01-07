@@ -1,4 +1,4 @@
-import { STATE_NAME } from './reducer';
+import { STATE_NAME } from './state';
 import { RootState } from '../store';
 
 export const getMultiTradeRequest = (state: RootState) => state[STATE_NAME].multiTradeRequest;

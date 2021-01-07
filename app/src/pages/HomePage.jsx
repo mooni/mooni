@@ -7,8 +7,8 @@ import { Button, IconEthereum, IconWallet } from '@aragon/ui'
 
 import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
 import { SmallWidth } from '../components/StyledComponents';
-import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { openWeb3Modal } from '../redux/eth/actions';
+import { getETHManager, getETHManagerLoading } from '../redux/wallet/selectors';
+import { openWeb3Modal } from '../redux/wallet/actions';
 import RateForm from '../components/RateForm';
 import { getMultiTradeRequest } from '../redux/payment/selectors';
 

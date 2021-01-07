@@ -5,8 +5,8 @@ import { Box, Dialog } from '@material-ui/core';
 import { textStyle, LoadingRing } from '@aragon/ui'
 import { Button } from '@material-ui/core';
 
-import { logout } from '../redux/eth/actions';
-import { getETHManagerLoading } from '../redux/eth/selectors';
+import { logout } from '../redux/wallet/actions';
+import { getETHManagerLoading } from '../redux/wallet/selectors';
 import { useAppDispatch } from '../redux/store';
 import styled from 'styled-components';
 

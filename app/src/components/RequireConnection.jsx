@@ -5,8 +5,8 @@ import Loader from '../components/Loader';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getETHManager, getETHManagerLoading } from '../redux/eth/selectors';
-import { openWeb3Modal } from '../redux/eth/actions';
+import { getETHManager, getETHManagerLoading } from '../redux/wallet/selectors';
+import { openWeb3Modal } from '../redux/wallet/actions';
 
 import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
 

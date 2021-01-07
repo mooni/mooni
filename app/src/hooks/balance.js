@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 import { fetchTokenBalance } from '../lib/trading/currencyHelpers';
 
-import { getETHManager, getAddress } from '../redux/eth/selectors';
+import { getETHManager, getAddress } from '../redux/wallet/selectors';
 import { amountToDecimal } from '../lib/numbers';
 
 export function useBalance(symbol) {

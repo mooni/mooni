@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, IconClose, useViewport, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/eth/selectors';
-import { logout } from '../redux/eth/actions';
+import { getAddress, getETHManagerLoading, getProviderFromIframe } from '../redux/wallet/selectors';
+import { logout } from '../redux/wallet/actions';
 import { defaultProvider } from '../lib/web3Providers';
 
 const HEIGHT = 5 * GU;

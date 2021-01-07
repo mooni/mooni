@@ -1,5 +1,5 @@
 import BoxManager from '../../lib/box';
-import { getETHManager } from '../eth/selectors';
+import { getETHManager } from '../wallet/selectors';
 import { getBoxLoading } from './selectors';
 import { fetchMyAccount, resetContacts } from '../contacts/actions';
 import { track } from '../../lib/analytics';
