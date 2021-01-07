@@ -197,17 +197,6 @@ class Bity {
         );
       }
 
-      if(
-        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
-        ||
-        bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
-      ) {
-        throw new BityOrderError(
-          'bity_amount_too_low',
-          [{ minimumOutputAmount: bityOrderResponse.output.amount}]
-        )
-      }
-
       return {
         tradeRequest,
         inputAmount: bityOrderResponse.input.amount,

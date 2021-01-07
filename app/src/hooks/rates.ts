@@ -7,6 +7,8 @@ import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/api";
+import config from "../config";
+import {BityOrderError} from "../lib/wrappers/bityTypes";
 
 interface RateForm {
   loading: boolean,
@@ -50,8 +52,6 @@ function defaultRateForm(initialRequest): RateForm {
   };
 }
 
-const HIGH_OUTPUT_AMOUNT: number = 5000;
-
 let nonce = 0;
 
 interface RateResponse {
@@ -60,7 +60,6 @@ interface RateResponse {
   multiTradeEstimation: MultiTradeEstimation | null,
   onChangeCurrency: any, // TODO
   onChangeAmount: any,
-  HIGH_OUTPUT_AMOUNT: number,
 }
 
 export function useRate(initialTradeRequest: TradeRequest): RateResponse {
@@ -106,7 +105,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       setMultiTradeEstimation(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      if(new BN(currentRequest.amount).gt(HIGH_OUTPUT_AMOUNT)) {
+      if(new BN(currentRequest.amount).gt(config.maxOutputAmount)) {
         setRateForm(r => ({
           ...r,
           loading: false,
@@ -123,12 +122,13 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     try {
       multiTradeEstimation = await Api.estimateMultiTrade(currentRequest);
     } catch(error) {
-      if(error.message === 'bity_amount_too_low') {
+      if(error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
+        const bityOrderError = error as BityOrderError;
         setRateForm(r => ({
           ...r,
           loading: false,
           errors: {
-            lowAmount: error.errors[0].minimumOutputAmount,
+            lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
         }));
         setMultiTradeEstimation(null);
@@ -149,7 +149,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
       updateRateForm.values.outputAmount = new BN(multiTradeEstimation.outputAmount).toFixed();
-      if(new BN(multiTradeEstimation.outputAmount).gt(HIGH_OUTPUT_AMOUNT)) {
+      if(new BN(multiTradeEstimation.outputAmount).gt(config.maxOutputAmount)) {
         updateRateForm.errors = { highAmount: true };
       }
     }
@@ -226,6 +226,5 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     multiTradeEstimation,
     onChangeCurrency,
     onChangeAmount,
-    HIGH_OUTPUT_AMOUNT,
   };
 }

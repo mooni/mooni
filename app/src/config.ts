@@ -9,6 +9,7 @@ interface IConfig {
   fortmaticId: string,
   logRocketId: string,
   gtagId: string,
+  maxOutputAmount: number,
   private: {
     bityClientId: string,
     bityClientSecret: string,
@@ -38,6 +39,7 @@ const config: IConfig = {
   fortmaticId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'pk_live_362BC03A6D2421B4'),
   logRocketId: parseEnv(process.env.REACT_APP_LOG_ROCKET_ID, '282s2e/mooni'),
   gtagId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'UA-68373171-8'),
+  maxOutputAmount: 1000,
   private: {
     bityClientId: parseEnv(process.env.PRIVATE_BITY_CLIENT_ID, ''),
     bityClientSecret: parseEnv(process.env.PRIVATE_BITY_CLIENT_SECRET, ''),

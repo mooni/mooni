@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 import {Button, IconRefresh, LoadingRing, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
+import config from '../config';
 import AmountRow from './AmountRow';
 
 import {TradeExact, TradeRequest} from '../lib/trading/types';
@@ -52,7 +53,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   const ethManager = useSelector(getETHManager);
   const ethManagerLoading = useSelector(getETHManagerLoading);
 
-  const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency, HIGH_OUTPUT_AMOUNT } = useRate(initialTradeRequest);
+  const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
 
   const valid = !(rateForm.loading || rateForm.errors);
   const errors = rateForm.errors;
@@ -94,11 +95,11 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
           !errors ?
             (multiTradeEstimation && <RateAmount multiTradeEstimation={multiTradeEstimation}/>)
             :
-            Object.entries(errors).map(([key, value]) =>
+            Object.entries(errors).map(([key, _]) =>
               <InvalidMessage key={key}>
                 {key === 'lowBalance' && 'You do not have enough funds'}
                 {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
-                {key === 'highAmount' && `Maximum amount is ${HIGH_OUTPUT_AMOUNT} ${rateForm.values.outputCurrency}`}
+                {key === 'highAmount' && `Maximum amount is ${config.maxOutputAmount} ${rateForm.values.outputCurrency}`}
                 {key === 'zeroAmount' && `Amount can't be zero`}
               </InvalidMessage>
             )
