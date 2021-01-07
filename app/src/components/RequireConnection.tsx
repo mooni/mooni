@@ -5,25 +5,25 @@ import Loader from '../components/Loader';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getETHManager, getETHManagerLoading } from '../redux/wallet/selectors';
-import { openWeb3Modal } from '../redux/wallet/actions';
+import { getETHManager, getWalletLoading } from '../redux/wallet/selectors';
+import { login } from '../redux/wallet/actions';
 
 import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
 
 function RequireConnection({ children }) {
   const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getETHManagerLoading);
+  const ethManagerLoading = useSelector(getWalletLoading);
   const dispatch = useDispatch();
 
   function login() {
-    dispatch(openWeb3Modal());
+    dispatch(login());
   }
 
   if(ethManager)
     return children;
 
   if(ethManagerLoading)
-    return <Loader text="Loading Ethereum provider" />;
+    return <Loader text="Loading Ethereum wallet" />;
 
   if(!ethManager) {
     return (

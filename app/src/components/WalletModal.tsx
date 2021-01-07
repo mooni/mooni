@@ -6,7 +6,7 @@ import { textStyle, LoadingRing } from '@aragon/ui'
 import { Button } from '@material-ui/core';
 
 import { logout } from '../redux/wallet/actions';
-import { getETHManagerLoading } from '../redux/wallet/selectors';
+import { getWalletLoading } from '../redux/wallet/selectors';
 import { useAppDispatch } from '../redux/store';
 import styled from 'styled-components';
 
@@ -18,7 +18,7 @@ const Content = styled.p`
 `;
 
 export default function WalletModal() {
-  const ethManagerLoading = useSelector(getETHManagerLoading);
+  const ethManagerLoading = useSelector(getWalletLoading);
   const dispatch = useAppDispatch();
 
   return (

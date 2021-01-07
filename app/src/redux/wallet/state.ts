@@ -1,10 +1,10 @@
 import ETHManager from "../../lib/eth";
 
-export const STATE_NAME = 'ETH';
+export const STATE_NAME = 'WALLET';
 
 export interface WalletState {
   ethManager: ETHManager | null;
-  ethManagerLoading: boolean;
+  walletLoading: boolean;
   address: string | null;
   jwsToken: string | null;
   providerFromIframe: boolean;
@@ -12,7 +12,7 @@ export interface WalletState {
 
 export const initialState: WalletState = {
   ethManager: null,
-  ethManagerLoading: false,
+  walletLoading: false,
   address: null,
   jwsToken: null,
   providerFromIframe: false,

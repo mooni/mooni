@@ -36,7 +36,7 @@ export default class ETHManager {
     await ethManager.checkIsContract();
     if(ethManager.isContract) {
       ethManager.close();
-      throw new Error('eth_smart_account_not_supported');
+      throw new MetaError('eth_smart_account_not_supported');
     }
 
     if (ethManager.ethereum.on) {
