@@ -95,7 +95,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
           !errors ?
             (multiTradeEstimation && <RateAmount multiTradeEstimation={multiTradeEstimation}/>)
             :
-            Object.entries(errors).map(([key, value]) =>
+            Object.entries(errors).map(([key, _]) =>
               <InvalidMessage key={key}>
                 {key === 'lowBalance' && 'You do not have enough funds'}
                 {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}

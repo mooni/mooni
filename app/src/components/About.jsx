@@ -10,15 +10,21 @@ const Title = styled.p`
   ${textStyle('body1')};
   text-align: center;
 `;
+const SubTitle = styled.p`
+  ${textStyle('body4')};
+  margin-top: ${2 * GU}px;
+  margin-bottom: ${2 * GU}px;
+  text-align: center;
+`;
 const Header = styled.p`
   ${textStyle('title4')};
   text-align: center;
-  margin-top: ${4 * GU}px;
   margin-bottom: ${1 * GU}px;
 `;
 const Content = styled.p`
   ${textStyle('body2')};
   text-align: center;
+  margin-bottom: ${4 * GU}px;
 `;
 const SocialIcon = styled.a`
   margin: 0 ${1 * GU}px;
@@ -30,6 +36,9 @@ export default function AboutPage() {
       <Title>
         Mooni is a web application allowing to transfer funds from a crypto wallet to a bank account.
       </Title>
+      <SubTitle>
+        Want to see how it works ? Check out the <Link href="https://doc.mooni.tech/walkthrough" external style={{ textDecoration: 'none' }}>Walkthrough</Link> !
+      </SubTitle>
       <Header>
         Availability
       </Header>
@@ -56,7 +65,7 @@ export default function AboutPage() {
       <Header>
         Social
       </Header>
-      <Box display="flex" justifyContent="center" mt={1}>
+      <Box display="flex" justifyContent="center" my={1}>
         <SocialIcon href="https://twitter.com/moonidapp" target="_blank">
           <Twitter fontSize="large" />
         </SocialIcon>
@@ -67,13 +76,12 @@ export default function AboutPage() {
           <Email fontSize="large" />
         </SocialIcon>
       </Box>
-
-      <Content>
+      <SubTitle>
         Mooni is open-source !
-      </Content>
-      <Box display="flex" justifyContent="center" mt={1}>
-        <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
-      </Box>
+        <Box display="flex" justifyContent="center" mt={1}>
+          <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
+        </Box>
+      </SubTitle>
     </Box>
   );
 }
