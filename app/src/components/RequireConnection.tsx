@@ -5,39 +5,32 @@ import Loader from '../components/Loader';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getETHManager, getWalletStatus } from '../redux/wallet/selectors';
+import { getWalletStatus, isWalletLoading } from '../redux/wallet/selectors';
 import { login } from '../redux/wallet/actions';
 
 import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
+import { WalletStatus } from "../redux/wallet/state";
 
 function RequireConnection({ children }) {
-  const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getWalletStatus);
+  const walletStatus = useSelector(getWalletStatus);
+  const walletLoading = useSelector(isWalletLoading);
   const dispatch = useDispatch();
 
-  function login() {
-    dispatch(login());
-  }
-
-  if(ethManager)
+  if(walletStatus === WalletStatus.CONNECTED)
     return children;
 
-  if(ethManagerLoading)
+  if(walletLoading)
     return <Loader text="Loading Ethereum wallet" />;
 
-  if(!ethManager) {
-    return (
-      <Box display="flex" justifyContent="center">
-        <EmptyStateCard
-          text="Please connect your Ethereum wallet"
-          illustration={<img src={LoadImage} width="80%" alt="" />}
-          action={<Button onClick={login}>Connect</Button>}
-        />
-      </Box>
-    );
-  }
-
-  return children;
+  return (
+    <Box display="flex" justifyContent="center">
+      <EmptyStateCard
+        text="Please connect your Ethereum wallet"
+        illustration={<img src={LoadImage} width="80%" alt="" />}
+        action={<Button onClick={() => dispatch(login())}>Connect</Button>}
+      />
+    </Box>
+  );
 }
 
 export default RequireConnection;

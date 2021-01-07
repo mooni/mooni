@@ -6,7 +6,7 @@ import { textStyle, LoadingRing } from '@aragon/ui'
 import { Button } from '@material-ui/core';
 
 import { logout } from '../redux/wallet/actions';
-import { getWalletStatus } from '../redux/wallet/selectors';
+import { getWalletStatus, isWalletLoading } from '../redux/wallet/selectors';
 import { useAppDispatch } from '../redux/store';
 import styled from 'styled-components';
 import { WalletStatus } from "../redux/wallet/state";
@@ -19,10 +19,11 @@ const Content = styled.p`
 `;
 
 export default function WalletModal() {
+  const walletLoading = useSelector(isWalletLoading);
   const walletStatus = useSelector(getWalletStatus);
   const dispatch = useAppDispatch();
 
-  const dialogOpen = walletStatus !== WalletStatus.CONNECTED && walletStatus !== WalletStatus.DISCONNECTED;
+  const dialogOpen = walletLoading && walletStatus !== WalletStatus.CHOOSING_WALLET;
   const allowCancel = walletStatus !== WalletStatus.DISCONNECTING;
 
   return (
@@ -39,7 +40,6 @@ export default function WalletModal() {
           >
             <Title>
               {walletStatus === WalletStatus.LOADING && 'Loading Wallet...'}
-              {walletStatus === WalletStatus.WAITING_APPROVAL && 'Waiting wallet...'}
               {walletStatus === WalletStatus.WAITING_SIGNATURE && 'Waiting for signature...'}
               {walletStatus === WalletStatus.DISCONNECTING && 'Disconnecting wallet...'}
             </Title>
@@ -54,7 +54,6 @@ export default function WalletModal() {
           >
             <Content>
               {walletStatus === WalletStatus.LOADING && 'That\'ll be quick!'}
-              {walletStatus === WalletStatus.WAITING_APPROVAL && 'Please approve Mooni in your wallet'}
               {walletStatus === WalletStatus.WAITING_SIGNATURE && <span>
                 We need to verify you are the owner of this address.<br/>
                 Please accept the signature request in your wallet to be able to access the app.

@@ -16,9 +16,10 @@ import {getInputCurrencies} from '../redux/ui/selectors';
 
 import {getCurrenciesSymbols} from '../lib/trading/currencyHelpers';
 import {useRate} from '../hooks/rates';
-import {getETHManager, getWalletStatus} from '../redux/wallet/selectors';
+import {getWalletStatus} from '../redux/wallet/selectors';
 import {CurrencyType} from "../lib/trading/currencyTypes";
 import { RateAmount } from "./RateAmount";
+import { WalletStatus } from "../redux/wallet/state";
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -50,8 +51,7 @@ interface RateFormParams {
 function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }: RateFormParams) {
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
-  const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getWalletStatus);
+  const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
 
@@ -107,7 +107,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
           <LoadingRing/>
         }
       </Box>
-      {(ethManager && !ethManagerLoading) &&
+      {(walletStatus === WalletStatus.CONNECTED) &&
       <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!valid} />
       }
     </>

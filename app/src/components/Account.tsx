@@ -4,20 +4,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, IconClose, useViewport, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getWalletStatus, getProviderFromIframe } from '../redux/wallet/selectors';
+import { getAddress, getWalletStatus, getProviderFromIframe, isWalletLoading } from '../redux/wallet/selectors';
 import { logout } from '../redux/wallet/actions';
 import { defaultProvider } from '../lib/web3Providers';
+import { WalletStatus } from "../redux/wallet/state";
 
 const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
 
 function Account() {
-  const address = useSelector(getAddress);
-  const [ens, setENS] = useState<string>();
-  const ethManagerLoading = useSelector(getWalletStatus);
-  const providerFromIframe = useSelector(getProviderFromIframe);
   const dispatch = useDispatch();
   const { below } = useViewport();
+
+  const walletStatus = useSelector(getWalletStatus);
+  const walletLoading = useSelector(isWalletLoading);
+  const address = useSelector(getAddress);
+  const providerFromIframe = useSelector(getProviderFromIframe);
+
+  const [ens, setENS] = useState<string>();
 
   useEffect(() => {
     if(address) {
@@ -32,7 +36,7 @@ function Account() {
     dispatch(logout());
   }
 
-  if(ethManagerLoading)
+  if(walletLoading)
     return (
       <>
         <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
@@ -41,7 +45,7 @@ function Account() {
       </>
     );
 
-  if(!address) {
+  if(walletStatus === WalletStatus.DISCONNECTED) {
     return (
       <Button disabled wide icon={<IconWallet/>} display="all" label="Not connected" />
     );

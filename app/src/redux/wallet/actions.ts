@@ -70,9 +70,9 @@ const onAccountChanged = () => (dispatch, getState) => {
 };
 
 export const login = (forcedProvider?) => async function (dispatch)  {
-  dispatch(setWalletStatus(WalletStatus.WAITING_APPROVAL));
   try {
 
+    dispatch(setWalletStatus(WalletStatus.CHOOSING_WALLET));
     const ethereum = forcedProvider || await web3Modal.connect();
     const ethManager = await ETHManager.create(ethereum);
     dispatch(setWalletStatus(WalletStatus.LOADING));
@@ -152,10 +152,9 @@ export const logout = () => (dispatch, getState) => {
 };
 
 export const autoConnect = () => async (dispatch) => {
-  return;
-  dispatch(setWalletStatus(WalletStatus.LOADING));
   const initIframeProvider = await detectIframeWeb3Provider();
   if (initIframeProvider) {
+    dispatch(setWalletStatus(WalletStatus.LOADING));
     const ethereum = getWalletProvider('iframe');
     await dispatch(login(ethereum));
     dispatch(setProviderFromIframe(true));
