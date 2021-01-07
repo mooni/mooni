@@ -7,7 +7,7 @@ import { Button, IconEthereum, IconWallet } from '@aragon/ui'
 
 import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
 import { SmallWidth } from '../components/StyledComponents';
-import { getETHManager, getWalletLoading } from '../redux/wallet/selectors';
+import { getETHManager, getWalletStatus } from '../redux/wallet/selectors';
 import { login } from '../redux/wallet/actions';
 import RateForm from '../components/RateForm';
 import { getMultiTradeRequest } from '../redux/payment/selectors';
@@ -16,7 +16,7 @@ export default function HomePage() {
   const history = useHistory();
   const dispatch = useDispatch();
   const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getWalletLoading);
+  const ethManagerLoading = useSelector(getWalletStatus);
   const { tradeRequest } = useSelector(getMultiTradeRequest);
 
   function connectWallet() {

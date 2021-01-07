@@ -16,7 +16,7 @@ import {getInputCurrencies} from '../redux/ui/selectors';
 
 import {getCurrenciesSymbols} from '../lib/trading/currencyHelpers';
 import {useRate} from '../hooks/rates';
-import {getETHManager, getWalletLoading} from '../redux/wallet/selectors';
+import {getETHManager, getWalletStatus} from '../redux/wallet/selectors';
 import {CurrencyType} from "../lib/trading/currencyTypes";
 import { RateAmount } from "./RateAmount";
 
@@ -51,7 +51,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   const classes = useStyles();
   const inputCurrencies = useSelector(getInputCurrencies);
   const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getWalletLoading);
+  const ethManagerLoading = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
 

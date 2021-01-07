@@ -5,14 +5,14 @@ import Loader from '../components/Loader';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getETHManager, getWalletLoading } from '../redux/wallet/selectors';
+import { getETHManager, getWalletStatus } from '../redux/wallet/selectors';
 import { login } from '../redux/wallet/actions';
 
 import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
 
 function RequireConnection({ children }) {
   const ethManager = useSelector(getETHManager);
-  const ethManagerLoading = useSelector(getWalletLoading);
+  const ethManagerLoading = useSelector(getWalletStatus);
   const dispatch = useDispatch();
 
   function login() {

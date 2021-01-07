@@ -12,11 +12,11 @@ export default function(state = initialState, action) {
         ethManager,
       };
     }
-    case actions.SET_WALLET_LOADING: {
-      const { walletLoading } = action.payload;
+    case actions.SET_WALLET_STATUS: {
+      const { walletStatus } = action.payload;
       return {
         ...state,
-        walletLoading,
+        walletStatus,
       };
     }
     case actions.SET_ADDRESS: {

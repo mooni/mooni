@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, EthIdenticon, AddressField, IconWallet, IconPower, IconClose, useViewport, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 
-import { getAddress, getWalletLoading, getProviderFromIframe } from '../redux/wallet/selectors';
+import { getAddress, getWalletStatus, getProviderFromIframe } from '../redux/wallet/selectors';
 import { logout } from '../redux/wallet/actions';
 import { defaultProvider } from '../lib/web3Providers';
 
@@ -14,7 +14,7 @@ const IDENTICON_SIZE = 6 * GU;
 function Account() {
   const address = useSelector(getAddress);
   const [ens, setENS] = useState<string>();
-  const ethManagerLoading = useSelector(getWalletLoading);
+  const ethManagerLoading = useSelector(getWalletStatus);
   const providerFromIframe = useSelector(getProviderFromIframe);
   const dispatch = useDispatch();
   const { below } = useViewport();
