@@ -10,7 +10,7 @@ import {
   BityOrderStatus,
 } from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
-import Api from '../../lib/api';
+import Api from '../../lib/apiWrapper';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';

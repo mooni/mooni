@@ -54,7 +54,7 @@ async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 1) 
   }
 }
 
-const API: IAPI = {
+const ApiWrapper: IAPI = {
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     const {data} = await mooniAPICatcher({
       method: 'post',
@@ -115,4 +115,4 @@ const API: IAPI = {
   }
 };
 
-export default API;
+export default ApiWrapper;

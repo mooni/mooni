@@ -6,7 +6,7 @@ import { useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
-import Api from "../lib/api";
+import Api from "../lib/apiWrapper";
 import config from "../config";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
 
