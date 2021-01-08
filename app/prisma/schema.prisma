@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  EXECUTED
+}
+
+model MooniOrder {
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
+  executedAt      DateTime?
+  status          OrderStatus   @default(PENDING)
+  ethAddress      String
+  inputAmount     String
+  inputCurrency   String
+  outputAmount    String
+  outputCurrency  String
+  ethAmount       String
+  bityOrderId     String?       @unique
+  referralId      String?
+  user            User          @relation(name: "UserOrders", fields: [ethAddress], references: [ethAddress])
+  referralUser     User?         @relation(name: "ReferredOrders", fields: [referralId], references: [referralId])
+}
+
+model User {
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
+  ethAddress      String        @unique
+  referralId      String        @unique @default(cuid())
+  orders          MooniOrder[]  @relation("UserOrders")
+  referrals        MooniOrder[]  @relation("ReferredOrders")
+}

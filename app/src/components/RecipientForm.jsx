@@ -142,7 +142,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
       <Box display={more ? 'block' : 'none'}>
         <FormField label="BIC/SWIFT" name="bic_swift" ref={register(fields.bic_swift)} errors={errors} errorMessages={errorMessages} />
         <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessages={errorMessages} />
-       </Box>
+      </Box>
 
       {endComponent({ submit, hasErrors })}
     </form>

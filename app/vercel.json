@@ -1,0 +1,25 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers" : [
+        {
+          "key" : "X-Frame-Options",
+          "value" : "ALLOW-FROM *"
+        },
+        {
+          "key" : "Content-Security-Policy",
+          "value" : "frame-ancestors *"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "api/bity/*.ts": {
+      "maxDuration": 10
+    },
+    "api/trading/*.ts": {
+      "maxDuration": 10
+    }
+  }
+}

@@ -4,23 +4,23 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Box } from '@material-ui/core';
 import { IconArrowRight } from '@aragon/ui'
 
-import RateForm from '../components/RateForm';
+import RateForm from './RateForm';
 
-import { setRateRequest } from '../redux/payment/actions';
-import { getRateRequest } from '../redux/payment/selectors';
+import { setTradeRequest } from '../redux/payment/actions';
+import { getMultiTradeRequest } from '../redux/payment/selectors';
 
 export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();
-  const initialRateRequest = useSelector(getRateRequest);
+  const { tradeRequest } = useSelector(getMultiTradeRequest);
 
-  const onSubmit = (rateRequest) => {
-    dispatch(setRateRequest(rateRequest));
+  const onSubmit = (tradeRequest) => {
+    dispatch(setTradeRequest(tradeRequest));
     onComplete();
   };
 
   return (
     <Box width={1} py={1}>
-      <RateForm onSubmit={onSubmit} initialRateRequest={initialRateRequest} buttonIcon={<IconArrowRight/>} buttonLabel="Next"/>
+      <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest} buttonIcon={<IconArrowRight/>} buttonLabel="Next"/>
     </Box>
   )
 }

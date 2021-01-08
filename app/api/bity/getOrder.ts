@@ -1,52 +1,42 @@
 import { NowRequest, NowResponse } from '@now/node'
 
-import Bity from '../../src/lib/bity';
-import { BityOrderResponse } from '../../src/lib/types';
-
+import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
-import DIDManager, { Token } from "../../src/lib/didManager";
+import {Token} from "../../src/lib/didManager";
+import {authMiddleware} from "../../src/lib/api/authMiddleware";
+import {BityOrderError, BityOrderStatus} from "../../src/lib/wrappers/bityTypes";
+import prisma from '../../src/lib/api/prisma'
+import {APIError} from "../../src/lib/errors";
+import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 
 const bityInstance = new Bity();
 
-function getHeaderToken(req: NowRequest): string | null {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return null;
-  const token = authHeader.replace('Bearer ', '');
-  if (token.length === 0) return null;
-  return token;
-}
+export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
 
-export default async (req: NowRequest, res: NowResponse) => {
-  const orderId: string = req.body?.orderId as string;
+  const bityOrderId: string = req.body?.bityOrderId as string;
 
-  if(!orderId) {
-    return res.status(400).send('wrong body');
-  }
-  const jwsToken = getHeaderToken(req);
-  if(!jwsToken) {
-    return res.status(401).send('authorization required');
-  }
-  let token: Token;
-  try {
-    token = DIDManager.decodeToken(jwsToken);
-  } catch(error) {
-    return res.status(401).send('invalid token');
+  if(!bityOrderId) {
+    throw new APIError(400, 'wrong-body', '{ bityOrderId } is required');
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
-  try {
-    const orderDetails = (await bityInstance.getOrderDetails(orderId)) as BityOrderResponse;
-    if(orderDetails.input.crypto_address.toLowerCase() !== token.claim.iss.toLowerCase()) {
-      return res.status(401).send('unauthorized');
-    }
-    return res.json(orderDetails);
-  } catch(error) {
-    if(error.message === 'not-found') {
-      return res.status(404).send('Not found');
-    } else {
-      return res.status(500).send('Unexpected server error');
-    }
+  const mooniOrder = await prisma.mooniOrder.findUnique({
+    where: { bityOrderId },
+  });
+  if(!mooniOrder) {
+    throw new APIError(404, 'not-found', 'Corresponding MooniOrder not found');
   }
+  const bityOrderDetails = await bityInstance.getOrderDetails(bityOrderId);
+  if(bityOrderDetails.input.crypto_address.toLowerCase() !== token.claim.iss.toLowerCase()) {
+    throw new APIError(401, 'unauthorized');
+  }
+  if(bityOrderDetails.orderStatus === BityOrderStatus.EXECUTED) {
+    await prisma.mooniOrder.update({
+      where: { bityOrderId },
+      data: { status: 'EXECUTED' },
+    });
+  }
+  return res.json(bityOrderDetails);
 
-}
+}))

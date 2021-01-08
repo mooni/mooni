@@ -1,21 +1,31 @@
-import {getOrder, getOrderRequest} from './selectors';
-import {getAddress, getETHManager, getJWS} from '../eth/selectors';
-import {checkTradeAllowance, createOrder as libCreateOrder, executeTrade} from '../../lib/exchange';
-import {BityOrderStatus, ExchangePath, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus} from '../../lib/types';
+import {getMultiTrade, getMultiTradeRequest} from './selectors';
+import {getAddress, getETHManager, getJWS} from '../wallet/selectors';
+import {
+  Payment,
+  PaymentStatus,
+  PaymentStepId,
+  PaymentStepStatus, Recipient
+} from '../../lib/types';
+import {
+  BityOrderStatus,
+} from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
-import BityProxy from '../../lib/bityProxy';
+import Api from '../../lib/api';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
-import { detectWalletError } from '../../lib/web3Providers';
+import { detectWalletError } from '../../lib/web3Wallets';
+import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
+import DexProxy from "../../lib/trading/dexProxy";
 
-export const SET_RATE_REQUEST = 'SET_RATE_REQUEST';
+export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 
 export const SET_EXCHANGE_STEP = 'SET_EXCHANGE_STEP';
 
 export const SET_RECIPIENT = 'SET_RECIPIENT';
 export const SET_REFERENCE = 'SET_REFERENCE';
+export const SET_REFERRAL = 'SET_REFERRAL';
 
-export const SET_ORDER = 'SET_ORDER';
+export const SET_MULTITRADE = 'SET_MULTITRADE';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 
@@ -24,39 +34,46 @@ export const SET_PAYMENT = 'SET_PAYMENT';
 export const UPDATE_PAYMENT_STEP = 'UPDATE_PAYMENT_STEP';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
 
-export const setRateRequest = (rateRequest) => ({
-  type: SET_RATE_REQUEST,
+export const setTradeRequest = (tradeRequest: TradeRequest) => ({
+  type: SET_TRADE_REQUEST,
   payload: {
-    rateRequest,
+    tradeRequest,
   }
 });
 
-export const setExchangeStep = (stepId) => ({
+export const setExchangeStep = (stepId: number) => ({
   type: SET_EXCHANGE_STEP,
   payload: {
     stepId,
   }
 });
 
-export const setRecipient = (recipient) => ({
+export const setRecipient = (recipient: Recipient) => ({
   type: SET_RECIPIENT,
   payload: {
     recipient,
   }
 });
-export const setReference = (reference) => ({
+export const setReference = (reference: string) => ({
   type: SET_REFERENCE,
   payload: {
     reference,
   }
 });
-
-export const setOrder = (order) => ({
-  type: SET_ORDER,
+export const setReferral = (referralId: string) => ({
+  type: SET_REFERRAL,
   payload: {
-    order,
+    referralId,
   }
 });
+
+export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
+  type: SET_MULTITRADE,
+  payload: {
+    multiTrade,
+  }
+});
+
 export const setOrderErrors = (errors) => ({
   type: SET_ORDER_ERRORS,
   payload: {
@@ -87,13 +104,17 @@ export const setPaymentStatus = (status: PaymentStatus) => ({
   payload: { status },
 });
 
-export const createPayment = (order) => (dispatch) => {
+export const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
   const payment: Payment = {
     steps: [],
     status: PaymentStatus.ONGOING,
   };
 
-  if(order.path === ExchangePath.DEX_BITY) {
+  const dexTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as DexTrade[];
+  if(dexTrades.length > 1) {
+    throw new Error('Only one dex exchange is supported per payment');
+  }
+  if(multiTrade.path.includes(TradeType.DEX)) {
     payment.steps.push({
       id: PaymentStepId.ALLOWANCE,
       status: PaymentStepStatus.QUEUED,
@@ -104,6 +125,10 @@ export const createPayment = (order) => (dispatch) => {
     });
   }
 
+  const bityTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as BityTrade[];
+  if(bityTrades.length !== 1) {
+    throw new Error('Payments must pass through bity');
+  }
   payment.steps.push({
     id: PaymentStepId.PAYMENT,
     status: PaymentStepStatus.QUEUED,
@@ -111,7 +136,7 @@ export const createPayment = (order) => (dispatch) => {
   payment.steps.push({
     id: PaymentStepId.BITY,
     status: PaymentStepStatus.QUEUED,
-    bityOrderId: order.bityOrder.id,
+    bityOrderId: bityTrades[0].bityOrderResponse.id,
   });
 
   dispatch(setPayment(payment));
@@ -123,33 +148,41 @@ export const createOrder = () => async function (dispatch, getState)  {
   sendEvent('order', 'create', 'init');
 
   const state = getState();
-  const fromAddress = getAddress(state);
-  const orderRequest = getOrderRequest(state);
+  const multiTradeRequest = getMultiTradeRequest(state);
+  if(!multiTradeRequest) throw new Error('Missing multiTradeRequest');
+
+  multiTradeRequest.ethInfo = {
+    fromAddress: getAddress(state),
+  };
+
   const jwsToken = getJWS(state);
   try {
 
-    const order = await libCreateOrder({
-      recipient: orderRequest.recipient,
-      rateRequest: orderRequest.rateRequest,
-      reference: orderRequest.reference,
-    }, fromAddress, jwsToken);
-
-    dispatch(setOrder(order));
-    dispatch(createPayment(order));
+    const multiTrade = await Api.createMultiTrade(multiTradeRequest, jwsToken);
+    dispatch(setMultiTrade(multiTrade));
+    dispatch(createPayment(multiTrade));
 
     sendEvent('order', 'create', 'done');
 
   } catch(error) {
-    dispatch(setOrder(null));
+    dispatch(setMultiTrade(null));
 
     sendEvent('order', 'create', 'error');
-
-    if(error._orderError) {
-      logError('Bity order creation error', error);
-      dispatch(setOrderErrors(error.errors));
+    if(error.message === 'timeout') {
+      logError('Create order: timeout', error);
+      dispatch(setOrderErrors([{
+        code: 'timeout',
+        message: 'The request could not be executed within the allotted time. Please retry later.'
+      }]));
+    } else if (error._bityError) {
+      logError('Create order: Bity error', error);
+      dispatch(setOrderErrors(error.meta.errors));
+    } else if(error._apiError) {
+      logError('Create order: API error', error);
+      dispatch(setOrderErrors([{code: error.message, message: error.description}]));
     } else {
-      logError('Bity order creation unknown error', error);
-      dispatch(setOrderErrors([{code: 'unknown', message: 'unknown error'}]));
+      logError('Create order: unknown error', error);
+      dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
   }
 };
@@ -189,11 +222,13 @@ async function sendPaymentStep({ dispatch, stepId, paymentFunction, ethManager }
   }
 }
 
-function watchBityOrder(state, dispatch, orderId) {
-  const POLL_INTERVAL = 5000;
-  let intervalId;
+type Timeout = ReturnType<typeof setTimeout>;
+const watching: Map<string, Timeout> = new Map();
+const POLL_INTERVAL = 5000;
 
-  const jwsToken = getJWS(state);
+export const watchBityOrder = (orderId) => (dispatch, getState) => {
+  if(watching.get(orderId)) return;
+  const jwsToken = getJWS(getState());
 
   dispatch(updatePaymentStep({
     id: PaymentStepId.BITY,
@@ -201,8 +236,10 @@ function watchBityOrder(state, dispatch, orderId) {
   }));
 
   function fetchNewData() {
-    BityProxy.getOrder(orderId, jwsToken)
+    Api.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
+        if(!watching.has(orderId)) return;
+        const timer = watching.get(orderId) as Timeout;
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
 
@@ -215,7 +252,8 @@ function watchBityOrder(state, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
@@ -227,7 +265,8 @@ function watchBityOrder(state, dispatch, orderId) {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
-          clearInterval(intervalId);
+          clearInterval(timer);
+          watching.delete(orderId);
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
@@ -243,7 +282,7 @@ function watchBityOrder(state, dispatch, orderId) {
       .catch(error => logError('Error while fetching order state', error));
   }
   fetchNewData();
-  intervalId = setInterval(fetchNewData, POLL_INTERVAL);
+  watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {
@@ -251,27 +290,27 @@ export const sendPayment = () => async function (dispatch, getState)  {
   sendEvent('payment', 'send', 'init');
 
   const state = getState();
-  const order = getOrder(state);
+  const multiTrade = getMultiTrade(state);
+  if(!multiTrade) throw new Error('Missing multitrade');
+
   const ethManager = getETHManager(state);
-  const signer = ethManager.provider.getSigner();
 
-  const bityInputAmount = order.bityOrder.input.amount;
-  const bityDepositAddress = order.bityOrder.payment_details.crypto_address;
+  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
+  const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
 
-  log('PAYMENT: bity order id', order.bityOrder.id);
+  const bityOrderId = bityTrade.bityOrderResponse.id;
+  log('PAYMENT: bity order id', bityOrderId);
   log('PAYMENT: ETH address', ethManager.getAddress());
 
   try {
-    if(order.path === ExchangePath.DEX_BITY) {
-
-      if(!order.tradeData) throw new Error('missing trade data');
-      const tradeDetails = order.tradeData.tradeDetails;
+    if(dexTrade) {
+      if(!dexTrade.dexMetadata) throw new Error('missing dex meta data');
 
       // Allowance
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => checkTradeAllowance(tradeDetails, signer).then(tx => tx?.hash)
+        paymentFunction: async () => DexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -280,11 +319,11 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.TRADE,
-        paymentFunction: async () => executeTrade(
-          tradeDetails,
-          undefined,
-          signer,
-        ).then(tx => tx.hash)
+        paymentFunction: async () => DexProxy.executeTrade(
+          dexTrade,
+          ethManager.provider,
+          0.01, // TODO let user choose that
+        )
       });
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');
@@ -292,6 +331,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
     }
 
     // Payment
+    const bityInputAmount = bityTrade.inputAmount;
+    const bityDepositAddress = bityTrade.bityOrderResponse.payment_details.crypto_address;
     await sendPaymentStep({
       dispatch, ethManager,
       stepId: PaymentStepId.PAYMENT,
@@ -300,13 +341,20 @@ export const sendPayment = () => async function (dispatch, getState)  {
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
 
-    watchBityOrder(state, dispatch, order.bityOrder.id);
-
   } catch(error) {
 
     logError('Error while sending payment', error);
     sendEvent('payment', 'send', 'error');
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
 
+  }
+};
+
+export const initReferral = () => async function (dispatch) {
+  const query = new URLSearchParams(window.location.search);
+  const referralId = query.get('referralId');
+
+  if(referralId) {
+    dispatch(setReferral(referralId));
   }
 };

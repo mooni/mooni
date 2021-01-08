@@ -24,7 +24,7 @@ function getErrorTitle(error) {
     case 'invalid-custom-token':
       return 'Invalid token';
     case 'eth_signature_rejected':
-      return 'Requires authentification';
+      return 'Requires authentication';
     default:
       return 'Unknown error';
   }
@@ -39,9 +39,9 @@ function getErrorContent(error) {
     case 'no_ethereum_provider':
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
     case 'unable_open_wallet':
-      return `The wallet you are trying to connect with seems incompatible. Please report this problem to our support.`;
+      return `We encountered an error while trying to connect with your wallet. Please try again or report this problem to our support.`;
     case 'eth_signature_rejected':
-      return 'You need to sign the message in order to authenticate in the app. Please retry and accept the signature in your wallet.';
+      return 'We were unable to prove your identity. Please retry to connect and check signature requests in your wallet.';
     case 'invalid-custom-token':
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
     default:
@@ -78,11 +78,19 @@ export default function ErrorModal() {
             <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
               <IconCaution size="large" style={{color: theme.negative}}/>
             </Box>
-            {getErrorContent(modalError)}
+
+            <Box textAlign="center" width={1}>
+              {getErrorContent(modalError)}
+            </Box>
+
+            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
+              <a href="https://t.me/moonidapp" target="_blank" rel="noopener noreferrer">
+                Contact support
+              </a>
+            </Box>
           </Box>
           <Box mb={1}/>
           <Button onClick={onCloseModal}>Close</Button>
-
         </Box>
       </Box>
     </Dialog>
