@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
 import { Link } from '@aragon/ui'
+import styled from 'styled-components';
 import {CurrencyType} from '../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../lib/numbers';
 import { Fee, MultiTradeEstimation, Trade, TradeType } from '../lib/trading/types'
 import {MetaError} from "../lib/errors";
-import styled from 'styled-components';
+import {ShadowBox} from "./StyledComponents";
 
 import bityLogo from "../assets/bity_logo_small.png";
 import paraswapLogo from "../assets/paraswap_logo_small.png";
@@ -47,12 +48,7 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null 
   };
 }
 
-const Container = styled.div`
-background: #FCFDFF;
-border: 1px solid #ececec;
-box-sizing: border-box;
-box-shadow: 2px 2px 4px rgba(86, 86, 86, 0.1);
-border-radius: 27px;
+const Container = styled(ShadowBox)`
 width: 100%;
 padding: 15px 20px;
 margin: 20px 0;

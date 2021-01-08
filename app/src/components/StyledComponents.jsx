@@ -47,3 +47,11 @@ export const SimpleLink = styled(Link)`
     textDecoration: none;
   }
 `;
+
+export const ShadowBox = styled.div`
+  background: #FCFDFF;
+  border: 1px solid #ececec;
+  box-sizing: border-box;
+  box-shadow: 2px 2px 4px rgba(86, 86, 86, 0.1);
+  border-radius: 27px;
+`;
