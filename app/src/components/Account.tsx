@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -37,6 +38,7 @@ function shortenedAddress(address) {
 
 function Account() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const { below } = useViewport();
 
   const walletStatus = useSelector(getWalletStatus);
@@ -59,6 +61,10 @@ function Account() {
     dispatch(logout());
   }
 
+  function goToProfile() {
+    history.push('/profile');
+  }
+
   if(walletLoading)
     return (
       <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
@@ -75,7 +81,7 @@ function Account() {
   return (
     <Box display="flex">
       <Box mr={1} data-private>
-        <ProfileBox>
+        <ProfileBox onClick={goToProfile}>
           <Avatar>
             <EthIdenticon
               address={address}
