@@ -65,7 +65,8 @@
     "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev --preview-feature",
     "prisma:migrate:deploy": "prisma migrate deploy --preview-feature",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
   },
   "eslintConfig": {
     "extends": "react-app"

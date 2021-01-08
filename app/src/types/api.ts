@@ -5,7 +5,7 @@ type CUID = string;
 type EthereumAddress = string;
 type CurrencyAmount = string;
 
-enum MooniOrderStatus {
+export enum MooniOrderStatus {
   PENDING = 'PENDING',
   EXECUTED = 'EXECUTED',
 }
