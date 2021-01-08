@@ -192,7 +192,7 @@ export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) =>
       <Box px={1}>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {fee &&
-        <BasicLine title="Fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
+        <BasicLine title="Exchange fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>
