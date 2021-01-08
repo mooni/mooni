@@ -69,37 +69,39 @@ export default function ExchangePage() {
 
   return (
     <RequireConnection>
-      <SmallWidth>
-        <ABox width={1} py={3}>
-          <CustomMobileStepper
-            activeStep={stepId}
-            steps={stepElements.length}
-            variant="progress"
-            position="static"
-            className={classes.mobileStepperRoot}
-          />
+      {() =>
+        <SmallWidth>
+          <ABox width={1} py={3}>
+            <CustomMobileStepper
+              activeStep={stepId}
+              steps={stepElements.length}
+              variant="progress"
+              position="static"
+              className={classes.mobileStepperRoot}
+            />
 
-          <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-            {steps[stepId]}
-          </Box>
+            <Box textAlign="center" className={classes.mobileStepperStepLabel}>
+              {steps[stepId]}
+            </Box>
 
-          {stepId !== 0 && <Box mb={2}>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="small"
-              startIcon={<ArrowBack/>}
-              disabled={stepId === 0}
-              style={{width: '100%'}}
-              onClick={handleBack}
-            >
-              Back
-            </Button>
-          </Box>
-          }
-          {stepElements[stepId]}
-        </ABox>
-      </SmallWidth>
+            {stepId !== 0 && <Box mb={2}>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                startIcon={<ArrowBack/>}
+                disabled={stepId === 0}
+                style={{width: '100%'}}
+                onClick={handleBack}
+              >
+                Back
+              </Button>
+            </Box>
+            }
+            {stepElements[stepId]}
+          </ABox>
+        </SmallWidth>
+      }
     </RequireConnection>
   );
 }

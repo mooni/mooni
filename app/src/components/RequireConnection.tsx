@@ -17,7 +17,7 @@ function RequireConnection({ children }) {
   const dispatch = useDispatch();
 
   if(walletStatus === WalletStatus.CONNECTED)
-    return children;
+    return children();
 
   if(walletLoading)
     return <Loader text="Loading Ethereum wallet" />;

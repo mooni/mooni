@@ -28,9 +28,11 @@ export default function OrderStatusContainer() {
 
   return (
     <RequireConnection>
-      <SmallWidth>
-        <PaymentStatus payment={payment} onRestart={onRestart}/>
-      </SmallWidth>
+      {() =>
+        <SmallWidth>
+          <PaymentStatus payment={payment} onRestart={onRestart}/>
+        </SmallWidth>
+      }
     </RequireConnection>
   );
 }
