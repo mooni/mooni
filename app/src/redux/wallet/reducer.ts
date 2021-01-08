@@ -1,14 +1,7 @@
 import * as actions from "./actions";
+import { STATE_NAME, initialState } from "./state";
 
-export const STATE_NAME = 'ETH';
-
-const initialState = {
-  ethManager: null,
-  address: null,
-  jwsToken: null,
-  loginModalOpen: false,
-  providerFromIframe: false,
-};
+export { STATE_NAME };
 
 export default function(state = initialState, action) {
   switch (action.type) {
@@ -19,18 +12,11 @@ export default function(state = initialState, action) {
         ethManager,
       };
     }
-    case actions.SET_ETH_MANAGER_LOADING: {
-      const { ethManagerLoading } = action.payload;
+    case actions.SET_WALLET_STATUS: {
+      const { walletStatus } = action.payload;
       return {
         ...state,
-        ethManagerLoading,
-      };
-    }
-    case actions.OPEN_LOGIN_MODAL: {
-      const { loginModalOpen } = action.payload;
-      return {
-        ...state,
-        loginModalOpen,
+        walletStatus,
       };
     }
     case actions.SET_ADDRESS: {

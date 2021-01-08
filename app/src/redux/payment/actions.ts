@@ -1,5 +1,5 @@
 import {getMultiTrade, getMultiTradeRequest} from './selectors';
-import {getAddress, getETHManager, getJWS} from '../eth/selectors';
+import {getAddress, getETHManager, getJWS} from '../wallet/selectors';
 import {
   Payment,
   PaymentStatus,
