@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { Button, EthIdenticon, IconWallet, IconPower, useViewport, GU } from '@aragon/ui'
 import { Box, Avatar, Typography } from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
 
 import {ShadowBox} from "../UI/StyledComponents";
 
@@ -17,19 +18,26 @@ const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
 
 // @ts-ignore
-const ProfileBox = styled(ShadowBox)`
+const BadgeBox = styled(ShadowBox)`
   display: flex;
   align-items: center;
   cursor: pointer;
   &:hover {
-    background-color: #fafafb;
+    background-color: #eef1f6;
   }
 `
 // @ts-ignore
-const ProfileName = styled.span`
-  margin-left: 10px;
-  margin-right: 10px;
+const ConnectedText = styled(Typography)`
+  && {
+  margin-left: 8px;
   color: #504E4E;
+  }
+`
+// @ts-ignore
+const NotConnectedText = styled(ConnectedText)`
+  && {
+    margin-right: 8px;
+  }
 `
 
 function shortenedAddress(address) {
@@ -67,7 +75,12 @@ function AccountBadge() {
 
   if(walletLoading)
     return (
-      <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
+      <BadgeBox>
+        <Avatar/>
+        <NotConnectedText variant="caption">
+          Connecting...
+        </NotConnectedText>
+      </BadgeBox>
     );
 
   if(walletStatus === WalletStatus.DISCONNECTED) {
@@ -81,7 +94,7 @@ function AccountBadge() {
   return (
     <Box display="flex">
       <Box mr={1} data-private>
-        <ProfileBox onClick={goToProfile}>
+        <BadgeBox onClick={goToProfile}>
           <Avatar>
             <EthIdenticon
               address={address}
@@ -92,17 +105,18 @@ function AccountBadge() {
               `}
             />
           </Avatar>
+
           {
             !below('medium') &&
-            <ProfileName>
-              <Typography variant="caption">
-                {displayedName}
-              </Typography>
-            </ProfileName>
+            <ConnectedText variant="caption">
+              {displayedName}
+            </ConnectedText>
           }
-        </ProfileBox>
+
+          <MenuIcon color="disabled" style={{ marginLeft: 8, marginRight: 8 }} />
+        </BadgeBox>
       </Box>
-      {!providerFromIframe && <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />}
+      {false && !providerFromIframe && <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />}
     </Box>
   );
 }

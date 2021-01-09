@@ -37,8 +37,8 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
         {order.status === MooniOrderStatus.PENDING && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
         {order.status === MooniOrderStatus.EXECUTED && <IconCheck size="medium" style={{ color: theme.positive }}/>}
       </TableCell>
-      <TableCell>{truncateNumber(order.inputAmount)}{order.inputCurrency}</TableCell>
-      <TableCell>{truncateNumber(order.outputAmount)}{order.outputCurrency}</TableCell>
+      <TableCell>{truncateNumber(order.inputAmount)} {order.inputCurrency}</TableCell>
+      <TableCell>{truncateNumber(order.outputAmount)} {order.outputCurrency}</TableCell>
       <TableCell>{date.toLocaleDateString()} {date.toLocaleTimeString()}</TableCell>
     </TableRow>
   );
