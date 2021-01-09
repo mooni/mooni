@@ -1,15 +1,15 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loader from '../components/Loader';
+import Loader from '../UI/Loader';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, Button } from '@aragon/ui'
 
-import { getWalletStatus, isWalletLoading } from '../redux/wallet/selectors';
-import { login } from '../redux/wallet/actions';
+import { getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
+import { login } from '../../redux/wallet/actions';
 
-import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
-import { WalletStatus } from "../redux/wallet/state";
+import LoadImage from '../../assets/undraw_counting_stars_rrnl.svg';
+import { WalletStatus } from "../../redux/wallet/state";
 
 function RequireConnection({ children }) {
   const walletStatus = useSelector(getWalletStatus);

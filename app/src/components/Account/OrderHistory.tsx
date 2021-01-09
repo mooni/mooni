@@ -12,11 +12,11 @@ import {
   useViewport,
 } from '@aragon/ui'
 
-import Api from '../lib/apiWrapper';
-import { getJWS } from '../redux/wallet/selectors';
-import { MooniOrder, MooniOrderStatus } from '../types/api';
-import { truncateNumber } from '../lib/numbers';
-import { ShadowBox } from './StyledComponents';
+import Api from '../../lib/apiWrapper';
+import { getJWS } from '../../redux/wallet/selectors';
+import { MooniOrder, MooniOrderStatus } from '../../types/api';
+import { truncateNumber } from '../../lib/numbers';
+import { ShadowBox } from '../UI/StyledComponents';
 
 // @ts-ignore
 const CustomTableContainer = styled(ShadowBox)`

@@ -1,11 +1,12 @@
 import React from 'react';
 
 import {Box} from '@material-ui/core';
-import Header from './Header';
-import Footer from './Footer';
-import ScrollRoot from './ScrollRoot';
-
 import { makeStyles } from '@material-ui/core/styles';
+
+import Header from '../Header';
+import Footer from '../Footer';
+import ScrollRoot from '../Utils/ScrollRoot';
+
 
 const useStyles = makeStyles(() => ({
   root: {

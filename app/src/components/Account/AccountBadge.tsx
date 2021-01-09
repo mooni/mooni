@@ -6,12 +6,12 @@ import styled from 'styled-components';
 import { Button, EthIdenticon, IconWallet, IconPower, useViewport, GU } from '@aragon/ui'
 import { Box, Avatar, Typography } from '@material-ui/core';
 
-import {ShadowBox} from "./StyledComponents";
+import {ShadowBox} from "../UI/StyledComponents";
 
-import { getAddress, getWalletStatus, getProviderFromIframe, isWalletLoading } from '../redux/wallet/selectors';
-import { logout } from '../redux/wallet/actions';
-import { defaultProvider } from '../lib/web3Providers';
-import { WalletStatus } from "../redux/wallet/state";
+import { getAddress, getWalletStatus, getProviderFromIframe, isWalletLoading } from '../../redux/wallet/selectors';
+import { logout } from '../../redux/wallet/actions';
+import { defaultProvider } from '../../lib/web3Providers';
+import { WalletStatus } from "../../redux/wallet/state";
 
 const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
@@ -36,7 +36,7 @@ function shortenedAddress(address) {
   return `${address.slice(0, 5)}...${address.slice(-5)}`;
 }
 
-function Account() {
+function AccountBadge() {
   const dispatch = useDispatch();
   const history = useHistory();
   const { below } = useViewport();
@@ -62,7 +62,7 @@ function Account() {
   }
 
   function goToProfile() {
-    history.push('/profile');
+    history.push('/account');
   }
 
   if(walletLoading)
@@ -107,4 +107,4 @@ function Account() {
   );
 }
 
-export default Account;
+export default AccountBadge;

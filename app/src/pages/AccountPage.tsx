@@ -2,13 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Box, Grid, makeStyles } from '@material-ui/core';
-import { TextCopy, textStyle, GU } from '@aragon/ui';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../redux/user/userSlice';
+import { textStyle, GU } from '@aragon/ui';
 
-import RequireConnection from "../components/RequireConnection";
-import OrderHistory from '../components/OrderHistory';
-
+import RequireConnection from "../components/Utils/RequireConnection";
+import OrderHistory from '../components/Account/OrderHistory';
+import ReferralInfo from '../components/Account/ReferralInfo';
 
 const Title = styled.p`
   ${textStyle('title2')};
@@ -21,27 +19,13 @@ const SubTitle = styled.p`
   margin-bottom: ${2 * GU}px;
 `;
 
-const Content = styled.p`
-  ${textStyle('body2')};
-  text-align: center;
-  margin-top: ${2 * GU}px;
-  margin-bottom: ${2 * GU}px;
-`;
-const SubContent = styled.p`
-  ${textStyle('body4')};
-  text-align: center;
-  margin-top: ${2 * GU}px;
-`;
-
-
 const useStyles = makeStyles({
   grid: {
     padding: 2,
   },
 });
 
-export default function ProfilePage() {
-  const user = useSelector(selectUser);
+export default function AccountPage() {
   const classes = useStyles();
   return (
     <RequireConnection>
@@ -76,15 +60,7 @@ export default function ProfilePage() {
                 <SubTitle>
                   Referral
                 </SubTitle>
-                <Content>
-                  Earn cryptocurrency by sharing this referral link:
-                </Content>
-                <TextCopy
-                  value={`https://app.mooni.tech?referralId=${user.referralId}`}
-                />
-                <SubContent>
-                  You can earn money by referring other people to use Mooni ! Any completed order referred by you will make you earn 10 % profit sharing.
-                </SubContent>
+                <ReferralInfo/>
               </Box>
             </Grid>
           </Grid>

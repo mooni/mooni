@@ -5,10 +5,10 @@ import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { textStyle, Field, Info, Timer } from '@aragon/ui';
 
-import { getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
-import {truncateNumber} from '../lib/numbers';
+import { getCurrencyLogoAddress } from '../../lib/trading/currencyHelpers';
+import {truncateNumber} from '../../lib/numbers';
 
-import {BityTrade, MultiTrade, TradeType} from "../lib/trading/types";
+import {BityTrade, MultiTrade, TradeType} from "../../lib/trading/types";
 import { RateAmount } from "./RateAmount";
 
 const useStyles = makeStyles(theme => ({

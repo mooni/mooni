@@ -2,8 +2,9 @@ import React from 'react';
 
 import {Link as RouterLink} from 'react-router-dom';
 import { Link, Box } from '@material-ui/core';
-import Account from './Account';
 import {makeStyles} from '@material-ui/core/styles';
+
+import AccountBadge from './Account/AccountBadge';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -63,7 +64,7 @@ export default function Header() {
         </span>
       </Link>
       <Box className={classes.element}>
-        <Account />
+        <AccountBadge />
       </Box>
     </Box>
   );

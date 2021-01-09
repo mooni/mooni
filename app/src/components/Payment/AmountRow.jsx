@@ -6,9 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
 import { DropDown } from '@aragon/ui'
 
-import { getCurrency, getCurrencyLogoAddress } from '../lib/trading/currencyHelpers';
-import { SIGNIFICANT_DIGITS } from '../lib/numbers';
-import tokenDefaultImage  from '../assets/token_default.png';
+import { getCurrency, getCurrencyLogoAddress } from '../../lib/trading/currencyHelpers';
+import { SIGNIFICANT_DIGITS } from '../../lib/numbers';
+import tokenDefaultImage  from '../../assets/token_default.png';
 
 const useStyles = makeStyles(theme => ({
   caption: {

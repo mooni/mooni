@@ -2,15 +2,15 @@ import React from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
 import { Link } from '@aragon/ui'
 import styled from 'styled-components';
-import {CurrencyType} from '../lib/trading/currencyTypes';
-import {BN, truncateNumber} from '../lib/numbers';
-import { Fee, MultiTradeEstimation, Trade, TradeType } from '../lib/trading/types'
-import {MetaError} from "../lib/errors";
-import {ShadowBox} from "./StyledComponents";
+import {CurrencyType} from '../../lib/trading/currencyTypes';
+import {BN, truncateNumber} from '../../lib/numbers';
+import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
+import {MetaError} from "../../lib/errors";
+import {ShadowBox} from "../UI/StyledComponents";
 
-import bityLogo from "../assets/bity_logo_small.png";
-import paraswapLogo from "../assets/paraswap_logo_small.png";
-import { getCurrency } from '../lib/trading/currencyHelpers'
+import bityLogo from "../../assets/bity_logo_small.png";
+import paraswapLogo from "../../assets/paraswap_logo_small.png";
+import { getCurrency } from '../../lib/trading/currencyHelpers'
 
 function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
@@ -48,6 +48,7 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null 
   };
 }
 
+// @ts-ignore
 const Container = styled(ShadowBox)`
 width: 100%;
 padding: 15px 20px;

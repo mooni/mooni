@@ -11,7 +11,7 @@ import './App.css';
 import HomePage from './pages/HomePage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
-import ProfilePage from './pages/ProfilePage';
+import AccountPage from './pages/AccountPage';
 
 import { usePageViews } from './lib/analytics';
 
@@ -29,8 +29,8 @@ export const Routes: React.FC = () => {
       <Route path="/status">
         <StatusPage />
       </Route>
-      <Route path="/profile">
-        <ProfilePage />
+      <Route path="/account">
+        <AccountPage />
       </Route>
       <Route path="*">
         <Redirect to="/" />

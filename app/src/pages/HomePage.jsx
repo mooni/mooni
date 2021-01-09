@@ -6,10 +6,10 @@ import { Box, Typography } from '@material-ui/core';
 import { Button, IconEthereum, IconWallet } from '@aragon/ui'
 
 import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
-import { SmallWidth } from '../components/StyledComponents';
+import { SmallWidth } from '../components/UI/StyledComponents';
 import {getWalletStatus, isWalletLoading} from '../redux/wallet/selectors';
 import { login } from '../redux/wallet/actions';
-import RateForm from '../components/RateForm';
+import RateForm from '../components/Payment/RateForm';
 import { getMultiTradeRequest } from '../redux/payment/selectors';
 import {WalletStatus} from "../redux/wallet/state";
 
