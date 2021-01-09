@@ -8,6 +8,8 @@ import {
   IconCheck,
   useTheme,
   IconEllipsis,
+  LoadingRing,
+  useViewport,
 } from '@aragon/ui'
 
 import Api from '../lib/apiWrapper';
@@ -16,6 +18,7 @@ import { MooniOrder, MooniOrderStatus } from '../types/api';
 import { truncateNumber } from '../lib/numbers';
 import { ShadowBox } from './StyledComponents';
 
+// @ts-ignore
 const CustomTableContainer = styled(ShadowBox)`
   padding: 0px 5px;
 `;
@@ -30,7 +33,7 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
   const date = new Date(order.createdAt);
   return (
     <TableRow>
-      <TableCell component="th" scope="row">
+      <TableCell component="th" scope="row" align="center">
         {order.status === MooniOrderStatus.PENDING && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
         {order.status === MooniOrderStatus.EXECUTED && <IconCheck size="medium" style={{ color: theme.positive }}/>}
       </TableCell>
@@ -43,31 +46,38 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
 
 export default function OrderHistory() {
   const jwsToken = useSelector(getJWS);
+  const { below } = useViewport();
   const { data, error } = useSWR(jwsToken, Api.getOrders);
 
   if (error) return <Box>Failed to load orders</Box>;
-  if (!data) return <Box>Loading orders...</Box>;
+  if (!data) return (
+    <Box display="flex" flexDirection="column" alignItems="center">
+      <p>Loading orders...</p>
+      <Box m={1}/>
+      <LoadingRing mode="half-circle" />
+    </Box>
+  );
 
   const orders = data as MooniOrder[];
 
   return (
     <Box width={1} mx={2}>
       {orders.length > 0 ?
-          <TableContainer component={CustomTableContainer}>
-            <Table aria-label="order history">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>From</TableCell>
-                  <TableCell>To</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {orders.map(order => <OrderRow order={order} key={order.id}/>)}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <TableContainer component={CustomTableContainer}>
+          <Table aria-label="order history" size={below('medium') ? 'small' : 'medium'}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Status</TableCell>
+                <TableCell>From</TableCell>
+                <TableCell>To</TableCell>
+                <TableCell>Date</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {orders.map(order => <OrderRow order={order} key={order.id}/>)}
+            </TableBody>
+          </Table>
+        </TableContainer>
         :
         <Box>
           You didn't make any orders.
