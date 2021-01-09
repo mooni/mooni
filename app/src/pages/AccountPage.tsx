@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Box, Grid, makeStyles } from '@material-ui/core';
+import { Box, Grid } from '@material-ui/core';
 import { textStyle, GU } from '@aragon/ui';
 
 import RequireConnection from "../components/Utils/RequireConnection";
 import OrderHistory from '../components/Account/OrderHistory';
 import ReferralInfo from '../components/Account/ReferralInfo';
+import AccountInfo from '../components/Account/AccountInfo';
 
 const Title = styled.p`
   ${textStyle('title2')};
@@ -19,14 +20,8 @@ const SubTitle = styled.p`
   margin-bottom: ${2 * GU}px;
 `;
 
-const useStyles = makeStyles({
-  grid: {
-    padding: 2,
-  },
-});
 
 export default function AccountPage() {
-  const classes = useStyles();
   return (
     <RequireConnection>
       {() =>
@@ -45,7 +40,9 @@ export default function AccountPage() {
             My account
           </Title>
 
-          <Grid container spacing={8} classes={{'spacing-xs-8': classes.grid}}>
+          <AccountInfo/>
+
+          <Grid container spacing={8}>
             <Grid item xs={12} sm={6}>
               <Box display="flex" alignItems="center" justifyContent="center" flexDirection="column">
                 <SubTitle>

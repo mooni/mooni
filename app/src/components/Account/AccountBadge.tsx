@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button, EthIdenticon, IconWallet, IconPower, useViewport, GU } from '@aragon/ui'
+import { Button, EthIdenticon, IconWallet, useViewport, GU } from '@aragon/ui'
 import { Box, Avatar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import {ShadowBox} from "../UI/StyledComponents";
 
-import { getAddress, getWalletStatus, getProviderFromIframe, isWalletLoading } from '../../redux/wallet/selectors';
-import { logout } from '../../redux/wallet/actions';
+import { getAddress, getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
 import { defaultProvider } from '../../lib/web3Providers';
 import { WalletStatus } from "../../redux/wallet/state";
 
@@ -45,14 +44,12 @@ function shortenedAddress(address) {
 }
 
 function AccountBadge() {
-  const dispatch = useDispatch();
   const history = useHistory();
   const { below } = useViewport();
 
   const walletStatus = useSelector(getWalletStatus);
   const walletLoading = useSelector(isWalletLoading);
   const address = useSelector(getAddress);
-  const providerFromIframe = useSelector(getProviderFromIframe);
 
   const [ens, setENS] = useState<string>();
 
@@ -64,10 +61,6 @@ function AccountBadge() {
       })().catch(console.error);
     }
   }, [address]);
-
-  function onLogout() {
-    dispatch(logout());
-  }
 
   function goToProfile() {
     history.push('/account');
@@ -93,7 +86,7 @@ function AccountBadge() {
 
   return (
     <Box display="flex">
-      <Box mr={1} data-private>
+      <Box mr={1}>
         <BadgeBox onClick={goToProfile}>
           <Avatar>
             <EthIdenticon
@@ -116,7 +109,6 @@ function AccountBadge() {
           <MenuIcon color="disabled" style={{ marginLeft: 8, marginRight: 8 }} />
         </BadgeBox>
       </Box>
-      {false && !providerFromIframe && <Button icon={<IconPower />} size="medium" display="icon" label="logout" onClick={onLogout} />}
     </Box>
   );
 }
