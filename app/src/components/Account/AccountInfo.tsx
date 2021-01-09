@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button } from '@aragon/ui'
+import { Button, Link } from '@aragon/ui'
 import { Box, Typography } from '@material-ui/core';
 import { ExitToApp } from '@material-ui/icons';
 
-import {ShadowBox} from "../UI/StyledComponents";
+import {ShadowBox, SimpleLink} from "../UI/StyledComponents";
 
 import { getAddress, getProviderFromIframe } from '../../redux/wallet/selectors';
 import { logout } from '../../redux/wallet/actions';
-import { defaultProvider } from '../../lib/web3Providers';
+import { selectENS } from '../../redux/user/userSlice';
+import { getEtherscanAddressURL } from '../../lib/eth';
 
 // @ts-ignore
 const BadgeBox = styled(ShadowBox)`
@@ -29,18 +30,8 @@ function AccountBadge() {
   const dispatch = useDispatch();
 
   const address = useSelector(getAddress);
+  const ens = useSelector(selectENS);
   const providerFromIframe = useSelector(getProviderFromIframe);
-
-  const [ens, setENS] = useState<string>();
-
-  useEffect(() => {
-    if(address) {
-      (async () => {
-        const ens = await defaultProvider.lookupAddress(address);
-        setENS(ens);
-      })().catch(console.error);
-    }
-  }, [address]);
 
   function onLogout() {
     dispatch(logout());
@@ -48,9 +39,11 @@ function AccountBadge() {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
-      <Typography variant="subtitle1" align="center">Logged in as</Typography>
+      <Typography variant="subtitle1" align="center">Logged in as:</Typography>
       <BadgeBox>
-        <AddressText variant="caption" align="center">{address} {ens &&  `(${ens})`}</AddressText>
+        <SimpleLink href={getEtherscanAddressURL(address)} external>
+          <AddressText variant="caption" align="center">{address} {ens &&  <i>({ens})</i>}</AddressText>
+        </SimpleLink>
       </BadgeBox>
       {!providerFromIframe && <Button icon={<ExitToApp />} mode="negative" size="small" label="Disconnect" onClick={onLogout} />}
     </Box>

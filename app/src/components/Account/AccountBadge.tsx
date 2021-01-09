@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -10,8 +10,8 @@ import MenuIcon from '@material-ui/icons/Menu';
 import {ShadowBox} from "../UI/StyledComponents";
 
 import { getAddress, getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
-import { defaultProvider } from '../../lib/web3Providers';
 import { WalletStatus } from "../../redux/wallet/state";
+import { selectENS } from '../../redux/user/userSlice';
 
 const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
@@ -50,17 +50,7 @@ function AccountBadge() {
   const walletStatus = useSelector(getWalletStatus);
   const walletLoading = useSelector(isWalletLoading);
   const address = useSelector(getAddress);
-
-  const [ens, setENS] = useState<string>();
-
-  useEffect(() => {
-    if(address) {
-      (async () => {
-        const ens = await defaultProvider.lookupAddress(address);
-        setENS(ens);
-      })().catch(console.error);
-    }
-  }, [address]);
+  const ens = useSelector(selectENS);
 
   function goToProfile() {
     history.push('/account');

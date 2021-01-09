@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import { Box, TableContainer, Table, TableRow, TableBody, TableHead, TableCell } from '@material-ui/core';
+import { Box, Typography, TableContainer, Table, TableRow, TableBody, TableHead, TableCell } from '@material-ui/core';
 import {
   IconCheck,
   useTheme,
@@ -79,7 +79,7 @@ export default function OrderHistory() {
           </Table>
         </TableContainer>
         :
-        <Box>
+        <Box textAlign="center">
           You didn't make any orders.
         </Box>
       }

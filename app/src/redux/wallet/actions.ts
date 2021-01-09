@@ -7,7 +7,7 @@ import {MetaError} from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import {store} from '../../lib/store';
 import {WalletStatus} from "./state";
-import { fetchUser, setUser } from '../user/userSlice';
+import { fetchUser, resetUser } from '../user/userSlice';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -52,6 +52,7 @@ const setProviderFromIframe = (providerFromIframe: boolean) => ({
 
 const onAccountChanged = () => (dispatch, getState) => {
   dispatch(setWalletStatus(WalletStatus.LOADING));
+  dispatch(resetUser());
 
   const ethManager = getETHManager(getState());
 
@@ -143,7 +144,7 @@ export const logout = () => (dispatch, getState) => {
   dispatch(setAddress(null));
   dispatch(setJWS(null));
   dispatch(setProviderFromIframe(false));
-  dispatch(setUser(null));
+  dispatch(resetUser());
 
   web3Modal.clearCachedProvider();
 
