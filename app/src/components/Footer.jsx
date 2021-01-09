@@ -36,7 +36,7 @@ function Footer() {
   return (
     <Box className={classes.root}>
       <Box className={classes.element}>
-        <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.6</ALink>
+        <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.7</ALink>
       </Box>
       <Box className={classes.element}>
         <Link onClick={() => dispatch(setInfoPanel('terms'))} className={classes.link}>
