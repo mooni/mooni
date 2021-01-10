@@ -118,3 +118,5 @@ export function createFromCurrencyObject(currencyObject: CurrencyObject): Curren
       throw new Error('unknown currency type')
   }
 }
+
+export type CurrenciesMap = Record<CurrencySymbol, Currency>;

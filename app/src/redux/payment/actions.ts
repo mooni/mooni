@@ -16,6 +16,7 @@ import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
 import DexProxy from "../../lib/trading/dexProxy";
+import { CurrenciesMap } from '../../lib/trading/currencyTypes';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 
@@ -285,9 +286,10 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const sendPayment = () => async function (dispatch, getState)  {
+export const sendPayment = (currencyMap: CurrenciesMap) => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
+
 
   const state = getState();
   const multiTrade = getMultiTrade(state);
@@ -297,6 +299,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
+
+  const dexProxy = new DexProxy(currencyMap);
 
   const bityOrderId = bityTrade.bityOrderResponse.id;
   log('PAYMENT: bity order id', bityOrderId);
@@ -310,7 +314,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => DexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
+        paymentFunction: async () => dexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
       });
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -319,7 +323,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       await sendPaymentStep({
         dispatch, ethManager,
         stepId: PaymentStepId.TRADE,
-        paymentFunction: async () => DexProxy.executeTrade(
+        paymentFunction: async () => dexProxy.executeTrade(
           dexTrade,
           ethManager.provider,
           0.01, // TODO let user choose that

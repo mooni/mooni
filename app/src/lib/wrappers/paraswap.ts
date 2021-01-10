@@ -7,9 +7,8 @@ import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '.
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import {CurrencyType, TokenCurrency} from "../trading/currencyTypes";
+import { CurrenciesMap, CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt, BN} from "../numbers";
-import {getCurrency} from "../trading/currencyHelpers";
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -39,6 +38,13 @@ const ParaswapWrapper = {
       new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
   },
+  async getTokenMap(): Promise<CurrenciesMap> {
+    const tokenList = await ParaswapWrapper.getTokenList();
+    return tokenList.reduce((acc, currency) => ({
+      ...acc,
+      [currency.symbol]: currency,
+    }), {});
+  },
   async getBalances(address: string): Promise<CurrencyBalances> {
     const { data } = await paraswapAxios({
       method: 'get',
@@ -53,11 +59,11 @@ const ParaswapWrapper = {
       }
     }), {});
   },
-  async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
+  async getRate(tradeRequest: TradeRequest, currencyMap: CurrenciesMap): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
 
-    const inputCurrency = getCurrency(tradeRequest.inputCurrencySymbol);
-    const outputCurrency = getCurrency(tradeRequest.outputCurrencySymbol);
+    const inputCurrency = currencyMap[tradeRequest.inputCurrencySymbol];
+    const outputCurrency = currencyMap[tradeRequest.outputCurrencySymbol];
     const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
 
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
@@ -102,9 +108,9 @@ const ParaswapWrapper = {
     const spender = await augustusContract.getTokenTransferProxy();
     return spender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number): Promise<any> {
+  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currencyMap: CurrenciesMap): Promise<any> {
     function getTokenAddress(symbol) {
-      const currency = getCurrency(symbol);
+      const currency = currencyMap[symbol];
 
       if(currency.equals(ETHER)) {
         return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';

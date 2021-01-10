@@ -1,17 +1,20 @@
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
-import {CurrencyType} from './currencyTypes';
+import {CurrencyType, CurrenciesMap} from './currencyTypes';
 import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 import Bity from "../wrappers/bity";
-import {addTokenFromSymbol, getCurrency} from "./currencyHelpers";
 
 export class Trader {
-  constructor(readonly bityInstance: Bity) {}
+  dexProxy: DexProxy;
 
-  private static findPath(tradeRequest: TradeRequest): TradePath {
-    const inputCurrency = getCurrency(tradeRequest.inputCurrencySymbol)
-    const outputCurrency = getCurrency(tradeRequest.outputCurrencySymbol)
+  constructor(readonly bityInstance: Bity, readonly currencyMap: CurrenciesMap) {
+    this.dexProxy = new DexProxy(currencyMap);
+  }
+
+  private findPath(tradeRequest: TradeRequest): TradePath {
+    const inputCurrency = this.currencyMap[tradeRequest.inputCurrencySymbol];
+    const outputCurrency = this.currencyMap[tradeRequest.outputCurrencySymbol];
     if(
         inputCurrency.equals(ETHER)
         &&
@@ -46,7 +49,7 @@ export class Trader {
   }
 
   private async estimateTrade(tradeRequest: TradeRequest): Promise<Trade> {
-    const path = Trader.findPath(tradeRequest);
+    const path = this.findPath(tradeRequest);
     if(path.length !== 1) {
       throw new Error('can only estimate direct trade');
     }
@@ -55,14 +58,14 @@ export class Trader {
       return await this.bityInstance.estimate(tradeRequest);
     }
     else if(tradeType === TradeType.DEX) {
-      return await DexProxy.getRate(tradeRequest);
+      return await this.dexProxy.getRate(tradeRequest);
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }
   }
 
   private async createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiTradeRequest): Promise<Trade> {
-    const path = Trader.findPath(tradeRequest);
+    const path = this.findPath(tradeRequest);
     if(path.length !== 1) {
       throw new Error('can only estimate direct trade');
     }
@@ -74,14 +77,14 @@ export class Trader {
       return await this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
     }
     else if(tradeType === TradeType.DEX) {
-      return await DexProxy.createTrade(tradeRequest);
+      return await this.dexProxy.createTrade(tradeRequest);
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }
   }
 
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
-    const path = Trader.findPath(tradeRequest);
+    const path = this.findPath(tradeRequest);
 
     const trades: Trade[] = [];
     let ethAmount: string;
@@ -159,7 +162,7 @@ export class Trader {
     let ethAmount: string;
 
     const {tradeRequest, ethInfo, bankInfo, referralId} = multiTradeRequest;
-    const path = Trader.findPath(multiTradeRequest.tradeRequest);
+    const path = this.findPath(multiTradeRequest.tradeRequest);
 
     const trades: Trade[] = [];
 
@@ -238,10 +241,5 @@ export class Trader {
       ethAmount,
       referralId,
     };
-  }
-
-  static async assertTokenReady(tradeRequest: TradeRequest) {
-    const inputSymbol = tradeRequest.inputCurrencySymbol;
-    await addTokenFromSymbol(inputSymbol);
   }
 }

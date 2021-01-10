@@ -6,8 +6,8 @@ import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
 import { textStyle } from '@aragon/ui'
 import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
-import { Currency } from '../../../lib/trading/currencyTypes';
-import { CurrenciesContext, CurrenciesMap } from '../../../contexts/CurrenciesContext';
+import { CurrenciesMap, Currency } from '../../../lib/trading/currencyTypes';
+import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
 import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
 
 const Title = styled.p`
@@ -104,14 +104,14 @@ function onlyHeldCurrencies(currenciesMap: CurrenciesMap, currencyBalances: Curr
 }
 
 export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectToken }) => {
-  const { inputCurrencies, inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
+  const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
 
   const [currencyList, setCurrencyList] = useState<Currency[]>([]);
 
   useEffect(() => {
       setCurrencyList(onlyHeldCurrencies(inputCurrenciesMap, currencyBalances));
     },
-    [inputCurrencies, currencyBalances]
+    [inputCurrenciesMap, currencyBalances]
   );
 
   return (

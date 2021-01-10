@@ -1,16 +1,12 @@
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Currency } from '../lib/trading/currencyTypes';
+import { Currency, CurrenciesMap } from '../lib/trading/currencyTypes';
 import ParaswapWrapper, { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { fiatCurrencies } from '../lib/trading/currencyList';
 import { getAddress } from '../redux/wallet/selectors';
-import { CurrencySymbol } from '../lib/trading/types';
-
-export type CurrenciesMap = Record<CurrencySymbol, Currency>;
 
 interface CurrenciesContextType {
   currenciesReady: boolean;
-  inputCurrencies: Currency[];
   inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
   getCurrency: (CurrencySymbol) => Currency | null;
@@ -18,7 +14,6 @@ interface CurrenciesContextType {
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
   currenciesReady: false,
-  inputCurrencies: [],
   inputCurrenciesMap: {},
   currencyBalances: {},
   getCurrency: () => null,
@@ -26,21 +21,15 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const [currenciesReady, setCurrenciesReady] = useState<boolean>(false);
-  const [inputCurrencies, setInputCurrencies] = useState<Currency[]>([]);
   const [inputCurrenciesMap, setInputCurrenciesMap] = useState<CurrenciesMap>({});
   const [currencyBalances, setCurrencyBalances] = useState<CurrencyBalances>({});
   const address = useSelector(getAddress);
 
   useEffect(() => {
-    ParaswapWrapper.getTokenList()
-      .then(currencies => {
+    ParaswapWrapper.getTokenMap()
+      .then(currenciesMap => {
 
-        setInputCurrencies(currencies);
-        setInputCurrenciesMap(currencies.reduce((acc, currency) => ({
-          ...acc,
-          [currency.symbol]: currency,
-        }), {}));
-
+        setInputCurrenciesMap(currenciesMap);
         setCurrenciesReady(true);
 
       })
@@ -67,7 +56,6 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
     <CurrenciesContext.Provider
       value={{
         currenciesReady,
-        inputCurrencies,
         inputCurrenciesMap,
         currencyBalances,
         getCurrency,
