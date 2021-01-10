@@ -14,11 +14,12 @@ import Api from '../../lib/apiWrapper';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
-import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
+import { BityTrade, CurrencySymbol, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
 import DexProxy from "../../lib/trading/dexProxy";
 import CurrenciesManager from '../../lib/trading/currenciesManager';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
+export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
 
 export const SET_EXCHANGE_STEP = 'SET_EXCHANGE_STEP';
 
@@ -39,6 +40,12 @@ export const setTradeRequest = (tradeRequest: TradeRequest) => ({
   type: SET_TRADE_REQUEST,
   payload: {
     tradeRequest,
+  }
+});
+export const setInputCurrency = (symbol: CurrencySymbol) => ({
+  type: SET_INPUT_CURRENCY,
+  payload: {
+    symbol,
   }
 });
 

@@ -3,7 +3,6 @@ import {Currency, CurrencyType, TokenCurrency} from "./currencyTypes";
 
 import {cryptoCurrencies, ETHER, fiatCurrencies, tokenCurrencies} from "./currencyList";
 import {amountToDecimal} from "../numbers";
-import DexProxy from "./dexProxy";
 import {defaultProvider} from "../web3Providers";
 import {CurrencySymbol} from "./types";
 
@@ -11,10 +10,6 @@ export function getCurrencies(type?: CurrencyType): Currency[] {
   const currencies = ([] as Currency[]).concat(fiatCurrencies).concat(cryptoCurrencies).concat(tokenCurrencies);
   const res = currencies.filter(c => !type || c.type === type);
   return res;
-}
-
-export function getTokens(): TokenCurrency[] {
-  return getCurrencies(CurrencyType.ERC20) as TokenCurrency[];
 }
 
 export function getCurrenciesSymbols(type?: CurrencyType): string[] {
@@ -56,16 +51,4 @@ export async function fetchTokenBalance(tokenSymbol: CurrencySymbol, tokenHolder
   const tokenBalance = await tokenContract.balanceOf(tokenHolder);
 
   return amountToDecimal(tokenBalance.toString(), token.decimals);
-}
-
-export async function addTokenFromAddress(tokenAddress: string): Promise<TokenCurrency> {
-  const t = getTokens().find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-  if(t) return t;
-
-  const token = await DexProxy.getTokenFromAddress(tokenAddress);
-  if(!token) {
-    throw new Error('Token not available for exchange');
-  }
-  tokenCurrencies.push(token);
-  return token;
 }

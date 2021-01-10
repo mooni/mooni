@@ -19,13 +19,11 @@ import { CurrenciesContextProvider } from './contexts/CurrenciesContext';
 import { store } from './redux/store';
 import { initReferral } from './redux/payment/actions';
 import { autoConnect } from './redux/wallet/actions';
-import { initTokens } from './redux/ui/actions';
 import AppLoader from './components/AppLoader';
 
 export const App: React.FC = () => {
   useEffect(() => {
     store.dispatch(autoConnect());
-    store.dispatch(initTokens());
     store.dispatch(initReferral());
   }, []);
 

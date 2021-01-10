@@ -1,5 +1,5 @@
 import ParaswapWrapper, { CurrencyBalances } from '../wrappers/paraswap';
-import { CurrenciesMap, Currency } from './currencyTypes';
+import { CurrenciesMap, Currency, CurrencyType, TokenCurrency } from './currencyTypes';
 import { CurrencySymbol } from './types';
 import { fiatCurrencies } from './currencyList';
 import { MetaError } from '../errors';
@@ -30,5 +30,14 @@ export default class CurrenciesManager {
     if(!tradeableCurrency)
       throw new MetaError('currency_not_found', { symbol })
     return tradeableCurrency;
+  }
+
+  getTokenByAddress(tokenAddress: string): Currency {
+    const tradeableToken = this.tradeableCurrencies.find(c =>
+      c.type === CurrencyType.ERC20 && (c as TokenCurrency).address.toLowerCase() === tokenAddress.toLowerCase()
+  );
+    if(!tradeableToken)
+      throw new MetaError('token_not_found', { tokenAddress })
+    return tradeableToken;
   }
 }

@@ -4,6 +4,10 @@ import { Currency, CurrenciesMap } from '../lib/trading/currencyTypes';
 import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { getAddress } from '../redux/wallet/selectors';
 import CurrenciesManager from '../lib/trading/currenciesManager';
+import { setInputCurrency } from '../redux/payment/actions';
+import { setModalError } from '../redux/ui/actions';
+import { useAppDispatch } from '../redux/store';
+import { logError } from '../lib/log';
 
 interface CurrenciesContextType {
   currenciesManager: CurrenciesManager;
@@ -28,6 +32,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const [inputCurrenciesMap, setInputCurrenciesMap] = useState<CurrenciesMap>({});
   const [currencyBalances, setCurrencyBalances] = useState<CurrencyBalances>({});
   const address = useSelector(getAddress);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     currenciesManager.fetchCurrencies()
@@ -35,7 +40,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
         setInputCurrenciesMap(tradeableCurrencyMap);
         setCurrenciesReady(true);
       })
-      .catch(console.error);
+      .catch(console.error); // TODO logerror
   }, [currenciesManager]);
 
   useEffect(() => {
@@ -45,8 +50,23 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
     }
     currenciesManager.fetchBalances(address)
       .then(setCurrencyBalances)
-      .catch(console.error);
+      .catch(console.error); // TODO logerror
   }, [address, currenciesManager]);
+
+  useEffect(() => {
+    if(!currenciesReady) return;
+    const query = new URLSearchParams(window.location.search);
+    const tokenAddress = query.get('token');
+    if(tokenAddress) {
+      try {
+        const currency = currenciesManager.getTokenByAddress(tokenAddress);
+        dispatch(setInputCurrency(currency.symbol));
+      } catch(error) {
+        logError('invalid-custom-token', error);
+        dispatch(setModalError(new Error('invalid-custom-token')))
+      }
+    }
+  }, [currenciesReady]);
 
   return (
     <CurrenciesContext.Provider
