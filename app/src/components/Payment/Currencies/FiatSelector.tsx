@@ -3,10 +3,9 @@ import { Box} from '@material-ui/core';
 
 import { DropDown } from '@aragon/ui'
 
-import {getCurrenciesSymbols} from '../../../lib/trading/currencyHelpers';
-import {CurrencyType} from "../../../lib/trading/currencyTypes";
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
+import { fiatCurrencies } from '../../../lib/trading/currencyList';
 
 function CurrencyItem({ symbol }) {
   return (
@@ -22,7 +21,7 @@ const CustomDropDown = styled(DropDown)`
   border-color: #aecfd6;
 `;
 
-const outputCurrencies: string[] = getCurrenciesSymbols(CurrencyType.FIAT);
+const outputCurrencies: string[] = fiatCurrencies.map(c => c.symbol);
 
 type Props = {
   selectedSymbol: string;

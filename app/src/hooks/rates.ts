@@ -228,7 +228,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       loading: true,
       balanceData: balanceData,
     }));
-  }, [balanceData.balanceLoading, balanceData.balanceAvailable, balanceData.balance]);
+  }, [balanceData.balanceLoading, balanceData.balanceAvailable, balanceData.balance]); // TODO
 
   return {
     rateForm,

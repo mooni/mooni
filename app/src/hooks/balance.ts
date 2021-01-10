@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { ETHER } from '../lib/trading/currencyList';
 import { useSelector } from 'react-redux';
 
-import { fetchTokenBalance } from '../lib/trading/currencyHelpers';
-
 import { getETHManager } from '../redux/wallet/selectors';
 import { amountToDecimal } from '../lib/numbers';
 import { CurrencySymbol } from '../lib/trading/types';
+import { useCurrency } from './currencies';
+import { TokenCurrency } from '../lib/trading/currencyTypes';
+import { logError } from '../lib/log';
+import { MetaError } from '../lib/errors';
 
 export interface BalanceData {
   symbol: CurrencySymbol,
@@ -22,6 +24,8 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
   const [balanceLoading, setLoading] = useState<boolean>(true);
   const [balanceAvailable, setBalanceAvailable] = useState<boolean>(false);
 
+  const currency = useCurrency(symbol);
+
   useEffect(() => {
     setLoading(true);
 
@@ -35,7 +39,7 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     setBalanceAvailable(true);
     const ethAddress = ethManager.getAddress();
 
-    if(symbol === ETHER.symbol) {
+    if(currency.equals(ETHER)) {
 
       const updateBalance = (res) => {
         const balanceEth = amountToDecimal(res.toString(), ETHER.decimals);
@@ -49,10 +53,10 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
 
       return () => ethManager.provider.removeListener(ethAddress, updateBalance);
 
-    } else {
+    } else if(currency instanceof TokenCurrency) {
 
       const updateBalance = () => {
-        fetchTokenBalance(symbol, ethAddress).then(res => {
+        currency.fetchBalance(ethAddress).then(res => {
           setBalance(res);
           setLoading(false);
         });
@@ -63,8 +67,11 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
 
       return () => ethManager.provider.removeListener('block', updateBalance);
 
+    } else {
+      const error = new MetaError('currency_balance_unavailable', {symbol: currency.symbol});
+      logError(error.message, error)
     }
-  }, [symbol, ethManager]);
+  }, [currency, ethManager]);
 
   return { balanceAvailable, balanceLoading, balance, symbol };
 }

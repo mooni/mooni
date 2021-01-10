@@ -14,7 +14,7 @@ interface CurrenciesContextType {
   currenciesReady: boolean;
   inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
-  getCurrency: (CurrencySymbol) => Currency | null;
+  getCurrency: (CurrencySymbol) => Currency;
 }
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
@@ -22,7 +22,7 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
   currenciesReady: false,
   inputCurrenciesMap: {},
   currencyBalances: {},
-  getCurrency: () => null,
+  getCurrency: () => { throw new Error('not_ready_getCurrency') },
 });
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
@@ -55,6 +55,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     if(!currenciesReady) return;
+    
     const query = new URLSearchParams(window.location.search);
     const tokenAddress = query.get('token');
     if(tokenAddress) {
@@ -66,7 +67,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
         dispatch(setModalError(new Error('invalid-custom-token')))
       }
     }
-  }, [currenciesReady]);
+  }, [dispatch, currenciesManager, currenciesReady]);
 
   return (
     <CurrenciesContext.Provider
