@@ -5,8 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
 
 import { CurrencyType } from '../../lib/trading/currencyTypes';
-import { FiatSelector } from './CurrencySelector/FiatSelector';
-import { TokenSelector } from './CurrencySelector/TokenSelector';
+import { CurrencySelector } from './Currencies/CurrencySelector';
 
 import { SIGNIFICANT_DIGITS } from '../../lib/numbers';
 
@@ -104,20 +103,12 @@ export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValu
           />
         </Box>
         <Box className={classes.currencySelector}>
-          {currencyType === CurrencyType.FIAT &&
-          <FiatSelector
+          <CurrencySelector
             selectedSymbol={selectedSymbol}
             onChange={onChangeCurrency}
             disabled={currencyDisabled}
+            currencyType={currencyType}
           />
-          }
-          {currencyType === CurrencyType.CRYPTO &&
-          <TokenSelector
-            selectedSymbol={selectedSymbol}
-            onChange={onChangeCurrency}
-            disabled={currencyDisabled}
-          />
-          }
         </Box>
       </Box>
     </Container>
