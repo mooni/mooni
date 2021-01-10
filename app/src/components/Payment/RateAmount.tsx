@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
 import { Link } from '@aragon/ui'
 import styled from 'styled-components';
@@ -10,9 +10,9 @@ import {ShadowBox} from "../UI/StyledComponents";
 
 import bityLogo from "../../assets/bity_logo_small.png";
 import paraswapLogo from "../../assets/paraswap_logo_small.png";
-import { getCurrency } from '../../lib/trading/currencyHelpers'
+import { CurrenciesContext } from '../../contexts/CurrenciesContext';
 
-function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
+function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
 
   if(fees.length === 0) {
@@ -168,10 +168,12 @@ interface RateAmountProps {
   multiTradeEstimation: MultiTradeEstimation;
 }
 export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
+  const { getCurrency } = useContext(CurrenciesContext);
+
   const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencySymbol;
   const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencySymbol;
 
-  const fee = aggregateFees(multiTradeEstimation);
+  const fee = aggregateFees(multiTradeEstimation, getCurrency);
   let feeAmount, feeCurrency;
   if(fee) {
     feeCurrency = getCurrency(fee.currencySymbol);

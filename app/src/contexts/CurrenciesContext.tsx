@@ -60,8 +60,8 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const getCurrency = useCallback(symbol => {
     const fiatCurrency = fiatCurrencies.find(c => c.symbol === symbol);
     if(fiatCurrency) return fiatCurrency;
-    return inputCurrencies[symbol] || null;
-  }, [inputCurrencies]);
+    return inputCurrenciesMap[symbol] || null;
+  }, [inputCurrenciesMap]);
 
   return (
     <CurrenciesContext.Provider
