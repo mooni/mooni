@@ -3,11 +3,11 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import { Box, Typography, TableContainer, Table, TableRow, TableBody, TableHead, TableCell } from '@material-ui/core';
+import { Box, TableContainer, Table, TableRow, TableBody, TableHead, TableCell } from '@material-ui/core';
 import {
   IconCheck,
   useTheme,
-  IconEllipsis,
+  IconClock,
   LoadingRing,
   useViewport,
 } from '@aragon/ui'
@@ -34,7 +34,7 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
   return (
     <TableRow>
       <TableCell component="th" scope="row" align="center">
-        {order.status === MooniOrderStatus.PENDING && <IconEllipsis size="medium" style={{ color: theme.disabledContent }}  />}
+        {order.status === MooniOrderStatus.PENDING && <IconClock size="medium" style={{ color: theme.disabledContent }}  />}
         {order.status === MooniOrderStatus.EXECUTED && <IconCheck size="medium" style={{ color: theme.positive }}/>}
       </TableCell>
       <TableCell>{truncateNumber(order.inputAmount)} {order.inputCurrency}</TableCell>
@@ -67,7 +67,7 @@ export default function OrderHistory() {
           <Table aria-label="order history" size={below('medium') ? 'small' : 'medium'}>
             <TableHead>
               <TableRow>
-                <TableCell>Status</TableCell>
+                <TableCell align="center">Status</TableCell>
                 <TableCell>From</TableCell>
                 <TableCell>To</TableCell>
                 <TableCell>Date</TableCell>

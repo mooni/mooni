@@ -26,7 +26,7 @@ const AddressText = styled(Typography)`
   }
 `
 
-function AccountBadge() {
+export default function AccountInfo() {
   const dispatch = useDispatch();
 
   const address = useSelector(getAddress);
@@ -49,5 +49,3 @@ function AccountBadge() {
     </Box>
   );
 }
-
-export default AccountBadge;

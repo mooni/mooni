@@ -356,5 +356,7 @@ export const initReferral = () => async function (dispatch) {
 
   if(referralId) {
     dispatch(setReferral(referralId));
+    // query.delete('referralId');
+    // window.location.search = query.toString();
   }
 };
