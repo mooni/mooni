@@ -9,6 +9,7 @@ import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
 import { CurrenciesMap, Currency } from '../../../lib/trading/currencyTypes';
 import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
 import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
+import { ETHER } from '../../../lib/trading/currencyList';
 
 const Title = styled.p`
   ${textStyle('title4')};
@@ -80,7 +81,9 @@ const TokenRow: React.FC<TokenRowProps> = ({ currency }) => {
 
 function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: CurrencyBalances) {
   return currencies.sort((a, b) => {
-    if (currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
+    if(a.equals(ETHER)) return -1;
+    else if(b.equals(ETHER)) return 1;
+    else if (currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
       const av = amountToDecimal(currencyBalances[a.symbol].balance, a.decimals);
       const bv = amountToDecimal(currencyBalances[b.symbol].balance, b.decimals);
       const diff = new BN(bv).minus(av);
