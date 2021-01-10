@@ -69,20 +69,3 @@ export async function addTokenFromAddress(tokenAddress: string): Promise<TokenCu
   tokenCurrencies.push(token);
   return token;
 }
-
-export async function addTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency> {
-  const t = getTokens().find(t => t.symbol === tokenSymbol);
-  if(t) return t;
-
-  const token = await DexProxy.getTokenFromSymbol(tokenSymbol);
-  if(!token) {
-    throw new Error('Token not available for exchange');
-  }
-  tokenCurrencies.push(token);
-  return token;
-}
-
-export function replaceTokens(tokens: TokenCurrency[]): void {
-  tokenCurrencies.splice(0, tokenCurrencies.length);
-  tokenCurrencies.push(...tokens);
-}

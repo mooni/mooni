@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Currency, CurrenciesMap } from '../lib/trading/currencyTypes';
 import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { getAddress } from '../redux/wallet/selectors';
-import CurrenciesManager from '../lib/trading/currencyManager';
+import CurrenciesManager from '../lib/trading/currenciesManager';
 
 interface CurrenciesContextType {
   currenciesManager: CurrenciesManager;
@@ -36,7 +36,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
         setCurrenciesReady(true);
       })
       .catch(console.error);
-  }, []);
+  }, [currenciesManager]);
 
   useEffect(() => {
     if(!address) {
@@ -46,7 +46,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
     currenciesManager.fetchBalances(address)
       .then(setCurrencyBalances)
       .catch(console.error);
-  }, [address]);
+  }, [address, currenciesManager]);
 
   return (
     <CurrenciesContext.Provider

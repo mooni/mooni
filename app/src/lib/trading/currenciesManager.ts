@@ -9,8 +9,6 @@ export default class CurrenciesManager {
   tradeableCurrenciesMap: CurrenciesMap = {};
   currencyBalances?: CurrencyBalances;
 
-  constructor() {}
-
   async fetchCurrencies(): Promise<CurrenciesMap> {
     this.tradeableCurrencies = await ParaswapWrapper.getTokenList();
     this.tradeableCurrenciesMap = this.tradeableCurrencies.reduce((acc, currency) => ({

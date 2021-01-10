@@ -1,12 +1,12 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
-import { CurrenciesMap, TokenCurrency } from './currencyTypes';
+import { TokenCurrency } from './currencyTypes';
 import {amountToInt, BN} from '../numbers';
 import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
-import CurrenciesManager from './currencyManager';
+import CurrenciesManager from './currenciesManager';
 
 function calculatedGasMargin(gas) {
   const offset = gas.mul(1000).div(10000);

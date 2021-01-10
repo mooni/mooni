@@ -3,5 +3,5 @@ import { CurrenciesContext } from '../contexts/CurrenciesContext';
 
 export const useCurrency = (symbol) => {
   const { getCurrency } = useContext(CurrenciesContext);
-  return useMemo(() => getCurrency(symbol), [symbol]);
+  return useMemo(() => getCurrency(symbol), [symbol, getCurrency]);
 }

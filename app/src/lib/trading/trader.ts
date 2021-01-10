@@ -4,7 +4,7 @@ import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 import Bity from "../wrappers/bity";
-import CurrenciesManager from './currencyManager';
+import CurrenciesManager from './currenciesManager';
 
 export class Trader {
   dexProxy: DexProxy;
@@ -16,7 +16,6 @@ export class Trader {
   private findPath(tradeRequest: TradeRequest): TradePath {
     const inputCurrency = this.currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
     const outputCurrency = this.currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
-    console.log(inputCurrency, outputCurrency);
     if(
         inputCurrency.equals(ETHER)
         &&

@@ -5,7 +5,7 @@ import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
 import {APIError} from "../../src/lib/errors";
 import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
-import CurrenciesManager from '../../src/lib/trading/currencyManager';
+import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 
 const bityInstance = new Bity();
 

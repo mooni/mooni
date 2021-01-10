@@ -9,7 +9,7 @@ import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
 import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt, BN} from "../numbers";
-import CurrenciesManager from '../trading/currencyManager';
+import CurrenciesManager from '../trading/currenciesManager';
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({

@@ -10,7 +10,7 @@ export default function AppLoader({ children }) {
   return (
     <div className="global-loader">
       <div className="global-loader-anim">
-        <img src="./logo512.png" height="100%" />
+        <img src="./logo512.png" height="100%" alt="mooni logo loader"/>
       </div>
     </div>
   );

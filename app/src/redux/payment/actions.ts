@@ -16,7 +16,7 @@ import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
 import DexProxy from "../../lib/trading/dexProxy";
-import CurrenciesManager from '../../lib/trading/currencyManager';
+import CurrenciesManager from '../../lib/trading/currenciesManager';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 
