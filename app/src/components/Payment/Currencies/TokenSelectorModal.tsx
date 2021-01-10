@@ -19,6 +19,9 @@ const Title = styled.p`
 const CurrencyLogoAvatar = styled(Avatar)`
   width: 20px;
   height: 20px;
+  && {
+    background: none;
+  }
 `
 const DialogContent = styled(Box)`
   width: 400px;
@@ -29,9 +32,9 @@ const CurrencySymbolText = styled.span`
 
 const CurrencyNameText = styled.span`
   font-style: italic;
-    margin-left: 4px;
-    font-weight: lighter;
-    color: #4b5155;
+  margin-left: 4px;
+  font-weight: lighter;
+  color: #4b5155;
 `;
 const CurrencyAmountText = styled.span`
   font-weight: lighter;

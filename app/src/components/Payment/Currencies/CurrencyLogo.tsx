@@ -22,6 +22,8 @@ function CurrencyLogoLoader({symbol}) {
     if(!currency) return tokenDefaultImage;
     else if(currency.equals(ETHER)) {
       return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+    } else if(currency.img && currency.img !== 'https://img.paraswap.network/token.png') {
+      return currency.img;
     } else if(currency.type === CurrencyType.FIAT){
       return `/images/coinIcons/${currency.symbol}.svg`;
     } else if(currency.type === CurrencyType.ERC20){
