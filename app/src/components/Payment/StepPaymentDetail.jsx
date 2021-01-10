@@ -7,8 +7,8 @@ import { Box } from '@material-ui/core';
 
 import { Button, GU, IconArrowRight, textStyle } from '@aragon/ui'
 
-import { setReference } from '../redux/payment/actions';
-import { getReference } from '../redux/payment/selectors';
+import { setReference } from '../../redux/payment/actions';
+import { getReference } from '../../redux/payment/selectors';
 import FormField from './FormField';
 
 const fields = {

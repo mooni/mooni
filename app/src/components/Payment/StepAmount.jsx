@@ -6,8 +6,8 @@ import { IconArrowRight } from '@aragon/ui'
 
 import RateForm from './RateForm';
 
-import { setTradeRequest } from '../redux/payment/actions';
-import { getMultiTradeRequest } from '../redux/payment/selectors';
+import { setTradeRequest } from '../../redux/payment/actions';
+import { getMultiTradeRequest } from '../../redux/payment/selectors';
 
 export default function StepAmount({ onComplete }) {
   const dispatch = useDispatch();

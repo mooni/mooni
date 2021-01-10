@@ -2,11 +2,11 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SidePanel } from '@aragon/ui'
 
-import About from './About';
-import Terms from './Terms';
+import About from '../Infos/About';
+import Terms from '../Infos/Terms';
 
-import { getInfoPanel } from '../redux/ui/selectors';
-import { setInfoPanel } from '../redux/ui/actions';
+import { getInfoPanel } from '../../redux/ui/selectors';
+import { setInfoPanel } from '../../redux/ui/actions';
 
 function getPanelTitle(panelType) {
   switch(panelType) {

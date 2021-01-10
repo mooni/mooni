@@ -5,13 +5,13 @@ import { Box } from '@material-ui/core';
 import { Button, Info, IconCoin, IconRefresh, Checkbox, Link } from '@aragon/ui'
 import { Button as MButton } from '@material-ui/core';
 
-import Loader from '../components/Loader';
+import Loader from '../UI/Loader';
 import OrderRecap from './OrderRecap';
 
-import { getMultiTrade, getOrderErrors } from '../redux/payment/selectors';
-import { setInfoPanel } from '../redux/ui/actions';
-import {BityTrade, TradeType} from "../lib/trading/types";
-import { createOrder } from '../redux/payment/actions'
+import { getMultiTrade, getOrderErrors } from '../../redux/payment/selectors';
+import { setInfoPanel } from '../../redux/ui/actions';
+import {BityTrade, TradeType} from "../../lib/trading/types";
+import { createOrder } from '../../redux/payment/actions'
 
 function StepRecap({ onComplete }) {
   const dispatch = useDispatch();
