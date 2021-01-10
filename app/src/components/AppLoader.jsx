@@ -1,14 +1,6 @@
 import React, { useContext } from 'react';
-import styled from 'styled-components';
 
 import {CurrenciesContext} from "../contexts/CurrenciesContext";
-
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justifyContent: center;
-`;
 
 export default function AppLoader({ children }) {
   const { currenciesReady } = useContext(CurrenciesContext);
@@ -16,8 +8,10 @@ export default function AppLoader({ children }) {
   if(currenciesReady) return children;
 
   return (
-    <Container>
-      Loading app
-    </Container>
+    <div className="global-loader">
+      <div className="global-loader-anim">
+        <img src="./logo512.png" height="100%" />
+      </div>
+    </div>
   );
 }
