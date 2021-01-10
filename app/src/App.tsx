@@ -14,6 +14,8 @@ import ErrorModal from './components/Modals/ErrorModal';
 import WalletModal from './components/Modals/WalletModal';
 import { Routes } from './Routes';
 
+import { CurrenciesContextProvider } from './contexts/CurrenciesContext';
+
 import { store } from './redux/store';
 import { initReferral } from './redux/payment/actions';
 import { autoConnect } from './redux/wallet/actions';
@@ -28,23 +30,25 @@ export const App: React.FC = () => {
 
   return (
     <ReduxProvider store={store}>
-      <Router>
-        <AragonUI
-          assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
-          theme="light"
-          layout={false}
-          scrollView={false}
-        >
-          <MUIThemeProvider theme={theme}>
-            <AppContainer>
-              <InfoPanel />
-              <WalletModal />
-              <ErrorModal />
-              <Routes/>
-            </AppContainer>
-          </MUIThemeProvider>
-        </AragonUI>
-      </Router>
+      <CurrenciesContextProvider>
+        <Router>
+          <AragonUI
+            assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
+            theme="light"
+            layout={false}
+            scrollView={false}
+          >
+            <MUIThemeProvider theme={theme}>
+              <AppContainer>
+                <InfoPanel />
+                <WalletModal />
+                <ErrorModal />
+                <Routes/>
+              </AppContainer>
+            </MUIThemeProvider>
+          </AragonUI>
+        </Router>
+      </CurrenciesContextProvider>
     </ReduxProvider>
   );
 }

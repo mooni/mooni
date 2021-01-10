@@ -1,10 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import {useImage} from 'react-image';
 
-import { getCurrency, getCurrencyLogoAddress } from '../../../lib/trading/currencyHelpers';
 import tokenDefaultImage  from '../../../assets/token_default.png';
-import {Currency} from "../../../lib/trading/currencyTypes";
+import { CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
 import { Box } from '@material-ui/core';
+import { ETHER } from '../../../lib/trading/currencyList';
+import { useCurrency } from '../../../hooks/currencies';
 
 const CurrencyLogoImage = ({src, symbol}) => (
   <img
@@ -15,11 +16,25 @@ const CurrencyLogoImage = ({src, symbol}) => (
 )
 
 function CurrencyLogoLoader({symbol}) {
-  const currency = getCurrency(symbol);
+  const currency = useCurrency(symbol);
+
+  const defaultSrc = useMemo(() => {
+    if(!currency) return tokenDefaultImage;
+    else if(currency.equals(ETHER)) {
+      return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+    } else if(currency.type === CurrencyType.FIAT){
+      return `/images/coinIcons/${currency.symbol}.svg`;
+    } else if(currency.type === CurrencyType.ERC20){
+      const tokenAddress = (currency as TokenCurrency).address;
+      return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`;
+    } else {
+      return tokenDefaultImage;
+    }
+  }, [currency]);
+
   const {src} = useImage({
     srcList: [
-      (currency as Currency).img,
-      getCurrencyLogoAddress(symbol),
+      defaultSrc,
       tokenDefaultImage,
     ],
   });

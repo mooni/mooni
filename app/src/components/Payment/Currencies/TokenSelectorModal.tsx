@@ -1,16 +1,14 @@
-import React  from 'react';
-import {useSelector} from 'react-redux';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { Box, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar } from '@material-ui/core';
 
-import { getInputCurrencies } from '../../../redux/ui/selectors';
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
-import { textStyle, LoadingRing } from '@aragon/ui'
-import { CurrencySymbol } from '../../../lib/trading/types';
-import { useCurrency } from '../../../hooks/currencies';
-import { useBalance } from '../../../hooks/balance';
-import { truncateNumber } from '../../../lib/numbers';
+import { textStyle } from '@aragon/ui'
+import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
+import { Currency } from '../../../lib/trading/currencyTypes';
+import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
+import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
 
 const Title = styled.p`
   ${textStyle('title4')};
@@ -27,6 +25,7 @@ const DialogContent = styled(Box)`
 
 const CurrencySymbolText = styled.span`
 `;
+
 const CurrencyNameText = styled.span`
   font-style: italic;
     margin-left: 4px;
@@ -45,12 +44,12 @@ type Props = {
 };
 
 type TokenRowProps = {
-  symbol: CurrencySymbol;
+  currency: Currency;
 };
 
-const TokenRow: React.FC<TokenRowProps> = ({ symbol }) => {
-  const currency = useCurrency(symbol);
-  const { balance, balanceLoading, balanceAvailable } = useBalance(symbol);
+const TokenRow: React.FC<TokenRowProps> = ({ currency }) => {
+  const { currencyBalances } = useContext(CurrenciesContext);
+  const currencyBalance = currencyBalances[currency.symbol];
 
   return (
     <>
@@ -68,13 +67,10 @@ const TokenRow: React.FC<TokenRowProps> = ({ symbol }) => {
             }
           </Box>
 
-          {balanceAvailable && (
-            balanceLoading ?
-              <LoadingRing/>
-              :
-              <CurrencyAmountText>
-                {truncateNumber(balance)}
-              </CurrencyAmountText>
+          {currencyBalance && (
+            <CurrencyAmountText>
+              {truncateNumber(amountToDecimal(currencyBalance.balance, currency.decimals))}
+            </CurrencyAmountText>
           )}
         </Box>
       </ListItemText>
@@ -82,8 +78,33 @@ const TokenRow: React.FC<TokenRowProps> = ({ symbol }) => {
   );
 };
 
+function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: CurrencyBalances) {
+  return currencies.sort((a, b) => {
+    if (currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
+      const av = amountToDecimal(currencyBalances[a.symbol].balance, a.decimals);
+      const bv = amountToDecimal(currencyBalances[b.symbol].balance, b.decimals);
+      const diff = new BN(bv).minus(av);
+      return diff.gt(0) ? 1:-1;
+    } else if (currencyBalances[a.symbol] && !currencyBalances[b.symbol]) {
+      return -1;
+    } else if (!currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
+      return 1;
+    } else {
+      return 0;
+    }
+  })
+}
+
 export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectToken }) => {
-  const inputCurrencies = useSelector(getInputCurrencies);
+  const { inputCurrencies, currencyBalances } = useContext(CurrenciesContext);
+
+  const [currencyList, setCurrencyList] = useState<Currency[]>([]);
+
+  useEffect(() => {
+      setCurrencyList(sortCurrenciesByBalance(inputCurrencies, currencyBalances));
+    },
+    [inputCurrencies, currencyBalances]
+  );
 
   return (
     <Dialog
@@ -98,9 +119,9 @@ export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectTok
       </DialogTitle>
       <DialogContent>
         <List>
-          {inputCurrencies.map(symbol => (
-            <ListItem key={symbol} button onClick={() => onSelectToken(symbol)}>
-              <TokenRow symbol={symbol}/>
+          {currencyList.map(currency => (
+            <ListItem key={currency.symbol} button onClick={() => onSelectToken(currency.symbol)}>
+              <TokenRow currency={currency} />
             </ListItem>
           ))}
         </List>

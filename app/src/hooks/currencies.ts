@@ -1,7 +1,7 @@
-import { Currency } from '../lib/trading/currencyTypes';
-import { useMemo } from 'react';
-import { getCurrency } from '../lib/trading/currencyHelpers';
+import { useContext, useMemo } from 'react';
+import { CurrenciesContext } from '../contexts/CurrenciesContext';
 
 export const useCurrency = (symbol) => {
-  return useMemo<Currency>(() => getCurrency(symbol), [symbol]);
+  const { getCurrency } = useContext(CurrenciesContext);
+  return useMemo(() => getCurrency(symbol), [symbol]);
 }

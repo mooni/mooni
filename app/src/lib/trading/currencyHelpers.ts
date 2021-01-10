@@ -12,6 +12,7 @@ export function getCurrencies(type?: CurrencyType): Currency[] {
   const res = currencies.filter(c => !type || c.type === type);
   return res;
 }
+
 export function getTokens(): TokenCurrency[] {
   return getCurrencies(CurrencyType.ERC20) as TokenCurrency[];
 }

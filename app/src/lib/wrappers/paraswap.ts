@@ -3,7 +3,7 @@ import {BigNumber, ethers} from "ethers";
 import {APIError, ParaSwap} from 'paraswap';
 
 import {defaultProvider} from "../web3Providers";
-import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
+import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
@@ -22,6 +22,13 @@ function applySlippage(amount: string, maxSlippage: number): string {
   return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
 }
 
+export interface CurrencyBalance {
+  symbol: CurrencySymbol,
+  balance: string,
+  allowance: string,
+}
+export type CurrencyBalances = Record<string, CurrencyBalance>;
+
 const ParaswapWrapper = {
   async getTokenList(): Promise<TokenCurrency[]> {
     const { data } = await paraswapAxios({
@@ -31,6 +38,20 @@ const ParaswapWrapper = {
     return data.tokens.map(t =>
       new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
+  },
+  async getBalances(address: string): Promise<CurrencyBalances> {
+    const { data } = await paraswapAxios({
+      method: 'get',
+      url: `/users/tokens/1/${address}`,
+    });
+    return data.tokens.reduce((acc, token) => ({
+      ...acc,
+      [token.symbol]: {
+        symbol: token.symbol,
+        balance: token.balance,
+        allowance: token.allowance,
+      }
+    }), {});
   },
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
