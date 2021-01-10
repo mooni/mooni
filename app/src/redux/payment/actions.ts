@@ -16,7 +16,7 @@ import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
 import DexProxy from "../../lib/trading/dexProxy";
-import { CurrenciesMap } from '../../lib/trading/currencyTypes';
+import CurrenciesManager from '../../lib/trading/currencyManager';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 
@@ -286,7 +286,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const sendPayment = (currencyMap: CurrenciesMap) => async function (dispatch, getState)  {
+export const sendPayment = (currenciesManager: CurrenciesManager) => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
 
@@ -300,7 +300,7 @@ export const sendPayment = (currencyMap: CurrenciesMap) => async function (dispa
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
 
-  const dexProxy = new DexProxy(currencyMap);
+  const dexProxy = new DexProxy(currenciesManager);
 
   const bityOrderId = bityTrade.bityOrderResponse.id;
   log('PAYMENT: bity order id', bityOrderId);

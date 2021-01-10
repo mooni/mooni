@@ -4,17 +4,19 @@ import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 import Bity from "../wrappers/bity";
+import CurrenciesManager from './currencyManager';
 
 export class Trader {
   dexProxy: DexProxy;
 
-  constructor(readonly bityInstance: Bity, readonly currencyMap: CurrenciesMap) {
-    this.dexProxy = new DexProxy(currencyMap);
+  constructor(readonly bityInstance: Bity, readonly currenciesManager: CurrenciesManager) {
+    this.dexProxy = new DexProxy(currenciesManager);
   }
 
   private findPath(tradeRequest: TradeRequest): TradePath {
-    const inputCurrency = this.currencyMap[tradeRequest.inputCurrencySymbol];
-    const outputCurrency = this.currencyMap[tradeRequest.outputCurrencySymbol];
+    const inputCurrency = this.currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
+    const outputCurrency = this.currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
+    console.log(inputCurrency, outputCurrency);
     if(
         inputCurrency.equals(ETHER)
         &&
@@ -67,7 +69,7 @@ export class Trader {
   private async createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiTradeRequest): Promise<Trade> {
     const path = this.findPath(tradeRequest);
     if(path.length !== 1) {
-      throw new Error('can only estimate direct trade');
+      throw new Error('can only create direct trade');
     }
     const tradeType = path[0];
     if(tradeType === TradeType.BITY) {

@@ -7,8 +7,9 @@ import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '.
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import { CurrenciesMap, CurrencyType, TokenCurrency } from '../trading/currencyTypes';
+import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt, BN} from "../numbers";
+import CurrenciesManager from '../trading/currencyManager';
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -16,6 +17,8 @@ const paraswapAxios = axios.create({
   timeout: 10000,
 });
 let paraswapAdapters: any | null = null;
+
+const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 function applySlippage(amount: string, maxSlippage: number): string {
   return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
@@ -35,15 +38,11 @@ const ParaswapWrapper = {
       url: '/tokens',
     });
     return data.tokens.map(t =>
-      new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
+      t.address.toLowerCase() === ETH_ADDRESS ?
+        ETHER
+        :
+        new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
-  },
-  async getTokenMap(): Promise<CurrenciesMap> {
-    const tokenList = await ParaswapWrapper.getTokenList();
-    return tokenList.reduce((acc, currency) => ({
-      ...acc,
-      [currency.symbol]: currency,
-    }), {});
   },
   async getBalances(address: string): Promise<CurrencyBalances> {
     const { data } = await paraswapAxios({
@@ -59,11 +58,11 @@ const ParaswapWrapper = {
       }
     }), {});
   },
-  async getRate(tradeRequest: TradeRequest, currencyMap: CurrenciesMap): Promise<DexTrade> {
+  async getRate(tradeRequest: TradeRequest, currenciesManager: CurrenciesManager): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
 
-    const inputCurrency = currencyMap[tradeRequest.inputCurrencySymbol];
-    const outputCurrency = currencyMap[tradeRequest.outputCurrencySymbol];
+    const inputCurrency = currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
+    const outputCurrency = currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
     const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
 
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
@@ -108,12 +107,12 @@ const ParaswapWrapper = {
     const spender = await augustusContract.getTokenTransferProxy();
     return spender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currencyMap: CurrenciesMap): Promise<any> {
+  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
     function getTokenAddress(symbol) {
-      const currency = currencyMap[symbol];
+      const currency = currenciesManager.getCurrency(symbol);
 
       if(currency.equals(ETHER)) {
-        return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+        return ETH_ADDRESS;
       } else if(currency.type === CurrencyType.ERC20) {
         return (currency as TokenCurrency).address;
       } else {

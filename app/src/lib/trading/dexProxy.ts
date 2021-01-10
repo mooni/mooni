@@ -6,6 +6,7 @@ import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
+import CurrenciesManager from './currencyManager';
 
 function calculatedGasMargin(gas) {
   const offset = gas.mul(1000).div(10000);
@@ -13,7 +14,7 @@ function calculatedGasMargin(gas) {
 }
 
 class DexProxy {
-  constructor(readonly currencyMap: CurrenciesMap) {}
+  constructor(readonly currenciesManager: CurrenciesManager) {}
 
   static async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
@@ -28,7 +29,7 @@ class DexProxy {
   }
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
-    return Paraswap.getRate(tradeRequest, this.currencyMap);
+    return Paraswap.getRate(tradeRequest, this.currenciesManager);
   }
 
   async createTrade(tradeRequest: TradeRequest): Promise<DexTrade> {
@@ -65,7 +66,7 @@ class DexProxy {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const inputToken = this.currencyMap[dexTrade.tradeRequest.inputCurrencySymbol] as TokenCurrency;
+    const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await this.getSpender(dexTrade);
     const intAmount = amountToInt(dexTrade.inputAmount, inputToken.decimals);
@@ -82,7 +83,7 @@ class DexProxy {
   async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider, maxSlippage: number): Promise<string> {
     const signer = provider.getSigner();
     const senderAddress = await signer.getAddress();
-    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, maxSlippage, this.currencyMap);
+    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, maxSlippage, this.currenciesManager);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
   }
