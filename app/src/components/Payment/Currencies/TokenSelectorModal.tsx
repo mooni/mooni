@@ -6,9 +6,11 @@ import { Box, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemText,
 import { getInputCurrencies } from '../../../redux/ui/selectors';
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
-import { textStyle } from '@aragon/ui'
+import { textStyle, LoadingRing } from '@aragon/ui'
 import { CurrencySymbol } from '../../../lib/trading/types';
 import { useCurrency } from '../../../hooks/currencies';
+import { useBalance } from '../../../hooks/balance';
+import { truncateNumber } from '../../../lib/numbers';
 
 const Title = styled.p`
   ${textStyle('title4')};
@@ -31,6 +33,10 @@ const CurrencyNameText = styled.span`
     font-weight: lighter;
     color: #4b5155;
 `;
+const CurrencyAmountText = styled.span`
+  font-weight: lighter;
+  color: #4b5155;
+`;
 
 type Props = {
   open: boolean;
@@ -44,6 +50,8 @@ type TokenRowProps = {
 
 const TokenRow: React.FC<TokenRowProps> = ({ symbol }) => {
   const currency = useCurrency(symbol);
+  const { balance, balanceLoading, balanceAvailable } = useBalance(symbol);
+
   return (
     <>
       <ListItemAvatar>
@@ -52,10 +60,23 @@ const TokenRow: React.FC<TokenRowProps> = ({ symbol }) => {
         </CurrencyLogoAvatar>
       </ListItemAvatar>
       <ListItemText>
-        <CurrencySymbolText>{currency.symbol}</CurrencySymbolText>
-        {currency.name &&
-        <CurrencyNameText>{currency.name}</CurrencyNameText>
-        }
+        <Box display="flex">
+          <Box flex={1}>
+            <CurrencySymbolText>{currency.symbol}</CurrencySymbolText>
+            {currency.name &&
+            <CurrencyNameText>{currency.name}</CurrencyNameText>
+            }
+          </Box>
+
+          {balanceAvailable && (
+            balanceLoading ?
+              <LoadingRing/>
+              :
+              <CurrencyAmountText>
+                {truncateNumber(balance)}
+              </CurrencyAmountText>
+          )}
+        </Box>
       </ListItemText>
     </>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {MultiTradeEstimation, TradeExact} from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
 import { useDebounce } from './utils';
-import { useBalance } from './balance';
+import { BalanceData, useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
@@ -25,6 +25,7 @@ interface RateForm {
     outputAmount: string,
     tradeExact: TradeExact,
   },
+  balanceData: BalanceData,
 }
 
 function defaultRateForm(initialRequest): RateForm {
@@ -49,6 +50,12 @@ function defaultRateForm(initialRequest): RateForm {
     loading: true,
     errors: undefined,
     values,
+    balanceData: {
+      symbol: initialRequest.inputCurrencySymbol,
+      balance: '0',
+      balanceLoading: false,
+      balanceAvailable: false,
+    },
   };
 }
 
@@ -66,14 +73,15 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
   const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
-  const { balance } = useBalance(rateForm.values.inputCurrency);
+  const balanceData = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
     setRateForm(defaultRateForm(initialTradeRequest));
   }, [initialTradeRequest]);
 
-  const estimate = useCallback(async (_rateForm, _balance, _nonce) => {
+  const estimate = useCallback(async (_rateForm, _nonce) => {
     if(!_rateForm.loading) return;
+    if(_rateForm.balanceData.balanceAvailable && _rateForm.balanceData.balanceLoading) return;
 
     const currentRequest: TradeRequest = {
       inputCurrencySymbol: _rateForm.values.inputCurrency,
@@ -94,7 +102,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       return;
     }
 
-    if(_balance !== null && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_balance)) {
+    if(_rateForm.balanceData.balanceAvailable && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_rateForm.balanceData.balance)) {
       setRateForm(r => ({
         ...r,
         loading: false,
@@ -155,7 +163,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     }
     else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       updateRateForm.values.inputAmount = new BN(multiTradeEstimation.inputAmount).toFixed();
-      if(_balance !== null && new BN(multiTradeEstimation.inputAmount).gt(_balance)) {
+      if(_rateForm.balanceData.balanceAvailable && new BN(multiTradeEstimation.inputAmount).gt(_rateForm.balanceData.balance)) {
         updateRateForm.errors = { lowBalance: true };
       }
     }
@@ -209,16 +217,18 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
     nonce++;
-    estimate(debouncedRateForm, balance, nonce).catch(error => {
+    estimate(debouncedRateForm, nonce).catch(error => {
       logError('unable to fetch rates', error);
     });
-  }, [debouncedRateForm, balance, estimate]);
+  }, [debouncedRateForm, estimate]);
+
   useEffect(() => {
     setRateForm(r => ({
       ...r,
       loading: true,
+      balanceData: balanceData,
     }));
-  }, [balance]);
+  }, [balanceData.balanceLoading, balanceData.balanceAvailable, balanceData.balance]);
 
   return {
     rateForm,
