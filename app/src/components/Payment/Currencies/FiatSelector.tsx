@@ -11,7 +11,7 @@ import styled from 'styled-components';
 function CurrencyItem({ symbol }) {
   return (
     <Box display="flex" alignItems="center">
-      <CurrencyLogo symbol={symbol}/>
+      <CurrencyLogo symbol={symbol} width="20px"/>
       <Box ml={1}>{symbol}</Box>
     </Box>
   );

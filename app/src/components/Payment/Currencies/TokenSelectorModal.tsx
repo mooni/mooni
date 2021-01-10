@@ -5,6 +5,12 @@ import { Dialog, DialogTitle, DialogContent, List, ListItem, ListItemAvatar, Lis
 
 import { getInputCurrencies } from '../../../redux/ui/selectors';
 import { CurrencyLogo } from './CurrencyLogo';
+import styled from 'styled-components';
+
+const CurrencyLogoAvatar = styled(Avatar)`
+  width: 20px;
+  height: 20px;
+`
 
 type Props = {
   open: boolean;
@@ -26,9 +32,9 @@ export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectTok
           {inputCurrencies.map(symbol => (
             <ListItem key={symbol} button onClick={() => onSelectToken(symbol)}>
               <ListItemAvatar>
-                <Avatar>
+                <CurrencyLogoAvatar>
                   <CurrencyLogo symbol={symbol}/>
-                </Avatar>
+                </CurrencyLogoAvatar>
               </ListItemAvatar>
               <ListItemText>
                 {symbol}
