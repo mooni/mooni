@@ -1,14 +1,14 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import BN from 'bignumber.js';
-import {useImage} from 'react-image';
 import { Box, Typography} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
-import { DropDown } from '@aragon/ui'
 
-import { getCurrency, getCurrencyLogoAddress } from '../../lib/trading/currencyHelpers';
+import { CurrencyType } from '../../lib/trading/currencyTypes';
+import { FiatSelector } from './CurrencySelector/FiatSelector';
+import { TokenSelector } from './CurrencySelector/TokenSelector';
+
 import { SIGNIFICANT_DIGITS } from '../../lib/numbers';
-import tokenDefaultImage  from '../../assets/token_default.png';
 
 const useStyles = makeStyles(theme => ({
   caption: {
@@ -52,64 +52,37 @@ const useStyles = makeStyles(theme => ({
   currencySelector: {
     width: 126,
   },
-  currencyButton: {
-    borderRadius: 20,
-    borderColor: '#aecfd6',
-  },
   disabledInput: {
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.default,
   },
 }));
 
-function CurrencyLogo({symbol}) {
-  const currency = getCurrency(symbol);
-  const {src} = useImage({
-    srcList: [
-      currency.img,
-      getCurrencyLogoAddress(symbol),
-      tokenDefaultImage,
-    ],
-  });
-
-  return (
-      <img
-        src={src}
-        alt={`coin-icon-${symbol}`}
-        width={20}
-      />
-  );
-}
-function CurrencyItem({ symbol }) {
-  return (
-    <Box display="flex" alignItems="center">
-      <Suspense
-        fallback={
-          <img
-            src={tokenDefaultImage}
-            alt={`coin-icon-${symbol}`}
-            width={20}
-          />
-        }
-      >
-        <CurrencyLogo symbol={symbol}/>
-      </Suspense>
-      <Box ml={1}>{symbol}</Box>
-    </Box>
-  );
-}
-
 const Container = styled.div`
-& + & {
-  margin-top: 10px;
-}
+  & + & {
+    margin-top: 10px;
+  }
 `;
 
-export default function AmountRow({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencies, active, error, valueDisabled, currencyDisabled, caption }) {
+type Props = {
+  value: string;
+  selectedSymbol: string;
+  onChangeValue: (string) => void;
+  onChangeCurrency: (string) => void;
+  currencyType: CurrencyType;
+  active: boolean;
+  disabled?: boolean;
+  valueDisabled?: boolean;
+  currencyDisabled?: boolean;
+  error: boolean;
+  caption: string;
+};
+
+export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencyType, active, error, valueDisabled, currencyDisabled, caption }) => {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
-    (active ? value : BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
+    (active ? value : new BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
     : '';
 
   return (
@@ -131,16 +104,22 @@ export default function AmountRow({ value, selectedSymbol, onChangeValue, onChan
           />
         </Box>
         <Box className={classes.currencySelector}>
-          <DropDown
-            items={currencies.map(symbol => <CurrencyItem symbol={symbol}/>)}
-            selected={currencies.indexOf(selectedSymbol)}
-            onChange={i => onChangeCurrency(currencies[i])}
+          {currencyType === CurrencyType.FIAT &&
+          <FiatSelector
+            selectedSymbol={selectedSymbol}
+            onChange={onChangeCurrency}
             disabled={currencyDisabled}
-            className={classes.currencyButton}
-            wide
           />
+          }
+          {currencyType === CurrencyType.CRYPTO &&
+          <TokenSelector
+            selectedSymbol={selectedSymbol}
+            onChange={onChangeCurrency}
+            disabled={currencyDisabled}
+          />
+          }
         </Box>
       </Box>
     </Container>
   );
-}
+};

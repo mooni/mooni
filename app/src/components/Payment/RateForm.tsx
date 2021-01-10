@@ -8,13 +8,10 @@ import {Button, IconRefresh, LoadingRing, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
 import config from '../../config';
-import AmountRow from './AmountRow';
+import { AmountRow } from './AmountRow';
 
 import {TradeExact, TradeRequest} from '../../lib/trading/types';
 
-import {getInputCurrencies} from '../../redux/ui/selectors';
-
-import {getCurrenciesSymbols} from '../../lib/trading/currencyHelpers';
 import {useRate} from '../../hooks/rates';
 import {getWalletStatus} from '../../redux/wallet/selectors';
 import {CurrencyType} from "../../lib/trading/currencyTypes";
@@ -39,8 +36,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const outputCurrencies: string[] = getCurrenciesSymbols(CurrencyType.FIAT);
-
 interface RateFormParams {
  onSubmit: (TradeRequest?) => void;
   initialTradeRequest: TradeRequest;
@@ -50,7 +45,6 @@ interface RateFormParams {
 
 function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }: RateFormParams) {
   const classes = useStyles();
-  const inputCurrencies = useSelector(getInputCurrencies);
   const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
@@ -67,7 +61,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
     <>
       <AmountRow
         value={rateForm.values.inputAmount}
-        currencies={inputCurrencies}
+        currencyType={CurrencyType.CRYPTO}
         selectedSymbol={rateForm.values.inputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.INPUT)}
         onChangeValue={onChangeAmount(TradeExact.INPUT)}
@@ -79,7 +73,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
       />
       <AmountRow
         value={rateForm.values.outputAmount}
-        currencies={outputCurrencies}
+        currencyType={CurrencyType.FIAT}
         selectedSymbol={rateForm.values.outputCurrency}
         onChangeCurrency={onChangeCurrency(TradeExact.OUTPUT)}
         onChangeValue={onChangeAmount(TradeExact.OUTPUT)}
