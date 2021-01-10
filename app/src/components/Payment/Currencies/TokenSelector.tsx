@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const TokenSelector: React.FC<Props> = ({ selectedSymbol, onChange, disabled }) => {
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(true);
   const theme = useTheme();
 
   function onSelectToken(symbol) {

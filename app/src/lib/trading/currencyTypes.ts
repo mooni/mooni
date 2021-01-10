@@ -42,7 +42,7 @@ export abstract class Currency {
   }
 
   get name(): string {
-    return this._name || this.symbol;
+    return this._name || '';
   }
 
   toObject(): CurrencyObject {
