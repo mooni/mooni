@@ -20,6 +20,7 @@ import { store } from './redux/store';
 import { initReferral } from './redux/payment/actions';
 import { autoConnect } from './redux/wallet/actions';
 import { initTokens } from './redux/ui/actions';
+import AppLoader from './components/AppLoader';
 
 export const App: React.FC = () => {
   useEffect(() => {
@@ -39,12 +40,14 @@ export const App: React.FC = () => {
             scrollView={false}
           >
             <MUIThemeProvider theme={theme}>
-              <AppContainer>
-                <InfoPanel />
-                <WalletModal />
-                <ErrorModal />
-                <Routes/>
-              </AppContainer>
+              <AppLoader>
+                <AppContainer>
+                  <InfoPanel />
+                  <WalletModal />
+                  <ErrorModal />
+                  <Routes/>
+                </AppContainer>
+              </AppLoader>
             </MUIThemeProvider>
           </AragonUI>
         </Router>

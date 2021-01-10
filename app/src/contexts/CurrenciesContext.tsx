@@ -9,6 +9,7 @@ import { CurrencySymbol } from '../lib/trading/types';
 export type CurrenciesMap = Record<CurrencySymbol, Currency>;
 
 interface CurrenciesContextType {
+  currenciesReady: boolean;
   inputCurrencies: Currency[];
   inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
@@ -16,6 +17,7 @@ interface CurrenciesContextType {
 }
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
+  currenciesReady: false,
   inputCurrencies: [],
   inputCurrenciesMap: {},
   currencyBalances: {},
@@ -23,6 +25,7 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
 });
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
+  const [currenciesReady, setCurrenciesReady] = useState<boolean>(false);
   const [inputCurrencies, setInputCurrencies] = useState<Currency[]>([]);
   const [inputCurrenciesMap, setInputCurrenciesMap] = useState<CurrenciesMap>({});
   const [currencyBalances, setCurrencyBalances] = useState<CurrencyBalances>({});
@@ -37,6 +40,8 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
           ...acc,
           [currency.symbol]: currency,
         }), {}));
+
+        setCurrenciesReady(true);
 
       })
       .catch(console.error);
@@ -61,6 +66,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
   return (
     <CurrenciesContext.Provider
       value={{
+        currenciesReady,
         inputCurrencies,
         inputCurrenciesMap,
         currencyBalances,
