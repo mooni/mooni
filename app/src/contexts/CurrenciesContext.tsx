@@ -4,28 +4,40 @@ import { Currency } from '../lib/trading/currencyTypes';
 import ParaswapWrapper, { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { fiatCurrencies } from '../lib/trading/currencyList';
 import { getAddress } from '../redux/wallet/selectors';
+import { CurrencySymbol } from '../lib/trading/types';
 
-type CurrenciesContextType = {
+export type CurrenciesMap = Record<CurrencySymbol, Currency>;
+
+interface CurrenciesContextType {
   inputCurrencies: Currency[];
+  inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
   getCurrency: (CurrencySymbol) => Currency | null;
-};
+}
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
   inputCurrencies: [],
+  inputCurrenciesMap: {},
   currencyBalances: {},
   getCurrency: () => null,
 });
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const [inputCurrencies, setInputCurrencies] = useState<Currency[]>([]);
+  const [inputCurrenciesMap, setInputCurrenciesMap] = useState<CurrenciesMap>({});
   const [currencyBalances, setCurrencyBalances] = useState<CurrencyBalances>({});
   const address = useSelector(getAddress);
 
   useEffect(() => {
     ParaswapWrapper.getTokenList()
       .then(currencies => {
+
         setInputCurrencies(currencies);
+        setInputCurrenciesMap(currencies.reduce((acc, currency) => ({
+          ...acc,
+          [currency.symbol]: currency,
+        }), {}));
+
       })
       .catch(console.error);
   }, []);
@@ -41,15 +53,16 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
   }, [address]);
 
   const getCurrency = useCallback(symbol => {
-    const currencies = ([] as Currency[]).concat(fiatCurrencies).concat(inputCurrencies);
-    const c = currencies.find(c => c.symbol === symbol);
-    return c || null;
+    const fiatCurrency = fiatCurrencies.find(c => c.symbol === symbol);
+    if(fiatCurrency) return fiatCurrency;
+    return inputCurrencies[symbol] || null;
   }, [inputCurrencies]);
 
   return (
     <CurrenciesContext.Provider
       value={{
         inputCurrencies,
+        inputCurrenciesMap,
         currencyBalances,
         getCurrency,
       }}

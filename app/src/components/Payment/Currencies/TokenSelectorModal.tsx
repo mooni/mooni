@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { textStyle } from '@aragon/ui'
 import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
 import { Currency } from '../../../lib/trading/currencyTypes';
-import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
+import { CurrenciesContext, CurrenciesMap } from '../../../contexts/CurrenciesContext';
 import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
 
 const Title = styled.p`
@@ -95,13 +95,21 @@ function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: Curre
   })
 }
 
+function onlyHeldCurrencies(currenciesMap: CurrenciesMap, currencyBalances: CurrencyBalances): Currency[] {
+  const heldCurrencies = Object.keys(currencyBalances)
+    .map(symbol => currenciesMap[symbol])
+    .filter(c => c !== undefined) as Currency[];
+
+  return sortCurrenciesByBalance(heldCurrencies, currencyBalances);
+}
+
 export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectToken }) => {
-  const { inputCurrencies, currencyBalances } = useContext(CurrenciesContext);
+  const { inputCurrencies, inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
 
   const [currencyList, setCurrencyList] = useState<Currency[]>([]);
 
   useEffect(() => {
-      setCurrencyList(sortCurrenciesByBalance(inputCurrencies, currencyBalances));
+      setCurrencyList(onlyHeldCurrencies(inputCurrenciesMap, currencyBalances));
     },
     [inputCurrencies, currencyBalances]
   );
