@@ -74,13 +74,15 @@ export default function ExchangePage() {
       {() =>
         <SmallWidth>
           <ABox width={1} py={3}>
-            {/* TODO <CustomMobileStepper
+            <CustomMobileStepper
+              backButton={null}
+              nextButton={null}
               activeStep={stepId}
               steps={stepElements.length}
               variant="progress"
               position="static"
               className={classes.mobileStepperRoot}
-            />*/}
+            />
 
             <Box textAlign="center" className={classes.mobileStepperStepLabel}>
               {steps[stepId]}
