@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross } from '@aragon/ui';
 
 import Api from '../../lib/apiWrapper';
@@ -25,43 +25,59 @@ interface OrderRowProps {
   order: MooniOrder;
 }
 
-function ExternalButton({ url, label }) {
-  const theme = useTheme();
-
-  let display = 'all';
-
-  return (
-    <Button href={url} size="mini" display={display} icon={<IconExternal style={{color: theme.accent}}/>} />
-  )
-}
-
-const OrderRow: React.FC<OrderRowProps> = ({order}) => {
+const OrderStatusIcon: React.FC<OrderRowProps> = ({order}) => {
   const theme = useTheme();
 
   const date = new Date(order.createdAt);
   const now = new Date();
   const expired = order.status === MooniOrderStatus.PENDING && !order.txHash && ((+now - +date) > 10*60*1000);
 
+  let tooltipText;
+  if(expired) {
+    tooltipText = 'Expired'
+  } else if(order.status === MooniOrderStatus.PENDING && !expired) {
+    tooltipText = 'Pending'
+  } else {
+    tooltipText = 'Executed'
+  }
+
   return (
-    <TableRow>
-      <TableCell component="th" scope="row" align="center">
-        <Box display="flex" alignItems="center" justifyContent="center">
+    <Box display="flex" alignItems="center" justifyContent="center">
+      <Tooltip title={tooltipText}>
+        <Box display="flex" alignItems="center">
           {order.status === MooniOrderStatus.PENDING && !expired &&
           <IconClock size="medium" style={{ color: theme.disabledContent }}  />
           }
-          {order.status === MooniOrderStatus.PENDING && expired &&
+          {expired &&
           <IconCross size="medium" style={{ color: theme.negative }}  />
           }
           {order.status === MooniOrderStatus.EXECUTED &&
           <IconCheck size="medium" style={{ color: theme.positive }}/>
           }
         </Box>
+      </Tooltip>
+    </Box>
+  );
+};
+
+const OrderRow: React.FC<OrderRowProps> = ({order}) => {
+  const date = new Date(order.createdAt);
+  const theme = useTheme();
+
+  return (
+    <TableRow>
+      <TableCell component="th" scope="row" align="center">
+        <Box display="flex" alignItems="center" justifyContent="center">
+          <OrderStatusIcon order={order}/>
+        </Box>
       </TableCell>
       <TableCell><CellText>{truncateNumber(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
       <TableCell><CellText>{truncateNumber(order.outputAmount)} {order.outputCurrency}</CellText></TableCell>
       <TableCell><CellText>{date.toLocaleDateString()} {date.toLocaleTimeString()}</CellText></TableCell>
       <TableCell>
-        {order.txHash && <ExternalButton url={getEtherscanTxURL(order.txHash)} label="Transaction" />}
+        {order.txHash &&
+        <Button href={getEtherscanTxURL(order.txHash)} size="mini" display="all" icon={<IconExternal style={{color: theme.accent}}/>} />
+        }
       </TableCell>
     </TableRow>
   );

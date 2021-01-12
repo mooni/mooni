@@ -21,7 +21,6 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
       id: multiTradeId,
     },
   });
-  console.log(mooniOrder, token.claim.iss);
   if(!mooniOrder || !compareAddresses(mooniOrder.ethAddress, token.claim.iss)) {
     throw new APIError(404, 'not-found', 'MooniOrder not found');
   }
