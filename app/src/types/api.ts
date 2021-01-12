@@ -1,9 +1,10 @@
 import {CurrencySymbol} from "../lib/trading/types";
 
-type UUID = string;
-type CUID = string;
-type EthereumAddress = string;
-type CurrencyAmount = string;
+export type UUID = string;
+export type CUID = string;
+export type EthereumAddress = string;
+export type CurrencyAmount = string;
+export type TransactionHash = string;
 
 export enum MooniOrderStatus {
   PENDING = 'PENDING',
@@ -23,6 +24,7 @@ export interface MooniOrder {
   executedAt?: Date;
   status: MooniOrderStatus;
   ethAddress: EthereumAddress;
+  txHash: TransactionHash;
   inputAmount: CurrencyAmount;
   inputCurrency: CurrencySymbol;
   outputAmount: CurrencyAmount;

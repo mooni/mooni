@@ -11,6 +11,8 @@ import RpcSubprovider from 'web3-provider-engine/subproviders/rpc';
 
 import config from '../config';
 import { logError } from './log';
+import { BityOrderError } from './wrappers/bityTypes';
+import { MetaError } from './errors';
 
 const { infuraId, portisAppId, fortmaticId } = config;
 
@@ -89,13 +91,18 @@ export function detectIframeWeb3Provider() {
 }
 
 export function detectWalletError(error) {
-  if(
+  if(error instanceof MetaError || error instanceof BityOrderError) {
+    return error;
+  }
+  else if(
     error?.code === 4001 ||  // Metamask
     (error && error.message && String(error.message).includes('User canceled')) // Trust wallet
-  )
+  ) {
     return new Error('user-rejected-transaction');
-  logError('wallet-error', error);
-  return error;
+  } else {
+    logError('wallet-error', error);
+    return error;
+  }
 }
 
 const providerOptions = {
