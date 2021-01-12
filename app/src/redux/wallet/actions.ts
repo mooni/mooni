@@ -98,13 +98,6 @@ export const login = (forcedProvider?) => async function (dispatch)  {
       }
     }
 
-    ethManager.events.on('accountsChanged', () => {
-      dispatch(onAccountChanged());
-    });
-    ethManager.events.on('stop', () => {
-      dispatch(logout());
-    });
-
     dispatch(setWalletStatus(WalletStatus.CONNECTED));
 
   } catch(error) {
