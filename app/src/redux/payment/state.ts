@@ -61,17 +61,17 @@ const initialMockStateMinimum: PaymentState = {
           zip: 'fdsqfqs',
           city: 'dsfqs'
         },
-        iban: 'NL84INGB1679475908',
+        iban: 'NL37INGB8265634552',
       },
       reference: '',
     },
     ethInfo: {
-      fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
+      fromAddress: '0x1cD300E6d25193Fb6CbEF685ACb89B4B39dc9d79'
     },
     tradeRequest: {
-      inputCurrencySymbol: DEFAULT_INPUT_CURRENCY,
+      inputCurrencySymbol: 'ETH',
       outputCurrencySymbol: DEFAULT_OUTPUT_CURRENCY,
-      amount: '50',
+      amount: '40',
       tradeExact: TradeExact.OUTPUT,
     },
   },

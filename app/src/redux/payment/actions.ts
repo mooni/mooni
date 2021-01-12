@@ -243,11 +243,6 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   if(watching.get(orderId)) return;
   const jwsToken = getJWS(getState());
 
-  dispatch(updatePaymentStep({
-    id: PaymentStepId.BITY,
-    status: PaymentStepStatus.WAITING,
-  }));
-
   function fetchNewData() {
     Api.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
@@ -350,6 +345,11 @@ export const sendPayment = () => async function (dispatch, getState)  {
     }));
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
+
+    dispatch(updatePaymentStep({
+      id: PaymentStepId.BITY,
+      status: PaymentStepStatus.WAITING,
+    }));
 
   } catch(error) {
 
