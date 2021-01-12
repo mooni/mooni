@@ -110,6 +110,7 @@ const initialMockStateComplete: PaymentState = {
     },
   },
   multiTrade: {
+    id: 'abcd-efgh',
     tradeRequest: {
       inputCurrencySymbol: 'ETH',
       outputCurrencySymbol: 'EUR',
