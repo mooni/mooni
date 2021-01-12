@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button, Link } from '@aragon/ui'
+import { Button } from '@aragon/ui'
 import { Box, Typography } from '@material-ui/core';
 import { ExitToApp } from '@material-ui/icons';
 
