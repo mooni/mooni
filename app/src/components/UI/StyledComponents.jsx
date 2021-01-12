@@ -1,7 +1,7 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import { Link, useTheme } from '@aragon/ui';
+import { Link, Button, useTheme } from '@aragon/ui';
 
 export const SmallWidth = styled.div`
   max-width: 25rem;
@@ -54,4 +54,8 @@ export const ShadowBox = styled.div`
   box-sizing: border-box;
   box-shadow: 2px 2px 4px rgba(86, 86, 86, 0.1);
   border-radius: 27px;
+`;
+
+export const RoundButton = styled(Button)`
+  border-radius: 25px;
 `;

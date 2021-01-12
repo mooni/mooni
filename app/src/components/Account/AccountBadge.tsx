@@ -1,17 +1,18 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button, EthIdenticon, IconWallet, useViewport, GU } from '@aragon/ui'
+import { EthIdenticon, IconWallet, useViewport, GU } from '@aragon/ui'
 import { Box, Avatar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import {ShadowBox} from "../UI/StyledComponents";
+import {ShadowBox, RoundButton} from "../UI/StyledComponents";
 
 import { getAddress, getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
 import { WalletStatus } from "../../redux/wallet/state";
 import { selectENS } from '../../redux/user/userSlice';
+import { login } from '../../redux/wallet/actions';
 
 const HEIGHT = 5 * GU;
 const IDENTICON_SIZE = 6 * GU;
@@ -45,6 +46,7 @@ function shortenedAddress(address) {
 
 function AccountBadge() {
   const history = useHistory();
+  const dispatch = useDispatch();
   const { below } = useViewport();
 
   const walletStatus = useSelector(getWalletStatus);
@@ -66,9 +68,13 @@ function AccountBadge() {
       </BadgeBox>
     );
 
+  function connectWallet() {
+    dispatch(login());
+  }
+
   if(walletStatus === WalletStatus.DISCONNECTED) {
     return (
-      <Button disabled wide icon={<IconWallet/>} display="all" label="Not connected" />
+      <RoundButton wide icon={<IconWallet/>} display="all" label="Not connected" onClick={connectWallet} />
     );
   }
 
