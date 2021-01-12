@@ -4,7 +4,10 @@ import GitHubButton from 'react-github-btn';
 import { Link, textStyle, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 import styled from 'styled-components';
-import { Twitter, Telegram, Email } from '@material-ui/icons';
+import { Twitter, Email } from '@material-ui/icons';
+import DiscordIcon from '../assets/discord_icon.svg';
+
+import config from '../config';
 
 const Title = styled.p`
   ${textStyle('body1')};
@@ -60,7 +63,11 @@ export default function AboutPage() {
         Support
       </Header>
       <Content>
-        If you have any problem or suggestion, please contact us on one of the following socials.
+        If you have any problem or suggestion, please contact us on our
+        <Link href={config.discordInviteUrl} external style={{ textDecoration: 'none' }}>
+          &nbsp;Discord server&nbsp;
+        </Link>
+        .
       </Content>
       <Header>
         Social
@@ -69,8 +76,8 @@ export default function AboutPage() {
         <SocialIcon href="https://twitter.com/moonidapp" target="_blank">
           <Twitter fontSize="large" />
         </SocialIcon>
-        <SocialIcon href="https://t.me/moonidapp" target="_blank">
-          <Telegram fontSize="large" />
+        <SocialIcon href={config.discordInviteUrl} target="_blank">
+          <img src={DiscordIcon} width={30} />
         </SocialIcon>
         <SocialIcon href="mailto:contact@mooni.tech" target="_blank">
           <Email fontSize="large" />
