@@ -3,17 +3,8 @@ import useSWR from 'swr';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 
-import { Box, TableContainer, Table, TableRow, TableBody, TableHead, TableCell } from '@material-ui/core';
-import {
-  IconCheck,
-  useTheme,
-  IconClock,
-  LoadingRing,
-  useViewport,
-  IconExternal,
-  Button,
-
-} from '@aragon/ui'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross } from '@aragon/ui';
 
 import Api from '../../lib/apiWrapper';
 import { getJWS } from '../../redux/wallet/selectors';
@@ -48,12 +39,22 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
   const theme = useTheme();
 
   const date = new Date(order.createdAt);
+  const now = new Date();
+  const expired = order.status === MooniOrderStatus.PENDING && !order.txHash && ((+now - +date) > 10*60*1000);
+
   return (
     <TableRow>
       <TableCell component="th" scope="row" align="center">
         <Box display="flex" alignItems="center" justifyContent="center">
-          {order.status === MooniOrderStatus.PENDING && <IconClock size="medium" style={{ color: theme.disabledContent }}  />}
-          {order.status === MooniOrderStatus.EXECUTED && <IconCheck size="medium" style={{ color: theme.positive }}/>}
+          {order.status === MooniOrderStatus.PENDING && !expired &&
+          <IconClock size="medium" style={{ color: theme.disabledContent }}  />
+          }
+          {order.status === MooniOrderStatus.PENDING && expired &&
+          <IconCross size="medium" style={{ color: theme.negative }}  />
+          }
+          {order.status === MooniOrderStatus.EXECUTED &&
+          <IconCheck size="medium" style={{ color: theme.positive }}/>
+          }
         </Box>
       </TableCell>
       <TableCell><CellText>{truncateNumber(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
