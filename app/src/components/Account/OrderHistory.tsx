@@ -1,10 +1,10 @@
 import React from 'react';
 import useSWR from 'swr';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross } from '@aragon/ui';
+import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross, Link } from '@aragon/ui';
 
 import Api from '../../lib/apiWrapper';
 import { getJWS } from '../../redux/wallet/selectors';
@@ -12,6 +12,7 @@ import { MooniOrder, MooniOrderStatus } from '../../types/api';
 import { truncateNumber } from '../../lib/numbers';
 import { ShadowBox } from '../UI/StyledComponents';
 import { getEtherscanTxURL } from '../../lib/eth';
+import { setInfoPanel } from '../../redux/ui/actions';
 
 // @ts-ignore
 const CustomTableContainer = styled(ShadowBox)`
@@ -19,6 +20,12 @@ const CustomTableContainer = styled(ShadowBox)`
 `;
 const CellText = styled.span`
   font-size: 12px;
+`;
+const OrdersHint = styled.p`
+  font-size: 14px;
+  text-align: center;
+  font-style: italic;
+  margin-top: 16px;
 `;
 
 interface OrderRowProps {
@@ -84,6 +91,7 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
 };
 
 export default function OrderHistory() {
+  const dispatch = useDispatch();
   const jwsToken = useSelector(getJWS);
   const { below } = useViewport();
   const { data, error } = useSWR(jwsToken, Api.getOrders);
@@ -123,6 +131,13 @@ export default function OrderHistory() {
           You didn't make any orders.
         </Box>
       }
+      <OrdersHint>
+        If you have any issues with an order, please contact the
+        <Link onClick={() => dispatch(setInfoPanel('support'))} style={{ textDecoration: 'none', fontStyle: 'italic' }}>
+          &nbsp;support
+        </Link>
+        .
+      </OrdersHint>
     </Box>
   );
 }

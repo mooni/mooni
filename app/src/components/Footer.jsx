@@ -44,6 +44,11 @@ function Footer() {
         </Link>
       </Box>
       <Box className={classes.element}>
+        <Link onClick={() => dispatch(setInfoPanel('support'))} className={classes.link}>
+          Support
+        </Link>
+      </Box>
+      <Box className={classes.element}>
         <Link onClick={() => dispatch(setInfoPanel('about'))} className={classes.link}>
           About
         </Link>

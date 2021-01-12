@@ -60,16 +60,6 @@ export default function AboutPage() {
         for more informations.
       </Content>
       <Header>
-        Support
-      </Header>
-      <Content>
-        If you have any problem or suggestion, please contact us on our
-        <Link href={config.discordInviteUrl} external style={{ textDecoration: 'none' }}>
-          &nbsp;Discord server&nbsp;
-        </Link>
-        .
-      </Content>
-      <Header>
         Social
       </Header>
       <Box display="flex" justifyContent="center" my={1}>
