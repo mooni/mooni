@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
-import { ethers } from 'ethers';
+import { ethers, providers } from 'ethers';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import config from '../config';
 import { MetaError } from './errors';
@@ -96,4 +97,24 @@ export default class ETHManager {
 
 export function getEtherscanTxURL(hash) {
   return `https://etherscan.io/tx/${hash}`;
+}
+
+export async function shittySigner(provider: providers.Web3Provider, rawMessage: string) {
+  if(provider.provider instanceof WalletConnectProvider) {
+    const rawMessageLength = new Blob([rawMessage]).size
+    const message = ethers.utils.toUtf8Bytes("\x19Ethereum Signed Message:\n" + rawMessageLength + rawMessage)
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    const keccakMessage = ethers.utils.keccak256(message);
+
+    const wc = provider.provider as WalletConnectProvider;
+    const signature = await wc.connector.signMessage([
+      address.toLowerCase(),
+      keccakMessage,
+    ]);
+    return signature;
+  } else {
+    const signer = provider.getSigner();
+    return await signer.signMessage(rawMessage);
+  }
 }
