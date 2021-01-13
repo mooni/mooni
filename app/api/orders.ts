@@ -8,7 +8,12 @@ export default authMiddleware(async (req: NowRequest, res: NowResponse, token: T
   const orders = await prisma.mooniOrder.findMany({
     where: {
       ethAddress,
-    }
+    },
+    orderBy: [
+      {
+        createdAt: 'desc',
+      },
+    ],
   });
   res.json(orders)
 });

@@ -3,13 +3,13 @@ import useForm from 'react-hook-form';
 import IBAN from 'iban';
 import EmailValidator from 'email-validator';
 
-import { COUNTRIES } from '../lib/countries';
+import { COUNTRIES } from '../../lib/countries';
 
 import { Box } from '@material-ui/core';
 import { Button, IconArrowRight, DropDown, Link } from '@aragon/ui';
 
 import FormField from './FormField';
-import { FieldError } from './StyledComponents';
+import { FieldError } from '../UI/StyledComponents';
 
 const fields = {
   name: {

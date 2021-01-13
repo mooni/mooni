@@ -8,10 +8,10 @@ import { theme } from './theme';
 
 import './App.css';
 
-import AppContainer from './components/AppContainer';
-import InfoPanel from './components/InfoPanel';
-import ErrorModal from './components/ErrorModal';
-import WalletModal from './components/WalletModal';
+import AppContainer from './components/UI/AppContainer';
+import InfoPanel from './components/Modals/InfoPanel';
+import ErrorModal from './components/Modals/ErrorModal';
+import WalletModal from './components/Modals/WalletModal';
 import { Routes } from './Routes';
 
 import { store } from './redux/store';

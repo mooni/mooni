@@ -1,15 +1,16 @@
 import React from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
 import { Link } from '@aragon/ui'
-import {CurrencyType} from '../lib/trading/currencyTypes';
-import {BN, truncateNumber} from '../lib/numbers';
-import { Fee, MultiTradeEstimation, Trade, TradeType } from '../lib/trading/types'
-import {MetaError} from "../lib/errors";
 import styled from 'styled-components';
+import {CurrencyType} from '../../lib/trading/currencyTypes';
+import {BN, truncateNumber} from '../../lib/numbers';
+import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
+import {MetaError} from "../../lib/errors";
+import {ShadowBox} from "../UI/StyledComponents";
 
-import bityLogo from "../assets/bity_logo_small.png";
-import paraswapLogo from "../assets/paraswap_logo_small.png";
-import { getCurrency } from '../lib/trading/currencyHelpers'
+import bityLogo from "../../assets/bity_logo_small.png";
+import paraswapLogo from "../../assets/paraswap_logo_small.png";
+import { getCurrency } from '../../lib/trading/currencyHelpers'
 
 function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
@@ -47,12 +48,8 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null 
   };
 }
 
-const Container = styled.div`
-background: #FCFDFF;
-border: 1px solid #ececec;
-box-sizing: border-box;
-box-shadow: 2px 2px 4px rgba(86, 86, 86, 0.1);
-border-radius: 27px;
+// @ts-ignore
+const Container = styled(ShadowBox)`
 width: 100%;
 padding: 15px 20px;
 margin: 20px 0;
@@ -192,7 +189,7 @@ export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) =>
       <Box px={1}>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {fee &&
-        <BasicLine title="Fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
+        <BasicLine title="Exchange fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>

@@ -3,9 +3,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, LoadingRing, Modal} from '@aragon/ui';
 import Box from '@material-ui/core/Box';
 
-import {cancelInitBox, initBox} from '../redux/box/actions';
-import {getBoxLoading} from '../redux/box/selectors';
-import { logError } from '../lib/log';
+import {cancelInitBox, initBox} from '../../redux/box/actions';
+import {getBoxLoading} from '../../redux/box/selectors';
+import { logError } from '../../lib/log';
 
 function BoxLoading() {
   const dispatch = useDispatch();

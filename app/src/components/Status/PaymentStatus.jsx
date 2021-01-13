@@ -20,12 +20,12 @@ import {
 } from '@aragon/ui'
 import styled from 'styled-components';
 
-import { SimpleLink } from './StyledComponents';
+import { SimpleLink } from '../UI/StyledComponents';
 
-import { getEtherscanTxURL } from '../lib/eth';
-import Bity from '../lib/wrappers/bity';
-import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../lib/types';
-import { watchBityOrder } from '../redux/payment/actions';
+import { getEtherscanTxURL } from '../../lib/eth';
+import Bity from '../../lib/wrappers/bity';
+import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
+import { watchBityOrder } from '../../redux/payment/actions';
 
 const Title = styled.p`
   ${textStyle('title3')};

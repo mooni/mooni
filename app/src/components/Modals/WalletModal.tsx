@@ -5,11 +5,11 @@ import { Box, Dialog } from '@material-ui/core';
 import { textStyle, LoadingRing } from '@aragon/ui'
 import { Button } from '@material-ui/core';
 
-import { logout } from '../redux/wallet/actions';
-import { getWalletStatus, isWalletLoading } from '../redux/wallet/selectors';
-import { useAppDispatch } from '../redux/store';
+import { logout } from '../../redux/wallet/actions';
+import { getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
+import { useAppDispatch } from '../../redux/store';
 import styled from 'styled-components';
-import { WalletStatus } from "../redux/wallet/state";
+import { WalletStatus } from "../../redux/wallet/state";
 
 const Title = styled.p`
   ${textStyle('title4')};
