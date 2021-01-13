@@ -60,6 +60,12 @@ export default function Support() {
       <Content>
         If there is a problem with your order, or if your bank refuses the incoming transfer, you will be refunded ETH to your address after confirmation from support.
       </Content>
+      <FaqSection>
+        I do not see some transaction I did more than X months ago
+      </FaqSection>
+      <Content>
+        We did not store order information in previous versions of the app. If you need a full order history, please contact us.
+      </Content>
     </Box>
   );
 }

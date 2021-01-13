@@ -75,10 +75,10 @@ export default function AboutPage() {
       </Box>
       <SubTitle>
         Mooni is open-source !
-        <Box display="flex" justifyContent="center" mt={1}>
-          <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
-        </Box>
       </SubTitle>
+      <Box display="flex" justifyContent="center" mt={1}>
+        <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
+      </Box>
     </Box>
   );
 }
