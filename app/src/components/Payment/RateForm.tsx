@@ -7,19 +7,19 @@ import {useSelector} from 'react-redux';
 import {Button, IconRefresh, LoadingRing, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
-import config from '../config';
+import config from '../../config';
 import AmountRow from './AmountRow';
 
-import {TradeExact, TradeRequest} from '../lib/trading/types';
+import {TradeExact, TradeRequest} from '../../lib/trading/types';
 
-import {getInputCurrencies} from '../redux/ui/selectors';
+import {getInputCurrencies} from '../../redux/ui/selectors';
 
-import {getCurrenciesSymbols} from '../lib/trading/currencyHelpers';
-import {useRate} from '../hooks/rates';
-import {getWalletStatus} from '../redux/wallet/selectors';
-import {CurrencyType} from "../lib/trading/currencyTypes";
+import {getCurrenciesSymbols} from '../../lib/trading/currencyHelpers';
+import {useRate} from '../../hooks/rates';
+import {getWalletStatus} from '../../redux/wallet/selectors';
+import {CurrencyType} from "../../lib/trading/currencyTypes";
 import { RateAmount } from "./RateAmount";
-import { WalletStatus } from "../redux/wallet/state";
+import { WalletStatus } from "../../redux/wallet/state";
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};

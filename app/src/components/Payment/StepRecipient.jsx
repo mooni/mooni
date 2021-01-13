@@ -8,13 +8,13 @@ import Box from '@material-ui/core/Box';
 // eslint-disable-next-line
 import { Checkbox, Button, IconArrowRight, Help, textStyle, GU } from '@aragon/ui'
 
-import { setRecipient } from '../redux/payment/actions';
-import { getRecipient } from '../redux/payment/selectors';
-import { getBoxManager } from '../redux/box/selectors';
-import { updateMyAccount } from '../redux/contacts/actions';
+import { setRecipient } from '../../redux/payment/actions';
+import { getRecipient } from '../../redux/payment/selectors';
+import { getBoxManager } from '../../redux/box/selectors';
+import { updateMyAccount } from '../../redux/contacts/actions';
 
 import RecipientForm from './RecipientForm';
-import {BoxLoadingContainer, BoxModal} from './RequireBox';
+import {BoxLoadingContainer, BoxModal} from '../Utils/RequireBox';
 
 // const useStyles = makeStyles(() => ({
 //   saveInfoRow: {

@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, Dialog } from '@material-ui/core';
 import { Button, IconCaution, useTheme } from '@aragon/ui'
 
-import { getModalError } from '../redux/ui/selectors';
-import { setModalError } from '../redux/ui/actions';
+import { getModalError } from '../../redux/ui/selectors';
+import { setModalError } from '../../redux/ui/actions';
 
 const networkName = {
   1: 'Mainnet',

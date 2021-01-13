@@ -5,9 +5,9 @@ import { Link, textStyle, GU } from '@aragon/ui'
 import { Box } from '@material-ui/core';
 import styled from 'styled-components';
 import { Twitter, Email } from '@material-ui/icons';
-import DiscordIcon from '../assets/discord_icon.svg';
+import DiscordIcon from '../../assets/discord_icon.svg';
 
-import config from '../config';
+import config from '../../config';
 
 const Title = styled.p`
   ${textStyle('body1')};
@@ -60,24 +60,14 @@ export default function AboutPage() {
         for more informations.
       </Content>
       <Header>
-        Support
-      </Header>
-      <Content>
-        If you have any problem or suggestion, please contact us on our
-        <Link href={config.discordInviteUrl} external style={{ textDecoration: 'none' }}>
-          &nbsp;Discord server&nbsp;
-        </Link>
-        .
-      </Content>
-      <Header>
         Social
       </Header>
       <Box display="flex" justifyContent="center" my={1}>
         <SocialIcon href="https://twitter.com/moonidapp" target="_blank">
           <Twitter fontSize="large" />
         </SocialIcon>
-        <SocialIcon href={config.discordInviteUrl} target="_blank">
-          <img src={DiscordIcon} width={30} />
+        <SocialIcon href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
+          <img src={DiscordIcon} width={30} alt="discord icon" />
         </SocialIcon>
         <SocialIcon href="mailto:contact@mooni.tech" target="_blank">
           <Email fontSize="large" />
@@ -85,10 +75,10 @@ export default function AboutPage() {
       </Box>
       <SubTitle>
         Mooni is open-source !
-        <Box display="flex" justifyContent="center" mt={1}>
-          <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
-        </Box>
       </SubTitle>
+      <Box display="flex" justifyContent="center" mt={1}>
+        <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
+      </Box>
     </Box>
   );
 }

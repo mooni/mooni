@@ -1,5 +1,6 @@
 import { Recipient } from "../types";
 import { BityOrderResponse } from "../wrappers/bityTypes";
+import { UUID } from '../../types/api';
 
 export enum TradeExact {
   INPUT = 'INPUT',
@@ -37,14 +38,13 @@ export interface MultiTradeEstimation {
 }
 
 
-export interface MultiTrade extends MultiTradeEstimation{
-  tradeRequest: TradeRequest,
+export interface MultiTrade extends MultiTradeTemp{
+  id: UUID,
+}
+
+export interface MultiTradeTemp extends MultiTradeEstimation{
   ethInfo: ETHInfo,
   bankInfo: BankInfo,
-  trades: Trade[],
-  path: TradePath;
-  inputAmount: string,
-  outputAmount: string,
   referralId?: string,
 }
 

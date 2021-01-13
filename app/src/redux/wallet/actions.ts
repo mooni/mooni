@@ -6,8 +6,8 @@ import {detectIframeWeb3Provider, getWalletProvider, web3Modal} from '../../lib/
 import {MetaError} from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import {store} from '../../lib/store';
-import Api from '../../lib/api';
 import {WalletStatus} from "./state";
+import { fetchUser, resetUser } from '../user/userSlice';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -52,6 +52,7 @@ const setProviderFromIframe = (providerFromIframe: boolean) => ({
 
 const onAccountChanged = () => (dispatch, getState) => {
   dispatch(setWalletStatus(WalletStatus.LOADING));
+  dispatch(resetUser());
 
   const ethManager = getETHManager(getState());
 
@@ -59,10 +60,10 @@ const onAccountChanged = () => (dispatch, getState) => {
   DIDManager.getJWS(ethManager.provider)
     .then(async token => {
       dispatch(setWalletStatus(WalletStatus.LOADING));
-
-      await Api.getUser(token);
-      dispatch(setAddress(ethManager.getAddress()));
       dispatch(setJWS(token));
+      await dispatch(fetchUser());
+
+      dispatch(setAddress(ethManager.getAddress()));
 
       dispatch(setWalletStatus(WalletStatus.CONNECTED));
     })
@@ -137,6 +138,7 @@ export const logout = () => (dispatch, getState) => {
   dispatch(setAddress(null));
   dispatch(setJWS(null));
   dispatch(setProviderFromIframe(false));
+  dispatch(resetUser());
 
   web3Modal.clearCachedProvider();
 

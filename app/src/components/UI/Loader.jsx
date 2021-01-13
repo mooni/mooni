@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@material-ui/core';
 import { EmptyStateCard, LoadingRing } from '@aragon/ui'
-import LoadImage from '../assets/undraw_counting_stars_rrnl.svg';
+import LoadImage from '../../assets/undraw_counting_stars_rrnl.svg';
 
 function Loader({ text = 'Loading...' }) {
   return (
