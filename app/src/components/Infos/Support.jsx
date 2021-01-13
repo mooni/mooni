@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Box } from '@material-ui/core';
 import { textStyle, Link, GU } from '@aragon/ui';
 import config from '../../config';
+import DiscordIcon from "../../assets/discord_icon.svg";
 
 const SubTitle = styled.p`
   ${textStyle('title4')};
@@ -26,16 +27,19 @@ export default function Support() {
   return (
     <Box pt={3}>
       <Content>
-        If you have any problem or suggestion, feel free to contact us.
-        <br/>
-        The prefered way of communication is on our
-        <Link href={config.discordInviteUrl} external style={{ textDecoration: 'none' }}>
-          &nbsp;Discord server
-        </Link>.
-        You can also
-        <Link href="mailto:contact@mooni.tech" external style={{ textDecoration: 'none' }}>
-          &nbsp;reach us by mail
-        </Link>.
+        The preferred way to contact us is through our Discord server.
+      <br/>
+        <a href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
+          <img src={DiscordIcon} width={30} alt="discord icon" />
+        </a>
+      </Content>
+
+      <SubTitle>
+        Important informations
+      </SubTitle>
+      <Content>
+        Please make sure you are using our unique domain name at <u>app.mooni.tech</u>.
+        Mooni will never ask for your seed/private keys or ever contact you by email.
       </Content>
 
       <SubTitle>
@@ -71,6 +75,16 @@ export default function Support() {
       </FaqSection>
       <Content>
         To be able to earn profit sharing, referred user must have successfully completed orders. If they did, please contact our support to know your available balance and ask for a withdrawal. This is a new feature, and automatic withdrawal request will be available once there is enough demand.
+      </Content>
+
+      <SubTitle>
+        Not found your answer ?
+      </SubTitle>
+      <Content>
+        You can
+        <Link href="mailto:contact@mooni.tech" external style={{ textDecoration: 'none' }}>
+          &nbsp;reach us by mail
+        </Link>.
       </Content>
     </Box>
   );

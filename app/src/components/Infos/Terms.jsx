@@ -29,6 +29,7 @@ function Terms() {
       </SubTitle>
       <Content>
         Mooni is a web application that allows to transfer funds from a crypto wallet to a bank account. <br/>
+        The app is currently only available on the domain at <i>mooni.tech</i>. <br/>
         It is not a money service provider, does not holds any funds, and does not hold any financial license. Instead, it uses different third party services such as a foreign exchange, decentralized liquidity providers and data storages, in order to serve its purpose.
       </Content>
       <SubTitle>
