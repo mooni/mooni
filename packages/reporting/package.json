@@ -8,6 +8,7 @@
     "history": "ts-node src/orderHistory"
   },
   "dependencies": {
+    "@alch/alchemy-web3": "^0.1.18",
     "@types/node": "^14.14.14",
     "axios": "^0.21.0",
     "dotenv": "^8.2.0",
