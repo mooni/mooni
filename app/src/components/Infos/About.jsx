@@ -66,7 +66,7 @@ export default function AboutPage() {
         <SocialIcon href="https://twitter.com/moonidapp" target="_blank">
           <Twitter fontSize="large" />
         </SocialIcon>
-        <SocialIcon href={config.discordInviteUrl} target="_blank">
+        <SocialIcon href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
           <img src={DiscordIcon} width={30} alt="discord icon" />
         </SocialIcon>
         <SocialIcon href="mailto:contact@mooni.tech" target="_blank">
