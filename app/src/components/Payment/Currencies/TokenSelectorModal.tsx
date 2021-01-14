@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef, MutableRefObject } from 'react';
+import { useSelector } from 'react-redux';
+import InfiniteScroll from "react-infinite-scroller";
 
-import { Box, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar } from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar } from '@material-ui/core';
 
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
-import { textStyle } from '@aragon/ui'
+import { textStyle, LoadingRing } from '@aragon/ui'
 import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
 import { CurrenciesMap, Currency } from '../../../lib/trading/currencyTypes';
 import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
 import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
 import { ETHER } from '../../../lib/trading/currencyList';
+import { getWalletStatus } from '../../../redux/wallet/selectors';
+import { WalletStatus } from '../../../redux/wallet/state';
+import { useTokenList } from '../../../hooks/currencies';
 
 const Title = styled.p`
   ${textStyle('title4')};
@@ -23,9 +28,9 @@ const CurrencyLogoAvatar = styled(Avatar)`
     background: none;
   }
 `
-const DialogContent = styled(Box)`
-  width: 400px;
-`
+// const DialogContent = styled(Box)`
+//   width: 400px;
+// `
 
 const CurrencySymbolText = styled.span`
 `;
@@ -41,12 +46,16 @@ const CurrencyAmountText = styled.span`
   color: #4b5155;
 `;
 
-type Props = {
+type TokenSelectorModalProps = {
   open: boolean;
   onClose: () => void;
   onSelectToken: (CurrencySymbol) => void;
 };
 
+type TokenListProps = {
+  onSelectToken: (CurrencySymbol) => void;
+  scrollRef: React.RefObject<HTMLElement>;
+};
 type TokenRowProps = {
   currency: Currency;
 };
@@ -82,63 +91,74 @@ const TokenRow: React.FC<TokenRowProps> = ({ currency }) => {
   );
 };
 
-function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: CurrencyBalances) {
-  return currencies.sort((a, b) => {
-    if(a.equals(ETHER)) return -1;
-    else if(b.equals(ETHER)) return 1;
-    else if (currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
-      const av = amountToDecimal(currencyBalances[a.symbol].balance, a.decimals);
-      const bv = amountToDecimal(currencyBalances[b.symbol].balance, b.decimals);
-      const diff = new BN(bv).minus(av);
-      return diff.gt(0) ? 1:-1;
-    } else if (currencyBalances[a.symbol] && !currencyBalances[b.symbol]) {
-      return -1;
-    } else if (!currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
-      return 1;
-    } else {
-      return 0;
-    }
-  })
-}
-
-function onlyHeldCurrencies(currenciesMap: CurrenciesMap, currencyBalances: CurrencyBalances): Currency[] {
-  const heldCurrencies = Object.keys(currencyBalances)
-    .map(symbol => currenciesMap[symbol])
-    .filter(c => c !== undefined) as Currency[];
-
-  return sortCurrenciesByBalance(heldCurrencies, currencyBalances);
-}
-
-export const TokenSelectorModal: React.FC<Props> = ({ open, onClose, onSelectToken }) => {
-  const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
-
-  const [currencyList, setCurrencyList] = useState<Currency[]>([]);
-
-  useEffect(() => {
-      setCurrencyList(onlyHeldCurrencies(inputCurrenciesMap, currencyBalances));
-    },
-    [inputCurrenciesMap, currencyBalances]
+const LoadingRow: React.FC = () => {
+  return (
+    <ListItem>
+      <ListItemAvatar>
+        <LoadingRing mode="half-circle"/>
+      </ListItemAvatar>
+      <ListItemText>
+        <CurrencySymbolText>Loading more...</CurrencySymbolText>
+      </ListItemText>
+    </ListItem>
   );
+};
+
+const TOKEN_PAGINATION = 10;
+const TokenList: React.FC<TokenListProps> = ({ onSelectToken, scrollRef }) => {
+  const currencyList = useTokenList();
+  const [itemList, setItemList] = useState<Currency[]>(currencyList.slice(0, TOKEN_PAGINATION));
+  const [hasMore, setHasMore] = useState<boolean>(true);
+
+  const fetchMore = (page) => {
+    const si = page*TOKEN_PAGINATION;
+    if(si > currencyList.length) {
+      setHasMore(false);
+      return;
+    }
+
+    setItemList(itemList.concat(currencyList.slice(si, si+TOKEN_PAGINATION)))
+  }
+
+  return (
+    <List>
+      <InfiniteScroll
+        pageStart={0}
+        loadMore={fetchMore}
+        hasMore={hasMore}
+        loader={<LoadingRow key="loader" />}
+        useWindow={false}
+        getScrollParent={() => scrollRef?.current}
+      >
+        {itemList.map(currency => (
+          <ListItem key={currency.symbol} button onClick={() => onSelectToken(currency.symbol)}>
+            <TokenRow currency={currency} />
+          </ListItem>
+        ))}
+      </InfiniteScroll>
+    </List>
+  );
+}
+
+
+export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, onClose, onSelectToken }) => {
+  const dialogRef = useRef<HTMLElement>(null);
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      fullWidth
       maxWidth="sm"
+      scroll="paper"
     >
       <DialogTitle disableTypography>
         <Title>
           Select token
         </Title>
       </DialogTitle>
-      <DialogContent>
-        <List>
-          {currencyList.map(currency => (
-            <ListItem key={currency.symbol} button onClick={() => onSelectToken(currency.symbol)}>
-              <TokenRow currency={currency} />
-            </ListItem>
-          ))}
-        </List>
+      <DialogContent ref={dialogRef}>
+        <TokenList onSelectToken={onSelectToken} scrollRef={dialogRef}/>
       </DialogContent>
     </Dialog>
   );
