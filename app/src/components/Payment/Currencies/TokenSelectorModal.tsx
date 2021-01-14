@@ -1,24 +1,20 @@
-import React, { useState, useEffect, useContext, useRef, MutableRefObject } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import InfiniteScroll from "react-infinite-scroller";
 
-import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar } from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar, makeStyles } from '@material-ui/core';
 
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
-import { textStyle, LoadingRing } from '@aragon/ui'
-import { amountToDecimal, BN, truncateNumber } from '../../../lib/numbers';
-import { CurrenciesMap, Currency } from '../../../lib/trading/currencyTypes';
+import { textStyle, LoadingRing, SearchInput } from '@aragon/ui'
+import { amountToDecimal, truncateNumber } from '../../../lib/numbers';
+import { Currency } from '../../../lib/trading/currencyTypes';
 import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
-import { CurrencyBalances } from '../../../lib/wrappers/paraswap';
-import { ETHER } from '../../../lib/trading/currencyList';
-import { getWalletStatus } from '../../../redux/wallet/selectors';
-import { WalletStatus } from '../../../redux/wallet/state';
 import { useTokenList } from '../../../hooks/currencies';
 
 const Title = styled.p`
   ${textStyle('title4')};
   text-align: center;
+  margin-bottom: 8px;
 `;
 
 const CurrencyLogoAvatar = styled(Avatar)`
@@ -28,9 +24,10 @@ const CurrencyLogoAvatar = styled(Avatar)`
     background: none;
   }
 `
-// const DialogContent = styled(Box)`
-//   width: 400px;
-// `
+
+const CustomSearchInput = styled(SearchInput)`
+  border-radius: 15px;
+`
 
 const CurrencySymbolText = styled.span`
 `;
@@ -45,6 +42,17 @@ const CurrencyAmountText = styled.span`
   font-weight: lighter;
   color: #4b5155;
 `;
+
+const useStyles = makeStyles(theme => ({
+  modalRoot: {
+    height: '80%',
+    borderRadius: 25,
+  },
+  dialogContentRoot: {
+    padding: 0,
+    margin: '12px 24px',
+  },
+}));
 
 type TokenSelectorModalProps = {
   open: boolean;
@@ -150,6 +158,7 @@ const TokenList: React.FC<TokenListProps> = ({ onSelectToken, searchValue, scrol
 
 export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, onClose, onSelectToken }) => {
   const dialogRef = useRef<HTMLElement>(null);
+  const classes = useStyles();
   const [searchValue, setSearchValue] = useState<string>("");
 
   return (
@@ -159,16 +168,24 @@ export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, on
       fullWidth
       maxWidth="sm"
       scroll="paper"
+      classes={{paper: classes.modalRoot}}
     >
       <DialogTitle disableTypography>
         <Title>
           Select token
         </Title>
+        <CustomSearchInput
+          value={searchValue}
+          onChange={value => setSearchValue(value)}
+          type="text"
+          placeholder="Search token"
+          wide
+        />
       </DialogTitle>
-      <DialogContent>
-        <input value={searchValue} onChange={e => setSearchValue(e.target.value)} type="text" />
-      </DialogContent>
-      <DialogContent ref={dialogRef}>
+      <DialogContent
+        ref={dialogRef}
+        classes={{root: classes.dialogContentRoot}}
+      >
         <TokenList onSelectToken={onSelectToken} scrollRef={dialogRef} searchValue={searchValue}/>
       </DialogContent>
     </Dialog>

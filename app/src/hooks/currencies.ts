@@ -1,9 +1,6 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useContext, useMemo } from 'react';
 import { CurrenciesContext } from '../contexts/CurrenciesContext';
-import { getWalletStatus } from '../redux/wallet/selectors';
 import { CurrenciesMap, Currency, TokenCurrency } from '../lib/trading/currencyTypes';
-import { WalletStatus } from '../redux/wallet/state';
 import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { ETHER } from '../lib/trading/currencyList';
 import { amountToDecimal, BN } from '../lib/numbers';
@@ -14,7 +11,7 @@ export const useCurrency = (symbol) => {
 }
 
 
-function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: CurrencyBalances) {
+function sortCurrencies(currencies: Currency[], currencyBalances: CurrencyBalances) {
   return currencies.sort((a, b) => {
     if(a.equals(ETHER)) return -1;
     else if(b.equals(ETHER)) return 1;
@@ -33,14 +30,6 @@ function sortCurrenciesByBalance(currencies: Currency[], currencyBalances: Curre
   })
 }
 
-function onlyHeldCurrencies(currenciesMap: CurrenciesMap, currencyBalances: CurrencyBalances): Currency[] {
-  const heldCurrencies = Object.keys(currencyBalances)
-    .map(symbol => currenciesMap[symbol])
-    .filter(c => c !== undefined) as Currency[];
-
-  return sortCurrenciesByBalance(heldCurrencies, currencyBalances);
-}
-
 function searchFunction(currency: Currency, searchValue: string) {
   if(searchValue === '') return true;
 
@@ -50,29 +39,27 @@ function searchFunction(currency: Currency, searchValue: string) {
     return true;
   else if(currency.symbol.toLowerCase().includes(sl))
     return true;
-  else return false;
+  else
+    return false;
+}
+
+const useSortedList = (currenciesMap: CurrenciesMap, currencyBalances: CurrencyBalances) => {
+  return useMemo(() =>
+    sortCurrencies(Object.values(currenciesMap), currencyBalances)
+  , [currencyBalances, currenciesMap]);
+}
+
+const useFilteredList = (currencyList: Currency[], searchValue: string) => {
+  return useMemo(() =>
+    currencyList.filter(c => searchFunction(c, searchValue))
+  , [currencyList, searchValue]);
 }
 
 export const useTokenList = (searchValue: string) => {
   const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
-  const walletStatus = useSelector(getWalletStatus);
 
-  const [currencyList, setCurrencyList] = useState<Currency[]>(Object.values(inputCurrenciesMap));
-  const [filteredCurrencyList, setFilteredCurrencyList] = useState<Currency[]>(currencyList);
-
-  useEffect(() => {
-      if(walletStatus === WalletStatus.CONNECTED) {
-        setCurrencyList(onlyHeldCurrencies(inputCurrenciesMap, currencyBalances));
-      } else {
-        setCurrencyList(Object.values(inputCurrenciesMap));
-      }
-    },
-    [inputCurrenciesMap, currencyBalances, walletStatus]
-  );
-
-  useEffect(() => {
-    setFilteredCurrencyList(currencyList.filter(c => searchFunction(c, searchValue)));
-  }, [searchValue, currencyList]);
+  const sortedCurrencyList = useSortedList(inputCurrenciesMap, currencyBalances);
+  const filteredCurrencyList = useFilteredList(sortedCurrencyList, searchValue);
 
   return filteredCurrencyList;
 }
