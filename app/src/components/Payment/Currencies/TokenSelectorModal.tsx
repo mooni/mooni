@@ -54,6 +54,7 @@ type TokenSelectorModalProps = {
 
 type TokenListProps = {
   onSelectToken: (CurrencySymbol) => void;
+  searchValue: string;
   scrollRef: React.RefObject<HTMLElement>;
 };
 type TokenRowProps = {
@@ -105,25 +106,31 @@ const LoadingRow: React.FC = () => {
 };
 
 const TOKEN_PAGINATION = 10;
-const TokenList: React.FC<TokenListProps> = ({ onSelectToken, scrollRef }) => {
-  const currencyList = useTokenList();
+const TokenList: React.FC<TokenListProps> = ({ onSelectToken, searchValue, scrollRef }) => {
+  const currencyList = useTokenList(searchValue);
   const [itemList, setItemList] = useState<Currency[]>(currencyList.slice(0, TOKEN_PAGINATION));
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [page, setPage] = useState<number>(1);
 
-  const fetchMore = (page) => {
+  const fetchMore = () => {
     const si = page*TOKEN_PAGINATION;
     if(si > currencyList.length) {
       setHasMore(false);
       return;
     }
 
-    setItemList(itemList.concat(currencyList.slice(si, si+TOKEN_PAGINATION)))
+    setItemList(itemList.concat(currencyList.slice(si, si+TOKEN_PAGINATION)));
+    setPage(page+1);
   }
+  useEffect(() => {
+    setItemList(currencyList.slice(0, TOKEN_PAGINATION));
+    setHasMore(currencyList.length > TOKEN_PAGINATION);
+    setPage(1);
+  }, [currencyList]);
 
   return (
     <List>
       <InfiniteScroll
-        pageStart={0}
         loadMore={fetchMore}
         hasMore={hasMore}
         loader={<LoadingRow key="loader" />}
@@ -143,6 +150,7 @@ const TokenList: React.FC<TokenListProps> = ({ onSelectToken, scrollRef }) => {
 
 export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, onClose, onSelectToken }) => {
   const dialogRef = useRef<HTMLElement>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   return (
     <Dialog
@@ -157,8 +165,11 @@ export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, on
           Select token
         </Title>
       </DialogTitle>
+      <DialogContent>
+        <input value={searchValue} onChange={e => setSearchValue(e.target.value)} type="text" />
+      </DialogContent>
       <DialogContent ref={dialogRef}>
-        <TokenList onSelectToken={onSelectToken} scrollRef={dialogRef}/>
+        <TokenList onSelectToken={onSelectToken} scrollRef={dialogRef} searchValue={searchValue}/>
       </DialogContent>
     </Dialog>
   );

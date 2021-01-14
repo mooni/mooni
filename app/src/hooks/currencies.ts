@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CurrenciesContext } from '../contexts/CurrenciesContext';
 import { getWalletStatus } from '../redux/wallet/selectors';
-import { CurrenciesMap, Currency } from '../lib/trading/currencyTypes';
+import { CurrenciesMap, Currency, TokenCurrency } from '../lib/trading/currencyTypes';
 import { WalletStatus } from '../redux/wallet/state';
 import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { ETHER } from '../lib/trading/currencyList';
@@ -40,11 +40,25 @@ function onlyHeldCurrencies(currenciesMap: CurrenciesMap, currencyBalances: Curr
 
   return sortCurrenciesByBalance(heldCurrencies, currencyBalances);
 }
-export const useTokenList = () => {
+
+function searchFunction(currency: Currency, searchValue: string) {
+  if(searchValue === '') return true;
+
+  const sl = searchValue.toLowerCase().trim();
+
+  if((currency as TokenCurrency).address?.toLowerCase() === sl)
+    return true;
+  else if(currency.symbol.toLowerCase().includes(sl))
+    return true;
+  else return false;
+}
+
+export const useTokenList = (searchValue: string) => {
   const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
   const walletStatus = useSelector(getWalletStatus);
 
   const [currencyList, setCurrencyList] = useState<Currency[]>(Object.values(inputCurrenciesMap));
+  const [filteredCurrencyList, setFilteredCurrencyList] = useState<Currency[]>(currencyList);
 
   useEffect(() => {
       if(walletStatus === WalletStatus.CONNECTED) {
@@ -56,5 +70,9 @@ export const useTokenList = () => {
     [inputCurrenciesMap, currencyBalances, walletStatus]
   );
 
-  return currencyList;
+  useEffect(() => {
+    setFilteredCurrencyList(currencyList.filter(c => searchFunction(c, searchValue)));
+  }, [searchValue, currencyList]);
+
+  return filteredCurrencyList;
 }
