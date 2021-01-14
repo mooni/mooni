@@ -95,6 +95,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
                 {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
                 {key === 'highAmount' && `Maximum amount is ${config.maxOutputAmount} ${rateForm.values.outputCurrency}`}
                 {key === 'zeroAmount' && `Amount can't be zero`}
+                {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
               </InvalidMessage>
             )
           :

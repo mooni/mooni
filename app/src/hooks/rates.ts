@@ -17,6 +17,7 @@ interface RateForm {
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
+    failed?: boolean
   },
   values: {
     inputCurrency: string,
@@ -142,6 +143,15 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
         setMultiTradeEstimation(null);
         return;
       } else {
+        logError('api error while fetching rates', error);
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            failed: true,
+          },
+        }));
+        setMultiTradeEstimation(null);
         throw error;
       }
     }
@@ -218,7 +228,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   useEffect(() => {
     nonce++;
     estimate(debouncedRateForm, nonce).catch(error => {
-      logError('unable to fetch rates', error);
+      logError('unexpected error while fetching rates', error);
     });
   }, [debouncedRateForm, estimate]);
 
