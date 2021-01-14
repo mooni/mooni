@@ -179,6 +179,7 @@ export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, on
           onChange={value => setSearchValue(value)}
           type="text"
           placeholder="Search token"
+          autofocus
           wide
         />
       </DialogTitle>
