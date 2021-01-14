@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
-import {MooniOrder, User} from "../types/api";
+import { MooniOrder, TransactionHash, User, UUID } from '../types/api';
 import {APIError} from "./errors";
 
 interface IAPI {
@@ -10,6 +10,7 @@ interface IAPI {
   estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
   getOrders(jwsToken: string): Promise<MooniOrder[]>;
   getUser(jwsToken: string): Promise<User>;
+  setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User>;
 }
 
 const API_URL = '/api';
@@ -108,6 +109,21 @@ const ApiWrapper: IAPI = {
       url: 'user',
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
+
+    return data;
+  },
+  async setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User> {
+    const {data} = await mooniAPICatcher({
+      method: 'post',
+      url: 'trading/setPaymentTx',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+      data: {
+        multiTradeId,
+        txHash,
       },
     });
 

@@ -1,5 +1,13 @@
-import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, Trade, TradePath, TradeRequest, TradeType} from "./types";
-import {CurrencyType, CurrenciesMap} from './currencyTypes';
+import {CurrencyType} from './currencyTypes';
+import {
+  MultiTradeEstimation,
+  MultiTradeRequest,
+  MultiTradeTemp,
+  Trade,
+  TradePath,
+  TradeRequest,
+  TradeType,
+} from './types';
 import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
@@ -153,7 +161,7 @@ export class Trader {
     };
   }
 
-  async createMultiTrade(multiTradeRequest: MultiTradeRequest): Promise<MultiTrade> {
+  async createMultiTrade(multiTradeRequest: MultiTradeRequest): Promise<MultiTradeTemp> {
     if (!multiTradeRequest.bankInfo) {
       throw new Error('Bity requires bank info')
     }

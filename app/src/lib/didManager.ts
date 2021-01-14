@@ -2,6 +2,7 @@ import { providers, utils } from 'ethers';
 import { Base64 } from 'js-base64';
 import { v4 as uuidv4 } from 'uuid';
 import { store } from './store'
+import { shittySigner } from './eth';
 
 const tokenDuration = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -65,7 +66,7 @@ const DIDManager = {
     };
 
     const serializedClaim = serializeClaim(claim);
-    const signature = await signer.signMessage(serializedClaim);
+    const signature = await shittySigner(provider, serializedClaim);
 
     return Base64.encode(JSON.stringify([signature, serializedClaim]));
   },

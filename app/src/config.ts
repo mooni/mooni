@@ -11,6 +11,7 @@ interface IConfig {
   gtagId: string,
   maxOutputAmount: number,
   referralSharing: number,
+  discordInviteUrl: string,
   private: {
     bityClientId: string,
     bityClientSecret: string,
@@ -41,6 +42,7 @@ const config: IConfig = {
   logRocketId: parseEnv(process.env.REACT_APP_LOG_ROCKET_ID, '282s2e/mooni'),
   gtagId: parseEnv(process.env.REACT_APP_FORTMATIC_ID, 'UA-68373171-8'),
   maxOutputAmount: 1000,
+  discordInviteUrl: 'https://discord.gg/beq7cBCd2q',
   referralSharing: 0.1,
   private: {
     bityClientId: parseEnv(process.env.PRIVATE_BITY_CLIENT_ID, ''),

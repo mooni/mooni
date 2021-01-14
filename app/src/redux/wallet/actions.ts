@@ -58,16 +58,31 @@ const onAccountChanged = () => (dispatch, getState) => {
 
   dispatch(setWalletStatus(WalletStatus.WAITING_SIGNATURE));
   DIDManager.getJWS(ethManager.provider)
-      .then(async token => {
-        dispatch(setJWS(token));
+    .then(async token => {
+      dispatch(setWalletStatus(WalletStatus.LOADING));
+      dispatch(setJWS(token));
+      await dispatch(fetchUser());
 
-        dispatch(setWalletStatus(WalletStatus.LOADING));
-        await dispatch(fetchUser());
+      dispatch(setAddress(ethManager.getAddress()));
 
-        dispatch(setAddress(ethManager.getAddress()));
-        dispatch(setWalletStatus(WalletStatus.CONNECTED));
-      })
-      .catch(() => dispatch(logout()));
+      dispatch(setWalletStatus(WalletStatus.CONNECTED));
+    })
+    .catch(error => {
+      dispatch(logout());
+
+      if(error.code === 4001) {
+        dispatch(setModalError(
+          new MetaError('eth_signature_rejected')
+        ));
+      } else if(error instanceof MetaError) {
+        dispatch(setModalError(error));
+      } else {
+        logError('Unable to open ethereum wallet', error);
+        dispatch(setModalError(
+          new MetaError('unable_open_wallet', { error })
+        ));
+      }
+    });
 };
 
 export const login = (forcedProvider?) => async function (dispatch)  {
@@ -76,38 +91,17 @@ export const login = (forcedProvider?) => async function (dispatch)  {
     dispatch(setWalletStatus(WalletStatus.CHOOSING_WALLET));
     const ethereum = forcedProvider || await web3Modal.connect();
     const ethManager = await ETHManager.create(ethereum);
-    dispatch(setWalletStatus(WalletStatus.LOADING));
     dispatch(setETHManager(ethManager));
 
-    const address = ethManager.getAddress();
-    dispatch(setAddress(address));
-
-    let jwsToken;
-    try {
-      dispatch(setWalletStatus(WalletStatus.WAITING_SIGNATURE));
-      jwsToken = await DIDManager.getJWS(ethManager.provider);
-      dispatch(setJWS(jwsToken));
-
-      dispatch(setWalletStatus(WalletStatus.LOADING));
-      await dispatch(fetchUser());
-
-    } catch(error) {
-      DIDManager.removeStore(address);
-      if(error.code === 4001) {
-        throw new MetaError('eth_signature_rejected');
-      } else {
-        throw error;
-      }
-    }
-
-    ethManager.events.on('accountsChanged', () => {
-      dispatch(onAccountChanged());
-    });
     ethManager.events.on('stop', () => {
       dispatch(logout());
     });
 
-    dispatch(setWalletStatus(WalletStatus.CONNECTED));
+    ethManager.events.on('accountsChanged', () => {
+      dispatch(onAccountChanged());
+    });
+
+    await dispatch(onAccountChanged());
 
   } catch(error) {
     dispatch(logout());
@@ -119,7 +113,7 @@ export const login = (forcedProvider?) => async function (dispatch)  {
     } else {
       logError('Unable to open ethereum wallet', error);
       dispatch(setModalError(
-          new MetaError('unable_open_wallet', { error })
+        new MetaError('unable_open_wallet', { error })
       ));
     }
   }
