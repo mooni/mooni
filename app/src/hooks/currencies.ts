@@ -12,7 +12,7 @@ export const useCurrency = (symbol) => {
 
 
 function sortCurrencies(currencies: Currency[], currencyBalances: CurrencyBalances) {
-  return currencies.sort((a, b) => {
+  return currencies.slice().sort((a, b) => {
     if(a.equals(ETHER)) return -1;
     else if(b.equals(ETHER)) return 1;
     else if (currencyBalances[a.symbol] && currencyBalances[b.symbol]) {
@@ -43,10 +43,10 @@ function searchFunction(currency: Currency, searchValue: string) {
     return false;
 }
 
-const useSortedList = (currencies: Currency[], currencyBalances: CurrencyBalances) => {
+const useSortedList = (currencyList: Currency[], currencyBalances: CurrencyBalances) => {
   return useMemo(() =>
-    sortCurrencies(currencies, currencyBalances)
-  , [currencyBalances, currencies]);
+    sortCurrencies(currencyList, currencyBalances)
+  , [currencyList, currencyBalances]);
 }
 
 const useFilteredList = (currencyList: Currency[], searchValue: string) => {
