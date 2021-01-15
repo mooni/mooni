@@ -3,13 +3,14 @@ import {BigNumber, ethers} from "ethers";
 import {APIError, ParaSwap} from 'paraswap';
 
 import {defaultProvider} from "../web3Providers";
-import {DexTrade, TradeExact, TradeRequest, TradeType} from "../trading/types";
+import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import {CurrencyType, TokenCurrency} from "../trading/currencyTypes";
+import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt, BN} from "../numbers";
-import {getCurrency} from "../trading/currencyHelpers";
+import CurrenciesManager from '../trading/currenciesManager';
+import { MetaError } from '../errors';
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -18,9 +19,18 @@ const paraswapAxios = axios.create({
 });
 let paraswapAdapters: any | null = null;
 
+const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+
 function applySlippage(amount: string, maxSlippage: number): string {
   return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
 }
+
+export interface CurrencyBalance {
+  symbol: CurrencySymbol,
+  balance: string,
+  allowance: string,
+}
+export type CurrencyBalances = Record<string, CurrencyBalance>;
 
 const ParaswapWrapper = {
   async getTokenList(): Promise<TokenCurrency[]> {
@@ -29,18 +39,46 @@ const ParaswapWrapper = {
       url: '/tokens',
     });
     return data.tokens.map(t =>
-      new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
+      t.address.toLowerCase() === ETH_ADDRESS ?
+        ETHER
+        :
+        new TokenCurrency(t.decimals, t.address, config.chainId, t.symbol, undefined, t.img)
     );
   },
-  async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
+  async getBalances(address: string): Promise<CurrencyBalances> {
+    const { data } = await paraswapAxios({
+      method: 'get',
+      url: `/users/tokens/1/${address}`,
+    });
+    return data.tokens.reduce((acc, token) => ({
+      ...acc,
+      [token.symbol]: {
+        symbol: token.symbol,
+        balance: token.balance,
+        allowance: token.allowance,
+      }
+    }), {});
+  },
+  async getRate(tradeRequest: TradeRequest, currenciesManager: CurrenciesManager): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
 
-    const inputCurrency = getCurrency(tradeRequest.inputCurrencySymbol);
-    const outputCurrency = getCurrency(tradeRequest.outputCurrencySymbol);
+    const inputCurrency = currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
+    const outputCurrency = currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
     const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
 
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
 
+    try {
+
+    } catch(error) {
+      const paraswapErrorMessage = error.response?.data?.error;
+      if(paraswapErrorMessage) {
+        if(paraswapErrorMessage === 'ESTIMATED_LOSS_GREATER_THAN_MAX_IMPACT') {
+          throw new MetaError('dex-liquidity-error', { value: error.response?.data?.value });
+        }
+      }
+      throw error;
+    }
     const { data: dexMetadata } = await paraswapAxios({
       method: 'get',
       url: '/prices',
@@ -81,12 +119,12 @@ const ParaswapWrapper = {
     const spender = await augustusContract.getTokenTransferProxy();
     return spender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number): Promise<any> {
+  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
     function getTokenAddress(symbol) {
-      const currency = getCurrency(symbol);
+      const currency = currenciesManager.getCurrency(symbol);
 
       if(currency.equals(ETHER)) {
-        return '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+        return ETH_ADDRESS;
       } else if(currency.type === CurrencyType.ERC20) {
         return (currency as TokenCurrency).address;
       } else {

@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -19,6 +19,7 @@ import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
 import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep } from '../redux/payment/selectors';
+import { CurrenciesContext } from '../contexts/CurrenciesContext';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -35,6 +36,7 @@ const useStyles = makeStyles({
 });
 
 export default function ExchangePage() {
+  const { currenciesManager } = useContext(CurrenciesContext);
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -54,7 +56,7 @@ export default function ExchangePage() {
     handleNext();
   }
   function onSend() {
-    dispatch(sendPayment());
+    dispatch(sendPayment(currenciesManager));
     history.push('/status');
   }
 
@@ -73,6 +75,8 @@ export default function ExchangePage() {
         <SmallWidth>
           <ABox width={1} py={3}>
             <CustomMobileStepper
+              backButton={null}
+              nextButton={null}
               activeStep={stepId}
               steps={stepElements.length}
               variant="progress"
