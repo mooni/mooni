@@ -64,6 +64,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
         });
     }
     const interval = setInterval(fetchBalances, BALANCE_REFRESH_INTERVAL);
+    fetchBalances();
 
     return () => clearInterval(interval);
   }, [dispatch, address, currenciesManager]);
