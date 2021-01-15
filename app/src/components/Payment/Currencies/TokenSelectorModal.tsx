@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import InfiniteScroll from "react-infinite-scroller";
 
 import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar, makeStyles, IconButton } from '@material-ui/core';
@@ -128,7 +128,7 @@ const TokenList: React.FC<TokenListProps> = ({ onSelectToken, searchValue, scrol
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
 
-  const fetchMore = () => {
+  const fetchMore = useCallback(() => {
     const si = page*TOKEN_PAGINATION;
     if(si > currencyList.length) {
       setHasMore(false);
@@ -137,7 +137,8 @@ const TokenList: React.FC<TokenListProps> = ({ onSelectToken, searchValue, scrol
 
     setItemList(itemList.concat(currencyList.slice(si, si+TOKEN_PAGINATION)));
     setPage(page+1);
-  }
+  }, [page, itemList, currencyList]);
+
   useEffect(() => {
     setItemList(currencyList.slice(0, TOKEN_PAGINATION));
     setHasMore(currencyList.length > TOKEN_PAGINATION);
