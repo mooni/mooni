@@ -8,6 +8,7 @@ import DIDManager from '../../lib/didManager';
 import {store} from '../../lib/store';
 import {WalletStatus} from "./state";
 import { fetchUser, resetUser } from '../user/userSlice';
+import { identify } from '../../lib/analytics';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -63,7 +64,9 @@ const onAccountChanged = () => (dispatch, getState) => {
       dispatch(setJWS(token));
       await dispatch(fetchUser());
 
-      dispatch(setAddress(ethManager.getAddress()));
+      const address = ethManager.getAddress()
+      dispatch(setAddress(address));
+      identify(address);
 
       dispatch(setWalletStatus(WalletStatus.CONNECTED));
     })

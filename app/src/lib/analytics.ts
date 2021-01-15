@@ -31,6 +31,9 @@ if(process.env.NODE_ENV === 'production') {
 export function track(eventName: string) {
   LogRocket.track(eventName);
 }
+export function identify(uid: string) {
+  LogRocket.identify(uid);
+}
 
 export function sendEvent(category: string, action: string, label?: string, value?: number) {
   ReactGA.event({
