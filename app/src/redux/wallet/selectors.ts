@@ -10,5 +10,9 @@ export const isWalletLoading = createSelector(
 )
 export const getETHManager = (state: RootState) => state[STATE_NAME].ethManager;
 export const getAddress = (state: RootState) => state[STATE_NAME].address;
+export const getShortAddress = createSelector(
+  getAddress,
+  address => address ? `${address.slice(0, 5)}...${address.slice(-5)}` : null
+)
 export const getJWS = (state: RootState) => state[STATE_NAME].jwsToken;
 export const getProviderFromIframe = (state: RootState) => state[STATE_NAME].providerFromIframe;

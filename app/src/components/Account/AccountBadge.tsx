@@ -9,7 +9,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 
 import {ShadowBox, RoundButton} from "../UI/StyledComponents";
 
-import { getAddress, getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
+import { getAddress, getShortAddress, getWalletStatus, isWalletLoading } from '../../redux/wallet/selectors';
 import { WalletStatus } from "../../redux/wallet/state";
 import { selectENS } from '../../redux/user/userSlice';
 import { login } from '../../redux/wallet/actions';
@@ -34,10 +34,6 @@ const ConnectedText = styled(Typography)`
   }
 `
 
-function shortenedAddress(address) {
-  return `${address.slice(0, 5)}...${address.slice(-5)}`;
-}
-
 function AccountBadge() {
   const history = useHistory();
   const dispatch = useDispatch();
@@ -46,6 +42,7 @@ function AccountBadge() {
   const walletStatus = useSelector(getWalletStatus);
   const walletLoading = useSelector(isWalletLoading);
   const address = useSelector(getAddress);
+  const shortenAddress = useSelector(getShortAddress);
   const ens = useSelector(selectENS);
 
   function goToProfile() {
@@ -67,7 +64,7 @@ function AccountBadge() {
     );
   }
 
-  const displayedName = ens || shortenedAddress(address);
+  const displayedName = ens || shortenAddress;
 
   return (
     <Box display="flex">
