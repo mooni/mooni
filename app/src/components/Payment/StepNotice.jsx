@@ -3,7 +3,8 @@ import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
 
-import { Button, GU, IconArrowRight, textStyle } from '@aragon/ui'
+import { GU, IconArrowRight, textStyle } from '@aragon/ui'
+import {RoundButton} from "../UI/StyledComponents";
 
 const Hint = styled.p`
   ${textStyle('body3')};
@@ -44,7 +45,7 @@ export default function StepNotice({ onComplete }) {
         &nbsp;<i style={{color: '#881111'}}>Payoneer, Transferwise</i>
       </Info>
       <Box mt={2}/>
-      <Button mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} label="I understand, let's go!" />
+      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} label="I understand, let's go!" />
     </Box>
   )
 }

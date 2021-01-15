@@ -2,9 +2,9 @@ import React, { useCallback } from 'react';
 
 import {Box} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 
-import {Button, IconRefresh, LoadingRing, textStyle} from '@aragon/ui'
+import {IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
 import config from '../../config';
@@ -15,10 +15,12 @@ import {TradeExact, TradeRequest} from '../../lib/trading/types';
 import {useRate} from '../../hooks/rates';
 import {getWalletStatus} from '../../redux/wallet/selectors';
 import {CurrencyType} from "../../lib/trading/currencyTypes";
-import { RateAmount } from "./RateAmount";
+import { RateAmount, RateAmountSuspense } from './RateAmount';
 import { WalletStatus } from "../../redux/wallet/state";
 import { useAllowance } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
+import { RoundButton } from '../UI/StyledComponents';
+import { login } from '../../redux/wallet/actions';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -34,6 +36,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
     color: theme.palette.text.secondary,
   },
 }));
@@ -45,8 +48,9 @@ interface RateFormParams {
   buttonIcon?: any,
 }
 
-function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'Exchange', buttonIcon = <IconRefresh /> }: RateFormParams) {
+function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams) {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
@@ -73,18 +77,22 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
   let button: any = null;
   if(walletStatus === WalletStatus.CONNECTED) {
     if(allowanceMining) {
-      button = <Button wide icon={<LoadingRing/>} label={"Unlocking tokens"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label={"Unlocking tokens"} disabled />;
     } else if(rateForm.loading) {
-      button = <Button wide icon={<LoadingRing/>} label={"Loading rates"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label={"Loading rates"} disabled />;
     } else if(!valid) {
-      button = <Button wide icon={buttonIcon} label={buttonLabel}  disabled />;
+      button = <RoundButton wide icon={<IconRefresh/>} label="Exchange"  disabled />;
     } else if(allowanceLoading) {
-      button = <Button wide icon={<LoadingRing/>} label={"Checking allowance"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label={"Checking allowance"} disabled />;
     } else if(!allowanceReady) {
-      button = <Button mode="positive" onClick={approve} wide icon={buttonIcon} label="Unlock token" disabled={!valid} />
+      button = <RoundButton mode="positive" onClick={approve} wide icon={<IconCoin/>} label="Unlock token" disabled={!valid} />
     } else {
-      button = <Button mode="strong" onClick={submit} wide icon={buttonIcon} label={buttonLabel} disabled={!valid} />
+      button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange" disabled={!valid} />
     }
+  } else if(walletStatus === WalletStatus.DISCONNECTED) {
+    button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
+  } else {
+    button = <RoundButton disabled wide icon={<LoadingRing/>} display="all" label="Connecting..." />
   }
 
   return (
@@ -119,8 +127,10 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
       </Box>
 
       <Box className={classes.additionalInfo}>
-        {!rateForm.loading && !errors && multiTradeEstimation &&
-        <RateAmount multiTradeEstimation={multiTradeEstimation}/>
+        {rateForm.loading ?
+          <LoadingRing mode="half-circle"/>
+          :
+          (!errors && <RateAmount multiTradeEstimation={multiTradeEstimation}/>)
         }
 
         {!rateForm.loading && errors &&

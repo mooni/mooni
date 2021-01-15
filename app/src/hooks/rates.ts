@@ -91,6 +91,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       tradeExact: _rateForm.values.tradeExact as TradeExact,
       amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
+    setMultiTradeEstimation(null);
 
     if(!isNotZero(currentRequest.amount)) {
       setRateForm(r => ({
@@ -100,7 +101,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
           zeroAmount: true,
         },
       }));
-      setMultiTradeEstimation(null);
       return;
     }
 
@@ -112,7 +112,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
           lowBalance: true,
         },
       }));
-      setMultiTradeEstimation(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       if(new BN(currentRequest.amount).gt(config.maxOutputAmount)) {
@@ -123,7 +122,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             highAmount: true,
           },
         }));
-        setMultiTradeEstimation(null);
         return;
       }
     }
@@ -141,7 +139,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
         }));
-        setMultiTradeEstimation(null);
         return;
       } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
         setRateForm(r => ({
@@ -151,7 +148,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             lowLiquidity: true,
           },
         }));
-        setMultiTradeEstimation(null);
         return;
       } else {
         logError('api error while fetching rates', error);
@@ -162,7 +158,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             failed: true,
           },
         }));
-        setMultiTradeEstimation(null);
         return;
       }
     }
@@ -201,8 +196,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     if(!updateRateForm.errors) {
       setTradeRequest(currentRequest);
       setMultiTradeEstimation(multiTradeEstimation);
-    } else {
-      setMultiTradeEstimation(null);
     }
 
   }, []);

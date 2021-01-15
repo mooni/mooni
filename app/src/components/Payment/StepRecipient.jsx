@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import Box from '@material-ui/core/Box';
 // eslint-disable-next-line
-import { Checkbox, Button, IconArrowRight, Help, textStyle, GU } from '@aragon/ui'
+import { IconArrowRight, textStyle, GU } from '@aragon/ui'
 
 import { setRecipient } from '../../redux/payment/actions';
 import { getRecipient } from '../../redux/payment/selectors';
@@ -15,6 +15,7 @@ import { updateMyAccount } from '../../redux/contacts/actions';
 
 import RecipientForm from './RecipientForm';
 import {BoxLoadingContainer, BoxModal} from '../Utils/RequireBox';
+import {RoundButton} from "../UI/StyledComponents";
 
 // const useStyles = makeStyles(() => ({
 //   saveInfoRow: {
@@ -81,7 +82,7 @@ function StepRecipient({ onComplete }) {
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
               </label>*/}
-              <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
+              <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
             </>
           )}
         />

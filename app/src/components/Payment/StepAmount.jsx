@@ -20,7 +20,7 @@ export default function StepAmount({ onComplete }) {
 
   return (
     <Box width={1} py={1}>
-      <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest} buttonIcon={<IconArrowRight/>} buttonLabel="Next"/>
+      <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest} />
     </Box>
   )
 }
