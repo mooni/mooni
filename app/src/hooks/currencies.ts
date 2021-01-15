@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { CurrenciesContext } from '../contexts/CurrenciesContext';
-import { CurrenciesMap, Currency, TokenCurrency } from '../lib/trading/currencyTypes';
+import { Currency, TokenCurrency } from '../lib/trading/currencyTypes';
 import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { ETHER } from '../lib/trading/currencyList';
 import { amountToDecimal, BN } from '../lib/numbers';

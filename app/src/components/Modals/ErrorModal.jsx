@@ -25,6 +25,8 @@ function getErrorTitle(error) {
       return 'Invalid token';
     case 'eth_signature_rejected':
       return 'Requires authentication';
+    case 'error-fetching-balances':
+      return 'Balances unavailable';
     default:
       return 'Unknown error';
   }
@@ -44,6 +46,8 @@ function getErrorContent(error) {
       return 'We were unable to prove your identity. Please retry to connect and check signature requests in your wallet.';
     case 'invalid-custom-token':
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
+    case 'error-fetching-balances':
+      return 'We couldn\'nt get token balances of your wallet';
     default:
       return 'We did not expect that error, and will try to fix it soon. Do not hesitate to contact the support to help get this fixed.';
   }

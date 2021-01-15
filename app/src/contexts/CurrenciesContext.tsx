@@ -25,6 +25,8 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
   getCurrency: () => { throw new Error('not_ready_getCurrency') },
 });
 
+const BALANCE_REFRESH_INTERVAL = 20 * 1000;
+
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const currenciesManager = useMemo<CurrenciesManager>(() => new CurrenciesManager(), []);
 
@@ -34,28 +36,47 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const address = useSelector(getAddress);
   const dispatch = useAppDispatch();
 
+  // Get currency list
   useEffect(() => {
     currenciesManager.fetchCurrencies()
       .then(tradeableCurrencyMap => {
         setInputCurrenciesMap(tradeableCurrencyMap);
         setCurrenciesReady(true);
       })
-      .catch(console.error); // TODO logerror
+      .catch(error => {
+        logError('error-fetching-tokens', error);
+        // TODO error on loader
+      });
   }, [currenciesManager]);
 
+  // Update balances
   useEffect(() => {
     if(!address) {
-      setCurrencyBalances({});
       return;
     }
-    currenciesManager.fetchBalances(address)
-      .then(setCurrencyBalances)
-      .catch(console.error); // TODO logerror
-  }, [address, currenciesManager]);
 
+    function fetchBalances() {
+      currenciesManager.fetchBalances(address)
+        .then(setCurrencyBalances)
+        .catch(error => {
+          logError('error-fetching-balances', error);
+          dispatch(setModalError(new Error('error-fetching-balances')))
+        });
+    }
+    const interval = setInterval(fetchBalances, BALANCE_REFRESH_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [dispatch, address, currenciesManager]);
+
+  const currencyBalances_connected = useMemo(
+    () => address ? currencyBalances : {},
+    [address, currencyBalances]
+  );
+
+  // Get token from URL
   useEffect(() => {
     if(!currenciesReady) return;
-    
+
     const query = new URLSearchParams(window.location.search);
     const tokenAddress = query.get('token');
     if(tokenAddress) {
@@ -75,7 +96,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
         currenciesManager,
         currenciesReady,
         inputCurrenciesMap,
-        currencyBalances,
+        currencyBalances: currencyBalances_connected,
         getCurrency: currenciesManager.getCurrency.bind(currenciesManager),
       }}
     >
