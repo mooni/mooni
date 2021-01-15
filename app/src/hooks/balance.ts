@@ -12,7 +12,6 @@ import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
 
 export interface BalanceData {
-  symbol: CurrencySymbol,
   balance: string,
   balanceLoading: boolean,
   balanceAvailable: boolean,
@@ -73,5 +72,5 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     }
   }, [currency, ethManager]);
 
-  return { balanceAvailable, balanceLoading, balance, symbol };
+  return { balanceAvailable, balanceLoading, balance };
 }

@@ -52,7 +52,6 @@ function defaultRateForm(initialRequest): RateForm {
     errors: undefined,
     values,
     balanceData: {
-      symbol: initialRequest.inputCurrencySymbol,
       balance: '0',
       balanceLoading: false,
       balanceAvailable: false,
@@ -74,7 +73,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
   const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
-  const balanceData = useBalance(rateForm.values.inputCurrency);
+  const { balanceAvailable, balanceLoading, balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
     setRateForm(defaultRateForm(initialTradeRequest));
@@ -236,9 +235,9 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     setRateForm(r => ({
       ...r,
       loading: true,
-      balanceData: balanceData,
+      balanceData: { balanceLoading, balanceAvailable, balance },
     }));
-  }, [balanceData.balanceLoading, balanceData.balanceAvailable, balanceData.balance]); // TODO
+  }, [balanceLoading, balanceAvailable, balance]); // TODO
 
   return {
     rateForm,
