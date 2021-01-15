@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import InfiniteScroll from "react-infinite-scroller";
 
-import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar, makeStyles } from '@material-ui/core';
+import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar, makeStyles, IconButton } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
@@ -51,6 +52,13 @@ const useStyles = makeStyles(theme => ({
   dialogContentRoot: {
     padding: 0,
     margin: '12px 24px',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(2.5),
+    top: theme.spacing(1.5),
+    color: theme.palette.grey[500],
+    padding: theme.spacing(1),
   },
 }));
 
@@ -174,6 +182,9 @@ export const TokenSelectorModal: React.FC<TokenSelectorModalProps> = ({ open, on
         <Title>
           Select token
         </Title>
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
         <CustomSearchInput
           value={searchValue}
           onChange={value => setSearchValue(value)}
