@@ -43,10 +43,10 @@ function searchFunction(currency: Currency, searchValue: string) {
     return false;
 }
 
-const useSortedList = (currenciesMap: CurrenciesMap, currencyBalances: CurrencyBalances) => {
+const useSortedList = (currencies: Currency[], currencyBalances: CurrencyBalances) => {
   return useMemo(() =>
-    sortCurrencies(Object.values(currenciesMap), currencyBalances)
-  , [currencyBalances, currenciesMap]);
+    sortCurrencies(currencies, currencyBalances)
+  , [currencyBalances, currencies]);
 }
 
 const useFilteredList = (currencyList: Currency[], searchValue: string) => {
@@ -58,7 +58,8 @@ const useFilteredList = (currencyList: Currency[], searchValue: string) => {
 export const useTokenList = (searchValue: string) => {
   const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
 
-  const sortedCurrencyList = useSortedList(inputCurrenciesMap, currencyBalances);
+  const currencies = useMemo(() => Object.values(inputCurrenciesMap), [inputCurrenciesMap]);
+  const sortedCurrencyList = useSortedList(currencies, currencyBalances);
   const filteredCurrencyList = useFilteredList(sortedCurrencyList, searchValue);
 
   return filteredCurrencyList;

@@ -3,22 +3,31 @@ import {useImage} from 'react-image';
 
 import tokenDefaultImage  from '../../../assets/token_default.svg';
 import CustomCurrencyLogos from '../../../lib/constants/CustomCurrencyLogos';
-import { CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
+import { Currency, CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
 import { Box } from '@material-ui/core';
 import { ETHER } from '../../../lib/trading/currencyList';
 import { useCurrency } from '../../../hooks/currencies';
 import { CurrencySymbol } from '../../../lib/trading/types';
 
-const CurrencyLogoImage = ({src, symbol}) => (
-  <img
-    src={src}
-    alt={`coin-icon-${symbol}`}
-    width="100%"
-  />
-)
+interface CurrencyLogoImageProps {
+  src?: string;
+  symbol: string;
+}
+const CurrencyLogoImage = React.memo((props: CurrencyLogoImageProps) => {
+  return (
+    <img
+      src={props.src}
+      alt={`coin-icon-${props.symbol}`}
+      width="100%"
+    />
+  );
+});
 
-function CurrencyLogoLoader({symbol}) {
-  const currency = useCurrency(symbol);
+interface CurrencyLogoLoaderProps {
+  currency: Currency;
+}
+const CurrencyLogoLoader = React.memo((props: CurrencyLogoLoaderProps) => {
+  const { currency } = props;
 
   const defaultSrc = useMemo((): string[] => {
     if(!currency) return [tokenDefaultImage];
@@ -46,23 +55,24 @@ function CurrencyLogoLoader({symbol}) {
     srcList: defaultSrc.concat([tokenDefaultImage]),
   });
 
-  return <CurrencyLogoImage src={src} symbol={symbol}/>;
-}
+  return <CurrencyLogoImage src={src} symbol={currency.symbol}/>;
+});
+
 interface CurrencyLogoProps {
   symbol: CurrencySymbol;
   width?: string;
 }
+export const CurrencyLogo = React.memo((props: CurrencyLogoProps) => {
+  const currency = useCurrency(props.symbol);
 
-const StatelessCurrencyLogo: React.FC<CurrencyLogoProps> = ({ symbol, width= '100%' }) => {
   return (
-    <Box width={width} display="flex" alignItems="center">
+    <Box width={props.width || '100%'} display="flex" alignItems="center">
       <Suspense
-        fallback={<CurrencyLogoImage src={tokenDefaultImage} symbol={symbol}/>}
+        fallback={<CurrencyLogoImage src={tokenDefaultImage} symbol={props.symbol}/>}
       >
-        <CurrencyLogoLoader symbol={symbol}/>
+        <CurrencyLogoLoader currency={currency}/>
       </Suspense>
     </Box>
   );
-};
+});
 
-export const CurrencyLogo = React.memo(StatelessCurrencyLogo);
