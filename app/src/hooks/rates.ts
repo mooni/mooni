@@ -9,6 +9,7 @@ import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
 import config from "../config";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
+import { APIError } from '../lib/errors';
 
 interface RateForm {
   loading: boolean,
@@ -17,6 +18,7 @@ interface RateForm {
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
+    lowLiquidity?: boolean
     failed?: boolean
   },
   values: {
@@ -141,6 +143,16 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
         }));
         setMultiTradeEstimation(null);
         return;
+      } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            lowLiquidity: true,
+          },
+        }));
+        setMultiTradeEstimation(null);
+        return;
       } else {
         logError('api error while fetching rates', error);
         setRateForm(r => ({
@@ -151,7 +163,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
           },
         }));
         setMultiTradeEstimation(null);
-        throw error;
+        return;
       }
     }
 
@@ -237,7 +249,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       loading: true,
       balanceData: { balanceLoading, balanceAvailable, balance },
     }));
-  }, [balanceLoading, balanceAvailable, balance]); // TODO
+  }, [balanceLoading, balanceAvailable, balance]);
 
   return {
     rateForm,

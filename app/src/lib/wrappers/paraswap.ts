@@ -10,6 +10,7 @@ import {ETHER} from "../trading/currencyList";
 import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt, BN} from "../numbers";
 import CurrenciesManager from '../trading/currenciesManager';
+import { MetaError } from '../errors';
 
 const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -67,6 +68,17 @@ const ParaswapWrapper = {
 
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
 
+    try {
+
+    } catch(error) {
+      const paraswapErrorMessage = error.response?.data?.error;
+      if(paraswapErrorMessage) {
+        if(paraswapErrorMessage === 'ESTIMATED_LOSS_GREATER_THAN_MAX_IMPACT') {
+          throw new MetaError('dex-liquidity-error', { value: error.response?.data?.value });
+        }
+      }
+      throw error;
+    }
     const { data: dexMetadata } = await paraswapAxios({
       method: 'get',
       url: '/prices',

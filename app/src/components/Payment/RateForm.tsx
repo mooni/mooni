@@ -94,6 +94,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest, buttonLabel = 'E
                 {key === 'lowBalance' && 'You do not have enough funds'}
                 {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
                 {key === 'highAmount' && `Maximum amount is ${config.maxOutputAmount} ${rateForm.values.outputCurrency}`}
+                {key === 'lowLiquidity' && `There is not enough liquidity for this pair to trade. Please try with another currency.`}
                 {key === 'zeroAmount' && `Amount can't be zero`}
                 {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
               </InvalidMessage>

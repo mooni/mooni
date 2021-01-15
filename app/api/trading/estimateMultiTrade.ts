@@ -3,7 +3,7 @@ import { NowRequest, NowResponse } from '@now/node'
 import Bity from '../../src/lib/wrappers/bity';
 import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
-import {APIError} from "../../src/lib/errors";
+import { APIError, MetaError } from '../../src/lib/errors';
 import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 
@@ -22,8 +22,14 @@ export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promis
   await currenciesManager.fetchCurrencies();
   const trader = new Trader(bityInstance, currenciesManager);
 
-  const multiTrade = await trader.estimateMultiTrade(tradeRequest);
+  try {
+    const multiTrade = await trader.estimateMultiTrade(tradeRequest);
+    return res.json(multiTrade);
+  } catch(error) {
+    if(error instanceof MetaError && error.message === 'dex-liquidity-error') {
+      throw new APIError(417, 'dex-liquidity-error', 'not enough liquidity for token', error.meta);
+    }
+  }
 
-  return res.json(multiTrade);
 
 })
