@@ -33,12 +33,6 @@ const ConnectedText = styled(Typography)`
   color: #504E4E;
   }
 `
-// @ts-ignore
-const NotConnectedText = styled(ConnectedText)`
-  && {
-    margin-right: 8px;
-  }
-`
 
 function shortenedAddress(address) {
   return `${address.slice(0, 5)}...${address.slice(-5)}`;
@@ -60,12 +54,7 @@ function AccountBadge() {
 
   if(walletLoading)
     return (
-      <BadgeBox>
-        <Avatar/>
-        <NotConnectedText variant="caption">
-          Connecting...
-        </NotConnectedText>
-      </BadgeBox>
+      <RoundButton wide icon={<IconWallet/>} display="all" label="Connecting..." disabled />
     );
 
   function connectWallet() {

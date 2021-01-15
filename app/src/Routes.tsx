@@ -5,6 +5,7 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import './App.css';
 
@@ -14,27 +15,37 @@ import StatusPage from './pages/StatusPage';
 import AccountPage from './pages/AccountPage';
 
 import { usePageViews } from './lib/analytics';
+import { getWalletStatus, isWalletLoading } from './redux/wallet/selectors';
+import { WalletStatus } from './redux/wallet/state';
 
 export const Routes: React.FC = () => {
   usePageViews();
+  const walletStatus = useSelector(getWalletStatus);
+  const walletLoading = useSelector(isWalletLoading);
 
   return (
     <Switch>
       <Route exact path="/">
         <HomePage />
       </Route>
-      <Route path="/exchange">
-        <ExchangePage />
-      </Route>
-      <Route path="/status">
-        <StatusPage />
-      </Route>
-      <Route path="/account">
-        <AccountPage />
-      </Route>
+      {walletStatus===WalletStatus.CONNECTED &&
+      <>
+        <Route path="/account">
+          <AccountPage />
+        </Route>
+        <Route path="/status">
+          <StatusPage />
+        </Route>
+        <Route path="/exchange">
+          <ExchangePage />
+        </Route>
+      </>
+      }
+      {!walletLoading &&
       <Route path="*">
         <Redirect to="/" />
       </Route>
+      }
     </Switch>
   );
 }
