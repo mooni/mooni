@@ -64,10 +64,16 @@ export class Trader {
     }
     const tradeType = path[0];
     if(tradeType === TradeType.BITY) {
-      return await this.bityInstance.estimate(tradeRequest);
+      // console.time('bity_estimate');
+      const trade = await this.bityInstance.estimate(tradeRequest);
+      // console.timeEnd('bity_estimate');
+      return trade;
     }
     else if(tradeType === TradeType.DEX) {
-      return await this.dexProxy.getRate(tradeRequest);
+      // console.time('dex_estimate');
+      const trade = await this.dexProxy.getRate(tradeRequest);
+      // console.timeEnd('dex_estimate');
+      return trade;
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }

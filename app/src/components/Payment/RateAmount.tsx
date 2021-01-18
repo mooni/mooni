@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
-import { Link } from '@aragon/ui'
+import { Link, LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
@@ -52,7 +52,6 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency):
 const Container = styled(ShadowBox)`
 width: 100%;
 padding: 15px 20px;
-margin: 20px 0;
 `;
 
 const RouteTitle = styled.p`
@@ -164,10 +163,25 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   </TradeElement>
 );
 
-interface RateAmountProps {
+export const RateAmountSuspense: React.FC = () => {
+  return (
+    <Container>
+      <Box px={1}>
+        <BasicLine title="Rate" content={"-"}/>
+        <BasicLine title="Exchange fees" content="-"/>
+      </Box>
+      <Box display="flex" justifyContent="center" mt={1}>
+        <LoadingRing mode="half-circle"/>
+      </Box>
+    </Container>
+  );
+}
+
+interface RateAmountLoadedProps {
   multiTradeEstimation: MultiTradeEstimation;
 }
-export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
+
+export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEstimation}) => {
   const { getCurrency } = useContext(CurrenciesContext);
 
   const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencySymbol;
@@ -208,4 +222,19 @@ export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) =>
       {multiTradeEstimation.trades.map(trade => <TradeLine trade={trade} key={trade.tradeType} />)}
     </Container>
   );
+}
+
+interface RateAmountProps {
+  multiTradeEstimation: MultiTradeEstimation | null;
+}
+export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
+  if(multiTradeEstimation) {
+    return (
+      <RateAmountLoaded multiTradeEstimation={multiTradeEstimation}/>
+    )
+  } else {
+    return (
+      <RateAmountSuspense />
+    );
+  }
 }

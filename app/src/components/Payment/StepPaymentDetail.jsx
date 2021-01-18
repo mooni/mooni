@@ -5,11 +5,12 @@ import styled from 'styled-components';
 
 import { Box } from '@material-ui/core';
 
-import { Button, GU, IconArrowRight, textStyle } from '@aragon/ui'
+import { GU, IconArrowRight, textStyle } from '@aragon/ui'
 
 import { setReference } from '../../redux/payment/actions';
 import { getReference } from '../../redux/payment/selectors';
 import FormField from './FormField';
+import {RoundButton} from "../UI/StyledComponents";
 
 const fields = {
   reference: {
@@ -56,7 +57,7 @@ function StepPaymentDetail({ onComplete }) {
           errorMessages={{ reference: 'Invalid reference, please only use regular letters and numbers' }}
           placeholder="Bill A2313"
         />
-        <Button mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
+        <RoundButton mode="strong" onClick={onSubmit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
       </form>
     </Box>
   )

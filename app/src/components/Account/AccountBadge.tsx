@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { EthIdenticon, IconWallet, useViewport, GU } from '@aragon/ui'
+import { EthIdenticon, LoadingRing, IconWallet, useViewport, GU } from '@aragon/ui'
 import { Box, Avatar, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
@@ -51,7 +51,7 @@ function AccountBadge() {
 
   if(walletLoading)
     return (
-      <RoundButton wide icon={<IconWallet/>} display="all" label="Connecting..." disabled />
+      <RoundButton wide icon={<LoadingRing/>} display="all" label="Connecting..." disabled />
     );
 
   function connectWallet() {

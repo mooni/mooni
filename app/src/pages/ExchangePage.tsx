@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
 
-import { Box, Button } from '@material-ui/core'
+import { Box } from '@material-ui/core'
 import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 import { Box as ABox } from '@aragon/ui'
@@ -13,7 +14,7 @@ import StepRecipient from '../components/Payment/StepRecipient';
 import StepPaymentDetail from '../components/Payment/StepPaymentDetail';
 import StepAmount from '../components/Payment/StepAmount';
 import StepRecap from '../components/Payment/StepRecap';
-import { SmallWidth } from '../components/UI/StyledComponents';
+import { RoundButton, SmallWidth } from '../components/UI/StyledComponents';
 
 import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
@@ -34,6 +35,10 @@ const useStyles = makeStyles({
     marginBottom: '14px',
   }
 });
+
+const RoundedBox = styled(ABox)`
+  border-radius: 20px;
+`
 
 export default function ExchangePage() {
   const { currenciesManager } = useContext(CurrenciesContext);
@@ -73,7 +78,7 @@ export default function ExchangePage() {
     <RequireConnection>
       {() =>
         <SmallWidth>
-          <ABox width={1} py={3}>
+          <RoundedBox>
             <CustomMobileStepper
               backButton={null}
               nextButton={null}
@@ -89,21 +94,17 @@ export default function ExchangePage() {
             </Box>
 
             {stepId !== 0 && <Box mb={2}>
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                startIcon={<ArrowBack/>}
-                disabled={stepId === 0}
-                style={{width: '100%'}}
+              <RoundButton
+                wide
                 onClick={handleBack}
-              >
-                Back
-              </Button>
+                icon={<ArrowBack/>}
+                label={"Back"}
+                disabled={stepId === 0}
+              />
             </Box>
             }
             {stepElements[stepId]}
-          </ABox>
+          </RoundedBox>
         </SmallWidth>
       }
     </RequireConnection>

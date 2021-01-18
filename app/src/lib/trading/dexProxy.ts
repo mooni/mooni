@@ -1,7 +1,7 @@
 import { ethers, providers, BigNumber } from 'ethers';
 
 import { TokenCurrency } from './currencyTypes';
-import {amountToInt, BN} from '../numbers';
+import { amountToDecimal, amountToInt, BN } from '../numbers';
 import {CurrencySymbol, DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
@@ -36,26 +36,29 @@ class DexProxy {
     return this.getRate(tradeRequest);
   }
 
-  async getSpender(_dexTrade: DexTrade): Promise<string> {
+  static async getSpender(_: string): Promise<string> {
     return Paraswap.getSpender();
   }
 
-  async getAllowance(tokenAddress: string, senderAddress: string, spenderAddress: string): Promise<string>
+  static async getAllowance(token: TokenCurrency, senderAddress: string, spenderAddress: string): Promise<string>
   {
-    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, defaultProvider);
+    const tokenContract = new ethers.Contract(token.address, ERC20_ABI, defaultProvider);
     const allowance = await tokenContract.allowance(senderAddress, spenderAddress);
-    return allowance.toString();
+    return amountToDecimal(allowance.toString(), token.decimals);
   }
 
-  async approve(tokenAddress: string, senderAddress: string, spenderAddress: string, intAmount: string, provider: providers.Web3Provider): Promise<string> {
+  static async approve(token: TokenCurrency, senderAddress: string, spenderAddress: string, amount: string, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
-    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+    const tokenContract = new ethers.Contract(token.address, ERC20_ABI, signer);
+
+    const intAmount = BigNumber.from(amountToInt(amount, token.decimals));
 
     const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, intAmount);
     const gasLimit = calculatedGasMargin(estimatedGas);
+
     const tx = await tokenContract.approve(
       spenderAddress,
-      BigNumber.from(intAmount),
+      intAmount,
       {
         gasLimit: BigNumber.from(gasLimit),
       }
@@ -68,12 +71,11 @@ class DexProxy {
 
     const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;
     const senderAddress = await signer.getAddress();
-    const spenderAddress = await this.getSpender(dexTrade);
-    const intAmount = amountToInt(dexTrade.inputAmount, inputToken.decimals);
+    const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencySymbol);
 
-    const allowance = await this.getAllowance(inputToken.address, senderAddress, spenderAddress);
-    if(new BN(intAmount).gt(allowance)) {
-      const txHash = await this.approve(inputToken.address, senderAddress, spenderAddress, intAmount, provider);
+    const allowance = await DexProxy.getAllowance(inputToken, senderAddress, spenderAddress);
+    if(new BN(dexTrade.inputAmount).gt(allowance)) {
+      const txHash = await DexProxy.approve(inputToken, senderAddress, spenderAddress, dexTrade.inputAmount, provider);
       return txHash;
     }
 
