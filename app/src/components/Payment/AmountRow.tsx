@@ -48,9 +48,6 @@ const useStyles = makeStyles(theme => ({
       outline: 'none',
     }
   },
-  currencySelector: {
-    width: 126,
-  },
   disabledInput: {
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.default,
@@ -102,7 +99,7 @@ export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValu
             min={0}
           />
         </Box>
-        <Box className={classes.currencySelector}>
+        <Box>
           <CurrencySelector
             selectedSymbol={selectedSymbol}
             onChange={onChangeCurrency}
