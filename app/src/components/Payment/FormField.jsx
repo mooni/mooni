@@ -15,7 +15,7 @@ export const WideInput = styled.input`
   background: #FFFFFF;
   border: 1px solid #DDE4E9;
   color: #212B36;
-  border-radius: 4px;
+  border-radius: 10px;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;

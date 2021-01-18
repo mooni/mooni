@@ -15,7 +15,7 @@ import {TradeExact, TradeRequest} from '../../lib/trading/types';
 import {useRate} from '../../hooks/rates';
 import {getWalletStatus} from '../../redux/wallet/selectors';
 import {CurrencyType} from "../../lib/trading/currencyTypes";
-import { RateAmount, RateAmountSuspense } from './RateAmount';
+import { RateAmount } from './RateAmount';
 import { WalletStatus } from "../../redux/wallet/state";
 import { useAllowance } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
