@@ -47,7 +47,7 @@ function getErrorContent(error) {
     case 'invalid-custom-token':
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
     case 'error-fetching-balances':
-      return 'We couldn\'nt get token balances of your wallet';
+      return 'We could\'nt get token balances of your wallet';
     default:
       return 'We did not expect that error, and will try to fix it soon. Do not hesitate to contact the support to help get this fixed.';
   }
