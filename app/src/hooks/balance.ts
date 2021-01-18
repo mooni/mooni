@@ -14,14 +14,12 @@ import { MetaError } from '../lib/errors';
 export interface BalanceData {
   balance: string,
   balanceLoading: boolean,
-  balanceAvailable: boolean,
 }
 
 export function useBalance(symbol: CurrencySymbol): BalanceData {
   const ethManager = useSelector(getETHManager);
   const [balance, setBalance] = useState<string>('0');
   const [balanceLoading, setLoading] = useState<boolean>(true);
-  const [balanceAvailable, setBalanceAvailable] = useState<boolean>(false);
 
   const currency = useCurrency(symbol);
 
@@ -30,12 +28,10 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
 
     if(!ethManager) {
       setLoading(false);
-      setBalanceAvailable(false);
       setBalance('0');
       return;
     }
 
-    setBalanceAvailable(true);
     const ethAddress = ethManager.getAddress();
 
     if(currency.equals(ETHER)) {
@@ -47,7 +43,11 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
       };
 
       const signer = ethManager.provider.getSigner();
-      signer.getBalance().then(updateBalance);
+      signer.getBalance()
+        .then(updateBalance)
+        .catch(error => {
+          logError('error-fetching-balance-eth', error);
+        });
       ethManager.provider.on(ethAddress, updateBalance);
 
       return () => ethManager.provider.removeListener(ethAddress, updateBalance);
@@ -55,10 +55,14 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     } else if(currency instanceof TokenCurrency) {
 
       const updateBalance = () => {
-        currency.fetchBalance(ethAddress).then(res => {
-          setBalance(res);
-          setLoading(false);
-        });
+        currency.fetchBalance(ethAddress)
+          .then(res => {
+            setBalance(res);
+            setLoading(false);
+          })
+          .catch(error => {
+            logError('error-fetching-balance-token', error);
+          });
       }
 
       updateBalance();
@@ -72,5 +76,5 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     }
   }, [currency, ethManager]);
 
-  return { balanceAvailable, balanceLoading, balance };
+  return { balanceLoading, balance };
 }

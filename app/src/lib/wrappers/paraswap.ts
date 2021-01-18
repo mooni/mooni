@@ -15,7 +15,7 @@ import { MetaError } from '../errors';
 
 const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
-  baseURL: `https://api${config.chainId === ChainId.ROPSTEN && '-ropsten'}.paraswap.io/v2`,
+  baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
 let paraswapAdapters: any | null = null;
