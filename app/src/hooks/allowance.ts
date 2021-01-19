@@ -30,8 +30,6 @@ export function useAllowance(symbol: CurrencySymbol, amount: string): AllowanceD
 
 
   useEffect(() => {
-    setAllowanceLoading(true);
-
     if(!userAddress || !amount) {
       setAllowanceReady(false);
       setAllowanceLoading(false);
@@ -41,23 +39,34 @@ export function useAllowance(symbol: CurrencySymbol, amount: string): AllowanceD
       setAllowanceReady(true);
       setAllowanceLoading(false);
     } else if(currency instanceof TokenCurrency) {
-      DexProxy.getSpender(currency.symbol)
-        .then(spenderAddress =>
-          DexProxy.getAllowance(currency, userAddress, spenderAddress)
-        )
-        .then(allowance => {
-          const ready = new BN(allowance).gt(amount);
-          setAllowanceReady(ready);
-          setAllowanceLoading(false);
-        })
-        .catch(error => {
-          logError('error while fetching allowance', error);
-          setAllowanceLoading(false);
-        })
+
+      const updateBalance = () => {
+        setAllowanceLoading(true);
+        DexProxy.getSpender(currency.symbol)
+          .then(spenderAddress =>
+            DexProxy.getAllowance(currency, userAddress, spenderAddress)
+          )
+          .then(allowance => {
+            const ready = new BN(allowance).gt(amount);
+            setAllowanceReady(ready);
+            setAllowanceLoading(false);
+          })
+          .catch(error => {
+            logError('error while fetching allowance', error);
+            setAllowanceLoading(false);
+          });
+      };
+
+      updateBalance();
+      ethManager.provider.on('block', updateBalance);
+      return () => ethManager.provider.removeListener('block', updateBalance);
+
     } else {
-      throw new MetaError('unable to get allowance for currency', { symbol: currency.symbol })
+      logError('invalid currency for balance', new MetaError('unable to get allowance for currency', { symbol: currency.symbol }));
+      setAllowanceReady(false);
+      setAllowanceLoading(false);
     }
-  }, [currency, userAddress, amount]);
+  }, [currency, userAddress, amount, ethManager]);
 
   const approveAllowance = useCallback(async() => {
       setAllowanceMining(true);
