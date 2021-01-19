@@ -18,7 +18,7 @@ const paraswapAxios = axios.create({
   baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
-let paraswapAdapters: any | null = null;
+let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
@@ -103,22 +103,21 @@ const ParaswapWrapper = {
     };
   },
   async getSpender(): Promise<string> {
-    if(!paraswapAdapters) {
-      const { data } = await paraswapAxios({
+    if(!augustusSpender) {
+      const { data: paraswapAdapters } = await paraswapAxios({
         method: 'get',
         url: `/adapters/${config.chainId}`,
       });
-      paraswapAdapters = data;
-    }
-    const augustusAddress = paraswapAdapters.augustus.exchange;
-    const augustusContract = new ethers.Contract(
-      augustusAddress,
-      AUGUSTUS_ABI,
-      defaultProvider
-    );
+      const augustusAddress = paraswapAdapters.augustus.exchange;
+      const augustusContract = new ethers.Contract(
+        augustusAddress,
+        AUGUSTUS_ABI,
+        defaultProvider
+      );
 
-    const spender = await augustusContract.getTokenTransferProxy();
-    return spender;
+      augustusSpender = await augustusContract.getTokenTransferProxy() as string;
+    }
+    return augustusSpender;
   },
   async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
     function getTokenAddress(symbol) {
