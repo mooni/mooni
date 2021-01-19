@@ -35,7 +35,10 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   if(bityOrderDetails.orderStatus === BityOrderStatus.EXECUTED) {
     await prisma.mooniOrder.update({
       where: { bityOrderId },
-      data: { status: 'EXECUTED' },
+      data: {
+        status: 'EXECUTED',
+        executedAt: bityOrderDetails.timestamp_executed,
+      },
     });
   }
   return res.json(bityOrderDetails);
