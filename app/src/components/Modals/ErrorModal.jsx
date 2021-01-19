@@ -86,12 +86,6 @@ export default function ErrorModal() {
             <Box textAlign="center" width={1}>
               {getErrorContent(modalError)}
             </Box>
-
-            <Box display="flex" justifyContent="center" alignItems="center" mb={1}>
-              <a href="https://t.me/moonidapp" target="_blank" rel="noopener noreferrer">
-                Contact support
-              </a>
-            </Box>
           </Box>
           <Box mb={1}/>
           <Button onClick={onCloseModal}>Close</Button>
