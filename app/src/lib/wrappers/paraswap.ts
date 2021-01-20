@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {BigNumber, ethers} from "ethers";
-import {APIError, ParaSwap} from 'paraswap';
+import {APIError, ParaSwap, NetworkID} from 'paraswap';
+import { ChainId } from '@uniswap/sdk';
 
 import {defaultProvider} from "../web3Providers";
 import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
@@ -12,12 +13,12 @@ import {amountToDecimal, amountToInt, BN} from "../numbers";
 import CurrenciesManager from '../trading/currenciesManager';
 import { MetaError } from '../errors';
 
-const paraSwap = new ParaSwap().setWeb3Provider(defaultProvider);
+const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
-  baseURL: 'https://api.paraswap.io/v2',
+  baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
-let paraswapAdapters: any | null = null;
+let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
@@ -36,7 +37,7 @@ const ParaswapWrapper = {
   async getTokenList(): Promise<TokenCurrency[]> {
     const { data } = await paraswapAxios({
       method: 'get',
-      url: '/tokens',
+      url: `/tokens/${config.chainId}`,
     });
     return data.tokens.map(t =>
       t.address.toLowerCase() === ETH_ADDRESS ?
@@ -48,7 +49,7 @@ const ParaswapWrapper = {
   async getBalances(address: string): Promise<CurrencyBalances> {
     const { data } = await paraswapAxios({
       method: 'get',
-      url: `/users/tokens/1/${address}`,
+      url: `/users/tokens/${config.chainId}/${address}`,
     });
     return data.tokens.reduce((acc, token) => ({
       ...acc,
@@ -102,22 +103,21 @@ const ParaswapWrapper = {
     };
   },
   async getSpender(): Promise<string> {
-    if(!paraswapAdapters) {
-      const { data } = await paraswapAxios({
+    if(!augustusSpender) {
+      const { data: paraswapAdapters } = await paraswapAxios({
         method: 'get',
         url: `/adapters/${config.chainId}`,
       });
-      paraswapAdapters = data;
-    }
-    const augustusAddress = paraswapAdapters.augustus.exchange;
-    const augustusContract = new ethers.Contract(
-      augustusAddress,
-      AUGUSTUS_ABI,
-      defaultProvider
-    );
+      const augustusAddress = paraswapAdapters.augustus.exchange;
+      const augustusContract = new ethers.Contract(
+        augustusAddress,
+        AUGUSTUS_ABI,
+        defaultProvider
+      );
 
-    const spender = await augustusContract.getTokenTransferProxy();
-    return spender;
+      augustusSpender = await augustusContract.getTokenTransferProxy() as string;
+    }
+    return augustusSpender;
   },
   async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
     function getTokenAddress(symbol) {

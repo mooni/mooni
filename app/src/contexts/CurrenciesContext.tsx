@@ -59,8 +59,8 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
       currenciesManager.fetchBalances(address)
         .then(setCurrencyBalances)
         .catch(error => {
-          logError('error-fetching-balances', error);
-          dispatch(setModalError(new Error('error-fetching-balances')))
+          logError('error-fetching-balances-all', error);
+          // dispatch(setModalError(new Error('error-fetching-balances')))
         });
     }
     const interval = setInterval(fetchBalances, BALANCE_REFRESH_INTERVAL);

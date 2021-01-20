@@ -10,7 +10,6 @@ export const useCurrency = (symbol) => {
   return useMemo(() => getCurrency(symbol), [symbol, getCurrency]);
 }
 
-
 function sortCurrencies(currencies: Currency[], currencyBalances: CurrencyBalances) {
   return currencies.slice().sort((a, b) => {
     if(a.equals(ETHER)) return -1;
