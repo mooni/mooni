@@ -14,11 +14,13 @@ import Api from '../../lib/apiWrapper';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
-import {BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType} from "../../lib/trading/types";
+import { BityTrade, CurrencySymbol, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
 import DexProxy from "../../lib/trading/dexProxy";
+import CurrenciesManager from '../../lib/trading/currenciesManager';
 import { MetaError } from '../../lib/errors';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
+export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
 
 export const SET_EXCHANGE_STEP = 'SET_EXCHANGE_STEP';
 
@@ -39,6 +41,12 @@ export const setTradeRequest = (tradeRequest: TradeRequest) => ({
   type: SET_TRADE_REQUEST,
   payload: {
     tradeRequest,
+  }
+});
+export const setInputCurrency = (symbol: CurrencySymbol) => ({
+  type: SET_INPUT_CURRENCY,
+  payload: {
+    symbol,
   }
 });
 
@@ -215,7 +223,6 @@ const sendPaymentStep = ({ stepId, paymentFunction })  => async (dispatch, getSt
         txHash,
       }));
       await ethManager.waitForConfirmedTransaction(txHash);
-
     }
 
     dispatch(updatePaymentStep({
@@ -293,7 +300,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const sendPayment = () => async function (dispatch, getState)  {
+export const sendPayment = (currenciesManager: CurrenciesManager) => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
 
@@ -306,6 +313,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
 
+  const dexProxy = new DexProxy(currenciesManager);
+
   const bityOrderId = bityTrade.bityOrderResponse.id;
   log('PAYMENT: bity order id', bityOrderId);
   log('PAYMENT: ETH address', ethManager.getAddress());
@@ -317,7 +326,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       // Allowance
       await dispatch(sendPaymentStep({
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => DexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
+        paymentFunction: async () => dexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
       }));
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -325,7 +334,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
       // Trade
       await dispatch(sendPaymentStep({
         stepId: PaymentStepId.TRADE,
-        paymentFunction: async () => DexProxy.executeTrade(
+        paymentFunction: async () => dexProxy.executeTrade(
           dexTrade,
           ethManager.provider,
           0.01, // TODO let user choose that

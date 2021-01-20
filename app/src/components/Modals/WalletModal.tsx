@@ -24,7 +24,7 @@ export default function WalletModal() {
   const dispatch = useAppDispatch();
 
   const dialogOpen = walletLoading && walletStatus !== WalletStatus.CHOOSING_WALLET;
-  const allowCancel = walletStatus !== WalletStatus.DISCONNECTING;
+  const allowCancel = walletStatus === WalletStatus.WAITING_SIGNATURE;
 
   return (
     <Dialog
@@ -62,12 +62,12 @@ export default function WalletModal() {
           </Box>
           {allowCancel &&
           <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={() => dispatch(logout())}
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => dispatch(logout())}
           >
-              Cancel
+            Cancel
           </Button>
           }
         </Box>

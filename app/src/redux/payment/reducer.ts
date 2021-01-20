@@ -8,7 +8,7 @@ import {
 
 import { STATE_NAME, PaymentState, initialState } from "./state";
 import * as actions from './actions';
-import {BankInfo, MultiTrade, MultiTradeRequest, TradeRequest} from "../../lib/trading/types";
+import { BankInfo, CurrencySymbol, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types';
 
 export { STATE_NAME };
 
@@ -22,6 +22,20 @@ export default function(state : PaymentState = initialState, action: { type: str
         multiTradeRequest: {
           ...(state.multiTradeRequest as MultiTradeRequest),
           tradeRequest,
+        },
+      };
+    }
+    case actions.SET_INPUT_CURRENCY: {
+      const { symbol }: { symbol: CurrencySymbol } = action.payload;
+
+      return {
+        ...state,
+        multiTradeRequest: {
+          ...(state.multiTradeRequest as MultiTradeRequest),
+          tradeRequest: {
+            ...(state.multiTradeRequest.tradeRequest as TradeRequest),
+            inputCurrencySymbol: symbol,
+          },
         },
       };
     }

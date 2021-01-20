@@ -10,6 +10,7 @@ import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import prisma from '../../src/lib/api/prisma'
 import {getUser, getUserByReferral} from "../../src/lib/api/users";
 import {APIError} from "../../src/lib/errors";
+import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
 const bityInstance = new Bity();
@@ -74,9 +75,10 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
-  const trader = new Trader(bityInstance);
 
-  await Trader.assertTokenReady(multiTradeRequest.tradeRequest);
+  const currenciesManager = new CurrenciesManager();
+  await currenciesManager.fetchCurrencies();
+  const trader = new Trader(bityInstance, currenciesManager);
 
   const multiTradeTemp = await trader.createMultiTrade(multiTradeRequest);
 

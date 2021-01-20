@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
-import { Link } from '@aragon/ui'
+import { Link, LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
@@ -10,9 +10,9 @@ import {ShadowBox} from "../UI/StyledComponents";
 
 import bityLogo from "../../assets/bity_logo_small.png";
 import paraswapLogo from "../../assets/paraswap_logo_small.png";
-import { getCurrency } from '../../lib/trading/currencyHelpers'
+import { CurrenciesContext } from '../../contexts/CurrenciesContext';
 
-function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
+function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
 
   if(fees.length === 0) {
@@ -52,7 +52,6 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null 
 const Container = styled(ShadowBox)`
 width: 100%;
 padding: 15px 20px;
-margin: 20px 0;
 `;
 
 const RouteTitle = styled.p`
@@ -164,36 +163,78 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   </TradeElement>
 );
 
-interface RateAmountProps {
+export const RateAmountSuspense: React.FC = () => {
+  return (
+    <Container>
+      <Box px={1}>
+        <BasicLine title="Rate" content={"-"}/>
+        <BasicLine title="Exchange fees" content="-"/>
+      </Box>
+      <Box display="flex" justifyContent="center" mt={1}>
+        <LoadingRing mode="half-circle"/>
+      </Box>
+    </Container>
+  );
+}
+
+interface RateAmountLoadedProps {
   multiTradeEstimation: MultiTradeEstimation;
 }
-export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
+
+export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEstimation}) => {
+  const { getCurrency } = useContext(CurrenciesContext);
+
   const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencySymbol;
   const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencySymbol;
 
-  const fee = aggregateFees(multiTradeEstimation);
-  let feeAmount, feeCurrency;
-  if(fee) {
-    feeCurrency = getCurrency(fee.currencySymbol);
-    if(feeCurrency.type === CurrencyType.FIAT) {
-      feeAmount = truncateNumber(fee.amount, 2);
-    } else {
-      feeAmount = truncateNumber(fee.amount);
+  const fee = useMemo(() => aggregateFees(multiTradeEstimation, getCurrency), [multiTradeEstimation, getCurrency]);
+  const feeInfos = useMemo(() => {
+    let amount, currency;
+    if(fee) {
+      currency = getCurrency(fee.currencySymbol);
+      if(currency.type === CurrencyType.FIAT) {
+        amount = truncateNumber(fee.amount, 2);
+      } else {
+        amount = truncateNumber(fee.amount);
+      }
+      return {
+        currency,
+        amount,
+      }
     }
-  }
-  const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
-  const rateTrunc = truncateNumber(rate);
+    return null;
+  }, [fee, getCurrency]);
+
+  const rateTrunc = useMemo(() => {
+    const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
+    return truncateNumber(rate);
+  }, [multiTradeEstimation]);
 
   return (
     <Container>
       <Box px={1}>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
-        {fee &&
-        <BasicLine title="Exchange fees" content={`${feeAmount} ${feeCurrency.symbol}`}/>
+        {feeInfos &&
+        <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currency.symbol}`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>
       {multiTradeEstimation.trades.map(trade => <TradeLine trade={trade} key={trade.tradeType} />)}
     </Container>
   );
+}
+
+interface RateAmountProps {
+  multiTradeEstimation: MultiTradeEstimation | null;
+}
+export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
+  if(multiTradeEstimation) {
+    return (
+      <RateAmountLoaded multiTradeEstimation={multiTradeEstimation}/>
+    )
+  } else {
+    return (
+      <RateAmountSuspense />
+    );
+  }
 }

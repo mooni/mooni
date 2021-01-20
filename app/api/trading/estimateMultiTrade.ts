@@ -3,8 +3,9 @@ import { NowRequest, NowResponse } from '@now/node'
 import Bity from '../../src/lib/wrappers/bity';
 import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
-import {APIError} from "../../src/lib/errors";
+import { APIError, MetaError } from '../../src/lib/errors';
 import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
+import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 
 const bityInstance = new Bity();
 
@@ -17,12 +18,18 @@ export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promis
     throw new APIError(400, 'wrong-body', 'tradeRequest values are invalid');
   }
 
-  const trader = new Trader(bityInstance);
+  const currenciesManager = new CurrenciesManager();
+  await currenciesManager.fetchCurrencies();
+  const trader = new Trader(bityInstance, currenciesManager);
 
-  await Trader.assertTokenReady(tradeRequest);
+  try {
+    const multiTrade = await trader.estimateMultiTrade(tradeRequest);
+    return res.json(multiTrade);
+  } catch(error) {
+    if(error instanceof MetaError && error.message === 'dex-liquidity-error') {
+      throw new APIError(417, 'dex-liquidity-error', 'not enough liquidity for token', error.meta);
+    }
+  }
 
-  const multiTrade = await trader.estimateMultiTrade(tradeRequest);
-
-  return res.json(multiTrade);
 
 })
