@@ -25,6 +25,8 @@ export type BityOrderResponse = {
   },
   id: string,
   timestamp_created: string,
+  timestamp_executed?: string,
+  timestamp_payment_received?: string,
   timestamp_awaiting_payment_since: string,
   timestamp_price_guaranteed: string,
   payment_details: {
