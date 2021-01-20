@@ -59,3 +59,9 @@ export const ShadowBox = styled.div`
 export const RoundButton = styled(Button)`
   border-radius: 25px;
 `;
+
+export const FlexCenterBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

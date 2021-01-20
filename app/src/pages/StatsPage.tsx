@@ -1,8 +1,11 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
-import {textStyle} from '@aragon/ui'
-import { MediumWidth, ShadowBox, SmallWidth } from '../components/UI/StyledComponents';
+import {textStyle, LoadingRing} from '@aragon/ui'
+import useSWR from 'swr';
+import { MediumWidth, ShadowBox, FlexCenterBox } from '../components/UI/StyledComponents';
 import styled from 'styled-components';
+import Api from '../lib/apiWrapper';
+import { BN, truncateNumber } from '../lib/numbers';
 
 // @ts-ignore
 const StatItemBox = styled(ShadowBox)`
@@ -36,38 +39,48 @@ function StatItem({title, value}) {
 }
 
 export default function StatsPage() {
+  const { data, error } = useSWR('1', Api.getStats);
+
+  if (error) return <div>Failed to load stats</div>;
 
   return (
     <MediumWidth>
       <Title>
         Stats
       </Title>
-      <Grid container spacing={4}>
-        <Grid item xs={12} sm={6}>
-          <StatItem
-            title="Transactions"
-            value="124"
-          />
+      {data ?
+        <Grid container spacing={4}>
+          <Grid item xs={12} sm={6}>
+            <StatItem
+              title="Executed orders"
+              value={data.ordersCount}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <StatItem
+              title="ETH exchanged"
+              value={`${truncateNumber(data.totalETH)} ETH`}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <StatItem
+              title="EUR cashed out"
+              value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' }).format(new BN(data.totalEUR).toNumber())}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <StatItem
+              title="CHF cashed out"
+              value={new Intl.NumberFormat(undefined, { style: 'currency', currency: 'CHF' }).format(new BN(data.totalCHF).toNumber())}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <StatItem
-            title="ETH exchanged"
-            value="12.230€"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <StatItem
-            title="Euro cashed out"
-            value="12.230€"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <StatItem
-            title="CHF cashed out"
-            value="432.230 CHF"
-          />
-        </Grid>
-      </Grid>
+        :
+        <FlexCenterBox>
+          <LoadingRing mode="half-circle" />
+        </FlexCenterBox>
+      }
+
     </MediumWidth>
   );
 }

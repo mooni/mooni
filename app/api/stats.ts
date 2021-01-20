@@ -1,12 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import prisma from "../src/lib/api/prisma";
-
-interface Stats {
-  ordersCount: string;
-  totalETHAmount: string;
-  totalEUR: string;
-  totalCHF: string;
-}
+import { Stats } from '../src/types/api';
 
 export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
   const aggregateETH = await prisma.$queryRaw<any>(`
@@ -28,7 +22,7 @@ export default async (req: NowRequest, res: NowResponse): Promise<NowResponse |
 
   const stats: Stats = {
     ordersCount: aggregateETH[0].count,
-    totalETHAmount: aggregateETH[0].totalETH,
+    totalETH: aggregateETH[0].totalETH,
     totalEUR: aggregateOutput.find(a => a.outputCurrency === 'EUR').totalOutput,
     totalCHF: aggregateOutput.find(a => a.outputCurrency === 'CHF').totalOutput,
   };
