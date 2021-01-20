@@ -13,6 +13,7 @@ import HomePage from './pages/HomePage';
 import ExchangePage from './pages/ExchangePage';
 import StatusPage from './pages/StatusPage';
 import AccountPage from './pages/AccountPage';
+import StatsPage from './pages/StatsPage';
 
 import { usePageViews } from './lib/analytics';
 import { getWalletStatus, isWalletLoading } from './redux/wallet/selectors';
@@ -27,6 +28,9 @@ export const Routes: React.FC = () => {
     <Switch>
       <Route exact path="/">
         <HomePage />
+      </Route>
+      <Route exact path="/stats">
+        <StatsPage />
       </Route>
       {walletStatus===WalletStatus.CONNECTED &&
       <>
