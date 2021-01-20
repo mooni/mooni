@@ -65,7 +65,7 @@ const API: IAPI = {
     return data;
   },
   async createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade> {
-    const {data} = await mooniAPIRetryer({
+    const {data} = await mooniAPICatcher({
       method: 'post',
       url: 'trading/createMultiTrade',
       headers: {
