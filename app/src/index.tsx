@@ -8,6 +8,10 @@ const incompatibleBrowserElement = document.getElementById('incompatible-browser
 if(incompatibleBrowserElement?.parentNode) {
   incompatibleBrowserElement.parentNode.removeChild(incompatibleBrowserElement)
 }
+const loaderElement = document.getElementById('loader');
+if(loaderElement?.parentNode) {
+  loaderElement.parentNode.removeChild(loaderElement)
+}
 
 ReactDOM.render(<App/>, document.getElementById('root'));
 

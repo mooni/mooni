@@ -8,6 +8,7 @@ export enum WalletStatus {
   CHOOSING_WALLET= 'CHOOSING_WALLET',
   WAITING_SIGNATURE= 'WAITING_SIGNATURE',
   LOADING= 'LOADING',
+  INITIATING= 'INITIATING',
   DISCONNECTING= 'DISCONNECTING',
 }
 
@@ -21,7 +22,7 @@ export interface WalletState {
 
 export const initialState: WalletState = {
   ethManager: null,
-  walletStatus: WalletStatus.DISCONNECTED,
+  walletStatus: WalletStatus.INITIATING,
   address: null,
   jwsToken: null,
   providerFromIframe: false,

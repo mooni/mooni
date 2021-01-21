@@ -3,7 +3,7 @@ export class MetaError {
   message: string;
   meta: any;
 
-  constructor(message: string, meta: object = {}) {
+  constructor(message: string, meta?: object) {
     this.message = message;
     this.meta = meta;
   }
@@ -22,7 +22,7 @@ export class APIError extends MetaError {
   code: number;
   description?: string;
 
-  constructor(code: number, message: string, description?: string, meta: object = {}) {
+  constructor(code: number, message: string, description?: string, meta?: object) {
     super(message, meta);
     this.code = code;
     this.description = description;

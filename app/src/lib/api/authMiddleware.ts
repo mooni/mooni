@@ -1,5 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import DIDManager, {Token} from "../didManager";
+import { APIError } from '../errors';
 
 function getHeaderToken(req: NowRequest): string | null {
   const authHeader = req.headers.authorization;
@@ -15,13 +16,13 @@ type AuthedHandler = (req: NowRequest, res: NowResponse, token: Token) => Promis
 export const authMiddleware = (fn: AuthedHandler): Handler => async (req: NowRequest, res: NowResponse) => {
   const jwsToken = getHeaderToken(req);
   if(!jwsToken) {
-    return res.status(401).send('authorization required');
+    throw new APIError(401, 'authorization-required', 'No bearer token found');
   }
   let token;
   try {
     token = DIDManager.decodeToken(jwsToken);
   } catch(error) {
-    return res.status(401).send(`invalid token: ${error.message}`);
+    throw new APIError(401, 'invalid-token', error.message);
   }
   return await fn(req, res, token)
 };

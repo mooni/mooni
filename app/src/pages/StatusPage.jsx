@@ -2,9 +2,9 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import RequireConnection from '../components/RequireConnection';
-import PaymentStatus from '../components/PaymentStatus';
-import { SmallWidth } from '../components/StyledComponents';
+import RequireConnection from '../components/Utils/RequireConnection';
+import PaymentStatus from '../components/Status/PaymentStatus';
+import { SmallWidth } from '../components/UI/StyledComponents';
 
 import { getPayment } from '../redux/payment/selectors';
 import { resetOrder, setExchangeStep } from '../redux/payment/actions';
@@ -28,9 +28,11 @@ export default function OrderStatusContainer() {
 
   return (
     <RequireConnection>
-      <SmallWidth>
-        <PaymentStatus payment={payment} onRestart={onRestart}/>
-      </SmallWidth>
+      {() =>
+        <SmallWidth>
+          <PaymentStatus payment={payment} onRestart={onRestart}/>
+        </SmallWidth>
+      }
     </RequireConnection>
   );
 }

@@ -95,7 +95,11 @@ export default class ETHManager {
   }
 }
 
-export function getEtherscanTxURL(hash) {
+export function getEtherscanAddressURL(address: string) {
+  return `https://etherscan.io/address/${address}`;
+}
+
+export function getEtherscanTxURL(hash: string) {
   return `https://etherscan.io/tx/${hash}`;
 }
 

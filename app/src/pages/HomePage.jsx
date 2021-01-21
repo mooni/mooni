@@ -3,26 +3,16 @@ import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { Box, Typography } from '@material-ui/core';
-import { Button, IconEthereum, IconWallet } from '@aragon/ui'
 
 import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
-import { SmallWidth } from '../components/StyledComponents';
-import {getWalletStatus, isWalletLoading} from '../redux/wallet/selectors';
-import { login } from '../redux/wallet/actions';
-import RateForm from '../components/RateForm';
+import { SmallWidth } from '../components/UI/StyledComponents';
+import RateForm from '../components/Payment/RateForm';
 import { getMultiTradeRequest } from '../redux/payment/selectors';
-import {WalletStatus} from "../redux/wallet/state";
 
 export default function HomePage() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const walletStatus = useSelector(getWalletStatus);
-  const walletLoading = useSelector(isWalletLoading);
   const { tradeRequest } = useSelector(getMultiTradeRequest);
-
-  function connectWallet() {
-    dispatch(login());
-  }
 
   const onSubmit = (tradeRequest) => {
     dispatch(setTradeRequest(tradeRequest));
@@ -39,12 +29,6 @@ export default function HomePage() {
           </Typography>
         </Box>
         <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest}/>
-        {walletStatus === WalletStatus.DISCONNECTED &&
-        <Button mode="positive" onClick={connectWallet} wide icon={<IconEthereum/>} label="Connect wallet" />
-        }
-        {walletLoading &&
-        <Button disabled wide icon={<IconWallet/>} display="all" label="Connecting..." />
-        }
       </Box>
     </SmallWidth>
   );

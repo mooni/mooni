@@ -6,7 +6,7 @@ import LogRocket from 'logrocket';
 import config from '../config';
 import { serializeError } from './errors';
 
-if(process.env.NODE_ENV === 'production') {
+if(process.env.NODE_ENV === 'production') { // TODO config.ENABLE_ANALYTICS
   LogRocket.init(
     config.logRocketId,
     {
@@ -30,6 +30,9 @@ if(process.env.NODE_ENV === 'production') {
 
 export function track(eventName: string) {
   LogRocket.track(eventName);
+}
+export function identify(uid: string) {
+  LogRocket.identify(uid);
 }
 
 export function sendEvent(category: string, action: string, label?: string, value?: number) {

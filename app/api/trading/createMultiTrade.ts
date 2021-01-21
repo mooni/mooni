@@ -2,7 +2,7 @@ import {NowRequest, NowResponse} from '@now/node'
 
 import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
-import {BityTrade, MultiTrade, MultiTradeRequest, TradeType} from "../../src/lib/trading/types";
+import { BityTrade, MultiTrade, MultiTradeRequest, MultiTradeTemp, TradeType } from '../../src/lib/trading/types';
 import {Trader} from "../../src/lib/trading/trader";
 import {Token} from "../../src/lib/didManager";
 import {authMiddleware} from "../../src/lib/api/authMiddleware";
@@ -10,22 +10,24 @@ import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import prisma from '../../src/lib/api/prisma'
 import {getUser, getUserByReferral} from "../../src/lib/api/users";
 import {APIError} from "../../src/lib/errors";
+import CurrenciesManager from '../../src/lib/trading/currenciesManager';
+import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
 const bityInstance = new Bity();
 
-async function createMooniOrder(multiTrade: MultiTrade) {
-  const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY);
+async function createMooniOrder(multiTradeTemp: MultiTradeTemp) {
+  const bityTrade = multiTradeTemp.trades.find(t => t.tradeType === TradeType.BITY);
   const bityOrderId = bityTrade && (bityTrade as BityTrade).bityOrderResponse.id;
 
-  const ethAddress = multiTrade.ethInfo.fromAddress.toLowerCase();
+  const ethAddress = multiTradeTemp.ethInfo.fromAddress.toLowerCase();
 
   const rawMooniOrder = {
-    inputAmount: multiTrade.inputAmount,
-    outputAmount: multiTrade.outputAmount,
-    inputCurrency: multiTrade.tradeRequest.inputCurrencySymbol,
-    outputCurrency: multiTrade.tradeRequest.outputCurrencySymbol,
+    inputAmount: multiTradeTemp.inputAmount,
+    outputAmount: multiTradeTemp.outputAmount,
+    inputCurrency: multiTradeTemp.tradeRequest.inputCurrencySymbol,
+    outputCurrency: multiTradeTemp.tradeRequest.outputCurrencySymbol,
     bityOrderId,
-    ethAmount: multiTrade.ethAmount,
+    ethAmount: multiTradeTemp.ethAmount,
     user: {
       connectOrCreate: {
         where: { ethAddress },
@@ -33,10 +35,10 @@ async function createMooniOrder(multiTrade: MultiTrade) {
       },
     },
     referralUser: (
-      multiTrade.referralId ?
+      multiTradeTemp.referralId ?
         {
           connect: {
-            referralId: multiTrade.referralId,
+            referralId: multiTradeTemp.referralId,
           },
         }
         :
@@ -44,7 +46,7 @@ async function createMooniOrder(multiTrade: MultiTrade) {
     ),
   };
 
-  await prisma.mooniOrder.create({
+  return prisma.mooniOrder.create({
     data: rawMooniOrder,
   });
 }
@@ -57,7 +59,7 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   if(!multiTradeRequest) {
     throw new APIError(400, 'wrong-body', 'multiTradeRequest values are invalid');
   }
-  if(multiTradeRequest.ethInfo.fromAddress.toLowerCase() !== token.claim.iss.toLowerCase()) {
+  if(!compareAddresses(multiTradeRequest.ethInfo.fromAddress, token.claim.iss)) {
     throw new APIError(400, 'different-addresses', 'different ethereum address used for order and authentication');
   }
 
@@ -73,14 +75,19 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   }
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
-  const trader = new Trader(bityInstance);
 
-  await Trader.assertTokenReady(multiTradeRequest.tradeRequest);
+  const currenciesManager = new CurrenciesManager();
+  await currenciesManager.fetchCurrencies();
+  const trader = new Trader(bityInstance, currenciesManager);
 
-  const multiTrade = await trader.createMultiTrade(multiTradeRequest);
+  const multiTradeTemp = await trader.createMultiTrade(multiTradeRequest);
 
-  await createMooniOrder(multiTrade);
+  const { id } = await createMooniOrder(multiTradeTemp);
 
+  const multiTrade: MultiTrade = {
+    ...multiTradeTemp,
+    id,
+  }
   return res.json(multiTrade)
 
 }))

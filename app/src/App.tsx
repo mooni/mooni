@@ -8,43 +8,48 @@ import { theme } from './theme';
 
 import './App.css';
 
-import AppContainer from './components/AppContainer';
-import InfoPanel from './components/InfoPanel';
-import ErrorModal from './components/ErrorModal';
-import WalletModal from './components/WalletModal';
+import AppContainer from './components/UI/AppContainer';
+import InfoPanel from './components/Modals/InfoPanel';
+import ErrorModal from './components/Modals/ErrorModal';
+import WalletModal from './components/Modals/WalletModal';
 import { Routes } from './Routes';
+
+import { CurrenciesContextProvider } from './contexts/CurrenciesContext';
 
 import { store } from './redux/store';
 import { initReferral } from './redux/payment/actions';
 import { autoConnect } from './redux/wallet/actions';
-import { initTokens } from './redux/ui/actions';
+import AppLoader from './components/AppLoader';
 
 export const App: React.FC = () => {
   useEffect(() => {
     store.dispatch(autoConnect());
-    store.dispatch(initTokens());
     store.dispatch(initReferral());
   }, []);
 
   return (
     <ReduxProvider store={store}>
-      <Router>
-        <AragonUI
-          assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
-          theme="light"
-          layout={false}
-          scrollView={false}
-        >
-          <MUIThemeProvider theme={theme}>
-            <AppContainer>
-              <InfoPanel />
-              <WalletModal />
-              <ErrorModal />
-              <Routes/>
-            </AppContainer>
-          </MUIThemeProvider>
-        </AragonUI>
-      </Router>
+      <CurrenciesContextProvider>
+        <Router>
+          <AragonUI
+            assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`}
+            theme="light"
+            layout={false}
+            scrollView={false}
+          >
+            <MUIThemeProvider theme={theme}>
+              <AppLoader>
+                <AppContainer>
+                  <InfoPanel />
+                  <WalletModal />
+                  <ErrorModal />
+                  <Routes/>
+                </AppContainer>
+              </AppLoader>
+            </MUIThemeProvider>
+          </AragonUI>
+        </Router>
+      </CurrenciesContextProvider>
     </ReduxProvider>
   );
 }
