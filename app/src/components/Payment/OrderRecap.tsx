@@ -5,11 +5,11 @@ import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { textStyle, Field, Info, Timer } from '@aragon/ui';
 
-import { getCurrencyLogoAddress } from '../../lib/trading/currencyHelpers';
 import {truncateNumber} from '../../lib/numbers';
 
 import {BityTrade, MultiTrade, TradeType} from "../../lib/trading/types";
 import { RateAmount } from "./RateAmount";
+import { CurrencyLogo } from './Currencies/CurrencyLogo';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -87,11 +87,7 @@ function AmountRow({ value, symbol, caption }) {
         </Box>
         <Box className={classes.currencySelector}>
           <Box display="flex" alignItems="center">
-            <img
-              src={getCurrencyLogoAddress(symbol)}
-              alt={`coin-icon-${symbol}`}
-              width={20}
-            />
+            <CurrencyLogo symbol={symbol} width="20px"/>
             <Box ml={1}>{symbol}</Box>
           </Box>
         </Box>

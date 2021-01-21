@@ -33,3 +33,10 @@ export interface MooniOrder {
   bityOrderId?: UUID;
   referralId?: CUID;
 }
+
+export interface Stats {
+  ordersCount: string;
+  totalETH: string;
+  totalEUR: string;
+  totalCHF: string;
+}

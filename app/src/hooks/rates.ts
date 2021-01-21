@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import {MultiTradeEstimation, TradeExact} from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
+import { useSelector } from 'react-redux';
 import { useDebounce } from './utils';
-import { useBalance } from './balance';
+import { BalanceData, useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
 import config from "../config";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
+import { APIError } from '../lib/errors';
+import { getETHManager } from '../redux/wallet/selectors';
 
 interface RateForm {
   loading: boolean,
@@ -17,6 +20,8 @@ interface RateForm {
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
+    lowLiquidity?: boolean
+    failed?: boolean
   },
   values: {
     inputCurrency: string,
@@ -25,6 +30,8 @@ interface RateForm {
     outputAmount: string,
     tradeExact: TradeExact,
   },
+  balanceData: BalanceData,
+  connected: boolean,
 }
 
 function defaultRateForm(initialRequest): RateForm {
@@ -49,6 +56,11 @@ function defaultRateForm(initialRequest): RateForm {
     loading: true,
     errors: undefined,
     values,
+    balanceData: {
+      balance: '0',
+      balanceLoading: false,
+    },
+    connected: false,
   };
 }
 
@@ -63,17 +75,19 @@ interface RateResponse {
 }
 
 export function useRate(initialTradeRequest: TradeRequest): RateResponse {
+  const ethManager = useSelector(getETHManager);
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
   const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
-  const { balance } = useBalance(rateForm.values.inputCurrency);
+  const { balanceLoading, balance } = useBalance(rateForm.values.inputCurrency);
 
   useEffect(() => {
     setRateForm(defaultRateForm(initialTradeRequest));
   }, [initialTradeRequest]);
 
-  const estimate = useCallback(async (_rateForm, _balance, _nonce) => {
+  const estimate = useCallback(async (_rateForm: RateForm, _nonce: number) => {
     if(!_rateForm.loading) return;
+    if(_rateForm.connected && _rateForm.balanceData.balanceLoading) return;
 
     const currentRequest: TradeRequest = {
       inputCurrencySymbol: _rateForm.values.inputCurrency,
@@ -81,6 +95,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       tradeExact: _rateForm.values.tradeExact as TradeExact,
       amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
+    setMultiTradeEstimation(null);
 
     if(!isNotZero(currentRequest.amount)) {
       setRateForm(r => ({
@@ -90,11 +105,10 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
           zeroAmount: true,
         },
       }));
-      setMultiTradeEstimation(null);
       return;
     }
 
-    if(_balance !== null && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_balance)) {
+    if(_rateForm.connected && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_rateForm.balanceData.balance)) {
       setRateForm(r => ({
         ...r,
         loading: false,
@@ -102,7 +116,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
           lowBalance: true,
         },
       }));
-      setMultiTradeEstimation(null);
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       if(new BN(currentRequest.amount).gt(config.maxOutputAmount)) {
@@ -113,7 +126,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             highAmount: true,
           },
         }));
-        setMultiTradeEstimation(null);
         return;
       }
     }
@@ -131,10 +143,26 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
             lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
         }));
-        setMultiTradeEstimation(null);
+        return;
+      } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            lowLiquidity: true,
+          },
+        }));
         return;
       } else {
-        throw error;
+        logError('api error while fetching rates', error);
+        setRateForm(r => ({
+          ...r,
+          loading: false,
+          errors: {
+            failed: true,
+          },
+        }));
+        return;
       }
     }
 
@@ -155,7 +183,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     }
     else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
       updateRateForm.values.inputAmount = new BN(multiTradeEstimation.inputAmount).toFixed();
-      if(_balance !== null && new BN(multiTradeEstimation.inputAmount).gt(_balance)) {
+      if(_rateForm.connected && new BN(multiTradeEstimation.inputAmount).gt(_rateForm.balanceData.balance)) {
         updateRateForm.errors = { lowBalance: true };
       }
     }
@@ -172,8 +200,6 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     if(!updateRateForm.errors) {
       setTradeRequest(currentRequest);
       setMultiTradeEstimation(multiTradeEstimation);
-    } else {
-      setMultiTradeEstimation(null);
     }
 
   }, []);
@@ -209,16 +235,19 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
     nonce++;
-    estimate(debouncedRateForm, balance, nonce).catch(error => {
-      logError('unable to fetch rates', error);
+    estimate(debouncedRateForm, nonce).catch(error => {
+      logError('unexpected error while fetching rates', error);
     });
-  }, [debouncedRateForm, balance, estimate]);
+  }, [debouncedRateForm, estimate]);
+
   useEffect(() => {
     setRateForm(r => ({
       ...r,
       loading: true,
+      balanceData: { balanceLoading, balance },
+      connected: !!ethManager,
     }));
-  }, [balance]);
+  }, [balanceLoading, ethManager, balance]);
 
   return {
     rateForm,

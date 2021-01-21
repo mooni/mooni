@@ -2,13 +2,13 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button } from '@aragon/ui'
+import { Button, useViewport } from '@aragon/ui'
 import { Box, Typography } from '@material-ui/core';
 import { ExitToApp } from '@material-ui/icons';
 
 import {ShadowBox, SimpleLink} from "../UI/StyledComponents";
 
-import { getAddress, getProviderFromIframe } from '../../redux/wallet/selectors';
+import { getAddress, getProviderFromIframe, getShortAddress } from '../../redux/wallet/selectors';
 import { logout } from '../../redux/wallet/actions';
 import { selectENS } from '../../redux/user/userSlice';
 import { getEtherscanAddressURL } from '../../lib/eth';
@@ -28,8 +28,10 @@ const AddressText = styled(Typography)`
 
 export default function AccountInfo() {
   const dispatch = useDispatch();
+  const { below } = useViewport();
 
   const address = useSelector(getAddress);
+  const shortenAddress = useSelector(getShortAddress);
   const ens = useSelector(selectENS);
   const providerFromIframe = useSelector(getProviderFromIframe);
 
@@ -42,7 +44,7 @@ export default function AccountInfo() {
       <Typography variant="subtitle1" align="center">Logged in as:</Typography>
       <BadgeBox>
         <SimpleLink href={getEtherscanAddressURL(address)} external>
-          <AddressText variant="caption" align="center">{address} {ens &&  <i>({ens})</i>}</AddressText>
+          <AddressText variant="caption" align="center">{below('medium') ? shortenAddress : address} {ens &&  <i>({ens})</i>}</AddressText>
         </SimpleLink>
       </BadgeBox>
       {!providerFromIframe && <Button icon={<ExitToApp />} mode="negative" size="small" label="Disconnect" onClick={onLogout} />}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Button, Info, IconCoin, IconRefresh, Checkbox, Link } from '@aragon/ui'
+import { Info, IconCoin, IconRefresh, Checkbox, Link } from '@aragon/ui'
 import { Button as MButton } from '@material-ui/core';
 
 import Loader from '../UI/Loader';
@@ -12,6 +12,7 @@ import { getMultiTrade, getOrderErrors } from '../../redux/payment/selectors';
 import { setInfoPanel } from '../../redux/ui/actions';
 import {BityTrade, TradeType} from "../../lib/trading/types";
 import { createOrder } from '../../redux/payment/actions'
+import { RoundButton } from '../UI/StyledComponents';
 
 function StepRecap({ onComplete }) {
   const dispatch = useDispatch();
@@ -80,7 +81,7 @@ function StepRecap({ onComplete }) {
           I agree with the <Link onClick={() => dispatch(setInfoPanel('terms'))}>terms of service</Link>
         </label>
       </Box>
-      <Button mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
+      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
     </Box>
   )
 }

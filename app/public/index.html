@@ -42,11 +42,39 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
-    <p id="incompatible-browser" style="text-align: center; display: none;">
+    <p id="incompatible-browser" style="text-align: center; display: none; position: fixed;">
       Your browser seems incompatible.
       <br/>
       If you are using Brave browser, we recommend disabling shields to be able to use this website.
     </p>
+
+    <style>
+      .global-loader {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      @keyframes logoloader {
+        from {
+          transform: scale(0.3);
+        }
+        to {
+          transform: scale(0.5);
+        }
+      }
+      .global-loader-anim {
+        height: 450px;
+        animation: logoloader 1.5s alternate infinite ease-in;
+      }
+    </style>
+    <div id="loader" class="global-loader">
+      <div class="global-loader-anim">
+        <img src="./logo512.png" height="100%" />
+      </div>
+    </div>
     <script>
       setTimeout(() => {
         const incompatibleBrowserElement = document.getElementById('incompatible-browser');

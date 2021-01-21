@@ -2,6 +2,8 @@ import {ChainId} from '@uniswap/sdk';
 import {ethers} from "ethers";
 import ERC20_ABI from '../abis/ERC20.json';
 import {CurrencySymbol} from "./types";
+import { defaultProvider } from '../web3Providers';
+import { amountToDecimal } from '../numbers';
 
 export enum CurrencyType {
   FIAT = 'FIAT',
@@ -42,7 +44,7 @@ export abstract class Currency {
   }
 
   get name(): string {
-    return this._name || this.symbol;
+    return this._name || '';
   }
 
   toObject(): CurrencyObject {
@@ -85,11 +87,16 @@ export class TokenCurrency extends Currency {
     );
   }
 
-  getContract(provider: ethers.providers.BaseProvider) {
+  getContract(provider: ethers.providers.BaseProvider = defaultProvider) {
     if(!this.contract) {
       this.contract = new ethers.Contract(this.address, ERC20_ABI, provider);
     }
     return this.contract;
+  }
+
+  async fetchBalance(tokenHolder) {
+    const tokenBalance = await this.getContract().balanceOf(tokenHolder);
+    return amountToDecimal(tokenBalance.toString(), this.decimals);
   }
 
   toObject(): CurrencyObject {
@@ -118,3 +125,5 @@ export function createFromCurrencyObject(currencyObject: CurrencyObject): Curren
       throw new Error('unknown currency type')
   }
 }
+
+export type CurrenciesMap = Record<CurrencySymbol, Currency>;

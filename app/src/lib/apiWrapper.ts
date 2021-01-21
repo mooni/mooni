@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
 import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
-import { MooniOrder, TransactionHash, User, UUID } from '../types/api';
+import { MooniOrder, Stats, TransactionHash, User, UUID } from '../types/api';
 import {APIError} from "./errors";
 
 interface IAPI {
@@ -11,6 +11,7 @@ interface IAPI {
   getOrders(jwsToken: string): Promise<MooniOrder[]>;
   getUser(jwsToken: string): Promise<User>;
   setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User>;
+  getStats(): Promise<Stats>;
 }
 
 const API_URL = '/api';
@@ -128,7 +129,15 @@ const ApiWrapper: IAPI = {
     });
 
     return data;
-  }
+  },
+  async getStats(): Promise<Stats> {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      url: 'stats',
+    });
+
+    return data;
+  },
 };
 
 export default ApiWrapper;
