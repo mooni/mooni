@@ -22,6 +22,7 @@ const SubContent = styled.p`
 export default function ReferralInfo() {
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
 
   return (
     <>
@@ -29,7 +30,7 @@ export default function ReferralInfo() {
         Earn cryptocurrency by sharing this referral link:
       </Content>
       <TextCopy
-        value={`${window.location.origin}?referralId=${user.referralId}`}
+        value={referralURL}
       />
       <SubContent>
         You can earn money by referring other people to use Mooni ! Any completed order referred by you will make you earn {config.referralSharing * 100}% profit sharing.

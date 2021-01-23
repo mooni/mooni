@@ -74,7 +74,7 @@ export default function Support() {
         I have referred users to use Mooni, how can I get a profit sharing ?
       </FaqSection>
       <Content>
-        To be able to earn profit sharing, referred user must have successfully completed orders. If they did, please contact our support to know your available balance and ask for a withdrawal. This is a new feature, and automatic withdrawal request will be available once there is enough demand.
+        To be able to earn profit sharing, referred user must have successfully completed orders. If they did, please contact our support to know your available balance and ask for a withdrawal. This is a new feature, and automatic withdrawal request will be available once there is enough demand. Payments will be made in Ether (ETH) currency.
       </Content>
 
       <SubTitle>

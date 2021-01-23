@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Box, List, ListItem } from '@material-ui/core';
 import {
@@ -26,6 +26,7 @@ import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
 import { watchBityOrder } from '../../redux/payment/actions';
+import {selectUser} from "../../redux/user/userSlice";
 
 const Title = styled.p`
   ${textStyle('title3')};
@@ -96,7 +97,9 @@ function PaymentOngoingInfo({ payment }) {
 }
 
 function PaymentSuccessInfo() {
-  const tweetURL = "https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=https://app.mooni.tech&hashtags=defi,offramp,crypto";
+  const user = useSelector(selectUser);
+  const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
+  const tweetURL = `https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=${referralURL}&hashtags=defi,offramp,crypto`;
 
   return (
     <Box width={1}>
@@ -105,11 +108,17 @@ function PaymentSuccessInfo() {
       </SubTitle>
       <Hint>
         The payment is complete and the bank transfer have been sent. <br/>
-        Funds will arrive in you bank account between one hour and one/two days from now, depending on your bank.
+        Funds will arrive in your bank account between one hour and four days from now, depending on your bank.
       </Hint>
-      <Box display="flex" justifyContent="center">
+      <Box display="flex" justifyContent="center" mb={1}>
         <SimpleLink href={tweetURL} external>Spread the love <span role="img" aria-label="love">❤️</span></SimpleLink>
       </Box>
+      <Hint>
+        <b>Bonus</b> 🎁
+      </Hint>
+      <Hint>
+        Orders made with your referral link will make you earn profit sharing !
+      </Hint>
     </Box>
   )
 }
