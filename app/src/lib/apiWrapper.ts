@@ -17,9 +17,25 @@ interface IAPI {
 const API_URL = '/api';
 const mooniAPI = axios.create({
   baseURL: API_URL,
-  timeout: 9.9 * 1000,
+  timeout: 30 * 1000,
 });
+
+/*
 const RETRY_ATTEMPTS = 3;
+
+async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 1) {
+  try {
+    return await mooniAPICatcher(config);
+  }
+  catch (error) {
+    if(error.message === 'timeout' && attempt < RETRY_ATTEMPTS) {
+      console.log('timeout retry', config)
+      return await mooniAPIRetryer(config, attempt+1);
+    }
+    throw error;
+  }
+}
+*/
 
 async function mooniAPICatcher(config: AxiosRequestConfig) {
   try {
@@ -40,19 +56,6 @@ async function mooniAPICatcher(config: AxiosRequestConfig) {
     } else {
       throw new APIError(500, 'unexpected-server-error', '', error);
     }
-  }
-}
-
-async function mooniAPIRetryer(config: AxiosRequestConfig, attempt: number = 1) {
-  try {
-    return await mooniAPICatcher(config);
-  }
-  catch (error) {
-    if(error.message === 'timeout' && attempt < RETRY_ATTEMPTS) {
-      console.log('timeout retry', config)
-      return await mooniAPIRetryer(config, attempt+1);
-    }
-    throw error;
   }
 }
 
