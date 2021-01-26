@@ -28,6 +28,8 @@ export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promis
   } catch(error) {
     if(error instanceof MetaError && error.message === 'dex-liquidity-error') {
       throw new APIError(417, 'dex-liquidity-error', 'not enough liquidity for token', error.meta);
+    } else {
+      throw error;
     }
   }
 
