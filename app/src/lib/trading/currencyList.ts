@@ -8,5 +8,5 @@ export const cryptoCurrencies: CryptoCurrency[] = CryptoCurrenciesDefault.map(cr
 
 export const ETHER = cryptoCurrencies.find(c => c.symbol === 'ETH') as CryptoCurrency;
 
-export const DEFAULT_INPUT_CURRENCY: CurrencySymbol = 'DAI';
+export const DEFAULT_INPUT_CURRENCY: CurrencySymbol = 'ETH';
 export const DEFAULT_OUTPUT_CURRENCY: CurrencySymbol = 'EUR';
