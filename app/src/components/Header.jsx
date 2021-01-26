@@ -42,6 +42,7 @@ const useStyles = makeStyles(theme => ({
   alpha: {
     textTransform: 'uppercase',
     position: 'relative',
+    color: '#18b37b',
     fontSize: 9,
     top: -13,
     right: -3,
@@ -60,7 +61,7 @@ export default function Header() {
           MOONI
         </h1>
         <span className={classes.alpha}>
-          alpha
+          beta
         </span>
       </Link>
       <Box className={classes.element}>
