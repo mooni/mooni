@@ -82,6 +82,7 @@ const DIDManager = {
     }
     let signerAddress;
     try {
+      if(!signature) throw new Error('no signature found in token')
       signerAddress = utils.verifyMessage(serializedClaim, signature);
     } catch (error) {
       console.error(error);

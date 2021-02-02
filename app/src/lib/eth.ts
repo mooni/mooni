@@ -26,12 +26,13 @@ export default class ETHManager {
   }
 
   static async create(ethereum) {
-    const walletNetworkId = new BN(ethereum.chainId);
-    if(!walletNetworkId.eq(chainId)) {
-      throw new MetaError('eth_wrong_network_id', { expectedNetworkId: chainId, walletNetworkId: walletNetworkId.toFixed() });
+    const ethManager = new ETHManager(ethereum);
+    const walletChainId = await ethManager.provider.send('eth_chainId', []);
+    const walletChainIdBN = new BN(walletChainId);
+    if(!walletChainIdBN.eq(chainId)) {
+      throw new MetaError('eth_wrong_network_id', { expectedChainId: chainId, walletChainId: walletChainIdBN.toFixed() });
     }
 
-    const ethManager = new ETHManager(ethereum);
     await ethManager.provider.send('eth_requestAccounts', []);
     await ethManager.updateAccounts();
 
@@ -64,7 +65,7 @@ export default class ETHManager {
   }
 
   close() {
-    if(this.ethereum.on) {
+    if(this.ethereum.on && this.ethereum.removeAllListeners) {
       this.ethereum.removeAllListeners();
     }
     if(this.ethereum.close) {
@@ -103,6 +104,18 @@ export function getEtherscanAddressURL(address: string) {
 export function getEtherscanTxURL(hash: string) {
   return `https://etherscan.io/tx/${hash}`;
 }
+
+/*
+const getMethods = (obj) => {
+  let properties = new Set()
+  let currentObj = obj
+  do {
+    Object.getOwnPropertyNames(currentObj).map(item => properties.add(item))
+  } while ((currentObj = Object.getPrototypeOf(currentObj)))
+  // @ts-ignore
+  return [...properties.keys()].filter(item => typeof obj[item] === 'function')
+}
+*/
 
 export async function shittySigner(provider: providers.Web3Provider, rawMessage: string) {
   if(provider.provider instanceof WalletConnectProvider) {
