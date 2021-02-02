@@ -65,7 +65,7 @@ export default class ETHManager {
   }
 
   close() {
-    if(this.ethereum.on && this.ethereum.removeAllListeners) {
+    if(this.ethereum.on) {
       this.ethereum.removeAllListeners();
     }
     if(this.ethereum.close) {
