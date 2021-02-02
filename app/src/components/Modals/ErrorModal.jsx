@@ -14,6 +14,10 @@ const networkName = {
   42: 'Kovan',
 };
 
+function getNetworkName(chainId) {
+  return networkName[chainId] || chainId;
+}
+
 function getErrorTitle(error) {
   switch(error?.message) {
     case 'eth_smart_account_not_supported':
@@ -37,7 +41,7 @@ function getErrorContent(error) {
     case 'eth_smart_account_not_supported':
       return 'We currently do not support smart account wallets such as Argent or Gnosis Safe.';
     case 'eth_wrong_network_id':
-      return `Your wallet is on a wrong network. Please switch to ${networkName[error.meta.networkId]}.`;
+      return `Your wallet is on a wrong network (${getNetworkName(error.meta.walletNetworkId)}). Please switch to ${getNetworkName(error.meta.expectedNetworkId)}.`;
     case 'no_ethereum_provider':
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
     case 'unable_open_wallet':

@@ -26,8 +26,9 @@ export default class ETHManager {
   }
 
   static async create(ethereum) {
-    if(!new BN(ethereum.chainId).eq(chainId)) {
-      throw new MetaError('eth_wrong_network_id', { networkId: chainId });
+    const walletNetworkId = new BN(ethereum.chainId);
+    if(!walletNetworkId.eq(chainId)) {
+      throw new MetaError('eth_wrong_network_id', { expectedNetworkId: chainId, walletNetworkId: walletNetworkId.toFixed() });
     }
 
     const ethManager = new ETHManager(ethereum);
