@@ -6,7 +6,7 @@ import LogRocket from 'logrocket';
 import config from '../config';
 import { serializeError } from './errors';
 
-if(process.env.NODE_ENV === 'production') { // TODO config.ENABLE_ANALYTICS
+if(process.env.NODE_ENV === 'production' && config.enableAnalytics) {
   LogRocket.init(
     config.logRocketId,
     {
