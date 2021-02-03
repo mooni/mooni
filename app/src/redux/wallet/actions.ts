@@ -71,6 +71,7 @@ const onAccountChanged = () => (dispatch, getState) => {
       dispatch(setWalletStatus(WalletStatus.CONNECTED));
     })
     .catch(error => {
+      logError('error while getting JWS', error);
       dispatch(logout());
 
       if(error.code === 4001) {

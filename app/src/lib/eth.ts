@@ -5,6 +5,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import config from '../config';
 import { MetaError } from './errors';
 import {BN} from "./numbers";
+import { ExternalProvider } from '@ethersproject/providers';
 
 const { chainId } = config;
 
@@ -12,20 +13,27 @@ function reloadPage() {
   window.location.reload()
 }
 
+interface ExtendedExternalProvider extends ExternalProvider {
+  on?: any;
+  removeAllListeners?: () => void;
+  close?: () => void;
+  isStatus?: Boolean;
+}
+
 export default class ETHManager {
-  ethereum: any;
+  ethereum: ExtendedExternalProvider;
   provider: ethers.providers.Web3Provider;
   isContract: boolean= false;
   accounts: string[] = [];
   events: EventEmitter;
 
-  constructor(ethereum) {
+  constructor(ethereum: ExtendedExternalProvider) {
     this.events = new EventEmitter();
     this.ethereum = ethereum;
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
   }
 
-  static async create(ethereum) {
+  static async create(ethereum: ExtendedExternalProvider) {
     const ethManager = new ETHManager(ethereum);
     const walletChainId = await ethManager.provider.send('eth_chainId', []);
     const walletChainIdBN = new BN(walletChainId);
@@ -42,7 +50,7 @@ export default class ETHManager {
       throw new MetaError('eth_smart_account_not_supported');
     }
 
-    if (ethManager.ethereum.on) {
+    if (ethManager.ethereum.on && !ethereum.isStatus) {
       ethManager.ethereum.on('accountsChanged', ethManager.updateAccounts.bind(ethManager));
       ethManager.ethereum.on('networkChanged', reloadPage);
       ethManager.ethereum.on('chainChanged', reloadPage);
@@ -65,7 +73,7 @@ export default class ETHManager {
   }
 
   close() {
-    if(this.ethereum.on) {
+    if(this.ethereum.on && this.ethereum.removeAllListeners && !this.ethereum.isStatus) {
       this.ethereum.removeAllListeners();
     }
     if(this.ethereum.close) {
@@ -131,8 +139,22 @@ export async function shittySigner(provider: providers.Web3Provider, rawMessage:
       keccakMessage,
     ]);
     return signature;
+  } else if((provider.provider as ExtendedExternalProvider).isStatus) {
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+
+    const eth = provider.provider;
+    // @ts-ignore
+    const signature = await eth.request({
+      method: 'personal_sign', params: [
+        address.toLowerCase(),
+        rawMessage,
+      ]
+    });
+    return signature;
   } else {
     const signer = provider.getSigner();
-    return await signer.signMessage(rawMessage);
+    const signature = await signer.signMessage(rawMessage);
+    return signature;
   }
 }
