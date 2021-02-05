@@ -115,7 +115,6 @@ const providerOptions = {
           'rainbow',
           'metamask',
           'trust',
-          'pillar',
         ],
       },
     },
