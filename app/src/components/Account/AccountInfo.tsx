@@ -8,7 +8,7 @@ import { ExitToApp } from '@material-ui/icons';
 
 import {ShadowBox, SimpleLink} from "../UI/StyledComponents";
 
-import { getAddress, getProviderFromIframe, getShortAddress } from '../../redux/wallet/selectors';
+import { getAddress, getShortAddress } from '../../redux/wallet/selectors';
 import { logout } from '../../redux/wallet/actions';
 import { selectENS } from '../../redux/user/userSlice';
 import { getEtherscanAddressURL } from '../../lib/eth';
@@ -33,7 +33,6 @@ export default function AccountInfo() {
   const address = useSelector(getAddress);
   const shortenAddress = useSelector(getShortAddress);
   const ens = useSelector(selectENS);
-  const providerFromIframe = useSelector(getProviderFromIframe);
 
   function onLogout() {
     dispatch(logout());
@@ -47,7 +46,7 @@ export default function AccountInfo() {
           <AddressText variant="caption" align="center">{below('medium') ? shortenAddress : address} {ens &&  <i>({ens})</i>}</AddressText>
         </SimpleLink>
       </BadgeBox>
-      {!providerFromIframe && <Button icon={<ExitToApp />} mode="negative" size="small" label="Disconnect" onClick={onLogout} />}
+      <Button icon={<ExitToApp />} mode="negative" size="small" label="Disconnect" onClick={onLogout} />
     </Box>
   );
 }

@@ -7,11 +7,16 @@ const DEFAULT_TARGET_ORIGIN = '*';
 // By default timeout is 60 seconds
 const DEFAULT_TIMEOUT_MILLISECONDS = 60000;
 
+const IFRAME_PROVIDER_DOMAIN = 'IFRAME_PROVIDER';
 const JSON_RPC_VERSION = '2.0';
 
 // The interface for the source of the events, typically the window.
 export interface MinimalEventSourceInterface {
   addEventListener(
+    eventType: 'message',
+    handler: (message: MessageEvent) => void
+  ): void;
+  removeEventListener(
     eventType: 'message',
     handler: (message: MessageEvent) => void
   ): void;
@@ -63,12 +68,14 @@ interface JsonRpcRequestMessage<TParams = any> {
   id?: MessageId;
   method: string;
   params?: TParams;
+  domain: string;
 }
 
 interface BaseJsonRpcResponseMessage {
   // Required but null if not identified in request
   id: MessageId;
   jsonrpc: '2.0';
+  domain: string;
 }
 
 interface JsonRpcSucessfulResponseMessage<TResult = any>
@@ -170,7 +177,7 @@ export class IFrameEthereumProvider extends EventEmitter<
 
   private enabled: Promise<string[]> | null = null;
   private readonly targetOrigin: string;
-  private readonly timeoutMilliseconds: number;
+  timeoutMilliseconds: number;
   private readonly eventSource: MinimalEventSourceInterface;
   private readonly eventTarget: MinimalEventTargetInterface;
   private readonly completers: {
@@ -211,6 +218,7 @@ export class IFrameEthereumProvider extends EventEmitter<
     const payload: JsonRpcRequestMessage = {
       jsonrpc: JSON_RPC_VERSION,
       id,
+      domain: IFRAME_PROVIDER_DOMAIN,
       method,
       ...(typeof params === 'undefined' ? null : { params }),
     };
@@ -328,7 +336,7 @@ export class IFrameEthereumProvider extends EventEmitter<
     const message = data as ReceivedMessageType;
 
     // Always expect jsonrpc to be set to '2.0'
-    if (message.jsonrpc !== JSON_RPC_VERSION) {
+    if (message.jsonrpc !== JSON_RPC_VERSION || message.domain !== IFRAME_PROVIDER_DOMAIN) {
       return;
     }
 
@@ -410,34 +418,33 @@ export class IFrameEthereumProvider extends EventEmitter<
     this.enabled = Promise.resolve(accounts);
     this.emit('accountsChanged', accounts);
   }
+
+  close() {
+    this.eventSource.removeEventListener('message', this.handleEventSourceMessage);
+  }
 }
 
 export function isIframe(): boolean {
   return window && window.parent && window.self && window.parent !== window.self;
 }
 
-export function detectIframeWeb3Provider(): Promise<boolean> {
+export function detectIframeWeb3Provider(): Promise<IFrameEthereumProvider | null> {
   return new Promise(resolve => {
+    if(!isIframe()) return resolve(null);
 
-    function listener(e) {
-      if(e?.data?.jsonrpc === '2.0' && e?.data?.id === 'detect-web3-iframe') {
-        resolve(true);
-        window.removeEventListener('message', listener);
-      }
-    }
-    window.addEventListener('message', listener);
+    const provider = new IFrameEthereumProvider();
+    provider.timeoutMilliseconds = 1000;
 
-    window.parent.postMessage({
-      id: 'detect-web3-iframe',
-      jsonrpc: '2.0',
-      method: 'web3_clientVersion'
-    }, '*');
-
-    setTimeout(() => {
-      resolve(false);
-      window.removeEventListener('message', listener);
-    }, 1000);
+    provider.request({
+      method: 'mooni_handshake',
+    }).then(result => {
+      if(result !== 'ok') { throw new Error('unexpected handshake response') }
+      provider.timeoutMilliseconds = DEFAULT_TIMEOUT_MILLISECONDS;
+      resolve(provider);
+    }).catch(() => {
+      provider.close();
+      resolve(null);
+    });
 
   });
 }
-

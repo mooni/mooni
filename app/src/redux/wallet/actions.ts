@@ -9,7 +9,7 @@ import {store} from '../../lib/store';
 import {WalletStatus} from "./state";
 import { fetchUser, resetUser } from '../user/userSlice';
 import { identify } from '../../lib/analytics';
-import { isIframe, detectIframeWeb3Provider, IFrameEthereumProvider } from '../../lib/iFrameProvider';
+import { detectIframeWeb3Provider } from '../../lib/iFrameProvider';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -17,7 +17,7 @@ export const SET_ADDRESS = 'SET_ADDRESS';
 export const SET_JWS = 'SET_JWS';
 export const SET_PROVIDER_FROM_IFRAME = 'SET_PROVIDER_FROM_IFRAME';
 
-const setETHManager = (ethManager: ETHManager | null) => ({
+const setETHManager = (ethManager: ETHManager | null) => ({
   type: SET_ETH_MANAGER,
   payload: {
     ethManager,
@@ -31,14 +31,14 @@ const setWalletStatus = (walletStatus: WalletStatus) => ({
   }
 });
 
-const setAddress = (address: string | null) => ({
+const setAddress = (address: string | null) => ({
   type: SET_ADDRESS,
   payload: {
     address,
   }
 });
 
-export const setJWS = (jwsToken: string | null) => ({
+export const setJWS = (jwsToken: string | null) => ({
   type: SET_JWS,
   payload: {
     jwsToken,
@@ -157,15 +157,12 @@ export const logout = () => (dispatch, getState) => {
 };
 
 export const autoConnect = () => async (dispatch) => {
-  if (isIframe()) {
-    dispatch(setWalletStatus(WalletStatus.LOADING));
-    const iFrameProvider = await detectIframeWeb3Provider();
-    if(iFrameProvider) {
-      const ethereum = new IFrameEthereumProvider();
-      await dispatch(login(ethereum));
-      dispatch(setProviderFromIframe(true));
-      return;
-    }
+  dispatch(setWalletStatus(WalletStatus.LOADING));
+  const iFrameProvider = await detectIframeWeb3Provider();
+  if(iFrameProvider) {
+    await dispatch(login(iFrameProvider));
+    dispatch(setProviderFromIframe(true));
+    return;
   }
   if (web3Modal.cachedProvider) {
     await dispatch(login());
