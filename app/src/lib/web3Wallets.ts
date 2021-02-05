@@ -1,7 +1,5 @@
 import Web3Modal from 'web3modal';
 
-import Fortmatic from 'fortmatic';
-import Portis from '@portis/web3';
 import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import ProviderEngine from 'web3-provider-engine';
@@ -51,11 +49,13 @@ export async function getWalletProvider(walletType) {
 
       return engine;
     }
+    /*
     case 'Portis': {
       const portis = new Portis(portisAppId, 'mainnet');
       portis.provider.enable = defaultProviderEnable(portis.provider);
       return portis.provider;
     }
+    */
     default: {
       throw new Error('wallet-provider-not-supported')
     }
@@ -120,6 +120,7 @@ const providerOptions = {
       },
     },
   },
+  /*
   portis: {
     package: Portis,
     options: {
@@ -132,6 +133,7 @@ const providerOptions = {
       key: fortmaticId
     }
   }
+  */
 };
 
 export const web3Modal = new Web3Modal({
