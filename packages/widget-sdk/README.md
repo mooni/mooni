@@ -28,7 +28,7 @@ mooni.open();
 
 ### 📺 Example apps
 
-An [example app](https://mooni-widget-example.now.sh) including Mooni widget have been published to let you try it out.
+An [example app](https://integration-example.mooni.tech) including Mooni widget have been published to let you try it out.
 
 We also provided some [code examples](../example-host) that includes Mooni widget. You can also check the [Burner Wallet integration](../burner-plugin/src/ui/MooniPage.tsx) for a more advanced use case.
 
@@ -41,9 +41,9 @@ Instanciate a Mooni widget.
 
 `opts.containerElement`: Include Mooni inside of an HTML element on your website. If not set, the widget will appear as a modal.
 
-`opts.web3Provider`: Use your own connected web3 provider.
+`opts.ethereum`: A standard JSON-RPC provider. This is useful if the hosting app already authenticated the web3 wallet of the user, so he doesn't have to login again on Mooni.
 
-`opts.token`: Add a custom token to the list of input currencies. This must be the address of the contract and the token must be available on Uniswap.
+`opts.token`: Automatically select a token to sell in Mooni.
 
 #### If used as a modal:
 - `mooni.open()`  
