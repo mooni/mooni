@@ -3,6 +3,10 @@ import modalStyles from './modalStyles';
 
 const defaultAppUrl = 'http://localhost:3000';
 
+// TODO common package
+const IFRAME_PROVIDER_DOMAIN = 'IFRAME_PROVIDER';
+const JSON_RPC_VERSION = '2.0';
+
 export interface MooniWidgetOptions {
   containerElement?: HTMLElement;
   appUrl?: string;
@@ -144,13 +148,13 @@ class MooniWidget {
     const appOrigin = new UrlParse(this.appUrl).origin;
 
     const web3MessageListener = (e: any) => {
-      if (e.data && e.data.jsonrpc === '2.0' && e.data.domain === 'IFRAME_PROVIDER') {
+      if (e.data && e.data.jsonrpc === JSON_RPC_VERSION && e.data.domain === IFRAME_PROVIDER_DOMAIN) {
         if(e.data.method === 'mooni_handshake') {
           this.iframeElement!.contentWindow!.postMessage(
             {
               id: e.data.id,
-              jsonrpc: '2.0',
-              domain: 'IFRAME_PROVIDER',
+              jsonrpc: JSON_RPC_VERSION,
+              domain: IFRAME_PROVIDER_DOMAIN,
               result: 'ok',
             },
             appOrigin
@@ -161,8 +165,8 @@ class MooniWidget {
         this.forwardWeb3Message(e.data, (error: any, result: any) => {
           const message: any = {
             id: e.data.id,
-            jsonrpc: '2.0',
-            domain: 'IFRAME_PROVIDER',
+            jsonrpc: JSON_RPC_VERSION,
+            domain: IFRAME_PROVIDER_DOMAIN,
             result,
           };
 
