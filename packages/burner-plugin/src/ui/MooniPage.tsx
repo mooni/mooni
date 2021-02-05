@@ -18,7 +18,7 @@ const MooniPage: React.FC<PluginPageContext> = ({ burnerComponents, plugin }) =>
 
     new MooniWidget({
       containerElement: container,
-      web3Provider: _plugin.getWeb3Provider(),
+      ethereum: _plugin.getWeb3Provider(),
       appUrl: _plugin.appUrl,
     });
 

@@ -1,6 +1,6 @@
 import Web3Modal from 'web3modal';
 
-import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
+import { IFrameEthereumProvider } from './iFrameProvider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import ProviderEngine from 'web3-provider-engine';
 import TransporWebUSB from '@ledgerhq/hw-transport-webusb';
@@ -18,19 +18,13 @@ function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
 }
 
-function defaultProviderEnable(_) {
-  return async () => [];
-}
-
 export async function getWalletProvider(walletType) {
   switch (walletType) {
     case 'injected': {
       return window.ethereum;
     }
     case 'iframe': {
-      const provider = new IFrameEthereumProvider();
-      provider.enable = defaultProviderEnable(provider);
-      return provider;
+      return new IFrameEthereumProvider();
     }
     case 'WalletConnect': {
       return new WalletConnectProvider({
@@ -44,7 +38,6 @@ export async function getWalletProvider(walletType) {
 
       engine.addProvider(ledger);
       engine.addProvider(new RpcSubprovider({rpcUrl: getInfuraUrl(infuraId)}));
-      engine.enable = defaultProviderEnable(engine);
       engine.start();
 
       return engine;
@@ -60,34 +53,6 @@ export async function getWalletProvider(walletType) {
       throw new Error('wallet-provider-not-supported')
     }
   }
-}
-
-export function detectIframeWeb3Provider() {
-  return new Promise(resolve => {
-
-    const isIframe = window && window.parent && window.self && window.parent !== window.self;
-    if(!isIframe) return resolve(false);
-
-    function listener(e) {
-      if(e?.data?.jsonrpc === '2.0' && e?.data?.id === 'detect-web3-iframe') {
-        resolve(true);
-        window.removeEventListener('message', listener);
-      }
-    }
-    window.addEventListener('message', listener);
-
-    window.parent.postMessage({
-      id: 'detect-web3-iframe',
-      jsonrpc: '2.0',
-      method: 'web3_clientVersion'
-    }, '*');
-
-    setTimeout(() => {
-      resolve(false);
-      window.removeEventListener('message', listener);
-    }, 1000);
-
-  });
 }
 
 export function detectWalletError(error) {

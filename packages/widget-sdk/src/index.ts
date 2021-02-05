@@ -1,13 +1,34 @@
 import UrlParse from 'url-parse';
 import modalStyles from './modalStyles';
 
-const defaultAppUrl = 'https://app.mooni.tech/exchange';
+const defaultAppUrl = 'http://localhost:3000';
 
-interface MooniWidgetOptions {
+// TODO common package
+const IFRAME_PROVIDER_DOMAIN = 'IFRAME_PROVIDER';
+const JSON_RPC_VERSION = '2.0';
+
+export interface MooniWidgetOptions {
   containerElement?: HTMLElement;
   appUrl?: string;
-  web3Provider?: any;
+  ethereum?: any;
   token?: string;
+}
+
+export interface ExternalProvider {
+  isMetaMask?: boolean;
+  isStatus?: boolean;
+  sendAsync?: (request: {
+    method: string;
+    params?: Array<any>;
+  }, callback: (error: any, response: any) => void) => void;
+  send?: (request: {
+    method: string;
+    params?: Array<any>;
+  }, callback: (error: any, response: any) => void) => void;
+  request?: (request: {
+    method: string;
+    params?: Array<any>;
+  }) => Promise<any>;
 }
 
 class MooniWidget {
@@ -19,7 +40,7 @@ class MooniWidget {
   private modalContainer?: HTMLDivElement;
   private appUrl: string;
   private customToken?: string;
-  private web3Provider?: any;
+  private ethereum?: ExternalProvider;
 
   constructor(opts: MooniWidgetOptions = {}) {
 
@@ -31,13 +52,13 @@ class MooniWidget {
       this.createModal();
     }
 
-    this.appUrl = opts.appUrl || defaultAppUrl;
+    this.appUrl = opts.appUrl || defaultAppUrl;
     this.customToken = opts.token;
 
     this.createIframe();
 
-    if(opts.web3Provider) {
-      this.web3Provider = opts.web3Provider;
+    if(opts.ethereum) {
+      this.ethereum = opts.ethereum;
       this.listenWeb3Messages();
     }
 
@@ -73,7 +94,6 @@ class MooniWidget {
 
     this.iframeElement = document.createElement('iframe');
 
-    this.iframeElement.src = this.getAppUrl();
     this.iframeElement.style.flex = '1';
     this.iframeElement.style.border = '0 transparent';
 
@@ -87,7 +107,9 @@ class MooniWidget {
   }
 
   public open() {
-
+    if(!this.iframeElement!.src) {
+      this.iframeElement!.src = this.getAppUrl();
+    }
     if(this.isModal) {
       this.modalContainer!.style.display = 'flex';
     }
@@ -113,36 +135,48 @@ class MooniWidget {
 
   private forwardWeb3Message(rawmessage: string, callback: any) {
     const message = JSON.parse(JSON.stringify(rawmessage));
-    this.web3Provider.sendAsync(message, callback);
+    this.ethereum!.request!({
+      method: message.method,
+      params: message.params,
+    })
+      .then(result => callback(null, result))
+      .catch(error => callback(error));
   }
 
   private listenWeb3Messages() {
 
     const appOrigin = new UrlParse(this.appUrl).origin;
 
-    const web3MessageListener = async (e: any) => {
-      if (e.data && e.data.jsonrpc === '2.0') {
+    const web3MessageListener = (e: any) => {
+      if (e.data && e.data.jsonrpc === JSON_RPC_VERSION && e.data.domain === IFRAME_PROVIDER_DOMAIN) {
+        if(e.data.method === 'mooni_handshake') {
+          this.iframeElement!.contentWindow!.postMessage(
+            {
+              id: e.data.id,
+              jsonrpc: JSON_RPC_VERSION,
+              domain: IFRAME_PROVIDER_DOMAIN,
+              result: 'ok',
+            },
+            appOrigin
+          );
+          return;
+        }
 
         this.forwardWeb3Message(e.data, (error: any, result: any) => {
-          if(this.iframeElement!.contentWindow) {
-            if(error) {
-              this.iframeElement!.contentWindow.postMessage({
-                  ...result,
-                  id: e.data.id,
-                  error,
-                },
-                appOrigin
-              );
-            } else {
-              this.iframeElement!.contentWindow.postMessage(
-                {
-                  ...result,
-                  id: e.data.id,
-                },
-                appOrigin
-              );
-            }
+          const message: any = {
+            id: e.data.id,
+            jsonrpc: JSON_RPC_VERSION,
+            domain: IFRAME_PROVIDER_DOMAIN,
+            result,
+          };
+
+          if(error) {
+            message.error = error;
           }
+          this.iframeElement!.contentWindow!.postMessage(
+            message,
+            appOrigin
+          );
         });
 
       }
