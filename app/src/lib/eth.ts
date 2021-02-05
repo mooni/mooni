@@ -125,36 +125,22 @@ const getMethods = (obj) => {
 }
 */
 
-export async function shittySigner(provider: providers.Web3Provider, rawMessage: string) {
-  if(provider.provider instanceof WalletConnectProvider) {
-    const rawMessageLength = new Blob([rawMessage]).size
-    const message = ethers.utils.toUtf8Bytes("\x19Ethereum Signed Message:\n" + rawMessageLength + rawMessage)
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    const keccakMessage = ethers.utils.keccak256(message);
+export async function signerHelper(provider: providers.Web3Provider, rawMessage: string) {
+  const ethereum = provider.provider as ExtendedExternalProvider;
+  const signer = provider.getSigner();
+  const address = await signer.getAddress();
 
-    const wc = provider.provider as WalletConnectProvider;
-    const signature = await wc.connector.signMessage([
-      address.toLowerCase(),
-      keccakMessage,
-    ]);
-    return signature;
-  } else if((provider.provider as ExtendedExternalProvider).isStatus) {
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-
-    const eth = provider.provider;
-    // @ts-ignore
-    const signature = await eth.request({
-      method: 'personal_sign', params: [
-        address.toLowerCase(),
-        rawMessage,
-      ]
-    });
-    return signature;
-  } else {
-    const signer = provider.getSigner();
-    const signature = await signer.signMessage(rawMessage);
-    return signature;
+  let params = [
+    rawMessage,
+    address.toLowerCase(),
+  ];
+  if(ethereum.isMetaMask) {
+    params = [params[1], params[0]];
   }
+  // @ts-ignore
+  const signature = await ethereum.request({
+    method: 'personal_sign',
+    params,
+  });
+  return signature;
 }

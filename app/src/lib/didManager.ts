@@ -2,7 +2,7 @@ import { providers, utils } from 'ethers';
 import { Base64 } from 'js-base64';
 import { v4 as uuidv4 } from 'uuid';
 import { store } from './store'
-import { shittySigner } from './eth';
+import { signerHelper } from './eth';
 
 const tokenDuration = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -66,7 +66,7 @@ const DIDManager = {
     };
 
     const serializedClaim = serializeClaim(claim);
-    const signature = await shittySigner(provider, serializedClaim);
+    const signature = await signerHelper(provider, serializedClaim);
 
     return Base64.encode(JSON.stringify([signature, serializedClaim]));
   },
@@ -85,7 +85,6 @@ const DIDManager = {
       if(!signature) throw new Error('no signature found in token')
       signerAddress = utils.verifyMessage(serializedClaim, signature);
     } catch (error) {
-      console.error(error);
       throw new Error('invalid signature');
     }
 

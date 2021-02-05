@@ -1,5 +1,6 @@
 export class MetaError {
   readonly _metaError: boolean = true;
+  readonly name: string = 'MetaError';
   message: string;
   meta: any;
 
@@ -37,14 +38,17 @@ export class APIError extends MetaError {
   }
 }
 
-export function serializeError(error: any) {
-  if(typeof error.toObject === 'function') return error.toObject();
-  const obj = {
-    message: error.message,
-    code: error.code,
-    stack: error.stack?.toString(),
-    ...error,
-  };
-  const ser = JSON.stringify(obj, null, 2);
-  return ser;
+export function serializeError(error: Error | MetaError) {
+  let obj;
+
+  if(error instanceof MetaError) {
+    obj = error.toObject();
+  }  else {
+    obj = {
+      stack: error.stack?.toString(),
+      ...error,
+    };
+  }
+
+  return JSON.stringify(obj, null, 2);
 }
