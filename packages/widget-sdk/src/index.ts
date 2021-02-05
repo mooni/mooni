@@ -1,7 +1,7 @@
 import UrlParse from 'url-parse';
 import modalStyles from './modalStyles';
 
-const defaultAppUrl = 'https://app.mooni.tech/exchange';
+const defaultAppUrl = 'http://localhost:3000';
 
 interface MooniWidgetOptions {
   containerElement?: HTMLElement;
@@ -31,7 +31,7 @@ class MooniWidget {
       this.createModal();
     }
 
-    this.appUrl = opts.appUrl || defaultAppUrl;
+    this.appUrl = opts.appUrl || defaultAppUrl;
     this.customToken = opts.token;
 
     this.createIframe();
@@ -73,7 +73,6 @@ class MooniWidget {
 
     this.iframeElement = document.createElement('iframe');
 
-    this.iframeElement.src = this.getAppUrl();
     this.iframeElement.style.flex = '1';
     this.iframeElement.style.border = '0 transparent';
 
@@ -87,7 +86,9 @@ class MooniWidget {
   }
 
   public open() {
-
+    if(!this.iframeElement!.src) {
+      this.iframeElement!.src = this.getAppUrl();
+    }
     if(this.isModal) {
       this.modalContainer!.style.display = 'flex';
     }

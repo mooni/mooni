@@ -2,13 +2,14 @@ import ETHManager from '../../lib/eth';
 import {setModalError} from '../ui/actions';
 import {getAddress, getETHManager} from './selectors';
 import {logError} from '../../lib/log';
-import {detectIframeWeb3Provider, getWalletProvider, web3Modal} from '../../lib/web3Wallets';
+import { web3Modal } from '../../lib/web3Wallets';
 import {MetaError} from '../../lib/errors';
 import DIDManager from '../../lib/didManager';
 import {store} from '../../lib/store';
 import {WalletStatus} from "./state";
 import { fetchUser, resetUser } from '../user/userSlice';
 import { identify } from '../../lib/analytics';
+import { isIframe, detectIframeWeb3Provider, IFrameEthereumProvider } from '../../lib/iFrameProvider';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -89,11 +90,14 @@ const onAccountChanged = () => (dispatch, getState) => {
     });
 };
 
-export const login = (forcedProvider?) => async function (dispatch)  {
+export const login = (ethereum?) => async function (dispatch)  {
   try {
 
-    dispatch(setWalletStatus(WalletStatus.CHOOSING_WALLET));
-    const ethereum = forcedProvider || await web3Modal.connect();
+    if(!ethereum) {
+      dispatch(setWalletStatus(WalletStatus.CHOOSING_WALLET));
+      ethereum = await web3Modal.connect();
+    }
+    dispatch(setWalletStatus(WalletStatus.LOADING));
     const ethManager = await ETHManager.create(ethereum);
     dispatch(setETHManager(ethManager));
 
@@ -153,13 +157,17 @@ export const logout = () => (dispatch, getState) => {
 };
 
 export const autoConnect = () => async (dispatch) => {
-  const initIframeProvider = await detectIframeWeb3Provider();
-  if (initIframeProvider) {
+  if (isIframe()) {
     dispatch(setWalletStatus(WalletStatus.LOADING));
-    const ethereum = getWalletProvider('iframe');
-    await dispatch(login(ethereum));
-    dispatch(setProviderFromIframe(true));
-  } else if(web3Modal.cachedProvider) {
+    const iFrameProvider = await detectIframeWeb3Provider();
+    if(iFrameProvider) {
+      const ethereum = new IFrameEthereumProvider();
+      await dispatch(login(ethereum));
+      dispatch(setProviderFromIframe(true));
+      return;
+    }
+  }
+  if (web3Modal.cachedProvider) {
     await dispatch(login());
   } else {
     dispatch(setWalletStatus(WalletStatus.DISCONNECTED));
