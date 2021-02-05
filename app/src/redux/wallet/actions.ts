@@ -78,9 +78,10 @@ const onAccountChanged = () => (dispatch, getState) => {
           new MetaError('eth_signature_rejected')
         ));
       } else if(error instanceof MetaError) {
+        logError('Unable to authenticate ethereum wallet (meta)', error);
         dispatch(setModalError(error));
       } else {
-        logError('Unable to open ethereum wallet', error);
+        logError('Unable to authenticate ethereum wallet', error);
         dispatch(setModalError(
           new MetaError('unable_open_wallet', { error })
         ));
@@ -92,7 +93,7 @@ export const login = (forcedProvider?) => async function (dispatch)  {
   try {
 
     dispatch(setWalletStatus(WalletStatus.CHOOSING_WALLET));
-    const ethereum = forcedProvider || await web3Modal.connect();
+    const ethereum = forcedProvider || await web3Modal.connect();
     const ethManager = await ETHManager.create(ethereum);
     dispatch(setETHManager(ethManager));
 

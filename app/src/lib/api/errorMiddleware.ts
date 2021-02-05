@@ -10,7 +10,7 @@ export const errorMiddleware = (fn: Handler): Handler => async (req: NowRequest,
     return await fn(req, res)
 
   } catch(error) {
-    if(error instanceof BityOrderError || error instanceof APIError) {
+    if(error instanceof BityOrderError || error instanceof APIError) {
       return res.status(error.code).json(error.toObject());
     } else {
       console.error(error);

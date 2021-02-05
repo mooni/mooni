@@ -14,6 +14,10 @@ const networkName = {
   42: 'Kovan',
 };
 
+function getNetworkName(chainId) {
+  return networkName[chainId] || chainId;
+}
+
 function getErrorTitle(error) {
   switch(error?.message) {
     case 'eth_smart_account_not_supported':
@@ -27,6 +31,8 @@ function getErrorTitle(error) {
       return 'Requires authentication';
     case 'error-fetching-balances':
       return 'Balances unavailable';
+    case 'error-debug':
+      return 'Debug';
     default:
       return 'Unknown error';
   }
@@ -37,7 +43,7 @@ function getErrorContent(error) {
     case 'eth_smart_account_not_supported':
       return 'We currently do not support smart account wallets such as Argent or Gnosis Safe.';
     case 'eth_wrong_network_id':
-      return `Your wallet is on a wrong network. Please switch to ${networkName[error.meta.networkId]}.`;
+      return `Your wallet is on a wrong network (${getNetworkName(error.meta.walletChainId)}). Please switch to ${getNetworkName(error.meta.expectedChainId)}.`;
     case 'no_ethereum_provider':
       return 'It seems you are not using an ethereum compatible browser. Please install Metamask or use a browser such as Brave.';
     case 'unable_open_wallet':
@@ -48,6 +54,8 @@ function getErrorContent(error) {
       return 'The token address you provided is either invalid or does not exist on Uniswap.';
     case 'error-fetching-balances':
       return 'We could\'nt get token balances of your wallet';
+    case 'error-debug':
+      return JSON.stringify(error.meta, null, 2);
     default:
       return 'We did not expect that error, and will try to fix it soon. Do not hesitate to contact the support to help get this fixed.';
   }

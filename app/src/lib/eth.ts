@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events';
 import { ethers, providers } from 'ethers';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import config from '../config';
 import { MetaError } from './errors';
 import {BN} from "./numbers";
+import { ExternalProvider } from '@ethersproject/providers';
 
 const { chainId } = config;
 
@@ -12,25 +12,34 @@ function reloadPage() {
   window.location.reload()
 }
 
+interface ExtendedExternalProvider extends ExternalProvider {
+  on?: any;
+  removeAllListeners?: () => void;
+  close?: () => void;
+  isStatus?: Boolean;
+}
+
 export default class ETHManager {
-  ethereum: any;
+  ethereum: ExtendedExternalProvider;
   provider: ethers.providers.Web3Provider;
   isContract: boolean= false;
   accounts: string[] = [];
   events: EventEmitter;
 
-  constructor(ethereum) {
+  constructor(ethereum: ExtendedExternalProvider) {
     this.events = new EventEmitter();
     this.ethereum = ethereum;
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
   }
 
-  static async create(ethereum) {
-    if(!new BN(ethereum.chainId).eq(chainId)) {
-      throw new MetaError('eth_wrong_network_id', { networkId: chainId });
+  static async create(ethereum: ExtendedExternalProvider) {
+    const ethManager = new ETHManager(ethereum);
+    const walletChainId = await ethManager.provider.send('eth_chainId', []);
+    const walletChainIdBN = new BN(walletChainId);
+    if(!walletChainIdBN.eq(chainId)) {
+      throw new MetaError('eth_wrong_network_id', { expectedChainId: chainId, walletChainId: walletChainIdBN.toFixed() });
     }
 
-    const ethManager = new ETHManager(ethereum);
     await ethManager.provider.send('eth_requestAccounts', []);
     await ethManager.updateAccounts();
 
@@ -40,7 +49,7 @@ export default class ETHManager {
       throw new MetaError('eth_smart_account_not_supported');
     }
 
-    if (ethManager.ethereum.on) {
+    if (ethManager.ethereum.on && !ethereum.isStatus) {
       ethManager.ethereum.on('accountsChanged', ethManager.updateAccounts.bind(ethManager));
       ethManager.ethereum.on('networkChanged', reloadPage);
       ethManager.ethereum.on('chainChanged', reloadPage);
@@ -63,7 +72,7 @@ export default class ETHManager {
   }
 
   close() {
-    if(this.ethereum.on) {
+    if(this.ethereum.on && this.ethereum.removeAllListeners && !this.ethereum.isStatus) {
       this.ethereum.removeAllListeners();
     }
     if(this.ethereum.close) {
@@ -103,22 +112,34 @@ export function getEtherscanTxURL(hash: string) {
   return `https://etherscan.io/tx/${hash}`;
 }
 
-export async function shittySigner(provider: providers.Web3Provider, rawMessage: string) {
-  if(provider.provider instanceof WalletConnectProvider) {
-    const rawMessageLength = new Blob([rawMessage]).size
-    const message = ethers.utils.toUtf8Bytes("\x19Ethereum Signed Message:\n" + rawMessageLength + rawMessage)
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-    const keccakMessage = ethers.utils.keccak256(message);
+/*
+const getMethods = (obj) => {
+  let properties = new Set()
+  let currentObj = obj
+  do {
+    Object.getOwnPropertyNames(currentObj).map(item => properties.add(item))
+  } while ((currentObj = Object.getPrototypeOf(currentObj)))
+  // @ts-ignore
+  return [...properties.keys()].filter(item => typeof obj[item] === 'function')
+}
+*/
 
-    const wc = provider.provider as WalletConnectProvider;
-    const signature = await wc.connector.signMessage([
-      address.toLowerCase(),
-      keccakMessage,
-    ]);
-    return signature;
-  } else {
-    const signer = provider.getSigner();
-    return await signer.signMessage(rawMessage);
+export async function signerHelper(provider: providers.Web3Provider, rawMessage: string) {
+  const ethereum = provider.provider as ExtendedExternalProvider;
+  const signer = provider.getSigner();
+  const address = await signer.getAddress();
+
+  let params = [
+    rawMessage,
+    address.toLowerCase(),
+  ];
+  if(ethereum.isMetaMask) {
+    params = [params[1], params[0]];
   }
+  // @ts-ignore
+  const signature = await ethereum.request({
+    method: 'personal_sign',
+    params,
+  });
+  return signature;
 }

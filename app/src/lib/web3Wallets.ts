@@ -1,7 +1,5 @@
 import Web3Modal from 'web3modal';
 
-import Fortmatic from 'fortmatic';
-import Portis from '@portis/web3';
 import { IFrameEthereumProvider } from '@ethvault/iframe-provider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import ProviderEngine from 'web3-provider-engine';
@@ -14,7 +12,7 @@ import { logError } from './log';
 import { BityOrderError } from './wrappers/bityTypes';
 import { MetaError } from './errors';
 
-const { infuraId, portisAppId, fortmaticId } = config;
+const { infuraId } = config;
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;
@@ -51,11 +49,13 @@ export async function getWalletProvider(walletType) {
 
       return engine;
     }
+    /*
     case 'Portis': {
       const portis = new Portis(portisAppId, 'mainnet');
       portis.provider.enable = defaultProviderEnable(portis.provider);
       return portis.provider;
     }
+    */
     default: {
       throw new Error('wallet-provider-not-supported')
     }
@@ -115,11 +115,11 @@ const providerOptions = {
           'rainbow',
           'metamask',
           'trust',
-          'pillar',
         ],
       },
     },
   },
+  /*
   portis: {
     package: Portis,
     options: {
@@ -132,6 +132,7 @@ const providerOptions = {
       key: fortmaticId
     }
   }
+  */
 };
 
 export const web3Modal = new Web3Modal({
