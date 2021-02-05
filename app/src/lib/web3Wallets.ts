@@ -12,7 +12,7 @@ import { logError } from './log';
 import { BityOrderError } from './wrappers/bityTypes';
 import { MetaError } from './errors';
 
-const { infuraId, portisAppId, fortmaticId } = config;
+const { infuraId } = config;
 
 function getInfuraUrl(infuraId) {
   return `https://mainnet.infura.io/v3/${infuraId}`;

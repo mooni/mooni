@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events';
 import { ethers, providers } from 'ethers';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import config from '../config';
 import { MetaError } from './errors';
