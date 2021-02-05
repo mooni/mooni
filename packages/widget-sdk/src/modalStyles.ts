@@ -11,26 +11,28 @@ export default `
   padding: 5px;
   justify-content: center;
   align-items: center;
-  padding-top: 23px;
 }
 .mo_mooni-frame {
   position: relative;
   border-radius: 1rem;
   width: 100%;
-  height: 100%;
+  height:700px;
   max-width: 400px;
-  max-height: 600px;
+  max-height: 90%;
   background: #fff;
   display: flex;
 }
 .mo_mooni-closer {
   position: absolute;
-  right: 16px;
-  top: -20px;
+  right: 0;
+  top: -30px;
   cursor: pointer;
-  color: white;
   font-family: sans-serif;
   font-size: 0.8rem;
   font-weight: 400;
+  padding: 4px 12px;
+  color: black;
+  background-color: white;
+  border-radius: 1rem;
 }
 `;
