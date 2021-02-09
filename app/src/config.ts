@@ -10,7 +10,6 @@ interface IConfig {
   logRocketId: string,
   gtagId: string,
   enableAnalytics: boolean,
-  maxOutputAmount: number,
   referralSharing: number,
   discordInviteUrl: string,
   private: {
@@ -43,7 +42,6 @@ const config: IConfig = {
   logRocketId: parseEnv(process.env.REACT_APP_LOG_ROCKET_ID, '282s2e/mooni'),
   enableAnalytics: parseEnv(process.env.REACT_APP_ENABLE_ANALYTICS, false),
   gtagId: parseEnv(process.env.REACT_APP_GTAG_ID, 'UA-68373171-8'),
-  maxOutputAmount: 1000,
   discordInviteUrl: 'https://discord.gg/beq7cBCd2q',
   referralSharing: 0.1,
   private: {

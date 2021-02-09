@@ -7,7 +7,6 @@ import {useSelector, useDispatch} from 'react-redux';
 import {IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
-import config from '../../config';
 import { AmountRow } from './AmountRow';
 
 import {TradeExact, TradeRequest} from '../../lib/trading/types';
@@ -21,6 +20,7 @@ import { useAllowance } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
 import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
+import { outputLimits } from '../../constants/limits';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -138,7 +138,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
           <InvalidMessage key={key}>
             {key === 'lowBalance' && 'You do not have enough funds'}
             {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
-            {key === 'highAmount' && `Maximum amount is ${config.maxOutputAmount} ${rateForm.values.outputCurrency}`}
+            {key === 'highAmount' && `Maximum amount is ${outputLimits[rateForm.values.outputCurrency]} ${rateForm.values.outputCurrency}`}
             {key === 'lowLiquidity' && `There is not enough liquidity for this pair to trade. Please try with another currency.`}
             {key === 'zeroAmount' && `Amount can't be zero`}
             {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
