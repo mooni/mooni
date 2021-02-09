@@ -2,7 +2,7 @@ import React, { Suspense, useMemo } from 'react';
 import {useImage} from 'react-image';
 
 import tokenDefaultImage  from '../../../assets/token_default.svg';
-import CustomCurrencyLogos from '../../../lib/constants/CustomCurrencyLogos';
+import CustomCurrencyLogos from '../../../constants/CustomCurrencyLogos';
 import { Currency, CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
 import { Box } from '@material-ui/core';
 import { ETHER } from '../../../lib/trading/currencyList';

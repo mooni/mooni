@@ -1,7 +1,7 @@
 import {CryptoCurrency, FiatCurrency, createFromCurrencyObject} from './currencyTypes';
 import {CurrencySymbol} from "./types";
-import FiatCurrenciesDefault from "../constants/FiatCurrencies";
-import CryptoCurrenciesDefault from "../constants/CryptoCurrencies";
+import FiatCurrenciesDefault from "../../constants/FiatCurrencies";
+import CryptoCurrenciesDefault from "../../constants/CryptoCurrencies";
 
 export const fiatCurrencies: FiatCurrency[] = FiatCurrenciesDefault.map(createFromCurrencyObject);
 export const cryptoCurrencies: CryptoCurrency[] = CryptoCurrenciesDefault.map(createFromCurrencyObject);

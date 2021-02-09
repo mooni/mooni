@@ -1,4 +1,4 @@
-import {CurrencyObject, CurrencyType} from '../trading/currencyTypes';
+import {CurrencyObject, CurrencyType} from '../lib/trading/currencyTypes';
 import {ChainId} from "@uniswap/sdk";
 
 export default ([] as CurrencyObject[]).concat([
