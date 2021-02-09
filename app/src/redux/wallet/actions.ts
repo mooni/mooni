@@ -8,8 +8,8 @@ import DIDManager from '../../lib/didManager';
 import {store} from '../../lib/store';
 import {WalletStatus} from "./state";
 import { fetchUser, resetUser } from '../user/userSlice';
-import { identify } from '../../lib/analytics';
-import { detectIframeWeb3Provider } from '../../lib/iFrameProvider';
+import { identify, track } from '../../lib/analytics';
+import { detectIframeWeb3Provider, isIframe } from '../../lib/iFrameProvider';
 
 export const SET_WALLET_STATUS = 'SET_WALLET_STATUS';
 export const SET_ETH_MANAGER = 'SET_ETH_MANAGER';
@@ -158,9 +158,13 @@ export const logout = () => (dispatch, getState) => {
 
 export const autoConnect = () => async (dispatch) => {
   dispatch(setWalletStatus(WalletStatus.LOADING));
+  if(isIframe()) {
+    track('loaded from iframe');
+  }
   const iFrameProvider = await detectIframeWeb3Provider();
   if(iFrameProvider) {
     await dispatch(login(iFrameProvider));
+    track('provider loaded from iframe');
     dispatch(setProviderFromIframe(true));
     return;
   }
