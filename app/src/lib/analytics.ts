@@ -4,7 +4,7 @@ import ReactGA from 'react-ga';
 import LogRocket from 'logrocket';
 
 import config from '../config';
-import { serializeError } from './errors';
+import { MetaError } from './errors';
 
 if(process.env.NODE_ENV === 'production' && config.enableAnalytics) {
   LogRocket.init(
@@ -48,7 +48,7 @@ export function captureError(message: string, error: Error) {
   LogRocket.captureMessage(message);
   LogRocket.captureException(error, {
     extra: {
-      serialized: serializeError(error),
+      meta: (error as MetaError).meta,
     },
   });
 }
