@@ -31,4 +31,8 @@ export function truncateNumber(n, sd = SIGNIFICANT_DIGITS) {
   return new BN(n).sd(sd).toFixed();
 }
 
+export function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 export const SIGNIFICANT_DIGITS = 7;

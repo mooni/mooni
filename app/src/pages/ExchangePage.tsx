@@ -8,7 +8,6 @@ import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 import { Box as ABox } from '@aragon/ui'
 
-import RequireConnection from '../components/Utils/RequireConnection';
 import StepNotice from '../components/Payment/StepNotice';
 import StepRecipient from '../components/Payment/StepRecipient';
 import StepPaymentDetail from '../components/Payment/StepPaymentDetail';
@@ -40,6 +39,8 @@ const RoundedBox = styled(ABox)`
   border-radius: 20px;
 `
 
+const steps = ['Amount', 'Recipient', 'Payment Details', 'Notice', 'Order summary'];
+
 export default function ExchangePage() {
   const { currenciesManager } = useCurrenciesContext();
   const classes = useStyles();
@@ -51,10 +52,12 @@ export default function ExchangePage() {
     dispatch(setExchangeStep(stepId + 1));
   }
   function handleBack() {
-    if(stepId === 4) {
-      dispatch(resetOrder());
-    }
     dispatch(setExchangeStep(Math.max(0, stepId - 1)));
+  }
+
+  function handleStartOver() {
+    dispatch(resetOrder());
+    dispatch(setExchangeStep(0));
   }
   function onPrepareRecap() {
     dispatch(createOrder());
@@ -65,48 +68,42 @@ export default function ExchangePage() {
     history.push('/status');
   }
 
-  const steps = ['Amount', 'Recipient', 'Payment Details', 'Notice', 'Order summary'];
   const stepElements = [
     <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
     <StepPaymentDetail onComplete={handleNext} />,
     <StepNotice onComplete={onPrepareRecap} />,
-    <StepRecap onComplete={onSend} />,
+    <StepRecap onComplete={onSend} onStartOver={handleStartOver} />,
   ];
 
   return (
-    <RequireConnection>
-      {() =>
-        <SmallWidth>
-          <RoundedBox>
-            <CustomMobileStepper
-              backButton={null}
-              nextButton={null}
-              activeStep={stepId}
-              steps={stepElements.length}
-              variant="progress"
-              position="static"
-              className={classes.mobileStepperRoot}
-            />
+    <SmallWidth>
+      <RoundedBox>
+        <CustomMobileStepper
+          backButton={null}
+          nextButton={null}
+          activeStep={stepId}
+          steps={stepElements.length}
+          variant="progress"
+          position="static"
+          className={classes.mobileStepperRoot}
+        />
 
-            <Box textAlign="center" className={classes.mobileStepperStepLabel}>
-              {steps[stepId]}
-            </Box>
+        <Box textAlign="center" className={classes.mobileStepperStepLabel}>
+          {steps[stepId]}
+        </Box>
 
-            {stepId !== 0 && <Box mb={2}>
-              <RoundButton
-                wide
-                onClick={handleBack}
-                icon={<ArrowBack/>}
-                label={"Back"}
-                disabled={stepId === 0}
-              />
-            </Box>
-            }
-            {stepElements[stepId]}
-          </RoundedBox>
-        </SmallWidth>
-      }
-    </RequireConnection>
+        {stepId !== 0 && stepId !== 4 && <Box mb={2}>
+          <RoundButton
+            wide
+            onClick={handleBack}
+            icon={<ArrowBack/>}
+            label={"Back"}
+          />
+        </Box>
+        }
+        {stepElements[stepId]}
+      </RoundedBox>
+    </SmallWidth>
   );
 }

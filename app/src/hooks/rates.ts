@@ -12,7 +12,7 @@ import {BityOrderError} from "../lib/wrappers/bityTypes";
 import { APIError } from '../lib/errors';
 import { getETHManager } from '../redux/wallet/selectors';
 
-import { outputLimits } from '../constants/limits';
+import { dailyLimits } from '../constants/limits';
 
 interface RateForm {
   loading: boolean,
@@ -90,7 +90,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     if(!_rateForm.loading) return;
     if(_rateForm.connected && _rateForm.balanceData.balanceLoading) return;
 
-    const outputLimit = outputLimits[_rateForm.values.outputCurrency];
+    const outputLimit = dailyLimits[_rateForm.values.outputCurrency];
 
     const currentRequest: TradeRequest = {
       inputCurrencySymbol: _rateForm.values.inputCurrency,

@@ -5,6 +5,8 @@ import { Box } from '@material-ui/core';
 import { textStyle, Link, GU } from '@aragon/ui';
 import config from '../../config';
 import DiscordIcon from "../../assets/discord_icon.svg";
+import {numberWithCommas} from "../../lib/numbers";
+import {dailyLimits} from "../../constants/limits";
 
 const SubTitle = styled.p`
   ${textStyle('title4')};
@@ -56,7 +58,7 @@ export default function Support() {
         The app say I have reached the limit, what can I do ?
       </FaqSection>
       <Content>
-        Due to our KYC-less process, exchange are subject to limitations approximately equivalent to an amount of 1.000 CHF per day. You can split your transaction among different days. If you think you haven't consumed that much but still cannot checkout in the app, please contact support.
+        Due to our KYC-less process, exchange are subject to limitations approximately equivalent to an amount of {numberWithCommas(dailyLimits['EUR'])} EUR per day. You can split your transaction among different days. If you think you haven't consumed that much but still cannot checkout in the app, please contact support.
       </Content>
       <FaqSection>
         I have sent the payment, but it never get confirmed

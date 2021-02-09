@@ -37,7 +37,7 @@ export default function StepNotice({ onComplete }) {
       </Info>
       <Title>Transfer recipient</Title>
       <Info>
-        You are supposed to send funds to a bank account you own. Do not send funds to a third party or a corporate account.
+        You are supposed to send funds to a bank account you own. Do not send funds to a third party or a corporate account. All the exchanges done within this app are legally regulated under swiss laws, but you are responsible for your own tax fillings.
       </Info>
       <Title>Unsupported banks</Title>
       <Info>

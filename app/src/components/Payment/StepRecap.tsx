@@ -13,39 +13,17 @@ import { setInfoPanel } from '../../redux/ui/actions';
 import {BityTrade, TradeType} from "../../lib/trading/types";
 import { createOrder } from '../../redux/payment/actions'
 import { RoundButton } from '../UI/StyledComponents';
+import OrderError from './OrderError';
 
-function StepRecap({ onComplete }) {
+function StepRecap({ onComplete, onStartOver }) {
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
   const orderErrors = useSelector(getOrderErrors);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
-
   if(orderErrors) {
     return (
-      <Box width={1}>
-        <Info title="Order error" mode="error">
-          {orderErrors.map(error => (
-            <Box key={error.code}>
-              <b>{error.code}</b> {error.message}
-            </Box>
-          ))}
-        </Info>
-        {orderErrors.find(e => e.code === 'timeout') &&
-        <Box mt={2}>
-          <MButton
-            variant="outlined"
-            color="primary"
-            size="small"
-            startIcon={<IconRefresh/>}
-            style={{width: '100%'}}
-            onClick={() => dispatch(createOrder())}
-            >
-              Retry
-            </MButton>
-          </Box>
-        }
-      </Box>
+      <OrderError orderErrors={orderErrors} onStartOver={onStartOver}/>
     );
   }
 
@@ -65,6 +43,18 @@ function StepRecap({ onComplete }) {
         <Info title="Order expired" mode="error">
           The order you made has expired. Please create a new one.
         </Info>
+        <Box mt={2}>
+          <MButton
+            variant="outlined"
+            color="primary"
+            size="small"
+            startIcon={<IconRefresh/>}
+            style={{width: '100%'}}
+            onClick={() => dispatch(createOrder())}
+          >
+            Retry
+          </MButton>
+        </Box>
       </Box>
     )
   }

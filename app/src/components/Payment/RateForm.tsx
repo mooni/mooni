@@ -20,7 +20,8 @@ import { useAllowance } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
 import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
-import { outputLimits } from '../../constants/limits';
+import { dailyLimits } from '../../constants/limits';
+import { numberWithCommas } from '../../lib/numbers';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -138,7 +139,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
           <InvalidMessage key={key}>
             {key === 'lowBalance' && 'You do not have enough funds'}
             {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
-            {key === 'highAmount' && `Maximum amount is ${outputLimits[rateForm.values.outputCurrency]} ${rateForm.values.outputCurrency}`}
+            {key === 'highAmount' && `Maximum amount is ${numberWithCommas(dailyLimits[rateForm.values.outputCurrency])} ${rateForm.values.outputCurrency}`}
             {key === 'lowLiquidity' && `There is not enough liquidity for this pair to trade. Please try with another currency.`}
             {key === 'zeroAmount' && `Amount can't be zero`}
             {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
