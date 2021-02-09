@@ -18,6 +18,7 @@ import StatsPage from './pages/StatsPage';
 import { usePageViews } from './lib/analytics';
 import { getWalletStatus, isWalletLoading } from './redux/wallet/selectors';
 import { WalletStatus } from './redux/wallet/state';
+import Loader from './components/UI/Loader';
 
 export const Routes: React.FC = () => {
   usePageViews();
@@ -32,7 +33,7 @@ export const Routes: React.FC = () => {
       <Route exact path="/stats">
         <StatsPage />
       </Route>
-      {walletStatus===WalletStatus.CONNECTED &&
+      {walletStatus === WalletStatus.CONNECTED ?
       <>
         <Route path="/account">
           <AccountPage />
@@ -44,6 +45,8 @@ export const Routes: React.FC = () => {
           <ExchangePage />
         </Route>
       </>
+        :
+        (walletLoading && <Loader text="Loading Ethereum wallet" />)
       }
       {!walletLoading &&
       <Route path="*">

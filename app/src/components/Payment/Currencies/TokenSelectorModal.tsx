@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import InfiniteScroll from "react-infinite-scroller";
 
 import { Box, Dialog, DialogContent, DialogTitle, List, ListItem, ListItemAvatar, ListItemText, Avatar, makeStyles, IconButton } from '@material-ui/core';
@@ -9,8 +9,7 @@ import styled from 'styled-components';
 import { textStyle, LoadingRing, SearchInput } from '@aragon/ui'
 import { amountToDecimal, truncateNumber } from '../../../lib/numbers';
 import { Currency } from '../../../lib/trading/currencyTypes';
-import { CurrenciesContext } from '../../../contexts/CurrenciesContext';
-import { useTokenList } from '../../../hooks/currencies';
+import { useCurrenciesContext, useTokenList } from '../../../hooks/currencies';
 
 const Title = styled.p`
   ${textStyle('title4')};
@@ -78,7 +77,7 @@ type TokenRowProps = {
 };
 
 const TokenRow: React.FC<TokenRowProps> = ({ currency }) => {
-  const { currencyBalances } = useContext(CurrenciesContext);
+  const { currencyBalances } = useCurrenciesContext();
   const currencyBalance = currencyBalances[currency.symbol];
 
   return (

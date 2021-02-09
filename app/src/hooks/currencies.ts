@@ -5,8 +5,12 @@ import { CurrencyBalances } from '../lib/wrappers/paraswap';
 import { ETHER } from '../lib/trading/currencyList';
 import { amountToDecimal, BN } from '../lib/numbers';
 
+export const useCurrenciesContext = () => {
+  return useContext(CurrenciesContext);
+}
+
 export const useCurrency = (symbol) => {
-  const { getCurrency } = useContext(CurrenciesContext);
+  const { getCurrency } = useCurrenciesContext();
   return useMemo(() => getCurrency(symbol), [symbol, getCurrency]);
 }
 
@@ -55,7 +59,7 @@ const useFilteredList = (currencyList: Currency[], searchValue: string) => {
 }
 
 export const useTokenList = (searchValue: string) => {
-  const { inputCurrenciesMap, currencyBalances } = useContext(CurrenciesContext);
+  const { inputCurrenciesMap, currencyBalances } = useCurrenciesContext();
 
   const currencies = useMemo(() => Object.values(inputCurrenciesMap), [inputCurrenciesMap]);
   const sortedCurrencyList = useSortedList(currencies, currencyBalances);

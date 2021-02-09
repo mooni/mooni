@@ -5,6 +5,8 @@ import { Box } from '@material-ui/core';
 
 import styled from 'styled-components';
 import config from "../../config";
+import {numberWithCommas} from "../../lib/numbers";
+import {dailyLimits, yearlyLimits} from "../../constants/limits";
 
 export const SubTitle = styled.p`
   ${textStyle('title4')};
@@ -33,7 +35,13 @@ function Terms() {
         It is not a money service provider, does not holds any funds, and does not hold any financial license. Instead, it uses different third party services such as a foreign exchange, decentralized liquidity providers and data storages, in order to serve its purpose.
       </Content>
       <SubTitle>
-        1.3 Third parties
+        1.3 Limitations
+      </SubTitle>
+      <Content>
+        Due to our KYC-less process, exchange are subject to some limitations. Each user can cash out up to an equivalent amount of {numberWithCommas(dailyLimits['EUR'])} EUR per day and {numberWithCommas(yearlyLimits['EUR'])} EUR per year. These amounts can vary depending on market conditions and user profiles, and the correct information is available within the app.
+      </Content>
+      <SubTitle>
+        1.4 Third parties
       </SubTitle>
       <Content>
         Mooni make the use of the following third party services: <Link href="https://bity.com" external>Bity</Link>, <Link href="https://paraswap.io" external>Paraswap</Link>, <Link href="https://3box.io" external>3Box</Link>.<br/>

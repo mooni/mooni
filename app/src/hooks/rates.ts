@@ -8,10 +8,11 @@ import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
-import config from "../config";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
 import { APIError } from '../lib/errors';
 import { getETHManager } from '../redux/wallet/selectors';
+
+import { dailyLimits } from '../constants/limits';
 
 interface RateForm {
   loading: boolean,
@@ -89,6 +90,8 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     if(!_rateForm.loading) return;
     if(_rateForm.connected && _rateForm.balanceData.balanceLoading) return;
 
+    const outputLimit = dailyLimits[_rateForm.values.outputCurrency];
+
     const currentRequest: TradeRequest = {
       inputCurrencySymbol: _rateForm.values.inputCurrency,
       outputCurrencySymbol: _rateForm.values.outputCurrency,
@@ -118,7 +121,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       }));
       return;
     } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      if(new BN(currentRequest.amount).gt(config.maxOutputAmount)) {
+      if(new BN(currentRequest.amount).gt(outputLimit)) {
         setRateForm(r => ({
           ...r,
           loading: false,
@@ -177,7 +180,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     };
     if(currentRequest.tradeExact === TradeExact.INPUT) {
       updateRateForm.values.outputAmount = new BN(multiTradeEstimation.outputAmount).toFixed();
-      if(new BN(multiTradeEstimation.outputAmount).gt(config.maxOutputAmount)) {
+      if(new BN(multiTradeEstimation.outputAmount).gt(outputLimit)) {
         updateRateForm.errors = { highAmount: true };
       }
     }

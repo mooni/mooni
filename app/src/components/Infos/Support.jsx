@@ -5,6 +5,8 @@ import { Box } from '@material-ui/core';
 import { textStyle, Link, GU } from '@aragon/ui';
 import config from '../../config';
 import DiscordIcon from "../../assets/discord_icon.svg";
+import {numberWithCommas} from "../../lib/numbers";
+import {dailyLimits} from "../../constants/limits";
 
 const SubTitle = styled.p`
   ${textStyle('title4')};
@@ -51,6 +53,12 @@ export default function Support() {
       </FaqSection>
       <Content>
         Bank transfer may take up to 4 <u>working</u> days to settle. Sometimes, it only takes few hours, but most of traditional banks takes few days to process incoming transfers, and they don't work on weekends. Don't worry, and please wait at least 4 days before contacting support regarding that.
+      </Content>
+      <FaqSection>
+        The app say I have reached the limit, what can I do ?
+      </FaqSection>
+      <Content>
+        Due to our KYC-less process, exchange are subject to limitations approximately equivalent to an amount of {numberWithCommas(dailyLimits['EUR'])} EUR per day. You can split your transaction among different days. If you think you haven't consumed that much but still cannot checkout in the app, please contact support.
       </Content>
       <FaqSection>
         I have sent the payment, but it never get confirmed
