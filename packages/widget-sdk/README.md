@@ -43,7 +43,7 @@ Instanciate a Mooni widget.
 
 `opts.ethereum`: A standard JSON-RPC provider. This is useful if the hosting app already authenticated the web3 wallet of the user, so he doesn't have to login again on Mooni.
 
-`opts.token`: Automatically select a token to sell in Mooni.
+`opts.token`: Automatically select a token to sell in Mooni. Must be an ERC20 contract address.
 
 #### If used as a modal:
 - `mooni.open()`  

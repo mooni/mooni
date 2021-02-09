@@ -20,20 +20,17 @@ Mooni is a simple solution for end-users, marketplaces or DAOs to cash out crypt
 
 ### Features
 
-* **Web wallets** Login with any web3-compatible wallet _\(Metamask, Portis, WalletConnect, Ledger, mobile wallets\)_
+* **Web wallets** Login with any web3-compatible wallet _\(Metamask, WalletConnect, etc...\)_
 * **Bank transfer** Receive funds in your bank account in EUR/CHF \(thanks to [Bity](https://bity.com)\)
-* **Private storage** Store your bank account information securely encrypted in IPFS \(thanks to [3Box](https://3box.io)\)
-* **No account** Withdraw up to 5000€ per year without KYC
-* **Decentralized** All in browser
+* **Quick checkout** No need to register accounts and pass long KYC verifications. Subject to amount limits.
 
 [🚀 Use Mooni now](https://app.mooni.tech)
 
 
 ### Use cases
 
-* **Crypto owner** I am a crypto user and I want to withdraw some crypto to my bank account
-* **dApp developer** I am a dApp developer and I want to allow my users to withdraw funds to their bank account \(games, decentralized marketplaces, via a widget\)
-* **DAOs** I am member of a DAO and I want to withdraw funds to my bank account
+* **Crypto owner** Any crypto holder can convert some crypto into fiat into their bank account
+* **dApps** Decentralized applications that makes users generate revenue can allow them to exit and withdraw funds into their bank account \(games, decentralized marketplaces, via a widget\)
 
 ## 🔮 Frontend integration
 
@@ -42,7 +39,7 @@ You can easily integrate Mooni into your web application and quickly enable your
 This is useful for marketplace builders which want to increase conversion rate by allowing their users to withdraw the profit they make on the app.
 
 
-An [example app](https://mooni-widget-example.now.sh) including Mooni widget is available to let you try it out.
+An [example app](https://integration-example.mooni.tech) including Mooni widget is available to let you try it out.
 
 ### 🎁 Quick start
 
