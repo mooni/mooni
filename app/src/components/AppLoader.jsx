@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
-import {CurrenciesContext} from "../contexts/CurrenciesContext";
+import { useCurrenciesContext } from "../hooks/currencies";
 
 export default function AppLoader({ children }) {
-  const { currenciesReady } = useContext(CurrenciesContext);
+  const { currenciesReady } = useCurrenciesContext();
 
   if(currenciesReady) return children;
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -20,7 +20,7 @@ import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
 import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep } from '../redux/payment/selectors';
-import { CurrenciesContext } from '../contexts/CurrenciesContext';
+import { useCurrenciesContext } from '../hooks/currencies';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -41,7 +41,7 @@ const RoundedBox = styled(ABox)`
 `
 
 export default function ExchangePage() {
-  const { currenciesManager } = useContext(CurrenciesContext);
+  const { currenciesManager } = useCurrenciesContext();
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();

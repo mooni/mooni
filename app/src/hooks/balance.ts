@@ -16,6 +16,10 @@ export interface BalanceData {
   balanceLoading: boolean,
 }
 
+/**
+ * Reads on-chain balance of an address for ETH or an ERC20 token
+ * @param symbol
+ */
 export function useBalance(symbol: CurrencySymbol): BalanceData {
   const ethManager = useSelector(getETHManager);
   const [balance, setBalance] = useState<string>('0');
