@@ -1,7 +1,8 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import { Link as ALink, Button, useTheme } from '@aragon/ui';
+import { Box, Button as BaseButton } from '@chakra-ui/react';
+import { Link as ALink, Button as AButton, useTheme } from '@aragon/ui';
 import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
 export const SmallWidth = styled.div`
@@ -75,7 +76,7 @@ export const ShadowBox = styled.div`
   border-radius: 27px;
 `;
 
-export const RoundButton = styled(Button)`
+export const RoundButton = styled(AButton)`
   border-radius: 25px;
 `;
 
@@ -84,3 +85,19 @@ export const FlexCenterBox = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+
+export function Button({leftIcon = null, children, ...props}) {
+  return (
+    <BaseButton
+      leftIcon={leftIcon && <Box color='gray.400' >{leftIcon}</Box>}
+      _disabled={{
+        background: 'buttonDisabled',
+        cursor: 'default',
+      }}
+      {...props}
+    >
+      {children}
+    </BaseButton>
+  );
+}

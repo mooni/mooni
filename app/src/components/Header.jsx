@@ -7,6 +7,7 @@ import {
   MenuList,
   MenuItem,
   Button,
+  Box,
 } from "@chakra-ui/react"
 import { IconChip, IconFile, IconInfo, IconChat } from '@aragon/ui'
 import MenuBookIcon from '@material-ui/icons/MenuBookOutlined';
@@ -176,30 +177,34 @@ export default function Header() {
           </NavLink>
           <RoutesContainer>
             {walletStatus === WalletStatus.CONNECTED &&
-              <>
-                <RouteLink to="/exchange" activeClassName="active">Exchange</RouteLink>
-                <RouteLink to="/account" activeClassName="active">Account</RouteLink>
-              </>
+            <>
+              <RouteLink to="/exchange" activeClassName="active">Exchange</RouteLink>
+              <RouteLink to="/account" activeClassName="active">Account</RouteLink>
+            </>
             }
             <RouteLink to="/stats" activeClassName="active">Stats</RouteLink>
           </RoutesContainer>
         </MainHeader>
 
         <SecondaryHeader>
+          <Box>
           <AccountBadge />
-          <Menu>
-            <MenuButton as={Button} variant="solid">
-              <HamburgerIcon/>
-            </MenuButton>
-            <MenuList borderRadius="1rem" minWidth="8rem">
-              <MenuItem icon={<IconInfo/>} onClick={() => dispatch(setInfoPanel('about'))}> About</MenuItem>
-              <MenuItem paddingLeft="1rem" icon={<MenuBookIcon fontSize="small"/>} onClick={() => window.open('https://doc.mooni.tech')}> Docs</MenuItem>
-              <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}> Support</MenuItem>
-              <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}> Code</MenuItem>
-              <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}> Terms</MenuItem>
-              <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
-            </MenuList>
-          </Menu>
+          </Box>
+          <Box ml={2}>
+            <Menu>
+              <MenuButton as={Button} variant="outline">
+                <HamburgerIcon/>
+              </MenuButton>
+              <MenuList borderRadius="1rem" minWidth="8rem">
+                <MenuItem icon={<IconInfo/>} onClick={() => dispatch(setInfoPanel('about'))}> About</MenuItem>
+                <MenuItem paddingLeft="1rem" icon={<MenuBookIcon fontSize="small"/>} onClick={() => window.open('https://doc.mooni.tech')}> Docs</MenuItem>
+                <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}> Support</MenuItem>
+                <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}> Code</MenuItem>
+                <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}> Terms</MenuItem>
+                <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
+              </MenuList>
+            </Menu>
+          </Box>
         </SecondaryHeader>
       </HeaderSubRoot>
     </HeaderRoot>
