@@ -4,7 +4,6 @@ import {Box} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Header from '../Header';
-import Footer from '../Footer';
 import ScrollRoot from '../Utils/ScrollRoot';
 
 
@@ -39,9 +38,6 @@ export default function AppContainer({ children }) {
         <Header />
         <Box className={classes.container}>
           {children}
-        </Box>
-        <Box className={classes.footer}>
-          <Footer />
         </Box>
       </Box>
     </ScrollRoot>

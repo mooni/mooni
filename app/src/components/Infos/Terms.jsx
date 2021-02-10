@@ -19,7 +19,7 @@ export const Content = styled.p`
 
 function Terms() {
   return (
-    <Box pt={6} pb={6}>
+    <Box>
       <SubTitle>
         1.1 Object
       </SubTitle>

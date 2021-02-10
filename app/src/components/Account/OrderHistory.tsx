@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross, Link } from '@aragon/ui';
+import { useMediaQuery } from '@chakra-ui/react';
 
 import Api from '../../lib/apiWrapper';
 import { getJWS } from '../../redux/wallet/selectors';
@@ -93,7 +94,7 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
 export default function OrderHistory() {
   const dispatch = useDispatch();
   const jwsToken = useSelector(getJWS);
-  const { below } = useViewport();
+  const [isSmall] = useMediaQuery("(max-width: 960px)")
   const { data, error } = useSWR(jwsToken, Api.getOrders);
 
   if (error) return <Box>Failed to load orders</Box>;
@@ -111,7 +112,7 @@ export default function OrderHistory() {
     <Box width={1} mx={2}>
       {orders.length > 0 ?
         <TableContainer component={CustomTableContainer}>
-          <Table aria-label="order history" size={below('medium') ? 'small' : 'medium'}>
+          <Table aria-label="order history" size={isSmall ? 'small' : 'medium'}>
             <TableHead>
               <TableRow>
                 <TableCell align="center">Status</TableCell>

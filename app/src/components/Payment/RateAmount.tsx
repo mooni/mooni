@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { Box, Typography, Tooltip} from '@material-ui/core';
-import { Link, LoadingRing } from '@aragon/ui'
+import { Image } from '@chakra-ui/react'
+import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
 import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
 import {MetaError} from "../../lib/errors";
-import {ShadowBox} from "../UI/StyledComponents";
+import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
 
 import bityLogo from "../../assets/bity_logo_small.png";
 import paraswapLogo from "../../assets/paraswap_logo_small.png";
@@ -115,31 +116,31 @@ const BasicLine: React.FC<BasicLineProps> = ({title, content}) => (
 interface ServiceLogoProps {
   tradeType: TradeType;
 }
+const d = {
+  [TradeType.BITY]: {
+    tooltip: "Bity - Swiss crypto-fiat exchange",
+    href: "https://bity.com",
+    alt: "bity",
+    image: bityLogo,
+  },
+  [TradeType.DEX]: {
+    tooltip: "Paraswap - DEX aggregator",
+    href: "https://paraswap.io",
+    alt: "paraswap",
+    image: paraswapLogo,
+  }
+};
 const ServiceLogo: React.FC<ServiceLogoProps> = ({tradeType}) => {
-  const d = {
-    [TradeType.BITY]: {
-      tooltip: "Bity - Swiss crypto-fiat exchange",
-      href: "https://bity.com",
-      alt: "bity",
-      image: bityLogo,
-    },
-    [TradeType.DEX]: {
-      tooltip: "Paraswap - DEX aggregator",
-      href: "https://paraswap.io",
-      alt: "paraswap",
-      image: paraswapLogo,
-    }
-  };
   const dd = d[tradeType];
 
   return (
-    <Link external href={dd.href} display="flex" alignItems="center">
+    <ExternalLink href={dd.href}>
       <Tooltip title={dd.tooltip}>
         <Box display="flex" alignItems="center">
-          <img src={dd.image} alt={dd.alt} height={20} />
+          <Image src={dd.image} alt={dd.alt} height="20px" />
         </Box>
       </Tooltip>
-    </Link>
+    </ExternalLink>
   );
 }
 

@@ -14,11 +14,11 @@ import {
   IconEllipsis,
   GU,
   IconPermissions,
-  useViewport,
   Info,
   Help,
 } from '@aragon/ui'
 import styled from 'styled-components';
+import { useMediaQuery } from '@chakra-ui/react';
 
 import { SimpleLink } from '../UI/StyledComponents';
 
@@ -175,12 +175,12 @@ function PaymentErrorInfo({ onRestart, payment }) {
 }
 
 function ExternalButton({ url, label }) {
-  const { below } = useViewport();
+  const [isSmall] = useMediaQuery("(max-width: 960px)")
   const theme = useTheme();
 
   let display = 'all';
   const style = {};
-  if(below('medium')) {
+  if(isSmall) {
     display = 'icon';
     style.width = '50px';
   } else {

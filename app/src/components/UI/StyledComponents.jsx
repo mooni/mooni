@@ -1,8 +1,8 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import { Link, Button, useTheme } from '@aragon/ui';
-import {NavLink as RouterNavLink} from 'react-router-dom';
+import { Link as ALink, Button, useTheme } from '@aragon/ui';
+import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
 export const SmallWidth = styled.div`
   max-width: 25rem;
@@ -42,13 +42,19 @@ export const WideInput = styled.input`
   line-height: 1.5;
 `;
 
-export const SimpleLink = styled(Link)`
+export const SimpleLink = styled(ALink)`
   text-decoration: none;
   &:hover: {
     textDecoration: none;
   }
 `;
 
+export const Link = styled(RouterLink)`
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+  }
+`;
 export const NavLink = styled(RouterNavLink)`
   text-decoration: none;
   :hover {
@@ -56,7 +62,11 @@ export const NavLink = styled(RouterNavLink)`
   }
 `;
 
-
+export function ExternalLink({ href, children }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+  )
+}
 export const ShadowBox = styled.div`
   background: #FCFDFF;
   border: 1px solid #ececec;

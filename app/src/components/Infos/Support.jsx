@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Box } from '@material-ui/core';
+import { Box, Flex } from '@chakra-ui/react';
 import { textStyle, Link, GU } from '@aragon/ui';
 import config from '../../config';
 import DiscordIcon from "../../assets/discord_icon.svg";
@@ -27,14 +27,16 @@ const Content = styled.p`
 
 export default function Support() {
   return (
-    <Box pt={3}>
+    <Box>
       <Content>
         The preferred way to contact us is through our Discord server.
-      <br/>
+      </Content>
+
+      <Flex justify="center">
         <a href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
           <img src={DiscordIcon} width={30} alt="discord icon" />
         </a>
-      </Content>
+      </Flex>
 
       <SubTitle>
         Important informations

@@ -43,7 +43,7 @@ export const App: React.FC = () => {
           >
             <ChakraProvider
               theme={chakraTheme}
-              resetCSS={false}
+              resetCSS={true}
             >
               <MUIThemeProvider theme={MUITheme}>
                 <StyledThemeProvider theme={aragonTheme}>
