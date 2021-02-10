@@ -4,8 +4,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Main as AragonUI, useTheme } from '@aragon/ui';
 import { ThemeProvider as MUIThemeProvider } from '@material-ui/core';
-import { theme } from './theme';
+import { MUITheme, chakraTheme } from './theme';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components'
+import { ChakraProvider } from '@chakra-ui/react';
 
 import './App.css';
 
@@ -40,18 +41,23 @@ export const App: React.FC = () => {
             layout={false}
             scrollView={false}
           >
-            <MUIThemeProvider theme={theme}>
-              <StyledThemeProvider theme={aragonTheme}>
-                <AppLoader>
-                  <AppContainer>
-                    <InfoPanel />
-                    <WalletModal />
-                    <ErrorModal />
-                    <Routes/>
-                  </AppContainer>
-                </AppLoader>
-              </StyledThemeProvider>
-            </MUIThemeProvider>
+            <ChakraProvider
+              theme={chakraTheme}
+              resetCSS={false}
+            >
+              <MUIThemeProvider theme={MUITheme}>
+                <StyledThemeProvider theme={aragonTheme}>
+                  <AppLoader>
+                    <AppContainer>
+                      <InfoPanel />
+                      <WalletModal />
+                      <ErrorModal />
+                      <Routes/>
+                    </AppContainer>
+                  </AppLoader>
+                </StyledThemeProvider>
+              </MUIThemeProvider>
+            </ChakraProvider>
           </AragonUI>
         </Router>
       </CurrenciesContextProvider>

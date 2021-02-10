@@ -3,9 +3,9 @@ import styled from 'styled-components';
 
 import AccountBadge from './Account/AccountBadge';
 import { NavLink } from './UI/StyledComponents';
-import {getWalletStatus} from "../redux/wallet/selectors";
+import { getWalletStatus } from "../redux/wallet/selectors";
 import { useSelector } from 'react-redux';
-import {WalletStatus} from "../redux/wallet/state";
+import { WalletStatus } from "../redux/wallet/state";
 
 const HeaderRoot = styled.div`
   display: flex;
