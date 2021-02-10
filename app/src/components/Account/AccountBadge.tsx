@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { Button } from '../UI/StyledComponents'
-import { LoadingRing, IconWallet, GU } from '@aragon/ui'
+import { LoadingRing, IconWallet } from '@aragon/ui'
 import { Flex, Box, Image} from '@chakra-ui/react';
 import makeBlockie from 'ethereum-blockies-base64';
 

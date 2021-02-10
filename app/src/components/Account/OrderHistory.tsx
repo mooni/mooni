@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, useViewport, IconCross, Link } from '@aragon/ui';
+import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, IconCross, Link } from '@aragon/ui';
 import { useMediaQuery } from '@chakra-ui/react';
 
 import Api from '../../lib/apiWrapper';
