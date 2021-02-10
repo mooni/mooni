@@ -2,6 +2,7 @@ import React from 'react';
 
 import styled from 'styled-components';
 import { Link, Button, useTheme } from '@aragon/ui';
+import {NavLink as RouterNavLink} from 'react-router-dom';
 
 export const SmallWidth = styled.div`
   max-width: 25rem;
@@ -47,6 +48,14 @@ export const SimpleLink = styled(Link)`
     textDecoration: none;
   }
 `;
+
+export const NavLink = styled(RouterNavLink)`
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+  }
+`;
+
 
 export const ShadowBox = styled.div`
   background: #FCFDFF;

@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider as ReduxProvider } from 'react-redux';
-import { Main as AragonUI } from '@aragon/ui';
+import { Main as AragonUI, useTheme } from '@aragon/ui';
 import { ThemeProvider as MUIThemeProvider } from '@material-ui/core';
 import { theme } from './theme';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components'
 
 import './App.css';
 
@@ -27,6 +28,8 @@ export const App: React.FC = () => {
     store.dispatch(initReferral());
   }, []);
 
+  const aragonTheme = useTheme();
+
   return (
     <ReduxProvider store={store}>
       <CurrenciesContextProvider>
@@ -38,14 +41,16 @@ export const App: React.FC = () => {
             scrollView={false}
           >
             <MUIThemeProvider theme={theme}>
-              <AppLoader>
-                <AppContainer>
-                  <InfoPanel />
-                  <WalletModal />
-                  <ErrorModal />
-                  <Routes/>
-                </AppContainer>
-              </AppLoader>
+              <StyledThemeProvider theme={aragonTheme}>
+                <AppLoader>
+                  <AppContainer>
+                    <InfoPanel />
+                    <WalletModal />
+                    <ErrorModal />
+                    <Routes/>
+                  </AppContainer>
+                </AppLoader>
+              </StyledThemeProvider>
             </MUIThemeProvider>
           </AragonUI>
         </Router>

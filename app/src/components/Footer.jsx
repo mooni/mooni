@@ -43,11 +43,6 @@ function Footer() {
         <ALink href="https://github.com/pakokrew/mooni/tree/master" external className={classes.link}>v0.8</ALink>
       </Box>
       <Box className={classes.element}>
-        <Link onClick={() => history.push('/stats')} className={classes.link}>
-          Stats
-        </Link>
-      </Box>
-      <Box className={classes.element}>
         <Link onClick={() => dispatch(setInfoPanel('terms'))} className={classes.link}>
           Terms
         </Link>
