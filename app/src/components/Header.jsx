@@ -111,21 +111,20 @@ const RoutesContainer = styled.div`
 `;
 
 const RouteLink = styled(NavLink)`
-  display: flex;
-  flex-flow: row nowrap;
-  border-radius: 3rem;
   outline: none;
   cursor: pointer;
   text-decoration: none;
   font-size: 1rem;
-  width: fit-content;
-  margin: 0px 12px;
+  margin: 0 12px;
   color: ${props => props.theme.surfaceContentSecondary};
   font-weight: 500;
   &.active {
-    border-radius: 12px;
     font-weight: 600;
     color: ${props => props.theme.surfaceContent};
+  }
+  @media (max-width: 500px) {
+    font-size: 0.9rem;
+    margin: 0 4px;
   }
 `;
 
@@ -140,13 +139,17 @@ const LogoBox = styled.div`
   > h1 {
     font-family: 'Montserrat', sans-serif;
     text-transform: uppercase;
-    font-size: 24px;
+    font-size: 2rem;
     line-height: 1;
     font-weight: 400;
     letter-spacing: 1px;
     color: black;
     text-decoration: none;
+    @media (max-width: 500px) {
+      font-size: 1.5rem;
+    }
   }
+
   > span {
     text-transform: uppercase;
     position: relative;
@@ -154,6 +157,9 @@ const LogoBox = styled.div`
     font-size: 9px;
     top: -11px;
     right: -2px;
+    @media (max-width: 500px) {
+      font-size: 7px;
+    }
   }
 `;
 
