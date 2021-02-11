@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Header from '../Header';
 import ScrollRoot from '../Utils/ScrollRoot';
+import styled from "styled-components";
 
 
 const useStyles = makeStyles(() => ({
@@ -30,6 +31,13 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
+const BottomSM = styled.div`
+  height: 0;
+  @media (max-width: 960px) {
+    height: 72px;
+  }
+`;
+
 export default function AppContainer({ children }) {
   const classes = useStyles();
   return (
@@ -39,6 +47,7 @@ export default function AppContainer({ children }) {
         <Box className={classes.container}>
           {children}
         </Box>
+        <BottomSM/>
       </Box>
     </ScrollRoot>
   );
