@@ -35,7 +35,7 @@ const SocialIcon = styled.a`
 
 export default function AboutPage() {
   return (
-    <Box pt={2}>
+    <Box>
       <Title>
         Mooni is a web application allowing to transfer funds from a crypto wallet to a bank account.
       </Title>

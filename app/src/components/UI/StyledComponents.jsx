@@ -1,7 +1,9 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import { Link, Button, useTheme } from '@aragon/ui';
+import { Box, Button as BaseButton } from '@chakra-ui/react';
+import { Link as ALink, Button as AButton, useTheme } from '@aragon/ui';
+import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
 export const SmallWidth = styled.div`
   max-width: 25rem;
@@ -41,13 +43,31 @@ export const WideInput = styled.input`
   line-height: 1.5;
 `;
 
-export const SimpleLink = styled(Link)`
+export const SimpleLink = styled(ALink)`
   text-decoration: none;
   &:hover: {
     textDecoration: none;
   }
 `;
 
+export const Link = styled(RouterLink)`
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+  }
+`;
+export const NavLink = styled(RouterNavLink)`
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+  }
+`;
+
+export function ExternalLink({ href, children }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+  )
+}
 export const ShadowBox = styled.div`
   background: #FCFDFF;
   border: 1px solid #ececec;
@@ -56,7 +76,7 @@ export const ShadowBox = styled.div`
   border-radius: 27px;
 `;
 
-export const RoundButton = styled(Button)`
+export const RoundButton = styled(AButton)`
   border-radius: 25px;
 `;
 
@@ -65,3 +85,19 @@ export const FlexCenterBox = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+
+export function Button({leftIcon = null, children, ...props}) {
+  return (
+    <BaseButton
+      leftIcon={leftIcon && <Box color='gray.400' >{leftIcon}</Box>}
+      _disabled={{
+        background: 'buttonDisabled',
+        cursor: 'default',
+      }}
+      {...props}
+    >
+      {children}
+    </BaseButton>
+  );
+}

@@ -1,6 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SidePanel } from '@aragon/ui'
+
+import {
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+} from "@chakra-ui/react"
 
 import About from '../Infos/About';
 import Terms from '../Infos/Terms';
@@ -45,12 +53,23 @@ export default function InfoPanel() {
   if(!panelType) return null;
 
   return (
-    <SidePanel
-      title={panelTitle}
-      opened
+    <Drawer
+      isOpen={panelType}
+      placement="right"
+      size="lg"
       onClose={() => dispatch(setInfoPanel(null))}
     >
-      {panelContent}
-    </SidePanel>
+      <DrawerOverlay>
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>{panelTitle}</DrawerHeader>
+
+          <DrawerBody mt={4} mb={4}>
+            {panelContent}
+          </DrawerBody>
+
+        </DrawerContent>
+      </DrawerOverlay>
+    </Drawer>
   );
 }

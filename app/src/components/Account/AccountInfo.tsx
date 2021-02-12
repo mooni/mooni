@@ -2,9 +2,11 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button, useViewport } from '@aragon/ui'
+import { Button } from '@aragon/ui'
 import { Box, Typography } from '@material-ui/core';
 import { ExitToApp } from '@material-ui/icons';
+
+import { useMediaQuery } from '@chakra-ui/react';
 
 import {ShadowBox, SimpleLink} from "../UI/StyledComponents";
 
@@ -28,7 +30,7 @@ const AddressText = styled(Typography)`
 
 export default function AccountInfo() {
   const dispatch = useDispatch();
-  const { below } = useViewport();
+  const [isSmall] = useMediaQuery("(max-width: 960px)")
 
   const address = useSelector(getAddress);
   const shortenAddress = useSelector(getShortAddress);
@@ -43,7 +45,7 @@ export default function AccountInfo() {
       <Typography variant="subtitle1" align="center">Logged in as:</Typography>
       <BadgeBox>
         <SimpleLink href={getEtherscanAddressURL(address)} external>
-          <AddressText variant="caption" align="center">{below('medium') ? shortenAddress : address} {ens &&  <i>({ens})</i>}</AddressText>
+          <AddressText variant="caption" align="center">{isSmall ? shortenAddress : address} {ens &&  <i>({ens})</i>}</AddressText>
         </SimpleLink>
       </BadgeBox>
       <Button icon={<ExitToApp />} mode="negative" size="small" label="Disconnect" onClick={onLogout} />
