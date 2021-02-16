@@ -26,7 +26,6 @@ export function FieldError({ text, children }) {
   )
 }
 
-// TODO replace with Aragon's TextInput when form ref fixed
 export const WideInput = styled.input`
   width: 100%;
   height: 40px;
@@ -41,6 +40,9 @@ export const WideInput = styled.input`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
+  :focus {
+    outline: ${props => props.theme.selected} auto 1px;
+  }  
 `;
 
 export const SimpleLink = styled(ALink)`
