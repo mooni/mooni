@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Header from '../Header';
 import ScrollRoot from '../Utils/ScrollRoot';
+import { TypeformFeedback } from '../Utils/Feedback';
 import styled from "styled-components";
 
 
@@ -48,6 +49,7 @@ export default function AppContainer({ children }) {
           {children}
         </Box>
         <BottomSM/>
+        <TypeformFeedback/>
       </Box>
     </ScrollRoot>
   );
