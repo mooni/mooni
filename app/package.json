@@ -25,6 +25,7 @@
     "@now/node": "^1.6.1",
     "@prisma/client": "^2.13.1",
     "@reduxjs/toolkit": "^1.4.0",
+    "@typeform/embed": "^0.34.6",
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.0",
     "@types/react": "^16.9.32",
