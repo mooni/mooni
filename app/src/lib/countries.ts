@@ -41,7 +41,9 @@ const COUNTRIES_NON_EEA = {
   MC: 'Monaco',
 }
 
-export const COUNTRIES = {
+export const COUNTRIES_MAP = {
   ...COUTRIES_EU,
   ...COUNTRIES_NON_EEA,
 };
+
+export const COUNTRIES_ARRAY = Object.entries(COUNTRIES_MAP).map(e => ({ code: e[0], label: e[1]}));

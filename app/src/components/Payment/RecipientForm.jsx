@@ -4,13 +4,12 @@ import IBAN from 'iban';
 import EmailValidator from 'email-validator';
 import styled from "styled-components";
 
-import { COUNTRIES } from '../../lib/countries';
-
 import { Box } from '@material-ui/core';
-import { Button, IconArrowRight, DropDown } from '@aragon/ui';
+import { Button, IconArrowRight } from '@aragon/ui';
 
 import FormField from './FormField';
 import { FieldError } from '../UI/StyledComponents';
+import CountrySelect from "../UI/CountrySelect";
 
 const fields = {
   name: {
@@ -54,9 +53,6 @@ const fields = {
   },
 };
 
-const countriesList = Object.keys(COUNTRIES);
-const countriesLabels = Object.values(COUNTRIES);
-
 const errorMessages = {
   iban: 'Invalid IBAN',
   bic_swift: 'Invalid BIC',
@@ -92,19 +88,15 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
   useEffect(() => {
     reset(initialRecipient);
   }, [reset, initialRecipient]);
-
-  const [selectedCountry, setSelectedCountry] = useState(
-    initialRecipient?.owner?.country ?
-      countriesList.indexOf(initialRecipient.owner.country)
-      : undefined
-  );
   const submit = handleSubmit(onSubmit);
 
-  function setCountry(index) {
-    setSelectedCountry(index);
-    setValue('owner.country', countriesList[index]);
+  const [selectedCountryCode, setSelectedCountryCode] = useState(
+    initialRecipient?.owner?.country
+  );
+  function setCountry(countryCode) {
+    setSelectedCountryCode(countryCode);
+    setValue('owner.country', countryCode);
   }
-
   useEffect(() => {
     register({ name: 'owner.country' }, fields.country);
     setValue('owner.country', initialRecipient?.owner?.country || '');
@@ -127,12 +119,9 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
       <FormField label="City" name="owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} required />
 
       <FormField label="Country" name="owner.country" errors={errors} errorMessages={errorMessages} required >
-        <DropDown
-          items={countriesLabels}
-          selected={selectedCountry}
+        <CountrySelect
+          countryCode={selectedCountryCode}
           onChange={setCountry}
-          placeholder="Please select a country"
-          wide
           data-private
         />
       </FormField>
