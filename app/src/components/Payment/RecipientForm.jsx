@@ -126,18 +126,6 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
         />
       </FormField>
 
-      <Box mb={2}>
-        <FieldError>{
-          Object.keys(errors)
-            .filter(s => s !== 'owner.name' && s !== "iban")
-            .map(errorField =>
-              errorMessages[errorField]
-            )
-            .join(', ')
-        }
-        </FieldError>
-      </Box>
-
       {/*<Box mb={2} mt={1}>
         <Link onClick={() => setMore(!more)}>
           {more ? 'Show less' : 'Show more'}

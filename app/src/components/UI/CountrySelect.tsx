@@ -22,6 +22,9 @@ export default function CountrySelect({ countryCode, onChange }) {
   return (
     <Autocomplete
       options={COUNTRIES_ARRAY}
+      disableClearable
+      clearOnEscape
+      clearOnBlur
       value={COUNTRIES_ARRAY.find(c => c.code === countryCode)}
       onChange={(_, value) => onChange(value?.code)}
       getOptionLabel={(option) => option.label}
