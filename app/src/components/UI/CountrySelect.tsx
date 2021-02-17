@@ -25,7 +25,8 @@ export default function CountrySelect({ countryCode, onChange }) {
       disableClearable
       clearOnEscape
       clearOnBlur
-      value={COUNTRIES_ARRAY.find(c => c.code === countryCode)}
+      // @ts-ignore
+      value={COUNTRIES_ARRAY.find(c => c.code === countryCode) || null}
       onChange={(_, value) => onChange(value?.code)}
       getOptionLabel={(option) => option.label}
       renderInput={(params) => (
