@@ -2,7 +2,7 @@ import React from 'react';
 
 import styled from 'styled-components';
 import { Box, Button as BaseButton } from '@chakra-ui/react';
-import { Link as ALink, Button as AButton, useTheme } from '@aragon/ui';
+import { Link as ALink, Button as AButton } from '@aragon/ui';
 import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
 export const SmallWidth = styled.div`
