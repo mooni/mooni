@@ -18,7 +18,7 @@ const paraswapAxios = axios.create({
   baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
-let augustusSpender: string | null = null;
+let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 

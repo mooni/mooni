@@ -10,8 +10,8 @@ function getHeaderToken(req: NowRequest): string | null {
   return token;
 }
 
-type Handler = (req: NowRequest, res: NowResponse) => Promise<NowResponse | void>
-type AuthedHandler = (req: NowRequest, res: NowResponse, token: Token) => Promise<NowResponse | void>
+type Handler = (req: NowRequest, res: NowResponse) => Promise<NowResponse | void>
+type AuthedHandler = (req: NowRequest, res: NowResponse, token: Token) => Promise<NowResponse | void>
 
 export const authMiddleware = (fn: AuthedHandler): Handler => async (req: NowRequest, res: NowResponse) => {
   const jwsToken = getHeaderToken(req);

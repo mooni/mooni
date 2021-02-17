@@ -66,7 +66,7 @@ export const CurrencyLogo = React.memo((props: CurrencyLogoProps) => {
   const currency = useCurrency(props.symbol);
 
   return (
-    <Box width={props.width || '100%'} display="flex" alignItems="center">
+    <Box width={props.width || '100%'} display="flex" alignItems="center">
       <Suspense
         fallback={<CurrencyLogoImage src={tokenDefaultImage} symbol={props.symbol}/>}
       >

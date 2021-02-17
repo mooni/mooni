@@ -30,7 +30,7 @@ export function useAllowance(symbol: CurrencySymbol, amount: string): AllowanceD
 
 
   useEffect(() => {
-    if(!userAddress || !amount) {
+    if(!userAddress || !amount) {
       setAllowanceReady(false);
       setAllowanceLoading(false);
       return;
@@ -70,7 +70,7 @@ export function useAllowance(symbol: CurrencySymbol, amount: string): AllowanceD
 
   const approveAllowance = useCallback(async() => {
       setAllowanceMining(true);
-      if(!(currency instanceof TokenCurrency) || !ethManager || !userAddress) {
+      if(!(currency instanceof TokenCurrency) || !ethManager || !userAddress) {
         throw new Error('missing something of approveAllowance');
       }
       const spenderAddress = await DexProxy.getSpender(currency.symbol);

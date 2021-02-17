@@ -21,7 +21,7 @@ export function FieldError({ text, children }) {
       color: theme.negative,
       fontSize: '10pt',
     }}>
-      {text || children}
+      {text || children}
     </p>
   )
 }

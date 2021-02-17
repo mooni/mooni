@@ -15,9 +15,9 @@ export const STATE_NAME = 'PAYMENT';
 export interface PaymentState {
   exchangeStep: number;
   multiTradeRequest: MultiTradeRequest;
-  multiTrade: MultiTrade | null;
-  orderErrors: OrderErrors | null;
-  payment: Payment | null;
+  multiTrade: MultiTrade | null;
+  orderErrors: OrderErrors | null;
+  payment: Payment | null;
 }
 
 // eslint-disable-next-line

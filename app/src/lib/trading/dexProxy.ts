@@ -16,16 +16,16 @@ function calculatedGasMargin(gas) {
 class DexProxy {
   constructor(readonly currenciesManager: CurrenciesManager) {}
 
-  static async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
+  static async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-    return foundToken || null;
+    return foundToken || null;
   }
 
-  static async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
+  static async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.symbol === tokenSymbol);
-    return foundToken || null;
+    return foundToken || null;
   }
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
@@ -66,7 +66,7 @@ class DexProxy {
     return tx.hash;
   }
 
-  async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
+  async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
     const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;

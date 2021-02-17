@@ -15,7 +15,7 @@ const networkName = {
 };
 
 function getNetworkName(chainId) {
-  return networkName[chainId] || chainId;
+  return networkName[chainId] || chainId;
 }
 
 function getErrorTitle(error) {

@@ -9,7 +9,7 @@ import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 
 const bityInstance = new Bity();
 
-export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
+export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
 
   const tradeRequest = req.body as TradeRequest;
 

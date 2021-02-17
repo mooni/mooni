@@ -7,7 +7,7 @@ import prisma from '../../src/lib/api/prisma'
 import { APIError } from '../../src/lib/errors';
 import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
-export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
 
   const multiTradeId = req.body?.multiTradeId as string;
   const txHash = req.body?.txHash as string;

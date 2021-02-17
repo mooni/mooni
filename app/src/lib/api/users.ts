@@ -19,7 +19,7 @@ export async function getUser(ethAddress: string): Promise<User> {
   return user;
 }
 
-export async function getUserByReferral(referralId: string): Promise<User | null> {
+export async function getUserByReferral(referralId: string): Promise<User | null> {
   const userData = {
     referralId,
   };

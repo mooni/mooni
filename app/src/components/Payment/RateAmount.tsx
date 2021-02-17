@@ -13,7 +13,7 @@ import bityLogo from "../../assets/bity_logo_small.png";
 import paraswapLogo from "../../assets/paraswap_logo_small.png";
 import { useCurrenciesContext } from '../../hooks/currencies';
 
-function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency): Fee | null {
+function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
 
   if(fees.length === 0) {
@@ -226,7 +226,7 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
 }
 
 interface RateAmountProps {
-  multiTradeEstimation: MultiTradeEstimation | null;
+  multiTradeEstimation: MultiTradeEstimation | null;
 }
 export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
   if(multiTradeEstimation) {

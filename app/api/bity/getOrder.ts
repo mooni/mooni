@@ -12,7 +12,7 @@ import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
 const bityInstance = new Bity();
 
-export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
 
   const bityOrderId: string = req.body?.bityOrderId as string;
 

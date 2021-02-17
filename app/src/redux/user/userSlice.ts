@@ -8,8 +8,8 @@ import { defaultProvider } from '../../lib/web3Providers';
 export const STATE_NAME = 'USER';
 
 interface UserState {
-  user: User | null;
-  ens: string | null;
+  user: User | null;
+  ens: string | null;
 }
 
 const initialState: UserState = {
@@ -21,10 +21,10 @@ export const userSlice = createSlice({
   name: STATE_NAME,
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User | null>) => {
+    setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
     },
-    setENS: (state, action: PayloadAction<string | null>) => {
+    setENS: (state, action: PayloadAction<string | null>) => {
       state.ens = action.payload;
     },
   },
