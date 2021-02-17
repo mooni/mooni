@@ -14,18 +14,6 @@ export const MediumWidth = styled.div`
   width: 90%;
 `;
 
-export function FieldError({ text, children }) {
-  const theme = useTheme();
-  return (
-    <p style={{
-      color: theme.negative,
-      fontSize: '10pt',
-    }}>
-      {text || children}
-    </p>
-  )
-}
-
 export const WideInput = styled.input`
   width: 100%;
   height: 40px;
