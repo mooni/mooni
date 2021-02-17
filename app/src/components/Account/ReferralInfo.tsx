@@ -30,7 +30,7 @@ export function ReferralBox() {
   return (
     <Flex direction="column" justify="center" align="center">
       <Content>
-        Share referral link to Earn cryptocurrency
+        Share referral link to earn cryptocurrency
       </Content>
       <Button
         onClick={onCopy}
