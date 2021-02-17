@@ -1,13 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import { get } from 'lodash';
 
-import { Field, textStyle } from '@aragon/ui';
+import { Box, Flex } from '@chakra-ui/react';
+import { textStyle } from '@aragon/ui';
 import { WideInput } from '../UI/StyledComponents';
-
-const fieldStyle = {
-  marginTop: '0.5rem',
-  marginBottom: '0px',
-};
 
 const ErrorMessage = styled.p`
   ${textStyle('body4')};
@@ -17,9 +14,47 @@ const ErrorMessage = styled.p`
   margin-right: 5px;
 `;
 
-const FormField = React.forwardRef(({ label, name, required, children, errors, errorMessages, placeholder }, ref) =>{
+const FieldContainer = styled.div`
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+`;
+const Label = styled.span`
+  ${textStyle('label2')};
+  color: ${props => props.theme.surfaceContentSecondary};
+  white-space: nowrap;
+`;
+const RequiredIcon = styled.span`
+  color: ${props => props.theme.accent};
+  margin-left: 0.1rem;
+`;
+
+function Field({ label, required, errorMessage, children }) {
   return (
-    <Field label={label} style={fieldStyle} required={required}>
+    <FieldContainer>
+      <Flex justify="space-between">
+        <Box mb={2}>
+          <Label>
+            {label}
+          </Label>
+          <RequiredIcon>
+            {required ? '*' : null}
+          </RequiredIcon>
+        </Box>
+        <ErrorMessage>
+          {errorMessage ?? null}
+        </ErrorMessage>
+      </Flex>
+      <Box>
+        {children}
+      </Box>
+    </FieldContainer>
+  );
+}
+
+const FormField = React.forwardRef(({ label, name, required, children, errors, errorMessages, placeholder }, ref) =>{
+  const errorMessage = get(errors, name) && errorMessages[name];
+  return (
+    <Field label={label} required={required} errorMessage={errorMessage}>
       {children ?
         children
         :
@@ -30,7 +65,6 @@ const FormField = React.forwardRef(({ label, name, required, children, errors, e
           data-private
         />
       }
-      {errors[name] && <ErrorMessage>{errorMessages[name]}</ErrorMessage>}
     </Field>
   )
 });

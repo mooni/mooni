@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@material-ui/core/Box';
 import { IconArrowRight } from '@aragon/ui'
 
-import { setRecipient } from '../../redux/payment/actions';
-import { getRecipient } from '../../redux/payment/selectors';
+import {setRecipient, setReference} from '../../redux/payment/actions';
+import {getRecipient, getReference} from '../../redux/payment/selectors';
 // import { getBoxManager } from '../../redux/box/selectors';
 // import { updateMyAccount } from '../../redux/contacts/actions';
 
@@ -24,13 +24,15 @@ import {RoundButton} from "../UI/StyledComponents";
 function StepRecipient({ onComplete }) {
   // const classes = useStyles();
   const recipient = useSelector(getRecipient);
+  const reference = useSelector(getReference);
   // const boxManager = useSelector(getBoxManager);
   const dispatch = useDispatch();
   // const [saveAccountInfosaveAccountInfo, setSaveAccountInfo] = useState(false);
   const [showBoxModal, setShowBoxModal] = useState(false);
 
   async function onSubmit(data) {
-    dispatch(setRecipient(data));
+    dispatch(setRecipient(data.recipient));
+    dispatch(setReference(data.reference));
     // if(saveAccountInfo) {
     //   await dispatch(updateMyAccount(data));
     // }
@@ -46,6 +48,10 @@ function StepRecipient({ onComplete }) {
     }
   }
    */
+  const initialData = useMemo(() => ({
+    recipient,
+    reference,
+  }), [recipient, reference]);
 
   return (
     <BoxLoadingContainer>
@@ -53,10 +59,10 @@ function StepRecipient({ onComplete }) {
         <BoxModal visible={showBoxModal} onClose={() => setShowBoxModal(false)}/>
 
         <RecipientForm
-          initialRecipient={recipient}
+          initialData={initialData}
           onSubmit={onSubmit}
-          endComponent={({ submit, hasErrors }) => (
-            <>
+          endComponent={({ submit, isValid }) => (
+            <Box mt={2}>
               {/*<label className={classes.saveInfoRow}>
                 <Checkbox
                   checked={saveAccountInfo}
@@ -68,8 +74,8 @@ function StepRecipient({ onComplete }) {
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
               </label>*/}
-              <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
-            </>
+              <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={!isValid} />
+            </Box>
           )}
         />
       </Box>
