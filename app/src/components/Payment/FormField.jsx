@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { get } from 'lodash';
 
 import { Field, textStyle } from '@aragon/ui';
 import { WideInput } from '../UI/StyledComponents';
@@ -18,6 +19,7 @@ const ErrorMessage = styled.p`
 `;
 
 const FormField = React.forwardRef(({ label, name, required, children, errors, errorMessages, placeholder }, ref) =>{
+  const hasError = get(errors, name);
   return (
     <Field label={label} style={fieldStyle} required={required}>
       {children ?
@@ -30,7 +32,7 @@ const FormField = React.forwardRef(({ label, name, required, children, errors, e
           data-private
         />
       }
-      {errors[name] && <ErrorMessage>{errorMessages[name]}</ErrorMessage>}
+      {hasError && <ErrorMessage>{errorMessages[name]}</ErrorMessage>}
     </Field>
   )
 });

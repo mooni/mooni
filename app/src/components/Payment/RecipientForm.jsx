@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import useForm from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { useForm, Controller } from "react-hook-form";
+
 import IBAN from 'iban';
 import EmailValidator from 'email-validator';
 import styled from "styled-components";
@@ -76,35 +77,24 @@ const Section = styled.p`
   margin-bottom: 0.5rem;
 `;
 
-const defaultEndComponent = ({ submit, hasErrors }) => (
-  <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={hasErrors} />
+const defaultEndComponent = ({ submit, isValid }) => (
+  <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={!isValid} />
 );
 
 function RecipientForm({ initialData, onSubmit, endComponent = defaultEndComponent }) {
   // const [more, setMore] = useState(false);
 
-  const { register, handleSubmit, errors, setValue, reset } = useForm({
+  const { register, control, handleSubmit, formState, reset } = useForm({
     mode: 'onChange',
     defaultValues: initialData || undefined,
   });
   useEffect(() => {
     reset(initialData);
   }, [reset, initialData]);
+
   const submit = handleSubmit(onSubmit);
-
-  const [selectedCountryCode, setSelectedCountryCode] = useState(
-    initialData?.recipient?.owner?.country
-  );
-  function setCountry(countryCode) {
-    setSelectedCountryCode(countryCode);
-    setValue('recipient.owner.country', countryCode);
-  }
-  useEffect(() => {
-    register({ name: 'recipient.owner.country' }, fields.country);
-    setValue('recipient.owner.country', initialData?.recipient?.owner?.country || '');
-  }, [register, initialData, setValue]);
-
-  const hasErrors = Object.keys(errors).length !== 0;
+  const { errors, isValid, isSubmitted } = formState;
+  const submitEnabled = (isValid || !isSubmitted);
 
   return (
     <form onSubmit={submit}>
@@ -129,13 +119,21 @@ function RecipientForm({ initialData, onSubmit, endComponent = defaultEndCompone
       <FormField label="Zip/Postal code" name="recipient.owner.zip" ref={register(fields.zip)} errors={errors} errorMessages={errorMessages} required />
       <FormField label="City" name="recipient.owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} required />
 
-      <FormField label="Country" name="recipient.owner.country" errors={errors} errorMessages={errorMessages} required >
-        <CountrySelect
-          countryCode={selectedCountryCode}
-          onChange={setCountry}
-          data-private
-        />
-      </FormField>
+      <Controller
+        control={control}
+        name="recipient.owner.country"
+        rules={fields.country}
+        render={({ onChange, value }) => (
+          <FormField label="Country" name="recipient.owner.country" errors={errors} errorMessages={errorMessages} required >
+            <CountrySelect
+              countryCode={value}
+              onChange={onChange}
+              data-private
+            />
+          </FormField>
+        )}
+      />
+
 
       {/*<Box mb={2} mt={1}>
         <Link onClick={() => setMore(!more)}>
@@ -148,7 +146,7 @@ function RecipientForm({ initialData, onSubmit, endComponent = defaultEndCompone
         <FormField label="Email" name="email" ref={register(fields.email)} errors={errors} errorMessages={errorMessages} />
       </Box>*/}
 
-      {endComponent({ submit, hasErrors })}
+      {endComponent({ submit, isValid: submitEnabled })}
     </form>
   )
 }

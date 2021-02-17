@@ -50,7 +50,7 @@
     "react-dom": "^16.13.1",
     "react-ga": "^2.7.0",
     "react-github-btn": "^1.1.1",
-    "react-hook-form": "^3.28.1",
+    "react-hook-form": "^6.15.1",
     "react-image": "^4.0.3",
     "react-infinite-scroller": "^1.2.4",
     "react-redux": "^7.2.2",

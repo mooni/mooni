@@ -61,7 +61,7 @@ function StepRecipient({ onComplete }) {
         <RecipientForm
           initialData={initialData}
           onSubmit={onSubmit}
-          endComponent={({ submit, hasErrors }) => (
+          endComponent={({ submit, isValid }) => (
             <Box mt={2}>
               {/*<label className={classes.saveInfoRow}>
                 <Checkbox
@@ -74,7 +74,7 @@ function StepRecipient({ onComplete }) {
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
               </label>*/}
-              <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
+              <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={!isValid} />
             </Box>
           )}
         />
