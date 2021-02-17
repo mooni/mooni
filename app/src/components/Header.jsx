@@ -139,7 +139,7 @@ const LogoBox = styled.div`
   > h1 {
     font-family: 'Montserrat', sans-serif;
     text-transform: uppercase;
-    font-size: 2rem;
+    font-size: 1.8rem;
     line-height: 1;
     font-weight: 400;
     letter-spacing: 1px;

@@ -13,7 +13,6 @@ const Button = {
   baseStyle: {
     borderRadius: '2rem',
     fontWeight: 'normal',
-    boxShadow: 'base',
   },
   sizes: {
     md: {
@@ -25,12 +24,17 @@ const Button = {
     outline: {
       border: '1px solid',
       borderColor: '#DDE4E9',
+      boxShadow: 'base',
     },
     solid: {
       border: 'none',
       bg: '#b8b9bb',
       color: '#637381',
+      boxShadow: 'base',
     },
+    link: {
+      color: '#637381',
+    }
   },
   defaultProps: {
     size: 'md',
