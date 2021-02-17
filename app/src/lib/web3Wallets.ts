@@ -60,7 +60,7 @@ export function detectWalletError(error) {
     return error;
   }
   else if(
-    error?.code === 4001 ||  // Metamask
+    error?.code === 4001 ||  // Metamask
     (error && error.message && String(error.message).includes('User canceled')) // Trust wallet
   ) {
     return new Error('user-rejected-transaction');

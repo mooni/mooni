@@ -13,10 +13,10 @@ export enum WalletStatus {
 }
 
 export interface WalletState {
-  ethManager: ETHManager | null;
+  ethManager: ETHManager | null;
   walletStatus: WalletStatus;
-  address: string | null;
-  jwsToken: string | null;
+  address: string | null;
+  jwsToken: string | null;
   providerFromIframe: boolean;
 }
 

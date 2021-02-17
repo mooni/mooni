@@ -19,7 +19,7 @@ interface IConfig {
   },
 }
 
-function parseEnv<T extends string | number | boolean>(
+function parseEnv<T extends string | number | boolean>(
     v: any,
     defaultValue: T
 ): T {

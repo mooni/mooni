@@ -22,7 +22,7 @@ export async function getReports(reporter: Reporter) {
 
   let year = config.year;
   console.log('year:', year);
-  reports[year] = reports[year] || {};
+  reports[year] = reports[year] || {};
 
   for(let month = 1; month<=maxMonth; month++) {
     reports[year][month] = await reporter.getMonthReport(month, year)
@@ -41,7 +41,7 @@ export async function getOrderIds(reporter: Reporter) {
 
   let year = config.year;
   console.log('year:', year);
-  ordersId[year] = ordersId[year] || {};
+  ordersId[year] = ordersId[year] || {};
 
   for(let month = 1; month<=maxMonth; month++) {
     console.log('month:', month);

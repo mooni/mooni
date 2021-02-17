@@ -76,7 +76,7 @@ export const setReferral = (referralId: string) => ({
   }
 });
 
-export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
+export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
   type: SET_MULTITRADE,
   payload: {
     multiTrade,

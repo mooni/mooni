@@ -51,7 +51,7 @@ async function createMooniOrder(multiTradeTemp: MultiTradeTemp) {
   });
 }
 
-export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
 
   const multiTradeRequest = req.body as MultiTradeRequest;
 

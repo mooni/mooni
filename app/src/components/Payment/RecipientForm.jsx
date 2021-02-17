@@ -50,7 +50,7 @@ const fields = {
     pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
   },
   email: {
-    validate: value => !value || value === '' || EmailValidator.validate(value),
+    validate: value => !value || value === '' || EmailValidator.validate(value),
   },
 };
 
@@ -87,7 +87,7 @@ function RecipientForm({ initialRecipient, onSubmit, endComponent = defaultEndCo
 
   const { register, handleSubmit, errors, setValue, reset } = useForm({
     mode: 'onChange',
-    defaultValues: initialRecipient || undefined,
+    defaultValues: initialRecipient || undefined,
   });
   useEffect(() => {
     reset(initialRecipient);
