@@ -56,7 +56,7 @@ function StepRecipient({ onComplete }) {
           initialRecipient={recipient}
           onSubmit={onSubmit}
           endComponent={({ submit, hasErrors }) => (
-            <>
+            <Box mt={2}>
               {/*<label className={classes.saveInfoRow}>
                 <Checkbox
                   checked={saveAccountInfo}
@@ -69,7 +69,7 @@ function StepRecipient({ onComplete }) {
                 </Help>
               </label>*/}
               <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={hasErrors} />
-            </>
+            </Box>
           )}
         />
       </Box>
