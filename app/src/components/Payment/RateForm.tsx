@@ -1,22 +1,22 @@
 import React, { useCallback } from 'react';
 
-import {Box} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
-import {useSelector, useDispatch} from 'react-redux';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
+import { IconCoin, IconEthereum, IconRefresh, LoadingRing, textStyle } from '@aragon/ui';
 import styled from 'styled-components';
 
 import { AmountRow } from './AmountRow';
 
-import {TradeExact, TradeRequest} from '../../lib/trading/types';
+import { TradeExact, TradeRequest } from '../../lib/trading/types';
 
-import {useRate} from '../../hooks/rates';
-import {getWalletStatus} from '../../redux/wallet/selectors';
-import {CurrencyType} from "../../lib/trading/currencyTypes";
+import { useRate } from '../../hooks/rates';
+import { getWalletStatus } from '../../redux/wallet/selectors';
+import { CurrencyType } from '../../lib/trading/currencyTypes';
 import { RateAmount } from './RateAmount';
-import { WalletStatus } from "../../redux/wallet/state";
-import { useAllowance } from '../../hooks/allowance';
+import { WalletStatus } from '../../redux/wallet/state';
+import { ApprovalState, useApproval } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
 import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
@@ -55,7 +55,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
   const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
-  const { allowanceReady, allowanceMining, allowanceLoading, approveAllowance } = useAllowance(rateForm.values.inputCurrency, rateForm.values.inputAmount);
+  const { approvalState, approveAllowance } = useApproval(rateForm.values.inputCurrency, rateForm.values.inputAmount);
 
   const valid = !(rateForm.loading || rateForm.errors);
   const errors = rateForm.errors;
@@ -77,15 +77,15 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
 
   let button: any = null;
   if(walletStatus === WalletStatus.CONNECTED) {
-    if(allowanceMining) {
+    if(approvalState === ApprovalState.MINING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Unlocking tokens" disabled />;
     } else if(rateForm.loading) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
-    } else if(!valid) {
+    } else if(!valid || approvalState === ApprovalState.UNKNOWN) {
       button = <RoundButton wide icon={<IconRefresh/>} label="Exchange" disabled />;
-    } else if(allowanceLoading) {
+    } else if(approvalState === ApprovalState.LOADING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Checking allowance" disabled />;
-    } else if(!allowanceReady) {
+    } else if(approvalState === ApprovalState.NOT_APPROVED) {
       button = <RoundButton mode="positive" onClick={approve} wide icon={<IconCoin/>} label="Unlock token" />
     } else {
       button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange" />
