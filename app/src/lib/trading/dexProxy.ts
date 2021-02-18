@@ -3,7 +3,7 @@ import { MaxUint256 } from '@ethersproject/constants'
 
 import { CurrencySymbol, CurrencyType, TokenCurrency, TokenObject } from './currencyTypes';
 import { amountToDecimal, amountToInt, BN } from '../numbers';
-import { DexTrade, TradeRequest } from './types';
+import { DexTrade, TradeExact, TradeRequest } from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
@@ -15,13 +15,43 @@ export function calculateGasMargin(value: BigNumber): BigNumber {
 
 export const MAX_SLIPPAGE = 0.01;
 
-export function applySlippage(amount: string, maxSlippage: number = MAX_SLIPPAGE, cutDecimals: boolean = false): string {
+export function applySlippage(amount: string, maxSlippage: number = MAX_SLIPPAGE): string {
   const slippageMultiply = new BN(1).plus(maxSlippage);
   let withSlippage = new BN(amount).times(slippageMultiply);
-  if(cutDecimals) {
-    withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
-  }
+  withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
   return withSlippage.toFixed();
+}
+
+interface TradeSlippage {
+  inputAmount: string,
+  outputAmount: string,
+  maxInputAmount: string,
+  minOutputAmount: string,
+}
+
+export function applySlippageOnTrade(dexTrade: DexTrade): TradeSlippage {
+  const {
+    maxSlippage,
+    inputAmount,
+    outputAmount,
+    tradeRequest: { tradeExact, inputCurrencyObject, outputCurrencyObject}
+  } = dexTrade;
+
+  function applyWithDecimals(a , d, s) {
+    const intAmount = amountToInt(a, d);
+    const intWithSlippage = applySlippage(intAmount, s);
+    return amountToDecimal(intWithSlippage, d);
+  }
+
+  const maxInputAmount = applyWithDecimals(inputAmount, inputCurrencyObject.decimals, maxSlippage);
+  const minOutputAmount = applyWithDecimals(outputAmount, outputCurrencyObject.decimals, -maxSlippage);
+
+  return {
+    inputAmount: tradeExact === TradeExact.OUTPUT ? maxInputAmount : inputAmount,
+    outputAmount: tradeExact === TradeExact.INPUT ? minOutputAmount : outputAmount,
+    maxInputAmount,
+    minOutputAmount,
+  }
 }
 
 
@@ -91,6 +121,8 @@ const DexProxy = {
     const inputTokenObject = inputCurrencyObject as TokenObject;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencyObject.symbol);
+
+    // TODO slippage
 
     const allowance = await DexProxy.getAllowance(inputTokenObject, senderAddress, spenderAddress);
     if(new BN(dexTrade.inputAmount).gt(allowance)) {

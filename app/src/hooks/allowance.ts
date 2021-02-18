@@ -10,9 +10,8 @@ import { useCurrency } from './currencies';
 import { CurrencySymbol, TokenCurrency } from '../lib/trading/currencyTypes';
 import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
-import DexProxy from '../lib/trading/dexProxy';
+import DexProxy, { applySlippageOnTrade } from '../lib/trading/dexProxy';
 import { detectWalletError } from '../lib/web3Wallets';
-import { applySlippage } from '../lib/trading/dexProxy';
 
 export enum ApprovalState {
   UNKNOWN,
@@ -122,9 +121,9 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
 }
 
 export function useApprovalForMultiTradeEstimation(multiTradeEstimation: MultiTradeEstimation): ApprovalData {
-  const inputAmount = useMemo(() =>
+  const inputAmount: string = useMemo(() =>
       multiTradeEstimation.trades[0].tradeType === TradeType.DEX ?
-        applySlippage(multiTradeEstimation.trades[0].inputAmount, (multiTradeEstimation.trades[0] as DexTrade).maxSlippage)
+        applySlippageOnTrade(multiTradeEstimation.trades[0] as DexTrade).maxInputAmount
         :
         multiTradeEstimation.trades[0].inputAmount,
     [multiTradeEstimation]

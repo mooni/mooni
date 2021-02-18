@@ -109,17 +109,25 @@ export class Trader {
 
     } else if(path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
       if(tradeRequest.tradeExact === TradeExact.INPUT) {
-        const dexTrade = await this.estimateTrade({
+
+        const {outputAmount: intermediateEthAmount} = await this.estimateTrade({
           inputCurrencyObject: tradeRequest.inputCurrencyObject,
           outputCurrencyObject: ETHER.toObject(),
           amount: tradeRequest.amount,
           tradeExact: TradeExact.INPUT,
         });
 
+        const dexTrade = await this.estimateTrade({
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
+          amount: intermediateEthAmount,
+          tradeExact: TradeExact.OUTPUT,
+        });
+
         const bityTrade = await this.estimateTrade({
           inputCurrencyObject: ETHER.toObject(),
           outputCurrencyObject: tradeRequest.outputCurrencyObject,
-          amount: dexTrade.outputAmount,
+          amount: intermediateEthAmount,
           tradeExact: TradeExact.INPUT,
         });
         ethAmount = bityTrade.inputAmount;
