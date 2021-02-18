@@ -71,7 +71,7 @@ const initialMockStateMinimum: PaymentState = {
     tradeRequest: {
       inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
       outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
-      amount: '320',
+      amount: '0.1',
       tradeExact: TradeExact.INPUT,
     },
   },

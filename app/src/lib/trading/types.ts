@@ -1,7 +1,7 @@
 import { Recipient } from '../types';
 import { BityOrderResponse } from '../wrappers/bityTypes';
 import { UUID } from '../../types/api';
-import { CurrencyObject, CurrencySymbol, TokenObject } from './currencyTypes';
+import { CurrencyObject, TokenObject } from './currencyTypes';
 
 export enum TradeExact {
   INPUT = 'INPUT',

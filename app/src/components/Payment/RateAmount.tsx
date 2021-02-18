@@ -5,7 +5,7 @@ import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
-import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
+import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
 import {MetaError} from "../../lib/errors";
 import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
 
@@ -150,7 +150,8 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrencyObject.symbol}
+        {truncateNumber(trade.inputAmount)}
+        {' '}{trade.tradeRequest.inputCurrencyObject.symbol}
         <b>{' > '}</b>
         {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
       </RouteAmount>
