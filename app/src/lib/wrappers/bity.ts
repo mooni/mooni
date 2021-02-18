@@ -31,7 +31,7 @@ function removeEmptyStrings(data: object = {}) {
     {});
 }
 
-function extractFees(order: any): Fee  {
+function extractFees(order: BityOrderResponse, tradeRequest: TradeRequest): Fee  {
   const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
 
   // expect the fees to be in the same currency
@@ -44,11 +44,17 @@ function extractFees(order: any): Fee  {
     .map(f => f.amount)
     .reduce((acc, a) => acc.plus(a), new BN(0))
     .toFixed();
-  const currencySymbol = fees[0].currency;
+
+  const currencyObjects = [tradeRequest.inputCurrencyObject, tradeRequest.outputCurrencyObject];
+
+  const currencyObject = currencyObjects.find(c => c.symbol === fees[0].currency);
+  if(!currencyObject) {
+    throw new Error('unknown bity fee currency');
+  }
 
   return {
     amount: totalAmountInputCurrency,
-    currencySymbol,
+    currencyObject,
   }
 }
 
@@ -142,7 +148,7 @@ class Bity {
         outputAmount: bityOrderResponse.output.amount,
         tradeType: TradeType.BITY,
         bityOrderResponse,
-        fee: extractFees(bityOrderResponse),
+        fee: extractFees(bityOrderResponse, tradeRequest),
       };
     } catch(error) {
       if(error instanceof BityOrderError) throw error;
@@ -224,7 +230,7 @@ class Bity {
         outputAmount: bityOrderResponse.output.amount,
         tradeType: TradeType.BITY,
         bityOrderResponse,
-        fee: extractFees(bityOrderResponse),
+        fee: extractFees(bityOrderResponse, tradeRequest),
       };
 
     } catch(error) {

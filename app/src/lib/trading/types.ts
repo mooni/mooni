@@ -77,5 +77,5 @@ export interface ETHInfo {
 
 export interface Fee {
   amount: string,
-  currencySymbol: CurrencySymbol,
+  currencyObject: CurrencyObject,
 }
