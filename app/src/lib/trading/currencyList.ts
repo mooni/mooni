@@ -1,5 +1,4 @@
-import {CryptoCurrency, FiatCurrency, createFromCurrencyObject} from './currencyTypes';
-import {CurrencySymbol} from "./types";
+import { CryptoCurrency, FiatCurrency, createFromCurrencyObject, CurrencySymbol } from './currencyTypes';
 import FiatCurrenciesDefault from "../../constants/FiatCurrencies";
 import CryptoCurrenciesDefault from "../../constants/CryptoCurrencies";
 

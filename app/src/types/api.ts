@@ -1,4 +1,4 @@
-import {CurrencySymbol} from "../lib/trading/types";
+import { CurrencySymbol } from '../lib/trading/currencyTypes';
 
 export type UUID = string;
 export type CUID = string;

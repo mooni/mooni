@@ -8,7 +8,8 @@ import {
 
 import { STATE_NAME, PaymentState, initialState } from "./state";
 import * as actions from './actions';
-import { BankInfo, CurrencySymbol, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types';
+import { BankInfo, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types';
+import { CurrencySymbol } from '../../lib/trading/currencyTypes';
 
 export { STATE_NAME };
 

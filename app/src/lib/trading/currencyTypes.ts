@@ -1,7 +1,6 @@
-import {ChainId} from '@uniswap/sdk';
-import {ethers} from "ethers";
+import { ChainId } from '@uniswap/sdk';
+import { ethers } from 'ethers';
 import ERC20_ABI from '../abis/ERC20.json';
-import {CurrencySymbol} from "./types";
 import { defaultProvider } from '../web3Providers';
 import { amountToDecimal } from '../numbers';
 
@@ -10,6 +9,8 @@ export enum CurrencyType {
   CRYPTO = 'CRYPTO',
   ERC20 = 'ERC20',
 }
+
+export type CurrencySymbol = string;
 
 export interface CurrencyObject {
   type: CurrencyType;

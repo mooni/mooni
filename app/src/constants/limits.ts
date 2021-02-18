@@ -1,4 +1,4 @@
-import { CurrencySymbol } from '../lib/trading/types';
+import { CurrencySymbol } from '../lib/trading/currencyTypes';
 
 type OutputLimits = Record<CurrencySymbol, number>;
 

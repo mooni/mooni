@@ -1,9 +1,9 @@
 import { ethers, providers, BigNumber } from 'ethers';
 import { MaxUint256 } from '@ethersproject/constants'
 
-import { TokenCurrency } from './currencyTypes';
+import { CurrencySymbol, TokenCurrency } from './currencyTypes';
 import { amountToDecimal, amountToInt, BN } from '../numbers';
-import {CurrencySymbol, DexTrade, TradeRequest} from './types';
+import {DexTrade, TradeRequest} from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';

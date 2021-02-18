@@ -1,6 +1,5 @@
 import ParaswapWrapper, { CurrencyBalances } from '../wrappers/paraswap';
-import { CurrenciesMap, Currency, CurrencyType, TokenCurrency } from './currencyTypes';
-import { CurrencySymbol } from './types';
+import { CurrenciesMap, Currency, CurrencySymbol, CurrencyType, TokenCurrency } from './currencyTypes';
 import { fiatCurrencies } from './currencyList';
 import { MetaError } from '../errors';
 

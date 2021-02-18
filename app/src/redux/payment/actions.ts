@@ -14,10 +14,11 @@ import Api from '../../lib/apiWrapper';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
-import { BityTrade, CurrencySymbol, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
+import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
 import DexProxy from "../../lib/trading/dexProxy";
 import CurrenciesManager from '../../lib/trading/currenciesManager';
 import { MetaError } from '../../lib/errors';
+import { CurrencySymbol } from '../../lib/trading/currencyTypes';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';

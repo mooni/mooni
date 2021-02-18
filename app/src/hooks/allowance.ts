@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux';
 
 import { getAddress, getETHManager } from '../redux/wallet/selectors';
 import { BN } from '../lib/numbers';
-import { CurrencySymbol, DexTrade, MultiTradeEstimation, TradeType } from '../lib/trading/types';
+import { DexTrade, MultiTradeEstimation, TradeType } from '../lib/trading/types';
 import { useCurrency } from './currencies';
-import { TokenCurrency } from '../lib/trading/currencyTypes';
+import { CurrencySymbol, TokenCurrency } from '../lib/trading/currencyTypes';
 import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
 import DexProxy from '../lib/trading/dexProxy';

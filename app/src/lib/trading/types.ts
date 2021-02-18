@@ -1,6 +1,7 @@
-import { Recipient } from "../types";
-import { BityOrderResponse } from "../wrappers/bityTypes";
+import { Recipient } from '../types';
+import { BityOrderResponse } from '../wrappers/bityTypes';
 import { UUID } from '../../types/api';
+import { CurrencySymbol } from './currencyTypes';
 
 export enum TradeExact {
   INPUT = 'INPUT',
@@ -13,7 +14,6 @@ export enum TradeType {
 }
 
 export type TradePath = TradeType[];
-export type CurrencySymbol = string;
 
 export interface TradeRequest {
   inputCurrencySymbol: CurrencySymbol;

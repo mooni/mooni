@@ -4,11 +4,11 @@ import {APIError, ParaSwap, NetworkID} from 'paraswap';
 import { ChainId } from '@uniswap/sdk';
 
 import {defaultProvider} from "../web3Providers";
-import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
+import { DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
+import { CurrencySymbol, CurrencyType, TokenCurrency } from '../trading/currencyTypes';
 import {amountToDecimal, amountToInt} from "../numbers";
 import CurrenciesManager from '../trading/currenciesManager';
 import { MetaError } from '../errors';
