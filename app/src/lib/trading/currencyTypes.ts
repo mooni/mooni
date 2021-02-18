@@ -111,16 +111,16 @@ export class TokenCurrency extends Currency {
   }
 }
 
-export function createFromCurrencyObject(currencyObject: CurrencyObject): Currency {
+export function createFromCurrencyObject<T extends Currency>(currencyObject: CurrencyObject): T {
   switch(currencyObject.type) {
     case CurrencyType.FIAT:
-      return new FiatCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      return new FiatCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.CRYPTO:
-      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.ERC20:
-      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img) as unknown as T;
 
     default:
       throw new Error('unknown currency type')

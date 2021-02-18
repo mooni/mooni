@@ -9,12 +9,13 @@ import { setModalError } from '../redux/ui/actions';
 import { useAppDispatch } from '../redux/store';
 import { logError } from '../lib/log';
 
+export type GetCurrencyFn = (CurrencySymbol) => Currency;
 interface CurrenciesContextType {
   currenciesManager: CurrenciesManager;
   currenciesReady: boolean;
   inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
-  getCurrency: (CurrencySymbol) => Currency;
+  getCurrency: GetCurrencyFn;
 }
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
@@ -83,7 +84,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
     if(tokenAddress) {
       try {
         const currency = currenciesManager.getTokenByAddress(tokenAddress);
-        dispatch(setInputCurrency(currency.symbol));
+        dispatch(setInputCurrency(currency.toObject()));
       } catch(error) {
         logError('invalid-custom-token', error);
         dispatch(setModalError(new Error('invalid-custom-token')))

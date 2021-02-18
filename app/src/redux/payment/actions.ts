@@ -18,7 +18,7 @@ import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../
 import DexProxy from "../../lib/trading/dexProxy";
 import CurrenciesManager from '../../lib/trading/currenciesManager';
 import { MetaError } from '../../lib/errors';
-import { CurrencySymbol } from '../../lib/trading/currencyTypes';
+import { CurrencyObject } from '../../lib/trading/currencyTypes';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
@@ -44,10 +44,10 @@ export const setTradeRequest = (tradeRequest: TradeRequest) => ({
     tradeRequest,
   }
 });
-export const setInputCurrency = (symbol: CurrencySymbol) => ({
+export const setInputCurrency = (inputCurrencyObject: CurrencyObject) => ({
   type: SET_INPUT_CURRENCY,
   payload: {
-    symbol,
+    inputCurrencyObject,
   }
 });
 

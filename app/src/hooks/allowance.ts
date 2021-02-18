@@ -130,5 +130,5 @@ export function useApprovalForMultiTradeEstimation(multiTradeEstimation: MultiTr
     [multiTradeEstimation]
   );
 
-  return useApproval(multiTradeEstimation.tradeRequest.inputCurrencySymbol, inputAmount);
+  return useApproval(multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol, inputAmount);
 }

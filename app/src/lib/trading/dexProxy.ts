@@ -66,10 +66,10 @@ class DexProxy {
 
     const intAmount = BigNumber.from(amountToInt(amount, token.decimals));
 
-    let useExact = false
+    // let useExact = false
     const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, MaxUint256).catch(() => {
       // general fallback for tokens who restrict approval amounts
-      useExact = true;
+      // useExact = true;
       return tokenContract.estimateGas.approve(spenderAddress, intAmount);
     });
 
@@ -86,9 +86,9 @@ class DexProxy {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencySymbol) as TokenCurrency;
+    const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencyObject.symbol) as TokenCurrency;
     const senderAddress = await signer.getAddress();
-    const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencySymbol);
+    const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencyObject.symbol);
 
     const allowance = await DexProxy.getAllowance(inputToken, senderAddress, spenderAddress);
     if(new BN(dexTrade.inputAmount).gt(allowance)) {

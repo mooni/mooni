@@ -22,8 +22,8 @@ export class Trader {
   }
 
   private findPath(tradeRequest: TradeRequest): TradePath {
-    const inputCurrency = this.currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
-    const outputCurrency = this.currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
+    const inputCurrency = this.currenciesManager.getCurrency(tradeRequest.inputCurrencyObject.symbol);
+    const outputCurrency = this.currenciesManager.getCurrency(tradeRequest.outputCurrencyObject.symbol);
     if(
         inputCurrency.equals(ETHER)
         &&
@@ -113,15 +113,15 @@ export class Trader {
     } else if(path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
       if(tradeRequest.tradeExact === TradeExact.INPUT) {
         const dexTrade = await this.estimateTrade({
-          inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
-          outputCurrencySymbol: ETHER.symbol,
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
           amount: tradeRequest.amount,
           tradeExact: TradeExact.INPUT,
         });
 
         const bityTrade = await this.estimateTrade({
-          inputCurrencySymbol: ETHER.symbol,
-          outputCurrencySymbol: tradeRequest.outputCurrencySymbol,
+          inputCurrencyObject: ETHER.toObject(),
+          outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: dexTrade.outputAmount,
           tradeExact: TradeExact.INPUT,
         });
@@ -132,16 +132,16 @@ export class Trader {
 
       } else if(tradeRequest.tradeExact === TradeExact.OUTPUT) {
         const bityTrade = await this.estimateTrade({
-          inputCurrencySymbol: ETHER.symbol,
-          outputCurrencySymbol: tradeRequest.outputCurrencySymbol,
+          inputCurrencyObject: ETHER.toObject(),
+          outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: tradeRequest.amount,
           tradeExact: TradeExact.OUTPUT,
         });
         ethAmount = bityTrade.inputAmount;
 
         const dexTrade = await this.estimateTrade({
-          inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
-          outputCurrencySymbol: ETHER.symbol,
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
           amount: bityTrade.inputAmount,
           tradeExact: TradeExact.OUTPUT,
         });
@@ -193,22 +193,22 @@ export class Trader {
 
       if (tradeRequest.tradeExact === TradeExact.INPUT) {
         const {outputAmount: intermediateEthAmount} = await this.createTrade({
-          inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
-          outputCurrencySymbol: ETHER.symbol,
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
           amount: tradeRequest.amount,
           tradeExact: TradeExact.INPUT,
         }, multiTradeRequest);
 
         const dexTrade = await this.createTrade({
-          inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
-          outputCurrencySymbol: ETHER.symbol,
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
           amount: intermediateEthAmount,
           tradeExact: TradeExact.OUTPUT,
         }, multiTradeRequest);
 
         const bityTrade = await this.createTrade({
-          inputCurrencySymbol: ETHER.symbol,
-          outputCurrencySymbol: tradeRequest.outputCurrencySymbol,
+          inputCurrencyObject: ETHER.toObject(),
+          outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: intermediateEthAmount,
           tradeExact: TradeExact.INPUT,
         }, multiTradeRequest);
@@ -220,16 +220,16 @@ export class Trader {
       }
       else if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
         const bityTrade = await this.createTrade({
-          inputCurrencySymbol: ETHER.symbol,
-          outputCurrencySymbol: tradeRequest.outputCurrencySymbol,
+          inputCurrencyObject: ETHER.toObject(),
+          outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: tradeRequest.amount,
           tradeExact: TradeExact.OUTPUT,
         }, multiTradeRequest);
         ethAmount = bityTrade.inputAmount;
 
         const dexTrade = await this.createTrade({
-          inputCurrencySymbol: tradeRequest.inputCurrencySymbol,
-          outputCurrencySymbol: ETHER.symbol,
+          inputCurrencyObject: tradeRequest.inputCurrencyObject,
+          outputCurrencyObject: ETHER.toObject(),
           amount: bityTrade.inputAmount,
           tradeExact: TradeExact.OUTPUT,
         }, multiTradeRequest);

@@ -87,14 +87,14 @@ class Bity {
   }
 
   async estimate(tradeRequest: TradeRequest): Promise<BityTrade> {
-    const { inputCurrencySymbol, outputCurrencySymbol, amount, tradeExact } = tradeRequest;
+    const { inputCurrencyObject, outputCurrencyObject, amount, tradeExact } = tradeRequest;
 
     const body: any = {
       input: {
-        currency: inputCurrencySymbol,
+        currency: inputCurrencyObject.symbol,
       },
       output: {
-        currency: outputCurrencySymbol,
+        currency: outputCurrencyObject.symbol,
       },
       partner_fee: { factor: bityPartnerFee }
     };
@@ -155,7 +155,7 @@ class Bity {
 
     const body: any = {
       input: {
-        currency: tradeRequest.inputCurrencySymbol,
+        currency: tradeRequest.inputCurrencyObject.symbol,
         type: 'crypto_address',
         crypto_address: ethInfo.fromAddress,
       },
@@ -163,7 +163,7 @@ class Bity {
         type: 'bank_account',
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
-        currency: tradeRequest.outputCurrencySymbol,
+        currency: tradeRequest.outputCurrencyObject.symbol,
         reference: reference,
       },
     };

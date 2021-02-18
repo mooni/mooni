@@ -24,8 +24,8 @@ async function createMooniOrder(multiTradeTemp: MultiTradeTemp) {
   const rawMooniOrder = {
     inputAmount: multiTradeTemp.inputAmount,
     outputAmount: multiTradeTemp.outputAmount,
-    inputCurrency: multiTradeTemp.tradeRequest.inputCurrencySymbol,
-    outputCurrency: multiTradeTemp.tradeRequest.outputCurrencySymbol,
+    inputCurrency: multiTradeTemp.tradeRequest.inputCurrencyObject.symbol,
+    outputCurrency: multiTradeTemp.tradeRequest.outputCurrencyObject.symbol,
     bityOrderId,
     ethAmount: multiTradeTemp.ethAmount,
     user: {

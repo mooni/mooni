@@ -60,8 +60,8 @@ const ParaswapWrapper = {
   async getRate(tradeRequest: TradeRequest, currenciesManager: CurrenciesManager): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
 
-    const inputCurrency = currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
-    const outputCurrency = currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
+    const inputCurrency = currenciesManager.getCurrency(tradeRequest.inputCurrencyObject.symbol);
+    const outputCurrency = currenciesManager.getCurrency(tradeRequest.outputCurrencyObject.symbol);
     const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
 
     const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
@@ -72,8 +72,8 @@ const ParaswapWrapper = {
         method: 'get',
         url: '/prices',
         params: {
-          from: tradeRequest.inputCurrencySymbol,
-          to: tradeRequest.outputCurrencySymbol,
+          from: tradeRequest.inputCurrencyObject.symbol,
+          to: tradeRequest.outputCurrencyObject.symbol,
           amount: intAmount,
           side: swapSide
         },
@@ -138,8 +138,8 @@ const ParaswapWrapper = {
     }
     const { priceRoute } = dexTrade.dexMetadata;
 
-    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencySymbol);
-    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencySymbol);
+    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencyObject.symbol);
+    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencyObject.symbol);
     const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? dexTrade.maxSlippage : 0, true);
     const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? -dexTrade.maxSlippage : 0, true);
     const receiver = undefined;

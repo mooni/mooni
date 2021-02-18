@@ -22,8 +22,8 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency):
 
   const lastTrade = multiTradeEstimation.trades[multiTradeEstimation.trades.length-1];
 
-  const expectedFeeCurrency = getCurrency(lastTrade.tradeRequest.inputCurrencySymbol);
-  const desiredFeeCurrency = getCurrency(lastTrade.tradeRequest.outputCurrencySymbol);
+  const expectedFeeCurrency = getCurrency(lastTrade.tradeRequest.inputCurrencyObject.symbol);
+  const desiredFeeCurrency = getCurrency(lastTrade.tradeRequest.outputCurrencyObject.symbol);
 
   // TODO support multiple fee currencies
   // expect the fees to be ~ETH
@@ -151,9 +151,9 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrencySymbol}
+        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrencyObject.symbol}
         <b>{' > '}</b>
-        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencySymbol}
+        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
       </RouteAmount>
     </Box>
     <Box height={30} display="flex" alignItems="center">
@@ -185,8 +185,8 @@ interface RateAmountLoadedProps {
 export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEstimation}) => {
   const { getCurrency } = useCurrenciesContext();
 
-  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencySymbol;
-  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencySymbol;
+  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol;
+  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencyObject.symbol;
 
   const fee = useMemo(() => aggregateFees(multiTradeEstimation, getCurrency), [multiTradeEstimation, getCurrency]);
   const feeInfos = useMemo(() => {
