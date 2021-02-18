@@ -123,7 +123,7 @@ export function createFromCurrencyObject<T extends Currency>(currencyObject: Cur
       return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.ERC20:
-      if(!(currencyObject as any).chaindId || !(currencyObject as any).address) {
+      if(!(currencyObject as any).chainId || !(currencyObject as any).address) {
         throw new Error('invalid token object, mising chainId or address')
       }
       const tokenObject = currencyObject as TokenObject;

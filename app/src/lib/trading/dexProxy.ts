@@ -7,7 +7,6 @@ import { DexTrade, TradeRequest } from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
-import CurrenciesManager from './currenciesManager';
 
 // Add 10%
 export function calculateGasMargin(value: BigNumber): BigNumber {
@@ -26,41 +25,40 @@ export function applySlippage(amount: string, maxSlippage: number = MAX_SLIPPAGE
 }
 
 
-class DexProxy {
-  constructor(readonly currenciesManager: CurrenciesManager) {}
+const DexProxy = {
 
-  static async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
+  async getTokenFromAddress(tokenAddress: string): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
     return foundToken || null;
-  }
+  },
 
-  static async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
+  async getTokenFromSymbol(tokenSymbol: CurrencySymbol): Promise<TokenCurrency | null> {
     const tokens = await Paraswap.getTokenList();
     const foundToken = tokens.find(t => t.symbol === tokenSymbol);
     return foundToken || null;
-  }
+  },
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
     return Paraswap.getRate(tradeRequest);
-  }
+  },
 
   async createTrade(tradeRequest: TradeRequest): Promise<DexTrade> {
-    return this.getRate(tradeRequest);
-  }
+    return DexProxy.getRate(tradeRequest);
+  },
 
-  static async getSpender(_: string): Promise<string> {
+  async getSpender(_: string): Promise<string> {
     return Paraswap.getSpender();
-  }
+  },
 
-  static async getAllowance(tokenObject: TokenObject, senderAddress: string, spenderAddress: string): Promise<string>
+  async getAllowance(tokenObject: TokenObject, senderAddress: string, spenderAddress: string): Promise<string>
   {
     const tokenContract = new ethers.Contract(tokenObject.address, ERC20_ABI, defaultProvider);
     const allowance = await tokenContract.allowance(senderAddress, spenderAddress);
     return amountToDecimal(allowance.toString(), tokenObject.decimals);
-  }
+  },
 
-  static async approve(tokenObject: TokenObject, senderAddress: string, spenderAddress: string, amount: string, provider: providers.Web3Provider): Promise<string> {
+  async approve(tokenObject: TokenObject, senderAddress: string, spenderAddress: string, amount: string, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const tokenContract = new ethers.Contract(tokenObject.address, ERC20_ABI, signer);
 
@@ -81,7 +79,7 @@ class DexProxy {
       }
     );
     return tx.hash;
-  }
+  },
 
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
@@ -101,7 +99,7 @@ class DexProxy {
     }
 
     return null;
-  }
+  },
 
   async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
@@ -109,7 +107,8 @@ class DexProxy {
     const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
-  }
+  },
+
 }
 
 export default DexProxy;

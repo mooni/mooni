@@ -1,4 +1,4 @@
-import {CurrencyType} from './currencyTypes';
+import { createFromCurrencyObject, CurrencyType } from './currencyTypes';
 import {
   BityTrade,
   DexTrade,
@@ -14,18 +14,13 @@ import {ETHER} from './currencyList';
 import { TradeExact } from './types';
 import DexProxy from "./dexProxy";
 import Bity from "../wrappers/bity";
-import CurrenciesManager from './currenciesManager';
 
 export class Trader {
-  dexProxy: DexProxy;
-
-  constructor(readonly bityInstance: Bity, readonly currenciesManager: CurrenciesManager) {
-    this.dexProxy = new DexProxy(currenciesManager);
-  }
+  constructor(readonly bityInstance: Bity) {}
 
   private findPath(tradeRequest: TradeRequest): TradePath {
-    const inputCurrency = this.currenciesManager.getCurrency(tradeRequest.inputCurrencyObject.symbol);
-    const outputCurrency = this.currenciesManager.getCurrency(tradeRequest.outputCurrencyObject.symbol);
+    const inputCurrency = createFromCurrencyObject(tradeRequest.inputCurrencyObject);
+    const outputCurrency = createFromCurrencyObject(tradeRequest.outputCurrencyObject);
     if(
         inputCurrency.equals(ETHER)
         &&
@@ -73,7 +68,7 @@ export class Trader {
     }
     else if(tradeType === TradeType.DEX) {
       // console.time('dex_estimate');
-      const trade = await this.dexProxy.getRate(tradeRequest);
+      const trade = await DexProxy.getRate(tradeRequest);
       // console.timeEnd('dex_estimate');
       return trade;
     } else {
@@ -94,7 +89,7 @@ export class Trader {
       return await this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
     }
     else if(tradeType === TradeType.DEX) {
-      return await this.dexProxy.createTrade(tradeRequest);
+      return await DexProxy.createTrade(tradeRequest);
     } else {
       throw new Error(`Estimation not available for TradeType ${tradeType}'`);
     }

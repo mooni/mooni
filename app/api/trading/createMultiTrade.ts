@@ -76,9 +76,7 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
 
   await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
-  const currenciesManager = new CurrenciesManager();
-  await currenciesManager.fetchCurrencies();
-  const trader = new Trader(bityInstance, currenciesManager);
+  const trader = new Trader(bityInstance);
 
   const multiTradeTemp = await trader.createMultiTrade(multiTradeRequest);
 

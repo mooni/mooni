@@ -16,7 +16,6 @@ import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
 import DexProxy from "../../lib/trading/dexProxy";
-import CurrenciesManager from '../../lib/trading/currenciesManager';
 import { MetaError } from '../../lib/errors';
 import { CurrencyObject } from '../../lib/trading/currencyTypes';
 
@@ -301,7 +300,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const sendPayment = (currenciesManager: CurrenciesManager) => async function (dispatch, getState)  {
+export const sendPayment = () => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
 
@@ -314,8 +313,6 @@ export const sendPayment = (currenciesManager: CurrenciesManager) => async funct
   const bityTrade = multiTrade.trades.find(t => t.tradeType === TradeType.BITY) as BityTrade;
   const dexTrade = multiTrade.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade;
 
-  const dexProxy = new DexProxy(currenciesManager);
-
   const bityOrderId = bityTrade.bityOrderResponse.id;
   log('PAYMENT: bity order id', bityOrderId);
   log('PAYMENT: ETH address', ethManager.getAddress());
@@ -327,7 +324,7 @@ export const sendPayment = (currenciesManager: CurrenciesManager) => async funct
       // Allowance
       await dispatch(sendPaymentStep({
         stepId: PaymentStepId.ALLOWANCE,
-        paymentFunction: async () => dexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
+        paymentFunction: async () => DexProxy.checkAndApproveAllowance(dexTrade, ethManager.provider)
       }));
       log('PAYMENT: allowance ok');
       track('PAYMENT: allowance ok');
@@ -335,7 +332,7 @@ export const sendPayment = (currenciesManager: CurrenciesManager) => async funct
       // Trade
       await dispatch(sendPaymentStep({
         stepId: PaymentStepId.TRADE,
-        paymentFunction: async () => dexProxy.executeTrade(
+        paymentFunction: async () => DexProxy.executeTrade(
           dexTrade,
           ethManager.provider,
         )
