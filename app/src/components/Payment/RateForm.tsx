@@ -78,17 +78,17 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
   let button: any = null;
   if(walletStatus === WalletStatus.CONNECTED) {
     if(allowanceMining) {
-      button = <RoundButton wide icon={<LoadingRing/>} label={"Unlocking tokens"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label="Unlocking tokens" disabled />;
     } else if(rateForm.loading) {
-      button = <RoundButton wide icon={<LoadingRing/>} label={"Loading rates"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
     } else if(!valid) {
-      button = <RoundButton wide icon={<IconRefresh/>} label="Exchange"  disabled />;
+      button = <RoundButton wide icon={<IconRefresh/>} label="Exchange" disabled />;
     } else if(allowanceLoading) {
-      button = <RoundButton wide icon={<LoadingRing/>} label={"Checking allowance"} disabled />;
+      button = <RoundButton wide icon={<LoadingRing/>} label="Checking allowance" disabled />;
     } else if(!allowanceReady) {
-      button = <RoundButton mode="positive" onClick={approve} wide icon={<IconCoin/>} label="Unlock token" disabled={!valid} />
+      button = <RoundButton mode="positive" onClick={approve} wide icon={<IconCoin/>} label="Unlock token" />
     } else {
-      button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange" disabled={!valid} />
+      button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange" />
     }
   } else if(walletStatus === WalletStatus.DISCONNECTED) {
     button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
