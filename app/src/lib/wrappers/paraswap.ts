@@ -22,9 +22,16 @@ let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
-function applySlippage(amount: string, maxSlippage: number): string {
-  return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
+function applySlippage(amount: string, maxSlippage: number, cutDecimals: boolean = false): string {
+  const slippageMultiply = new BN(1).plus(maxSlippage);
+  let withSlippage = new BN(amount).times(slippageMultiply);
+  if(cutDecimals) {
+    withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
+  }
+  return withSlippage.toFixed();
 }
+
+const MAX_SLIPPAGE = 0.01;
 
 export interface CurrencyBalance {
   symbol: CurrencySymbol,
@@ -71,6 +78,34 @@ const ParaswapWrapper = {
 
     try {
 
+      const { data: dexMetadata } = await paraswapAxios({
+        method: 'get',
+        url: '/prices',
+        params: {
+          from: tradeRequest.inputCurrencySymbol,
+          to: tradeRequest.outputCurrencySymbol,
+          amount: intAmount,
+          side: swapSide
+        },
+      });
+
+      const inputAmount = amountToDecimal(
+        applySlippage(dexMetadata.priceRoute.srcAmount, tradeRequest.tradeExact === TradeExact.INPUT ? 0 : MAX_SLIPPAGE, true),
+        inputCurrency.decimals
+      );
+      const outputAmount = amountToDecimal(
+        applySlippage(dexMetadata.priceRoute.destAmount, tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -MAX_SLIPPAGE, true),
+        outputCurrency.decimals
+      );
+
+      return {
+        tradeRequest,
+        inputAmount,
+        outputAmount,
+        tradeType: TradeType.DEX,
+        dexMetadata,
+      };
+
     } catch(error) {
       const paraswapErrorMessage = error.response?.data?.error;
       if(paraswapErrorMessage) {
@@ -80,27 +115,6 @@ const ParaswapWrapper = {
       }
       throw error;
     }
-    const { data: dexMetadata } = await paraswapAxios({
-      method: 'get',
-      url: '/prices',
-      params: {
-        from: tradeRequest.inputCurrencySymbol,
-        to: tradeRequest.outputCurrencySymbol,
-        amount: intAmount,
-        side: swapSide
-      },
-    });
-
-    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, inputCurrency.decimals);
-    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, outputCurrency.decimals);
-
-    return {
-      tradeRequest,
-      inputAmount,
-      outputAmount,
-      tradeType: TradeType.DEX,
-      dexMetadata,
-    };
   },
   async getSpender(): Promise<string> {
     if(!augustusSpender) {
@@ -119,7 +133,7 @@ const ParaswapWrapper = {
     }
     return augustusSpender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
+  async buildTx(dexTrade: DexTrade, senderAddress: string, currenciesManager: CurrenciesManager): Promise<any> {
     function getTokenAddress(symbol) {
       const currency = currenciesManager.getCurrency(symbol);
 
@@ -135,8 +149,8 @@ const ParaswapWrapper = {
 
     const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencySymbol);
     const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencySymbol);
-    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : maxSlippage);
-    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -maxSlippage);
+    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : MAX_SLIPPAGE, true);
+    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -MAX_SLIPPAGE, true);
     const receiver = undefined;
     const referrer = 'mooni';
 

@@ -1,4 +1,5 @@
 import { ethers, providers, BigNumber } from 'ethers';
+import { MaxUint256 } from '@ethersproject/constants'
 
 import { TokenCurrency } from './currencyTypes';
 import { amountToDecimal, amountToInt, BN } from '../numbers';
@@ -8,9 +9,9 @@ import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
 import CurrenciesManager from './currenciesManager';
 
-function calculatedGasMargin(gas) {
-  const offset = gas.mul(1000).div(10000);
-  return gas.add(offset);
+// Add 10%
+export function calculateGasMargin(value: BigNumber): BigNumber {
+  return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000))
 }
 
 class DexProxy {
@@ -53,14 +54,18 @@ class DexProxy {
 
     const intAmount = BigNumber.from(amountToInt(amount, token.decimals));
 
-    const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, intAmount);
-    const gasLimit = calculatedGasMargin(estimatedGas);
+    let useExact = false
+    const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, MaxUint256).catch(() => {
+      // general fallback for tokens who restrict approval amounts
+      useExact = true;
+      return tokenContract.estimateGas.approve(spenderAddress, intAmount);
+    });
 
     const tx = await tokenContract.approve(
       spenderAddress,
       intAmount,
       {
-        gasLimit: BigNumber.from(gasLimit),
+        gasLimit: calculateGasMargin(estimatedGas),
       }
     );
     return tx.hash;
@@ -82,10 +87,10 @@ class DexProxy {
     return null;
   }
 
-  async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider, maxSlippage: number): Promise<string> {
+  async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const senderAddress = await signer.getAddress();
-    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, maxSlippage, this.currenciesManager);
+    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, this.currenciesManager);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
   }

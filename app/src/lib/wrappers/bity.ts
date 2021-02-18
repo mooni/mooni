@@ -109,32 +109,45 @@ class Bity {
       body.output.amount = String(amount);
     else
       throw new Error('invalid TRADE_EXACT');
+    try {
 
-    const { data: bityOrderResponse } = await this.instance({
-      method: 'post',
-      url: '/v2/orders/estimate',
-      data: body,
-    });
+      const { data: bityOrderResponse } = await this.instance({
+        method: 'post',
+        url: '/v2/orders/estimate',
+        data: body,
+      });
 
-    if(
-      bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
-      ||
-      bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
-    ) {
-      throw new BityOrderError(
-        'bity_amount_too_low',
-        [{ minimumOutputAmount: bityOrderResponse.output.amount}]
-      )
+      if(
+        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
+        ||
+        bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
+      ) {
+        throw new BityOrderError(
+          'bity_amount_too_low',
+          [{ minimumOutputAmount: bityOrderResponse.output.amount}]
+        )
+      }
+
+      return {
+        tradeRequest,
+        inputAmount: bityOrderResponse.input.amount,
+        outputAmount: bityOrderResponse.output.amount,
+        tradeType: TradeType.BITY,
+        bityOrderResponse,
+        fee: extractFees(bityOrderResponse),
+      };
+    } catch(error) {
+      if(error instanceof BityOrderError) throw error;
+
+      if(error?.response?.data?.errors) {
+        throw new BityOrderError(
+          'api_error',
+          error.response.data.errors
+        );
+      } else {
+        throw error;
+      }
     }
-
-    return {
-      tradeRequest,
-      inputAmount: bityOrderResponse.input.amount,
-      outputAmount: bityOrderResponse.output.amount,
-      tradeType: TradeType.BITY,
-      bityOrderResponse,
-      fee: extractFees(bityOrderResponse),
-    };
   }
 
   async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo): Promise<BityTrade> {
@@ -207,6 +220,8 @@ class Bity {
       };
 
     } catch(error) {
+      if(error instanceof BityOrderError) throw error;
+
       if(error?.response?.data?.errors) {
         throw new BityOrderError(
           'api_error',

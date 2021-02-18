@@ -337,7 +337,6 @@ export const sendPayment = (currenciesManager: CurrenciesManager) => async funct
         paymentFunction: async () => dexProxy.executeTrade(
           dexTrade,
           ethManager.provider,
-          0.01, // TODO let user choose that
         )
       }));
       log('PAYMENT: trade ok');
