@@ -122,11 +122,11 @@ const DexProxy = {
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencyObject.symbol);
 
-    // TODO slippage
+    const { maxInputAmount } = applySlippageOnTrade(dexTrade);
 
     const allowance = await DexProxy.getAllowance(inputTokenObject, senderAddress, spenderAddress);
-    if(new BN(dexTrade.inputAmount).gt(allowance)) {
-      const txHash = await DexProxy.approve(inputTokenObject, senderAddress, spenderAddress, dexTrade.inputAmount, provider);
+    if(new BN(maxInputAmount).gt(allowance)) {
+      const txHash = await DexProxy.approve(inputTokenObject, senderAddress, spenderAddress, maxInputAmount, provider);
       return txHash;
     }
 
