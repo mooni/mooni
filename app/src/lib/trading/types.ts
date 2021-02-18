@@ -58,6 +58,7 @@ export interface Trade {
 
 export interface DexTrade extends Trade {
   dexMetadata: any;
+  maxSlippage: number;
 }
 export interface BityTrade extends Trade {
   bityOrderResponse: BityOrderResponse,

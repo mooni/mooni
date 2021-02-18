@@ -14,6 +14,18 @@ export function calculateGasMargin(value: BigNumber): BigNumber {
   return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000))
 }
 
+export const MAX_SLIPPAGE = 0.01;
+
+export function applySlippage(amount: string, maxSlippage: number = MAX_SLIPPAGE, cutDecimals: boolean = false): string {
+  const slippageMultiply = new BN(1).plus(maxSlippage);
+  let withSlippage = new BN(amount).times(slippageMultiply);
+  if(cutDecimals) {
+    withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
+  }
+  return withSlippage.toFixed();
+}
+
+
 class DexProxy {
   constructor(readonly currenciesManager: CurrenciesManager) {}
 

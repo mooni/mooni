@@ -9,9 +9,10 @@ import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
 import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
-import {amountToDecimal, amountToInt, BN} from "../numbers";
+import {amountToDecimal, amountToInt} from "../numbers";
 import CurrenciesManager from '../trading/currenciesManager';
 import { MetaError } from '../errors';
+import { applySlippage, MAX_SLIPPAGE } from '../trading/dexProxy';
 
 const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
@@ -21,17 +22,6 @@ const paraswapAxios = axios.create({
 let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
-
-function applySlippage(amount: string, maxSlippage: number, cutDecimals: boolean = false): string {
-  const slippageMultiply = new BN(1).plus(maxSlippage);
-  let withSlippage = new BN(amount).times(slippageMultiply);
-  if(cutDecimals) {
-    withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
-  }
-  return withSlippage.toFixed();
-}
-
-const MAX_SLIPPAGE = 0.01;
 
 export interface CurrencyBalance {
   symbol: CurrencySymbol,
@@ -90,11 +80,11 @@ const ParaswapWrapper = {
       });
 
       const inputAmount = amountToDecimal(
-        applySlippage(dexMetadata.priceRoute.srcAmount, tradeRequest.tradeExact === TradeExact.INPUT ? 0 : MAX_SLIPPAGE, true),
+        dexMetadata.priceRoute.srcAmount,
         inputCurrency.decimals
       );
       const outputAmount = amountToDecimal(
-        applySlippage(dexMetadata.priceRoute.destAmount, tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -MAX_SLIPPAGE, true),
+        dexMetadata.priceRoute.destAmount,
         outputCurrency.decimals
       );
 
@@ -104,6 +94,7 @@ const ParaswapWrapper = {
         outputAmount,
         tradeType: TradeType.DEX,
         dexMetadata,
+        maxSlippage: MAX_SLIPPAGE,
       };
 
     } catch(error) {
@@ -149,8 +140,8 @@ const ParaswapWrapper = {
 
     const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencySymbol);
     const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencySymbol);
-    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : MAX_SLIPPAGE, true);
-    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -MAX_SLIPPAGE, true);
+    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? dexTrade.maxSlippage : 0, true);
+    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? -dexTrade.maxSlippage : 0, true);
     const receiver = undefined;
     const referrer = 'mooni';
 

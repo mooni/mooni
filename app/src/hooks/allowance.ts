@@ -1,17 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { ETHER } from '../lib/trading/currencyList';
 import { useSelector } from 'react-redux';
 
 import { getAddress, getETHManager } from '../redux/wallet/selectors';
 import { BN } from '../lib/numbers';
-import { CurrencySymbol } from '../lib/trading/types';
+import { CurrencySymbol, DexTrade, MultiTradeEstimation, TradeType } from '../lib/trading/types';
 import { useCurrency } from './currencies';
 import { TokenCurrency } from '../lib/trading/currencyTypes';
 import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
 import DexProxy from '../lib/trading/dexProxy';
 import { detectWalletError } from '../lib/web3Wallets';
+import { applySlippage } from '../lib/trading/dexProxy';
 
 export enum ApprovalState {
   UNKNOWN,
@@ -118,4 +119,16 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
   );
 
   return { approvalState, approveAllowance };
+}
+
+export function useApprovalForMultiTradeEstimation(multiTradeEstimation: MultiTradeEstimation): ApprovalData {
+  const inputAmount = useMemo(() =>
+      multiTradeEstimation.trades[0].tradeType === TradeType.DEX ?
+        applySlippage(multiTradeEstimation.trades[0].inputAmount, (multiTradeEstimation.trades[0] as DexTrade).maxSlippage)
+        :
+        multiTradeEstimation.trades[0].inputAmount,
+    [multiTradeEstimation]
+  );
+
+  return useApproval(multiTradeEstimation.tradeRequest.inputCurrencySymbol, inputAmount);
 }
