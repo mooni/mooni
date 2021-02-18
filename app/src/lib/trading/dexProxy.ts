@@ -94,16 +94,18 @@ const DexProxy = {
 
     const intAmount = BigNumber.from(amountToInt(amount, tokenObject.decimals));
 
-    // let useExact = false
+    let useExact = false
     const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, MaxUint256).catch(() => {
       // general fallback for tokens who restrict approval amounts
-      // useExact = true;
+      useExact = true;
       return tokenContract.estimateGas.approve(spenderAddress, intAmount);
     });
 
+    const approvalAmount = useExact ? intAmount : MaxUint256;
+
     const tx = await tokenContract.approve(
       spenderAddress,
-      intAmount,
+      approvalAmount,
       {
         gasLimit: calculateGasMargin(estimatedGas),
       }
