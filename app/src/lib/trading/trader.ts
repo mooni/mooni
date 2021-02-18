@@ -1,5 +1,7 @@
 import {CurrencyType} from './currencyTypes';
 import {
+  BityTrade,
+  DexTrade,
   MultiTradeEstimation,
   MultiTradeRequest,
   MultiTradeTemp,
@@ -57,7 +59,7 @@ export class Trader {
     }
   }
 
-  private async estimateTrade(tradeRequest: TradeRequest): Promise<Trade> {
+  private async estimateTrade(tradeRequest: TradeRequest): Promise<DexTrade | BityTrade> {
     const path = this.findPath(tradeRequest);
     if(path.length !== 1) {
       throw new Error('can only estimate direct trade');

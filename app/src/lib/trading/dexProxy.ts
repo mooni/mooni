@@ -1,9 +1,9 @@
 import { ethers, providers, BigNumber } from 'ethers';
 import { MaxUint256 } from '@ethersproject/constants'
 
-import { CurrencySymbol, TokenCurrency } from './currencyTypes';
+import { CurrencySymbol, CurrencyType, TokenCurrency, TokenObject } from './currencyTypes';
 import { amountToDecimal, amountToInt, BN } from '../numbers';
-import {DexTrade, TradeRequest} from './types';
+import { DexTrade, TradeRequest } from './types';
 import { defaultProvider } from '../web3Providers';
 import ERC20_ABI from '../abis/ERC20.json';
 import Paraswap from '../wrappers/paraswap';
@@ -42,7 +42,7 @@ class DexProxy {
   }
 
   async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
-    return Paraswap.getRate(tradeRequest, this.currenciesManager);
+    return Paraswap.getRate(tradeRequest);
   }
 
   async createTrade(tradeRequest: TradeRequest): Promise<DexTrade> {
@@ -53,18 +53,18 @@ class DexProxy {
     return Paraswap.getSpender();
   }
 
-  static async getAllowance(token: TokenCurrency, senderAddress: string, spenderAddress: string): Promise<string>
+  static async getAllowance(tokenObject: TokenObject, senderAddress: string, spenderAddress: string): Promise<string>
   {
-    const tokenContract = new ethers.Contract(token.address, ERC20_ABI, defaultProvider);
+    const tokenContract = new ethers.Contract(tokenObject.address, ERC20_ABI, defaultProvider);
     const allowance = await tokenContract.allowance(senderAddress, spenderAddress);
-    return amountToDecimal(allowance.toString(), token.decimals);
+    return amountToDecimal(allowance.toString(), tokenObject.decimals);
   }
 
-  static async approve(token: TokenCurrency, senderAddress: string, spenderAddress: string, amount: string, provider: providers.Web3Provider): Promise<string> {
+  static async approve(tokenObject: TokenObject, senderAddress: string, spenderAddress: string, amount: string, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
-    const tokenContract = new ethers.Contract(token.address, ERC20_ABI, signer);
+    const tokenContract = new ethers.Contract(tokenObject.address, ERC20_ABI, signer);
 
-    const intAmount = BigNumber.from(amountToInt(amount, token.decimals));
+    const intAmount = BigNumber.from(amountToInt(amount, tokenObject.decimals));
 
     // let useExact = false
     const estimatedGas = await tokenContract.estimateGas.approve(spenderAddress, MaxUint256).catch(() => {
@@ -86,13 +86,17 @@ class DexProxy {
   async checkAndApproveAllowance(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string | null> {
     const signer = provider.getSigner();
 
-    const inputToken = this.currenciesManager.getCurrency(dexTrade.tradeRequest.inputCurrencyObject.symbol) as TokenCurrency;
+    const inputCurrencyObject = dexTrade.tradeRequest.inputCurrencyObject;
+    if(inputCurrencyObject.type !== CurrencyType.ERC20) {
+      throw new Error('tried to check allowance of non-erc20 currency');
+    }
+    const inputTokenObject = inputCurrencyObject as TokenObject;
     const senderAddress = await signer.getAddress();
     const spenderAddress = await DexProxy.getSpender(dexTrade.tradeRequest.inputCurrencyObject.symbol);
 
-    const allowance = await DexProxy.getAllowance(inputToken, senderAddress, spenderAddress);
+    const allowance = await DexProxy.getAllowance(inputTokenObject, senderAddress, spenderAddress);
     if(new BN(dexTrade.inputAmount).gt(allowance)) {
-      const txHash = await DexProxy.approve(inputToken, senderAddress, spenderAddress, dexTrade.inputAmount, provider);
+      const txHash = await DexProxy.approve(inputTokenObject, senderAddress, spenderAddress, dexTrade.inputAmount, provider);
       return txHash;
     }
 
@@ -102,7 +106,7 @@ class DexProxy {
   async executeTrade(dexTrade: DexTrade, provider: providers.Web3Provider): Promise<string> {
     const signer = provider.getSigner();
     const senderAddress = await signer.getAddress();
-    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress, this.currenciesManager);
+    const transactionRequest = await Paraswap.buildTx(dexTrade, senderAddress);
     const tx = await signer.sendTransaction(transactionRequest);
     return tx.hash as string;
   }

@@ -16,10 +16,13 @@ export interface CurrencyObject {
   type: CurrencyType;
   decimals: number;
   symbol: CurrencySymbol;
-  address?: string;
   name?: string;
-  chainId?: ChainId;
   img?: string;
+}
+
+export interface TokenObject extends CurrencyObject{
+  address: string;
+  chainId: ChainId;
 }
 
 export abstract class Currency {
@@ -120,7 +123,11 @@ export function createFromCurrencyObject<T extends Currency>(currencyObject: Cur
       return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.ERC20:
-      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img) as unknown as T;
+      if(!(currencyObject as any).chaindId || !(currencyObject as any).address) {
+        throw new Error('invalid token object, mising chainId or address')
+      }
+      const tokenObject = currencyObject as TokenObject;
+      return new TokenCurrency(currencyObject.decimals, tokenObject.address, tokenObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img) as unknown as T;
 
     default:
       throw new Error('unknown currency type')

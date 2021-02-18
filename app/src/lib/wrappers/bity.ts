@@ -1,6 +1,14 @@
 import axios, {AxiosInstance} from 'axios';
 import qs from 'qs';
-import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,} from '../trading/types';
+import {
+  BankInfo,
+  BityTrade,
+  TradeRequest,
+  ETHInfo,
+  Fee,
+  TradeExact,
+  TradeType,
+} from '../trading/types';
 import config from '../../config';
 import {BN} from '../numbers';
 import {MetaError} from '../errors';
