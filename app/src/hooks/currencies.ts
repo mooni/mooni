@@ -9,7 +9,7 @@ export const useCurrenciesContext = () => {
   return useContext(CurrenciesContext);
 }
 
-export const useCurrency = (symbol) => {
+export const useCurrency = (symbol: string) => {
   const { getCurrency } = useCurrenciesContext();
   return useMemo(() => getCurrency(symbol), [symbol, getCurrency]);
 }

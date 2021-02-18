@@ -83,6 +83,7 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
 
     if(!allowance) {
       setApprovalState(ApprovalState.LOADING);
+      return;
     }
 
     if(allowance) {
@@ -99,6 +100,9 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
   }, [currency, amount, allowance]);
 
   const approveAllowance = useCallback(async() => {
+      if(!amount) {
+        return;
+      }
       setApprovalState(ApprovalState.MINING);
       if(!(currency instanceof TokenCurrency) || !ethManager || !userAddress) {
         throw new Error('missing something of approveAllowance');
@@ -120,14 +124,25 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
   return { approvalState, approveAllowance };
 }
 
-export function useApprovalForMultiTradeEstimation(multiTradeEstimation: MultiTradeEstimation): ApprovalData {
-  const inputAmount: string = useMemo(() =>
-      multiTradeEstimation.trades[0].tradeType === TradeType.DEX ?
-        applySlippageOnTrade(multiTradeEstimation.trades[0] as DexTrade).maxInputAmount
+export function useApprovalForMultiTradeEstimation(multiTradeEstimation: MultiTradeEstimation | null): ApprovalData {
+  const symbol: string =  useMemo(() =>
+      multiTradeEstimation ?
+        multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol
         :
-        multiTradeEstimation.trades[0].inputAmount,
+        'ETH',
     [multiTradeEstimation]
   );
 
-  return useApproval(multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol, inputAmount);
+  const inputAmount: string = useMemo(() =>
+      multiTradeEstimation ?
+        multiTradeEstimation.trades[0].tradeType === TradeType.DEX ?
+          applySlippageOnTrade(multiTradeEstimation.trades[0] as DexTrade).maxInputAmount
+          :
+          multiTradeEstimation.trades[0].inputAmount
+        :
+        '0',
+    [multiTradeEstimation]
+  );
+
+  return useApproval(symbol, inputAmount);
 }

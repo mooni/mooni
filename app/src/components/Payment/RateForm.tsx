@@ -16,7 +16,7 @@ import { getWalletStatus } from '../../redux/wallet/selectors';
 import { CurrencyType } from '../../lib/trading/currencyTypes';
 import { RateAmount } from './RateAmount';
 import { WalletStatus } from '../../redux/wallet/state';
-import { ApprovalState, useApproval } from '../../hooks/allowance';
+import { ApprovalState, useApprovalForMultiTradeEstimation } from '../../hooks/allowance';
 import { logError } from '../../lib/log';
 import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
@@ -55,7 +55,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
   const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
-  const { approvalState, approveAllowance } = useApproval(rateForm.values.inputCurrency, rateForm.values.inputAmount);
+  const { approvalState, approveAllowance } = useApprovalForMultiTradeEstimation(multiTradeEstimation);
 
   const valid = !(rateForm.loading || rateForm.errors);
   const errors = rateForm.errors;
