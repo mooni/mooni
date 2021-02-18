@@ -47,7 +47,7 @@ export function useAllowance(symbol: CurrencySymbol, amount: string): AllowanceD
             DexProxy.getAllowance(currency, userAddress, spenderAddress)
           )
           .then(allowance => {
-            const ready = new BN(allowance).gt(amount);
+            const ready = new BN(allowance).gte(amount);
             setAllowanceReady(ready);
             setAllowanceLoading(false);
           })
