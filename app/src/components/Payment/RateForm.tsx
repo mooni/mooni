@@ -88,7 +88,11 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange"  />
     }
   } else if(walletStatus === WalletStatus.DISCONNECTED) {
-    button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
+    if (rateForm.loading) {
+      button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
+    } else {
+      button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
+    }
   } else {
     button = <RoundButton disabled wide icon={<LoadingRing/>} display="all" label="Connecting..." />
   }

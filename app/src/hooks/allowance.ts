@@ -100,7 +100,7 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
     }
 
     setApprovalState(ApprovalState.UNKNOWN);
-  }, [currency, amount, allowance]);
+  }, [currency, amount, allowance, approvalState]);
 
   const approveAllowance = useCallback(async() => {
       if(!amount) {
