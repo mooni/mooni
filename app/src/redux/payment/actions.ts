@@ -154,8 +154,6 @@ export const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
 export const createOrder = () => async function (dispatch, getState)  {
   dispatch(resetOrder());
 
-  sendEvent('order', 'create', 'init');
-
   const state = getState();
   const multiTradeRequest = getMultiTradeRequest(state);
   if(!multiTradeRequest) throw new Error('Missing multiTradeRequest');
@@ -171,12 +169,12 @@ export const createOrder = () => async function (dispatch, getState)  {
     dispatch(setMultiTrade(multiTrade));
     dispatch(createPayment(multiTrade));
 
-    sendEvent('order', 'create', 'done');
+    sendEvent('order_created');
 
   } catch(error) {
     dispatch(setMultiTrade(null));
 
-    sendEvent('order', 'create', 'error');
+    sendEvent('order_creation_error');
     if(error.message === 'timeout') {
       logError('Create order: timeout', error);
       dispatch(setOrderErrors([{
@@ -274,9 +272,9 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
             status: PaymentStepStatus.DONE,
           }));
           dispatch(setPaymentStatus(PaymentStatus.DONE));
-          sendEvent('payment', 'send', 'done');
           log('PAYMENT: bity ok');
           track('PAYMENT: bity ok');
+          sendEvent('order_completed');
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
@@ -288,7 +286,6 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
             error: new Error('bity-order-cancelled'),
           }));
           dispatch(setPaymentStatus(PaymentStatus.ERROR));
-          sendEvent('payment', 'send', 'error');
           log('PAYMENT: bity cancelled');
           track('PAYMENT: bity cancelled');
 
@@ -308,8 +305,6 @@ export const unwatchBityOrder = (orderId) => () => {
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {
-
-  sendEvent('payment', 'send', 'init');
 
   const state = getState();
   const multiTrade = getMultiTrade(state);
@@ -356,8 +351,10 @@ export const sendPayment = () => async function (dispatch, getState)  {
       stepId: PaymentStepId.PAYMENT,
       paymentFunction: async () => ethManager.send(bityDepositAddress, bityInputAmount).then(tx => tx.hash)
     }));
+
     log('PAYMENT: payment ok');
     track('PAYMENT: payment ok');
+    sendEvent('order_payment_executed');
 
     dispatch(updatePaymentStep({
       id: PaymentStepId.BITY,
@@ -367,7 +364,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
   } catch(error) {
 
     logError('Error while sending payment', error);
-    sendEvent('payment', 'send', 'error');
+    sendEvent('order_payment_error');
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
 
   }

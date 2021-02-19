@@ -15,13 +15,11 @@ import StatusPage from './pages/StatusPage';
 import AccountPage from './pages/AccountPage';
 import StatsPage from './pages/StatsPage';
 
-import { usePageViews } from './lib/analytics';
 import { getWalletStatus, isWalletLoading } from './redux/wallet/selectors';
 import { WalletStatus } from './redux/wallet/state';
 import Loader from './components/UI/Loader';
 
 export const Routes: React.FC = () => {
-  usePageViews();
   const walletStatus = useSelector(getWalletStatus);
   const walletLoading = useSelector(isWalletLoading);
 
