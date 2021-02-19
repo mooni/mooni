@@ -73,8 +73,9 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
       updateBalance();
       ethManager.provider.on('block', updateBalance);
 
-      return () => ethManager.provider.removeListener('block', updateBalance);
-
+      return () => {
+        ethManager.provider.removeListener('block', updateBalance);
+      };
     } else {
       const error = new MetaError('currency_balance_unavailable', {symbol: currency.symbol});
       logError(error.message, error)
