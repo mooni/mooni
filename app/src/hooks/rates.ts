@@ -1,31 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useReducer, useEffect, useCallback } from 'react';
 import {MultiTradeEstimation, TradeExact} from '../lib/trading/types';
 import { DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY } from '../lib/trading/currencyList';
-import { useSelector } from 'react-redux';
 import { useDebounce } from './utils';
-import { BalanceData, useBalance } from './balance';
 import { logError } from '../lib/log';
 import {isNotZero, BN} from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
 import { APIError } from '../lib/errors';
-import { getETHManager } from '../redux/wallet/selectors';
-
-import { dailyLimits } from '../constants/limits';
 import { GetCurrencyFn } from '../contexts/CurrenciesContext';
 import { useCurrenciesContext } from './currencies';
 
+import { dailyLimits } from '../constants/limits';
+
 interface RateForm {
   loading: boolean,
-  errors?: {
+  errors: {
     lowBalance?: boolean
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
     lowLiquidity?: boolean
     failed?: boolean
-  },
+  } | null,
   values: {
     inputCurrency: string,
     outputCurrency: string,
@@ -33,7 +30,6 @@ interface RateForm {
     outputAmount: string,
     tradeExact: TradeExact,
   },
-  balanceData: BalanceData,
   connected: boolean,
 }
 
@@ -57,12 +53,8 @@ function defaultRateForm(initialRequest): RateForm {
 
   return {
     loading: true,
-    errors: undefined,
+    errors: null,
     values,
-    balanceData: {
-      balance: '0',
-      balanceLoading: false,
-    },
     connected: false,
   };
 }
@@ -71,189 +63,231 @@ let nonce = 0;
 
 interface RateResponse {
   rateForm: RateForm,
-  tradeRequest: TradeRequest,
+  tradeRequest: TradeRequest | null,
   multiTradeEstimation: MultiTradeEstimation | null,
-  onChangeCurrency: any, // TODO
+  onChangeCurrency: any,
   onChangeAmount: any,
 }
 
-export function useRate(initialTradeRequest: TradeRequest): RateResponse {
-  const ethManager = useSelector(getETHManager);
-  const { getCurrency } = useCurrenciesContext();
-  const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
-  const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
-  const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
-  const { balanceLoading, balance } = useBalance(rateForm.values.inputCurrency);
+interface RateFormAction {
+  type: string;
+  payload?: any;
+}
 
-  useEffect(() => {
-    setRateForm(defaultRateForm(initialTradeRequest));
-  }, [initialTradeRequest]);
+type RateFormReducer = (RateForm, RateFormAction) => RateForm;
 
-  const estimate = useCallback(async (_rateForm: RateForm, _nonce: number, _getCurrency: GetCurrencyFn) => {
-    if(!_rateForm.loading) return;
-    if(_rateForm.connected && _rateForm.balanceData.balanceLoading) return;
+const rateFormReducer: RateFormReducer = (state: RateForm, action: RateFormAction) => {
+  switch (action.type) {
+    case 'init': {
+      return defaultRateForm(action.payload);
+    }
+    case 'setCurrency': {
+      const {tradeExact, currency} = action.payload;
+      const currencyKey = tradeExact === TradeExact.INPUT ? 'inputCurrency':'outputCurrency';
 
-    const outputLimit = dailyLimits[_rateForm.values.outputCurrency];
+      return {
+        ...state,
+        loading: true,
+        errors: null,
+        values: {
+          ...state.values,
+          [currencyKey]: currency,
+          [state.values.tradeExact===TradeExact.INPUT ? 'outputAmount':'inputAmount']: null,
+        }
+      };
+    }
+    case 'setAmount': {
+      const {tradeExact, amount} = action.payload;
 
-    const currentRequest: TradeRequest = {
-      inputCurrencyObject: _getCurrency(_rateForm.values.inputCurrency).toObject(),
-      outputCurrencyObject: _getCurrency(_rateForm.values.outputCurrency).toObject(),
-      tradeExact: _rateForm.values.tradeExact as TradeExact,
-      amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
-    };
-    setMultiTradeEstimation(null);
-
-    if(!isNotZero(currentRequest.amount)) {
-      setRateForm(r => ({
-        ...r,
+      return {
+        ...state,
+        loading: true,
+        errors: null,
+        values: {
+          ...state.values,
+          tradeExact,
+          inputAmount: tradeExact === TradeExact.INPUT ? amount : null,
+          outputAmount: tradeExact === TradeExact.OUTPUT ? amount : null,
+        }
+      };
+    }
+    case 'setError': {
+      return {
+        ...state,
         loading: false,
+        errors: action.payload.errors,
+      };
+    }
+    case 'setEstimation': {
+      const multiTradeEstimation: MultiTradeEstimation = action.payload.multiTradeEstimation;
+
+      const tradeExact = multiTradeEstimation.tradeRequest.tradeExact;
+
+      const amountKey = tradeExact === TradeExact.INPUT ? 'outputAmount':'inputAmount';
+      const amount = tradeExact === TradeExact.INPUT ? multiTradeEstimation.outputAmount : multiTradeEstimation.inputAmount;
+
+      return {
+        ...state,
+        loading: false,
+        errors: null,
+        values: {
+          ...state.values,
+          [amountKey]: amount,
+        }
+      };
+    }
+    case 'noop': {
+      return state;
+    }
+    default:
+      throw new Error();
+  }
+}
+
+const estimate = async (_rateForm: RateForm, _nonce: number, _getCurrency: GetCurrencyFn): Promise<RateFormAction> => {
+  const outputLimit = dailyLimits[_rateForm.values.outputCurrency];
+
+  const currentRequest: TradeRequest = {
+    inputCurrencyObject: _getCurrency(_rateForm.values.inputCurrency).toObject(),
+    outputCurrencyObject: _getCurrency(_rateForm.values.outputCurrency).toObject(),
+    tradeExact: _rateForm.values.tradeExact,
+    amount: _rateForm.values.tradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
+  };
+
+  if(!isNotZero(currentRequest.amount)) {
+    return {
+      type: 'setError',
+      payload: {
         errors: {
           zeroAmount: true,
         },
-      }));
-      return;
-    }
+      }
+    };
+  }
 
-    if(_rateForm.connected && currentRequest.tradeExact === TradeExact.INPUT && new BN(currentRequest.amount).gt(_rateForm.balanceData.balance)) {
-      setRateForm(r => ({
-        ...r,
-        loading: false,
-        errors: {
-          lowBalance: true,
-        },
-      }));
-      return;
-    } else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      if(new BN(currentRequest.amount).gt(outputLimit)) {
-        setRateForm(r => ({
-          ...r,
-          loading: false,
+  if(currentRequest.tradeExact === TradeExact.OUTPUT) {
+    if(new BN(currentRequest.amount).gt(outputLimit)) {
+      return {
+        type: 'setError',
+        payload: {
           errors: {
             highAmount: true,
           },
-        }));
-        return;
-      }
+        }
+      };
     }
+  }
 
-    let multiTradeEstimation: MultiTradeEstimation;
-    try {
-      multiTradeEstimation = await Api.estimateMultiTrade(currentRequest);
-    } catch(error) {
-      if(error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
-        const bityOrderError = error as BityOrderError;
-        setRateForm(r => ({
-          ...r,
-          loading: false,
+  let multiTradeEstimation: MultiTradeEstimation;
+  try {
+    multiTradeEstimation = await Api.estimateMultiTrade(currentRequest);
+  } catch(error) {
+    if(error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
+      const bityOrderError = error as BityOrderError;
+      return {
+        type: 'setError',
+        payload: {
           errors: {
             lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
-        }));
-        return;
-      } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
-        setRateForm(r => ({
-          ...r,
-          loading: false,
+        }
+      };
+    } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
+      return {
+        type: 'setError',
+        payload: {
           errors: {
             lowLiquidity: true,
           },
-        }));
-        return;
-      } else {
-        logError('api error while fetching rates', error);
-        setRateForm(r => ({
-          ...r,
-          loading: false,
+        }
+      };
+    } else {
+      logError('api error while fetching rates', error);
+      return {
+        type: 'setError',
+        payload: {
           errors: {
             failed: true,
           },
-        }));
-        return;
+        }
+      };
+    }
+  }
+
+  if(_nonce !== nonce) {
+    return {type: 'noop'};
+  }
+
+  if(currentRequest.tradeExact === TradeExact.INPUT && new BN(multiTradeEstimation.outputAmount).gt(outputLimit)) {
+    return {
+      type: 'setError',
+      payload: {
+        errors: {
+          highAmount: true, // TODO set outputamount
+        },
       }
     }
-
-    if(_nonce !== nonce) {
-      return;
+  }
+  return {
+    type: 'setEstimation',
+    payload: {
+      multiTradeEstimation,
+      tradeRequest: currentRequest,
     }
+  }
+};
 
-    const updateRateForm: any = {
-      loading: false,
-      errors: null,
-      values: {},
-    };
-    if(currentRequest.tradeExact === TradeExact.INPUT) {
-      updateRateForm.values.outputAmount = new BN(multiTradeEstimation.outputAmount).toFixed();
-      if(new BN(multiTradeEstimation.outputAmount).gt(outputLimit)) {
-        updateRateForm.errors = { highAmount: true };
-      }
-    }
-    else if(currentRequest.tradeExact === TradeExact.OUTPUT) {
-      updateRateForm.values.inputAmount = new BN(multiTradeEstimation.inputAmount).toFixed();
-      if(_rateForm.connected && new BN(multiTradeEstimation.inputAmount).gt(_rateForm.balanceData.balance)) {
-        updateRateForm.errors = { lowBalance: true };
-      }
-    }
+export function useRate(initialTradeRequest: TradeRequest): RateResponse {
+  const [tradeRequest, setTradeRequest] = useState<TradeRequest | null>(initialTradeRequest);
+  const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
+  const { getCurrency } = useCurrenciesContext();
 
-    setRateForm(r => ({
-      ...r,
-      ...updateRateForm,
-      values: {
-        ...r.values,
-        ...updateRateForm.values,
-      },
-    }));
+  const [rateForm, dispatchRateForm] = useReducer<RateFormReducer, TradeRequest>(rateFormReducer, initialTradeRequest, defaultRateForm);
 
-    if(!updateRateForm.errors) {
-      setTradeRequest(currentRequest);
-      setMultiTradeEstimation(multiTradeEstimation);
-    }
-
-  }, []);
+  useEffect(() => {
+    dispatchRateForm({ type: 'init', payload: initialTradeRequest });
+  }, [initialTradeRequest]);
 
   const onChangeCurrency = useCallback(tradeExact => currency => {
-    const currencyKey = tradeExact === TradeExact.INPUT ? 'inputCurrency' : 'outputCurrency';
-    setRateForm(r => ({
-      ...r,
-      loading: true,
-      values: {
-        ...r.values,
-        [currencyKey]: currency,
-        [r.values.tradeExact === TradeExact.INPUT ? 'outputAmount' : 'inputAmount']: null,
+    dispatchRateForm({
+      type: 'setCurrency',
+      payload: {
+        tradeExact,
+        currency,
       }
-    }))
+    });
   },[]);
 
   const onChangeAmount = useCallback(tradeExact => e => {
-    const amount = e.target.value;
-
-    setRateForm(r => ({
-      ...r,
-      loading: true,
-      values: {
-        ...r.values,
+    dispatchRateForm({
+      type: 'setAmount',
+      payload: {
         tradeExact,
-        inputAmount: tradeExact === TradeExact.INPUT ? amount : null,
-        outputAmount: tradeExact === TradeExact.OUTPUT ? amount : null,
+        amount: e.target.value,
       }
-    }))
+    });
   }, []);
 
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
-    nonce++;
-    estimate(debouncedRateForm, nonce, getCurrency).catch(error => {
-      logError('unexpected error while fetching rates', error);
-    });
-  }, [debouncedRateForm, estimate, getCurrency]);
+    if(!debouncedRateForm.loading) return;
 
-  useEffect(() => {
-    setRateForm(r => ({
-      ...r,
-      loading: true,
-      balanceData: { balanceLoading, balance },
-      connected: !!ethManager,
-    }));
-  }, [balanceLoading, ethManager, balance]);
+    nonce++;
+    setTradeRequest(null);
+    setMultiTradeEstimation(null);
+
+    estimate(debouncedRateForm, nonce, getCurrency)
+      .then((action: RateFormAction) => {
+        dispatchRateForm(action);
+        if(action.type === 'setEstimation') {
+          setMultiTradeEstimation(action.payload.multiTradeEstimation);
+          setTradeRequest(action.payload.tradeRequest);
+        }
+      })
+      .catch(error => {
+        logError('unexpected error while fetching rates', error);
+      });
+  }, [debouncedRateForm, getCurrency]);
 
   return {
     rateForm,

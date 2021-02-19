@@ -61,9 +61,9 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
   const errors = rateForm.errors;
 
   const submit = useCallback(() => {
-    if(!valid) return;
+    if(!tradeRequest) return;
     onSubmit(tradeRequest);
-  }, [valid, tradeRequest, onSubmit]);
+  }, [tradeRequest, onSubmit]);
 
   const approve = useCallback(() => {
     approveAllowance()
@@ -128,12 +128,6 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       </Box>
 
       <Box className={classes.additionalInfo}>
-        {rateForm.loading ?
-          <LoadingRing mode="half-circle"/>
-          :
-          (!errors && <RateAmount multiTradeEstimation={multiTradeEstimation}/>)
-        }
-
         {!rateForm.loading && errors &&
         Object.entries(errors).map(([key, _]) =>
           <InvalidMessage key={key}>
@@ -145,6 +139,8 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
             {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
           </InvalidMessage>
         )}
+
+        <RateAmount multiTradeEstimation={multiTradeEstimation}/>
       </Box>
     </>
   );
