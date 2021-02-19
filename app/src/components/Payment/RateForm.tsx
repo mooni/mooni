@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react';
 
-import { Box } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch, useSelector } from 'react-redux';
+import {Box, Flex} from '@chakra-ui/react';
+import {useSelector, useDispatch} from 'react-redux';
 
-import { IconCoin, IconEthereum, IconRefresh, LoadingRing, textStyle } from '@aragon/ui';
+import {IconCaution, IconEthereum, IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
 import { AmountRow } from './AmountRow';
 
-import { TradeExact, TradeRequest } from '../../lib/trading/types';
+import {TradeExact, TradeRequest} from '../../lib/trading/types';
+import {BN} from '../../lib/numbers';
 
 import { useRate } from '../../hooks/rates';
 import { getWalletStatus } from '../../redux/wallet/selectors';
@@ -22,25 +22,12 @@ import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
 import { dailyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
+import { useBalance } from '../../hooks/balance';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
-  color: #e61b1b;
+  color: ${props => props.theme.negative};
 `;
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    marginTop: theme.spacing(3),
-  },
-  additionalInfo: {
-    minHeight: 56,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    color: theme.palette.text.secondary,
-  },
-}));
 
 interface RateFormParams {
   onSubmit: (TradeRequest?) => void;
@@ -50,15 +37,19 @@ interface RateFormParams {
 }
 
 function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams) {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const walletStatus = useSelector(getWalletStatus);
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
   const { approvalState, approveAllowance } = useApprovalForMultiTradeEstimation(multiTradeEstimation);
+  const { balanceLoading, balance } = useBalance(rateForm.values.inputCurrency);
 
-  const valid = !(rateForm.loading || rateForm.errors);
   const errors = rateForm.errors;
+
+  const insufficientBalance = !balanceLoading ?
+    new BN(balance).lt(rateForm.values.inputAmount)
+    :
+    false;
 
   const submit = useCallback(() => {
     if(!tradeRequest) return;
@@ -75,20 +66,26 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       })
   }, [approveAllowance]);
 
-  let button: any = null;
+  let button;
   if(walletStatus === WalletStatus.CONNECTED) {
     if(approvalState === ApprovalState.MINING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Unlocking tokens" disabled />;
-    } else if(rateForm.loading) {
+    } else if (rateForm.loading) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
-    } else if(!valid || approvalState === ApprovalState.UNKNOWN) {
-      button = <RoundButton wide icon={<IconRefresh/>} label="Exchange" disabled />;
+    } else if(balanceLoading) {
+      button = <RoundButton wide icon={<LoadingRing/>} label="Loading balances" disabled />;
+    } else if(insufficientBalance) {
+      button = <RoundButton wide icon={<IconCaution/>} label="Insufficient balance" disabled />;
+    } else if(errors) {
+      button = <RoundButton wide icon={<IconCaution/>} label="Invalid" disabled />;
     } else if(approvalState === ApprovalState.LOADING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Checking allowance" disabled />;
+    } else if(approvalState === ApprovalState.UNKNOWN) {
+      button = <RoundButton wide icon={<IconRefresh/>} label="Exchange" disabled />;
     } else if(approvalState === ApprovalState.NOT_APPROVED) {
       button = <RoundButton mode="positive" onClick={approve} wide icon={<IconCoin/>} label="Unlock token" />
     } else {
-      button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange" />
+      button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange"  />
     }
   } else if(walletStatus === WalletStatus.DISCONNECTED) {
     button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
@@ -123,15 +120,14 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
         caption="Receive"
       />
 
-      <Box mt={2}>
+      <Box mt={4}>
         {button}
       </Box>
 
-      <Box className={classes.additionalInfo}>
-        {!rateForm.loading && errors &&
-        Object.entries(errors).map(([key, _]) =>
+      {errors &&
+      <Flex justify="center" mt={4}>
+        {Object.entries(errors).map(([key, _]) =>
           <InvalidMessage key={key}>
-            {key === 'lowBalance' && 'You do not have enough funds'}
             {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
             {key === 'highAmount' && `Maximum amount is ${numberWithCommas(dailyLimits[rateForm.values.outputCurrency])} ${rateForm.values.outputCurrency}`}
             {key === 'lowLiquidity' && `There is not enough liquidity for this pair to trade. Please try with another currency.`}
@@ -139,7 +135,10 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
             {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
           </InvalidMessage>
         )}
+      </Flex>
+      }
 
+      <Box mt={4}>
         <RateAmount multiTradeEstimation={multiTradeEstimation}/>
       </Box>
     </>

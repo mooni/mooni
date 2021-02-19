@@ -16,7 +16,6 @@ import { dailyLimits } from '../constants/limits';
 interface RateForm {
   loading: boolean,
   errors: {
-    lowBalance?: boolean
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
