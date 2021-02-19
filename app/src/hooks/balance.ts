@@ -39,12 +39,14 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     if(currency.equals(ETHER)) {
 
       const updateBalance = (res) => {
+        setLoading(true);
         const balanceEth = amountToDecimal(res.toString(), ETHER.decimals);
         setBalance(balanceEth);
         setLoading(false);
       };
 
       const signer = ethManager.provider.getSigner();
+      setLoading(true);
       signer.getBalance()
         .then(updateBalance)
         .catch(error => {
@@ -57,6 +59,7 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     } else if(currency instanceof TokenCurrency) {
 
       const updateBalance = () => {
+        setLoading(true);
         currency.fetchBalance(ethAddress)
           .then(res => {
             setBalance(res);
@@ -70,8 +73,9 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
       updateBalance();
       ethManager.provider.on('block', updateBalance);
 
-      return () => ethManager.provider.removeListener('block', updateBalance);
-
+      return () => {
+        ethManager.provider.removeListener('block', updateBalance);
+      };
     } else {
       const error = new MetaError('currency_balance_unavailable', {symbol: currency.symbol});
       logError(error.message, error)

@@ -8,6 +8,7 @@ import { setInputCurrency } from '../redux/payment/actions';
 import { setModalError } from '../redux/ui/actions';
 import { useAppDispatch } from '../redux/store';
 import { logError } from '../lib/log';
+import { defaultProvider } from '../lib/web3Providers';
 
 export type GetCurrencyFn = (CurrencySymbol) => Currency;
 interface CurrenciesContextType {
@@ -25,8 +26,6 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
   currencyBalances: {},
   getCurrency: () => { throw new Error('not_ready_getCurrency') },
 });
-
-const BALANCE_REFRESH_INTERVAL = 20 * 1000;
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const currenciesManager = useMemo<CurrenciesManager>(() => new CurrenciesManager(), []);
@@ -65,10 +64,12 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
           // dispatch(setModalError(new Error('error-fetching-balances')))
         });
     }
-    const interval = setInterval(fetchBalances, BALANCE_REFRESH_INTERVAL);
+    defaultProvider.on('block', fetchBalances);
     fetchBalances();
 
-    return () => clearInterval(interval);
+    return () => {
+      defaultProvider.removeListener('block', fetchBalances);
+    };
   }, [dispatch, address, currenciesManager]);
 
   const currencyBalances_connected = useMemo(
