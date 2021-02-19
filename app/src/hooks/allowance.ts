@@ -76,6 +76,9 @@ export function useApproval(symbol: CurrencySymbol, amount: string): ApprovalDat
   const [approvalState, setApprovalState] = useState<ApprovalState>(ApprovalState.UNKNOWN);
 
   useEffect(() => {
+    if(approvalState === ApprovalState.MINING) {
+      return;
+    }
     if(currency.equals(ETHER)) {
       setApprovalState(ApprovalState.APPROVED);
       return;
