@@ -300,6 +300,13 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
+export const unwatchBityOrder = (orderId) => () => {
+  if(!watching.get(orderId)) return;
+  const timer = watching.get(orderId) as Timeout;
+  clearInterval(timer);
+  watching.delete(orderId);
+}
+
 export const sendPayment = () => async function (dispatch, getState)  {
 
   sendEvent('payment', 'send', 'init');
