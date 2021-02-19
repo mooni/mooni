@@ -22,7 +22,7 @@ import { applySlippageOnTrade, MAX_SLIPPAGE } from '../trading/dexProxy';
 
 const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
-  baseURL: `https://apiv2${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
+  baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
 let augustusSpender: string | null = null;
