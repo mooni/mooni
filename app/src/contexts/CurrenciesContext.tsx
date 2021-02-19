@@ -8,13 +8,15 @@ import { setInputCurrency } from '../redux/payment/actions';
 import { setModalError } from '../redux/ui/actions';
 import { useAppDispatch } from '../redux/store';
 import { logError } from '../lib/log';
+import { defaultProvider } from '../lib/web3Providers';
 
+export type GetCurrencyFn = (CurrencySymbol) => Currency;
 interface CurrenciesContextType {
   currenciesManager: CurrenciesManager;
   currenciesReady: boolean;
   inputCurrenciesMap: CurrenciesMap;
   currencyBalances: CurrencyBalances;
-  getCurrency: (CurrencySymbol) => Currency;
+  getCurrency: GetCurrencyFn;
 }
 
 export const CurrenciesContext = createContext<CurrenciesContextType>({
@@ -24,8 +26,6 @@ export const CurrenciesContext = createContext<CurrenciesContextType>({
   currencyBalances: {},
   getCurrency: () => { throw new Error('not_ready_getCurrency') },
 });
-
-const BALANCE_REFRESH_INTERVAL = 20 * 1000;
 
 export const CurrenciesContextProvider: React.FC = ({ children }) => {
   const currenciesManager = useMemo<CurrenciesManager>(() => new CurrenciesManager(), []);
@@ -38,6 +38,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
 
   // Get currency list
   useEffect(() => {
+    // currenciesManager.getDefaultCurrencies() // Static currencies, disable token exchange
     currenciesManager.fetchCurrencies()
       .then(tradeableCurrencyMap => {
         setInputCurrenciesMap(tradeableCurrencyMap);
@@ -63,10 +64,12 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
           // dispatch(setModalError(new Error('error-fetching-balances')))
         });
     }
-    const interval = setInterval(fetchBalances, BALANCE_REFRESH_INTERVAL);
+    defaultProvider.on('block', fetchBalances);
     fetchBalances();
 
-    return () => clearInterval(interval);
+    return () => {
+      defaultProvider.removeListener('block', fetchBalances);
+    };
   }, [dispatch, address, currenciesManager]);
 
   const currencyBalances_connected = useMemo(
@@ -83,7 +86,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
     if(tokenAddress) {
       try {
         const currency = currenciesManager.getTokenByAddress(tokenAddress);
-        dispatch(setInputCurrency(currency.symbol));
+        dispatch(setInputCurrency(currency.toObject()));
       } catch(error) {
         logError('invalid-custom-token', error);
         dispatch(setModalError(new Error('invalid-custom-token')))

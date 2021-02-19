@@ -1,4 +1,4 @@
-import {DEFAULT_INPUT_CURRENCY, DEFAULT_OUTPUT_CURRENCY} from '../../lib/trading/currencyList';
+import {DEFAULT_INPUT_CURRENCY_OBJECT, DEFAULT_OUTPUT_CURRENCY_OBJECT} from '../../lib/trading/currencyList';
 import {
   OrderErrors,
   Payment,
@@ -37,8 +37,8 @@ const initialEmptyState: PaymentState = {
       fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
     },
     tradeRequest: {
-      inputCurrencySymbol: DEFAULT_INPUT_CURRENCY,
-      outputCurrencySymbol: DEFAULT_OUTPUT_CURRENCY,
+      inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
+      outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
       amount: '100',
       tradeExact: TradeExact.OUTPUT,
     },
@@ -69,10 +69,10 @@ const initialMockStateMinimum: PaymentState = {
       fromAddress: '0x1cD300E6d25193Fb6CbEF685ACb89B4B39dc9d79'
     },
     tradeRequest: {
-      inputCurrencySymbol: 'ETH',
-      outputCurrencySymbol: DEFAULT_OUTPUT_CURRENCY,
-      amount: '40',
-      tradeExact: TradeExact.OUTPUT,
+      inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
+      outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
+      amount: '0.1',
+      tradeExact: TradeExact.INPUT,
     },
   },
   multiTrade: null,
@@ -103,8 +103,8 @@ const initialMockStateComplete: PaymentState = {
       fromAddress: '0x14017C2A26D8e29e514354Fea097559bE7c02Aac'
     },
     tradeRequest: {
-      inputCurrencySymbol: 'ETH',
-      outputCurrencySymbol: 'EUR',
+      inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
+      outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
       amount: '50',
       tradeExact: TradeExact.OUTPUT
     },
@@ -112,8 +112,8 @@ const initialMockStateComplete: PaymentState = {
   multiTrade: {
     id: 'abcd-efgh',
     tradeRequest: {
-      inputCurrencySymbol: 'ETH',
-      outputCurrencySymbol: 'EUR',
+      inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
+      outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
       amount: '20',
       tradeExact: TradeExact.OUTPUT
     },
@@ -138,8 +138,8 @@ const initialMockStateComplete: PaymentState = {
     },
     trades: [{
       tradeRequest: {
-        inputCurrencySymbol: 'ETH',
-        outputCurrencySymbol: 'EUR',
+        inputCurrencyObject: DEFAULT_INPUT_CURRENCY_OBJECT,
+        outputCurrencyObject: DEFAULT_OUTPUT_CURRENCY_OBJECT,
         amount: '10',
         tradeExact: TradeExact.OUTPUT,
       },

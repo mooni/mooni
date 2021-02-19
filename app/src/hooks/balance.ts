@@ -3,11 +3,10 @@ import { useState, useEffect } from 'react';
 import { ETHER } from '../lib/trading/currencyList';
 import { useSelector } from 'react-redux';
 
-import { getETHManager } from '../redux/wallet/selectors';
+import { getAddress, getETHManager } from '../redux/wallet/selectors';
 import { amountToDecimal } from '../lib/numbers';
-import { CurrencySymbol } from '../lib/trading/types';
 import { useCurrency } from './currencies';
-import { TokenCurrency } from '../lib/trading/currencyTypes';
+import { CurrencySymbol, TokenCurrency } from '../lib/trading/currencyTypes';
 import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
 
@@ -22,6 +21,7 @@ export interface BalanceData {
  */
 export function useBalance(symbol: CurrencySymbol): BalanceData {
   const ethManager = useSelector(getETHManager);
+  const ethAddress = useSelector(getAddress);
   const [balance, setBalance] = useState<string>('0');
   const [balanceLoading, setLoading] = useState<boolean>(true);
 
@@ -30,23 +30,23 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
   useEffect(() => {
     setLoading(true);
 
-    if(!ethManager) {
+    if(!ethManager || !ethAddress) {
       setLoading(false);
       setBalance('0');
       return;
     }
 
-    const ethAddress = ethManager.getAddress();
-
     if(currency.equals(ETHER)) {
 
       const updateBalance = (res) => {
+        setLoading(true);
         const balanceEth = amountToDecimal(res.toString(), ETHER.decimals);
         setBalance(balanceEth);
         setLoading(false);
       };
 
       const signer = ethManager.provider.getSigner();
+      setLoading(true);
       signer.getBalance()
         .then(updateBalance)
         .catch(error => {
@@ -59,6 +59,7 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
     } else if(currency instanceof TokenCurrency) {
 
       const updateBalance = () => {
+        setLoading(true);
         currency.fetchBalance(ethAddress)
           .then(res => {
             setBalance(res);
@@ -72,13 +73,14 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
       updateBalance();
       ethManager.provider.on('block', updateBalance);
 
-      return () => ethManager.provider.removeListener('block', updateBalance);
-
+      return () => {
+        ethManager.provider.removeListener('block', updateBalance);
+      };
     } else {
       const error = new MetaError('currency_balance_unavailable', {symbol: currency.symbol});
       logError(error.message, error)
     }
-  }, [currency, ethManager]);
+  }, [currency, ethManager, ethAddress]);
 
   return { balanceLoading, balance };
 }

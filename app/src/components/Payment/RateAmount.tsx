@@ -5,15 +5,14 @@ import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
-import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
+import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
 import {MetaError} from "../../lib/errors";
 import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
 
 import bityLogo from "../../assets/bity_logo_small.png";
 import paraswapLogo from "../../assets/paraswap_logo_small.png";
-import { useCurrenciesContext } from '../../hooks/currencies';
 
-function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency): Fee | null {
+function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
   const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
 
   if(fees.length === 0) {
@@ -22,13 +21,13 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency):
 
   const lastTrade = multiTradeEstimation.trades[multiTradeEstimation.trades.length-1];
 
-  const expectedFeeCurrency = getCurrency(lastTrade.tradeRequest.inputCurrencySymbol);
-  const desiredFeeCurrency = getCurrency(lastTrade.tradeRequest.outputCurrencySymbol);
+  const expectedFeeCurrency = lastTrade.tradeRequest.inputCurrencyObject;
+  const desiredFeeCurrency = lastTrade.tradeRequest.outputCurrencyObject;
 
   // TODO support multiple fee currencies
   // expect the fees to be ~ETH
   const sameCurrencies = new Set(
-    fees.map(f => f.currencySymbol).concat(expectedFeeCurrency.symbol)
+    fees.map(f => f.currencyObject.symbol).concat(expectedFeeCurrency.symbol)
   ).size === 1;
 
   if(!sameCurrencies) {
@@ -45,7 +44,7 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation, getCurrency):
 
   return {
     amount: feeAmountInOutput,
-    currencySymbol: desiredFeeCurrency.symbol,
+    currencyObject: desiredFeeCurrency,
   };
 }
 
@@ -151,9 +150,10 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {truncateNumber(trade.inputAmount)} {trade.tradeRequest.inputCurrencySymbol}
+        {truncateNumber(trade.inputAmount)}
+        {' '}{trade.tradeRequest.inputCurrencyObject.symbol}
         <b>{' > '}</b>
-        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencySymbol}
+        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
       </RouteAmount>
     </Box>
     <Box height={30} display="flex" alignItems="center">
@@ -183,28 +183,26 @@ interface RateAmountLoadedProps {
 }
 
 export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEstimation}) => {
-  const { getCurrency } = useCurrenciesContext();
 
-  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencySymbol;
-  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencySymbol;
+  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol;
+  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencyObject.symbol;
 
-  const fee = useMemo(() => aggregateFees(multiTradeEstimation, getCurrency), [multiTradeEstimation, getCurrency]);
+  const fee = useMemo(() => aggregateFees(multiTradeEstimation), [multiTradeEstimation]);
   const feeInfos = useMemo(() => {
-    let amount, currency;
     if(fee) {
-      currency = getCurrency(fee.currencySymbol);
-      if(currency.type === CurrencyType.FIAT) {
+      let amount;
+      if(fee.currencyObject.type === CurrencyType.FIAT) {
         amount = truncateNumber(fee.amount, 2);
       } else {
         amount = truncateNumber(fee.amount);
       }
       return {
-        currency,
+        currencyObject: fee.currencyObject,
         amount,
       }
     }
     return null;
-  }, [fee, getCurrency]);
+  }, [fee]);
 
   const rateTrunc = useMemo(() => {
     const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
@@ -216,7 +214,7 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
       <Box px={1}>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {feeInfos &&
-        <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currency.symbol}`}/>
+        <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currencyObject.symbol}`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>

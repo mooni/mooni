@@ -4,27 +4,30 @@ import {APIError, ParaSwap, NetworkID} from 'paraswap';
 import { ChainId } from '@uniswap/sdk';
 
 import {defaultProvider} from "../web3Providers";
-import { CurrencySymbol, DexTrade, TradeExact, TradeRequest, TradeType } from '../trading/types';
+import { DexTrade, TradeRequest, TradeExact, TradeType } from '../trading/types';
 import config from "../../config";
 import AUGUSTUS_ABI from "../abis/augustus.json";
 import {ETHER} from "../trading/currencyList";
-import { CurrencyType, TokenCurrency } from '../trading/currencyTypes';
-import {amountToDecimal, amountToInt, BN} from "../numbers";
-import CurrenciesManager from '../trading/currenciesManager';
+import {
+  createFromCurrencyObject,
+  CurrencyObject,
+  CurrencySymbol,
+  CurrencyType,
+  TokenCurrency,
+  TokenObject,
+} from '../trading/currencyTypes';
+import {amountToDecimal, amountToInt} from "../numbers";
 import { MetaError } from '../errors';
+import { applySlippageOnTrade, MAX_SLIPPAGE } from '../trading/dexProxy';
 
-const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
+const paraSwapSDK = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
-  baseURL: `https://api${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
+  baseURL: `https://apiv2${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
 });
 let augustusSpender: string | null = null;
 
 const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
-
-function applySlippage(amount: string, maxSlippage: number): string {
-  return new BN(amount).times(new BN(1).plus(maxSlippage)).toFixed();
-}
 
 export interface CurrencyBalance {
   symbol: CurrencySymbol,
@@ -60,16 +63,43 @@ const ParaswapWrapper = {
       }
     }), {});
   },
-  async getRate(tradeRequest: TradeRequest, currenciesManager: CurrenciesManager): Promise<DexTrade> {
+  async getRate(tradeRequest: TradeRequest): Promise<DexTrade> {
     const swapSide = tradeRequest.tradeExact === TradeExact.INPUT ? 'SELL' : 'BUY';
 
-    const inputCurrency = currenciesManager.getCurrency(tradeRequest.inputCurrencySymbol);
-    const outputCurrency = currenciesManager.getCurrency(tradeRequest.outputCurrencySymbol);
-    const amountCurrency = tradeRequest.tradeExact === TradeExact.INPUT ? inputCurrency : outputCurrency;
+    const amountCurrencyObject = tradeRequest.tradeExact === TradeExact.INPUT ? tradeRequest.inputCurrencyObject : tradeRequest.outputCurrencyObject;
 
-    const intAmount = amountToInt(tradeRequest.amount, amountCurrency.decimals);
+    const intAmount = amountToInt(tradeRequest.amount, amountCurrencyObject.decimals);
 
     try {
+
+      const { data: dexMetadata } = await paraswapAxios({
+        method: 'get',
+        url: '/prices',
+        params: {
+          from: tradeRequest.inputCurrencyObject.symbol,
+          to: tradeRequest.outputCurrencyObject.symbol,
+          amount: intAmount,
+          side: swapSide
+        },
+      });
+
+      const inputAmount = amountToDecimal(
+        dexMetadata.priceRoute.srcAmount,
+        tradeRequest.inputCurrencyObject.decimals
+      );
+      const outputAmount = amountToDecimal(
+        dexMetadata.priceRoute.destAmount,
+        tradeRequest.outputCurrencyObject.decimals
+      );
+
+      return {
+        tradeRequest,
+        inputAmount,
+        outputAmount,
+        tradeType: TradeType.DEX,
+        dexMetadata,
+        maxSlippage: MAX_SLIPPAGE,
+      };
 
     } catch(error) {
       const paraswapErrorMessage = error.response?.data?.error;
@@ -80,27 +110,6 @@ const ParaswapWrapper = {
       }
       throw error;
     }
-    const { data: dexMetadata } = await paraswapAxios({
-      method: 'get',
-      url: '/prices',
-      params: {
-        from: tradeRequest.inputCurrencySymbol,
-        to: tradeRequest.outputCurrencySymbol,
-        amount: intAmount,
-        side: swapSide
-      },
-    });
-
-    const inputAmount = amountToDecimal(dexMetadata.priceRoute.srcAmount, inputCurrency.decimals);
-    const outputAmount = amountToDecimal(dexMetadata.priceRoute.destAmount, outputCurrency.decimals);
-
-    return {
-      tradeRequest,
-      inputAmount,
-      outputAmount,
-      tradeType: TradeType.DEX,
-      dexMetadata,
-    };
   },
   async getSpender(): Promise<string> {
     if(!augustusSpender) {
@@ -119,28 +128,27 @@ const ParaswapWrapper = {
     }
     return augustusSpender;
   },
-  async buildTx(dexTrade: DexTrade, senderAddress: string, maxSlippage: number, currenciesManager: CurrenciesManager): Promise<any> {
-    function getTokenAddress(symbol) {
-      const currency = currenciesManager.getCurrency(symbol);
-
-      if(currency.equals(ETHER)) {
+  async buildTx(dexTrade: DexTrade, senderAddress: string): Promise<any> {
+    function getTokenAddress(currencyObject: CurrencyObject) {
+      if(createFromCurrencyObject(currencyObject).equals(ETHER)) {
         return ETH_ADDRESS;
-      } else if(currency.type === CurrencyType.ERC20) {
-        return (currency as TokenCurrency).address;
+      } else if(currencyObject.type === CurrencyType.ERC20) {
+        return (currencyObject as TokenObject).address;
       } else {
         throw new Error('impossible token address');
       }
     }
     const { priceRoute } = dexTrade.dexMetadata;
 
-    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencySymbol);
-    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencySymbol);
-    const srcAmount = applySlippage(dexTrade.dexMetadata.priceRoute.srcAmount, dexTrade.tradeRequest.tradeExact === TradeExact.INPUT ? 0 : maxSlippage);
-    const destAmount = applySlippage(dexTrade.dexMetadata.priceRoute.destAmount, dexTrade.tradeRequest.tradeExact === TradeExact.OUTPUT ? 0 : -maxSlippage);
+    const srcToken = getTokenAddress(dexTrade.tradeRequest.inputCurrencyObject);
+    const destToken = getTokenAddress(dexTrade.tradeRequest.outputCurrencyObject);
+    const { inputAmount, outputAmount } = applySlippageOnTrade(dexTrade);
+    const srcAmount = amountToInt(inputAmount, dexTrade.tradeRequest.inputCurrencyObject.decimals);
+    const destAmount = amountToInt(outputAmount, dexTrade.tradeRequest.outputCurrencyObject.decimals);
     const receiver = undefined;
     const referrer = 'mooni';
 
-    const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
+    const txParams = await paraSwapSDK.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
     if((txParams as APIError).message) throw new Error((txParams as APIError).message);
 
     return {

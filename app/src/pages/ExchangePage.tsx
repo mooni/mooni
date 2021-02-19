@@ -18,7 +18,6 @@ import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
 import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep } from '../redux/payment/selectors';
-import { useCurrenciesContext } from '../hooks/currencies';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -41,7 +40,6 @@ const RoundedBox = styled(ABox)`
 const steps = ['Amount', 'Recipient', 'Notice', 'Order summary'];
 
 export default function ExchangePage() {
-  const { currenciesManager } = useCurrenciesContext();
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -63,7 +61,7 @@ export default function ExchangePage() {
     handleNext();
   }
   function onSend() {
-    dispatch(sendPayment(currenciesManager));
+    dispatch(sendPayment());
     history.push('/status');
   }
 

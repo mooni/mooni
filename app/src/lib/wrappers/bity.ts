@@ -1,6 +1,14 @@
 import axios, {AxiosInstance} from 'axios';
 import qs from 'qs';
-import {BankInfo, BityTrade, ETHInfo, Fee, TradeExact, TradeRequest, TradeType,} from '../trading/types';
+import {
+  BankInfo,
+  BityTrade,
+  TradeRequest,
+  ETHInfo,
+  Fee,
+  TradeExact,
+  TradeType,
+} from '../trading/types';
 import config from '../../config';
 import {BN} from '../numbers';
 import {MetaError} from '../errors';
@@ -23,7 +31,7 @@ function removeEmptyStrings(data: object = {}) {
     {});
 }
 
-function extractFees(order: any): Fee  {
+function extractFees(order: BityOrderResponse, tradeRequest: TradeRequest): Fee  {
   const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
 
   // expect the fees to be in the same currency
@@ -36,11 +44,17 @@ function extractFees(order: any): Fee  {
     .map(f => f.amount)
     .reduce((acc, a) => acc.plus(a), new BN(0))
     .toFixed();
-  const currencySymbol = fees[0].currency;
+
+  const currencyObjects = [tradeRequest.inputCurrencyObject, tradeRequest.outputCurrencyObject];
+
+  const currencyObject = currencyObjects.find(c => c.symbol === fees[0].currency);
+  if(!currencyObject) {
+    throw new Error('unknown bity fee currency');
+  }
 
   return {
     amount: totalAmountInputCurrency,
-    currencySymbol,
+    currencyObject,
   }
 }
 
@@ -87,14 +101,14 @@ class Bity {
   }
 
   async estimate(tradeRequest: TradeRequest): Promise<BityTrade> {
-    const { inputCurrencySymbol, outputCurrencySymbol, amount, tradeExact } = tradeRequest;
+    const { inputCurrencyObject, outputCurrencyObject, amount, tradeExact } = tradeRequest;
 
     const body: any = {
       input: {
-        currency: inputCurrencySymbol,
+        currency: inputCurrencyObject.symbol,
       },
       output: {
-        currency: outputCurrencySymbol,
+        currency: outputCurrencyObject.symbol,
       },
       partner_fee: { factor: bityPartnerFee }
     };
@@ -109,32 +123,45 @@ class Bity {
       body.output.amount = String(amount);
     else
       throw new Error('invalid TRADE_EXACT');
+    try {
 
-    const { data: bityOrderResponse } = await this.instance({
-      method: 'post',
-      url: '/v2/orders/estimate',
-      data: body,
-    });
+      const { data: bityOrderResponse } = await this.instance({
+        method: 'post',
+        url: '/v2/orders/estimate',
+        data: body,
+      });
 
-    if(
-      bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
-      ||
-      bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
-    ) {
-      throw new BityOrderError(
-        'bity_amount_too_low',
-        [{ minimumOutputAmount: bityOrderResponse.output.amount}]
-      )
+      if(
+        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
+        ||
+        bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
+      ) {
+        throw new BityOrderError(
+          'bity_amount_too_low',
+          [{ minimumOutputAmount: bityOrderResponse.output.amount}]
+        )
+      }
+
+      return {
+        tradeRequest,
+        inputAmount: bityOrderResponse.input.amount,
+        outputAmount: bityOrderResponse.output.amount,
+        tradeType: TradeType.BITY,
+        bityOrderResponse,
+        fee: extractFees(bityOrderResponse, tradeRequest),
+      };
+    } catch(error) {
+      if(error instanceof BityOrderError) throw error;
+
+      if(error?.response?.data?.errors) {
+        throw new BityOrderError(
+          'api_error',
+          error.response.data.errors
+        );
+      } else {
+        throw error;
+      }
     }
-
-    return {
-      tradeRequest,
-      inputAmount: bityOrderResponse.input.amount,
-      outputAmount: bityOrderResponse.output.amount,
-      tradeType: TradeType.BITY,
-      bityOrderResponse,
-      fee: extractFees(bityOrderResponse),
-    };
   }
 
   async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo): Promise<BityTrade> {
@@ -142,7 +169,7 @@ class Bity {
 
     const body: any = {
       input: {
-        currency: tradeRequest.inputCurrencySymbol,
+        currency: tradeRequest.inputCurrencyObject.symbol,
         type: 'crypto_address',
         crypto_address: ethInfo.fromAddress,
       },
@@ -150,7 +177,7 @@ class Bity {
         type: 'bank_account',
         owner: removeEmptyStrings(recipient.owner),
         iban: recipient.iban,
-        currency: tradeRequest.outputCurrencySymbol,
+        currency: tradeRequest.outputCurrencyObject.symbol,
         reference: reference,
       },
     };
@@ -203,10 +230,12 @@ class Bity {
         outputAmount: bityOrderResponse.output.amount,
         tradeType: TradeType.BITY,
         bityOrderResponse,
-        fee: extractFees(bityOrderResponse),
+        fee: extractFees(bityOrderResponse, tradeRequest),
       };
 
     } catch(error) {
+      if(error instanceof BityOrderError) throw error;
+
       if(error?.response?.data?.errors) {
         throw new BityOrderError(
           'api_error',

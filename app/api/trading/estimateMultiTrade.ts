@@ -18,9 +18,7 @@ export default errorMiddleware(async (req: NowRequest, res: NowResponse): Promis
     throw new APIError(400, 'wrong-body', 'tradeRequest values are invalid');
   }
 
-  const currenciesManager = new CurrenciesManager();
-  await currenciesManager.fetchCurrencies();
-  const trader = new Trader(bityInstance, currenciesManager);
+  const trader = new Trader(bityInstance);
 
   try {
     const multiTrade = await trader.estimateMultiTrade(tradeRequest);

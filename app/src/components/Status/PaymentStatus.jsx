@@ -25,7 +25,7 @@ import { SimpleLink } from '../UI/StyledComponents';
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
-import { watchBityOrder } from '../../redux/payment/actions';
+import { watchBityOrder, unwatchBityOrder } from '../../redux/payment/actions';
 import {selectUser} from "../../redux/user/userSlice";
 
 const Title = styled.p`
@@ -221,6 +221,7 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
     if(bityOrderId) {
       dispatch(watchBityOrder(bityOrderId));
     }
+    return () => dispatch(unwatchBityOrder(bityOrderId));
   }, [dispatch, bityOrderId]);
 
   return (
