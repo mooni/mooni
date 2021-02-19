@@ -138,9 +138,11 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       </Flex>
       }
 
+      {multiTradeEstimation &&
       <Box mt={4}>
         <RateAmount multiTradeEstimation={multiTradeEstimation}/>
       </Box>
+      }
     </>
   );
 }
