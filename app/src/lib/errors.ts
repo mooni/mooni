@@ -1,3 +1,5 @@
+import { getReasonPhrase } from 'http-status-codes';
+
 export class MetaError {
   readonly _metaError: boolean = true;
   readonly name: string = 'MetaError';
@@ -23,10 +25,10 @@ export class APIError extends MetaError {
   code: number;
   description?: string;
 
-  constructor(code: number, message: string, description?: string, meta?: object) {
-    super(message, meta);
+  constructor(code: number, message?: string, description?: string, meta?: object) {
+    super(message || getReasonPhrase(code), meta);
     this.code = code;
-    this.description = description;
+    this.description = description
   }
 
   toObject(): object {

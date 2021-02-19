@@ -13,6 +13,8 @@ import { APIError } from '../lib/errors';
 import { getETHManager } from '../redux/wallet/selectors';
 
 import { dailyLimits } from '../constants/limits';
+import { GetCurrencyFn } from '../contexts/CurrenciesContext';
+import { useCurrenciesContext } from './currencies';
 
 interface RateForm {
   loading: boolean,
@@ -38,8 +40,8 @@ interface RateForm {
 function defaultRateForm(initialRequest): RateForm {
   let values = initialRequest ?
     {
-      inputCurrency: initialRequest.inputCurrencySymbol,
-      outputCurrency: initialRequest.outputCurrencySymbol,
+      inputCurrency: initialRequest.inputCurrencyObject.symbol,
+      outputCurrency: initialRequest.outputCurrencyObject.symbol,
       inputAmount: initialRequest.tradeExact === TradeExact.INPUT ? initialRequest.amount : null,
       outputAmount: initialRequest.tradeExact === TradeExact.OUTPUT ? initialRequest.amount : null,
       tradeExact: initialRequest.tradeExact,
@@ -77,6 +79,7 @@ interface RateResponse {
 
 export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const ethManager = useSelector(getETHManager);
+  const { getCurrency } = useCurrenciesContext();
   const [rateForm, setRateForm] = useState<RateForm>(() => defaultRateForm(initialTradeRequest));
   const [tradeRequest, setTradeRequest] = useState<TradeRequest>(initialTradeRequest);
   const [multiTradeEstimation, setMultiTradeEstimation] = useState<MultiTradeEstimation|null>(null);
@@ -86,15 +89,15 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     setRateForm(defaultRateForm(initialTradeRequest));
   }, [initialTradeRequest]);
 
-  const estimate = useCallback(async (_rateForm: RateForm, _nonce: number) => {
+  const estimate = useCallback(async (_rateForm: RateForm, _nonce: number, _getCurrency: GetCurrencyFn) => {
     if(!_rateForm.loading) return;
     if(_rateForm.connected && _rateForm.balanceData.balanceLoading) return;
 
     const outputLimit = dailyLimits[_rateForm.values.outputCurrency];
 
     const currentRequest: TradeRequest = {
-      inputCurrencySymbol: _rateForm.values.inputCurrency,
-      outputCurrencySymbol: _rateForm.values.outputCurrency,
+      inputCurrencyObject: _getCurrency(_rateForm.values.inputCurrency).toObject(),
+      outputCurrencyObject: _getCurrency(_rateForm.values.outputCurrency).toObject(),
       tradeExact: _rateForm.values.tradeExact as TradeExact,
       amount: _rateForm.values.tradeExact as TradeExact === TradeExact.INPUT ? _rateForm.values.inputAmount : _rateForm.values.outputAmount,
     };
@@ -238,10 +241,10 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const debouncedRateForm = useDebounce(rateForm, 1000);
   useEffect(() => {
     nonce++;
-    estimate(debouncedRateForm, nonce).catch(error => {
+    estimate(debouncedRateForm, nonce, getCurrency).catch(error => {
       logError('unexpected error while fetching rates', error);
     });
-  }, [debouncedRateForm, estimate]);
+  }, [debouncedRateForm, estimate, getCurrency]);
 
   useEffect(() => {
     setRateForm(r => ({

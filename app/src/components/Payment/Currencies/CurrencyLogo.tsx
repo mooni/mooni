@@ -3,11 +3,10 @@ import {useImage} from 'react-image';
 
 import tokenDefaultImage  from '../../../assets/token_default.svg';
 import CustomCurrencyLogos from '../../../constants/CustomCurrencyLogos';
-import { Currency, CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
+import { Currency, CurrencySymbol, CurrencyType, TokenCurrency } from '../../../lib/trading/currencyTypes';
 import { Box } from '@material-ui/core';
 import { ETHER } from '../../../lib/trading/currencyList';
 import { useCurrency } from '../../../hooks/currencies';
-import { CurrencySymbol } from '../../../lib/trading/types';
 
 interface CurrencyLogoImageProps {
   src?: string;

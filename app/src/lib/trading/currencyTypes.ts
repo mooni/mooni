@@ -1,7 +1,6 @@
-import {ChainId} from '@uniswap/sdk';
-import {ethers} from "ethers";
+import { ChainId } from '@uniswap/sdk';
+import { ethers } from 'ethers';
 import ERC20_ABI from '../abis/ERC20.json';
-import {CurrencySymbol} from "./types";
 import { defaultProvider } from '../web3Providers';
 import { amountToDecimal } from '../numbers';
 
@@ -11,14 +10,19 @@ export enum CurrencyType {
   ERC20 = 'ERC20',
 }
 
+export type CurrencySymbol = string;
+
 export interface CurrencyObject {
   type: CurrencyType;
   decimals: number;
   symbol: CurrencySymbol;
-  address?: string;
   name?: string;
-  chainId?: ChainId;
   img?: string;
+}
+
+export interface TokenObject extends CurrencyObject{
+  address: string;
+  chainId: ChainId;
 }
 
 export abstract class Currency {
@@ -110,16 +114,20 @@ export class TokenCurrency extends Currency {
   }
 }
 
-export function createFromCurrencyObject(currencyObject: CurrencyObject): Currency {
+export function createFromCurrencyObject<T extends Currency>(currencyObject: CurrencyObject): T {
   switch(currencyObject.type) {
     case CurrencyType.FIAT:
-      return new FiatCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      return new FiatCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.CRYPTO:
-      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      return new CryptoCurrency(currencyObject.decimals, currencyObject.symbol, currencyObject.name, currencyObject.img) as T;
 
     case CurrencyType.ERC20:
-      return new TokenCurrency(currencyObject.decimals, currencyObject.address, currencyObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img);
+      if(!(currencyObject as any).chainId || !(currencyObject as any).address) {
+        throw new Error('invalid token object, mising chainId or address')
+      }
+      const tokenObject = currencyObject as TokenObject;
+      return new TokenCurrency(currencyObject.decimals, tokenObject.address, tokenObject.chainId, currencyObject.symbol, currencyObject.name, currencyObject.img) as unknown as T;
 
     default:
       throw new Error('unknown currency type')

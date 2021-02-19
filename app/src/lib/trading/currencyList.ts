@@ -1,5 +1,4 @@
-import {CryptoCurrency, FiatCurrency, createFromCurrencyObject} from './currencyTypes';
-import {CurrencySymbol} from "./types";
+import { CryptoCurrency, FiatCurrency, createFromCurrencyObject, CurrencySymbol } from './currencyTypes';
 import FiatCurrenciesDefault from "../../constants/FiatCurrencies";
 import CryptoCurrenciesDefault from "../../constants/CryptoCurrencies";
 
@@ -10,3 +9,6 @@ export const ETHER = cryptoCurrencies.find(c => c.symbol === 'ETH') as CryptoCur
 
 export const DEFAULT_INPUT_CURRENCY: CurrencySymbol = 'ETH';
 export const DEFAULT_OUTPUT_CURRENCY: CurrencySymbol = 'EUR';
+
+export const DEFAULT_INPUT_CURRENCY_OBJECT = cryptoCurrencies[0].toObject()
+export const DEFAULT_OUTPUT_CURRENCY_OBJECT = fiatCurrencies[0].toObject()
