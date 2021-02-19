@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import {Box, Flex} from '@chakra-ui/react';
 import {useSelector, useDispatch} from 'react-redux';
 
-import {IconCaution, IconEthereum, IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
+import {IconCaution, IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
 import styled from 'styled-components';
 
 import { AmountRow } from './AmountRow';
