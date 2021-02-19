@@ -1,12 +1,21 @@
 import ParaswapWrapper, { CurrencyBalances } from '../wrappers/paraswap';
 import { CurrenciesMap, Currency, CurrencySymbol, CurrencyType, TokenCurrency } from './currencyTypes';
-import { fiatCurrencies } from './currencyList';
+import { cryptoCurrencies, fiatCurrencies } from './currencyList';
 import { MetaError } from '../errors';
 
 export default class CurrenciesManager {
   tradeableCurrencies: Currency[] = [];
   tradeableCurrenciesMap: CurrenciesMap = {};
   currencyBalances?: CurrencyBalances;
+
+  async getDefaultCurrencies(): Promise<CurrenciesMap> {
+    this.tradeableCurrencies = cryptoCurrencies;
+    this.tradeableCurrenciesMap = this.tradeableCurrencies.reduce((acc, currency) => ({
+      ...acc,
+      [currency.symbol]: currency,
+    }), {});
+    return this.tradeableCurrenciesMap;
+  }
 
   async fetchCurrencies(): Promise<CurrenciesMap> {
     this.tradeableCurrencies = await ParaswapWrapper.getTokenList();

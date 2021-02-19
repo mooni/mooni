@@ -39,6 +39,7 @@ export const CurrenciesContextProvider: React.FC = ({ children }) => {
 
   // Get currency list
   useEffect(() => {
+    // currenciesManager.getDefaultCurrencies() // Static currencies, disable token exchange
     currenciesManager.fetchCurrencies()
       .then(tradeableCurrencyMap => {
         setInputCurrenciesMap(tradeableCurrencyMap);
