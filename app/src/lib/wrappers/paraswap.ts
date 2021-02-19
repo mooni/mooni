@@ -20,7 +20,7 @@ import {amountToDecimal, amountToInt} from "../numbers";
 import { MetaError } from '../errors';
 import { applySlippageOnTrade, MAX_SLIPPAGE } from '../trading/dexProxy';
 
-const paraSwapSDK = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
+const paraSwap = new ParaSwap(config.chainId as NetworkID).setWeb3Provider(defaultProvider);
 const paraswapAxios = axios.create({
   baseURL: `https://apiv2${config.chainId === ChainId.ROPSTEN ? '-ropsten' : ''}.paraswap.io/v2`,
   timeout: 10000,
@@ -148,7 +148,7 @@ const ParaswapWrapper = {
     const receiver = undefined;
     const referrer = 'mooni';
 
-    const txParams = await paraSwapSDK.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
+    const txParams = await paraSwap.buildTx(srcToken, destToken, srcAmount, destAmount, priceRoute, senderAddress, referrer, receiver);
     if((txParams as APIError).message) throw new Error((txParams as APIError).message);
 
     return {
