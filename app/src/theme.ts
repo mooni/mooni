@@ -58,6 +58,7 @@ export const chakraTheme = extendTheme({
   },
   shadows: {
     base: '0 1px 3px rgb(0 0 0 / 10%)',
+    medium: 'rgb(0 0 0 / 1%) 0px 0px 1px, rgb(0 0 0 / 4%) 0px 4px 8px, rgb(0 0 0 / 4%) 0px 16px 24px, rgb(0 0 0 / 1%) 0px 24px 32px',
   },
   components: {
     Button,
