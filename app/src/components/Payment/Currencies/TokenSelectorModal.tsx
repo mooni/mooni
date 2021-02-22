@@ -7,7 +7,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { CurrencyLogo } from './CurrencyLogo';
 import styled from 'styled-components';
 import { textStyle, LoadingRing, SearchInput } from '@aragon/ui'
-import { amountToDecimal, truncateNumber } from '../../../lib/numbers';
+import { amountToDecimal, significantNumbers } from '../../../lib/numbers';
 import { Currency } from '../../../lib/trading/currencyTypes';
 import { useCurrenciesContext, useTokenList } from '../../../hooks/currencies';
 
@@ -98,7 +98,7 @@ const TokenRow: React.FC<TokenRowProps> = ({ currency }) => {
 
           {currencyBalance && (
             <CurrencyAmountText>
-              {truncateNumber(amountToDecimal(currencyBalance.balance, currency.decimals))}
+              {significantNumbers(amountToDecimal(currencyBalance.balance, currency.decimals))}
             </CurrencyAmountText>
           )}
         </Box>
