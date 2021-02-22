@@ -3,12 +3,17 @@ import styled from 'styled-components';
 import { Flex, Button, useClipboard } from '@chakra-ui/react';
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { textStyle, GU, Link } from '@aragon/ui';
+import { textStyle, LoadingRing, GU, Link } from '@aragon/ui';
+import useSWR from 'swr';
 
 import { selectUser } from '../../redux/user/userSlice';
 import config from '../../config';
 import { setInfoPanel } from '../../redux/ui/actions';
 import { sendEvent } from '../../lib/analytics';
+import Api from '../../lib/apiWrapper';
+import { getJWS } from '../../redux/wallet/selectors';
+import { ProfitShare } from '../../types/api';
+import { truncateNumber } from '../../lib/numbers';
 
 const Content = styled.p`
   ${textStyle('body2')};
@@ -21,6 +26,20 @@ const SubContent = styled.p`
   text-align: center;
   margin-top: ${2 * GU}px;
   max-width: 335px;
+`;
+const KPIValue = styled.p`
+  ${textStyle('body4')};
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 500;
+  color: ${props => props.theme.selected}
+`;
+
+const KPILabel = styled.p`
+  ${textStyle('label1')};
+  text-align: center;
+  font-weight: 300;
+  color: ${props => props.theme.contentSecondary}
 `;
 
 export function ReferralBox() {
@@ -44,7 +63,7 @@ export function ReferralBox() {
         size="sm"
         variant="link"
       >
-          {hasCopied ? "Copied": "Copy referral link"}
+        {hasCopied ? "Copied": "Copy referral link"}
       </Button>
     </Flex>
   );
@@ -52,9 +71,23 @@ export function ReferralBox() {
 
 export default function ReferralInfo() {
   const dispatch = useDispatch();
+  const jwsToken = useSelector(getJWS);
+  const { data } = useSWR(jwsToken, Api.getProfitShare);
+
+  const profitShare = data as ProfitShare;
 
   return (
     <>
+      <Flex direction="column" align="center" mb={2}>
+        <KPILabel>Orders referred</KPILabel>
+        <KPIValue>
+          {profitShare ?
+            profitShare.referralTxCount
+            :
+            <LoadingRing mode="half-circle" />
+          }
+        </KPIValue>
+      </Flex>
       <ReferralBox/>
       <SubContent>
         You can earn money by referring other people to use Mooni ! Any completed order referred by you will make you earn {config.referralSharing * 100}% profit sharing.
@@ -62,6 +95,11 @@ export default function ReferralInfo() {
           &nbsp;More info
         </Link>
       </SubContent>
+      {profitShare && profitShare.referralTxCount > 0 &&
+      <SubContent>
+        You have accumulated {truncateNumber(profitShare.referralProfit)} ETH so far in profit sharing. Please contact support if you want to withdraw that.
+      </SubContent>
+      }
     </>
   );
 }
