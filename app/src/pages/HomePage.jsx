@@ -15,7 +15,8 @@ import {ReferralBox} from "../components/Account/ReferralInfo";
 import {Surface} from "../components/UI/StyledComponents";
 
 export const HeadLine = styled.h2`
-  margin-bottom: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 `;
 
@@ -41,7 +42,7 @@ export default function HomePage() {
           <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest}/>
         </Surface>
         {walletStatus === WalletStatus.CONNECTED &&
-        <Box mt={2}>
+        <Box mt={8}>
           <ReferralBox/>
         </Box>
         }

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Box, Typography, Tooltip} from '@material-ui/core';
-import { Image } from '@chakra-ui/react'
+import { Typography, Tooltip} from '@material-ui/core';
+import { Box, Image } from '@chakra-ui/react'
 import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
@@ -50,47 +50,47 @@ function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
 
 // @ts-ignore
 const Container = styled(ShadowBox)`
-width: 100%;
-padding: 15px 20px;
+  width: 100%;
+  padding: 15px 20px;
+  box-shadow: none;
+  border-radius: 16px;
 `;
 
 const RouteTitle = styled.p`
-font-family: Roboto;
-font-style: normal;
-font-weight: 200;
-font-size: 12px;
-line-height: 25px;
-color: #504E4E;
-text-align: center;
-text-transform: uppercase;
+  font-style: normal;
+  font-weight: 200;
+  font-size: 12px;
+  line-height: 25px;
+  color: #504E4E;
+  text-align: center;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
 `;
 
 const RouteAmount = styled.span`
-font-family: Roboto;
-font-style: normal;
-font-weight: normal;
-font-size: 12px;
-line-height: 12px;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 12px;
 `;
 
 const Via = styled.span`
-font-family: Roboto;
-font-style: normal;
-font-weight: 200;
-font-size: 12px;
-line-height: 14px;
-margin-right: 5px;
-text-transform: lowercase;
+  font-style: normal;
+  font-weight: 200;
+  font-size: 12px;
+  line-height: 14px;
+  margin-right: 5px;
+  text-transform: lowercase;
 `;
 
 const TradeElement = styled.div`
-height: 35px;
-display: flex;
-align-items: center;
+  height: 35px;
+  display: flex;
+  align-items: center;
 
-& + & {
-  border-top: 0.5px solid #D9D0D0;
-}
+  & + & {
+    border-top: 0.5px solid #D9D0D0;
+  }
 `;
 
 interface BasicLineProps {
@@ -98,16 +98,12 @@ interface BasicLineProps {
   content: string;
 }
 const BasicLine: React.FC<BasicLineProps> = ({title, content}) => (
-  <Box display="flex">
+  <Box display="flex" fontSize="0.8rem" justifyContent="space-between">
     <Box>
-      <Typography variant="caption">
-        <b>{title}</b>
-      </Typography>
+      {title}
     </Box>
-    <Box flex={1} textAlign="right">
-      <Typography variant="caption">
-        {content}
-      </Typography>
+    <Box fontWeight={600}>
+      {content}
     </Box>
   </Box>
 );
@@ -219,7 +215,7 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
 
   return (
     <Container>
-      <Box px={1}>
+      <Box>
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {feeInfos &&
         <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currencyObject.symbol}`}/>
