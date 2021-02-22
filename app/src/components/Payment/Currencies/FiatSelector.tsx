@@ -11,14 +11,17 @@ function CurrencyItem({ symbol }) {
   return (
     <Box display="flex" alignItems="center">
       <CurrencyLogo symbol={symbol} width="20px"/>
-      <Box ml={1}>{symbol}</Box>
+      <Box ml={1} fontSize="1.2rem">{symbol}</Box>
     </Box>
   );
 }
 
 const CustomDropDown = styled(DropDown)`
-  border-radius: 20px;
-  border-color: #aecfd6;
+  border: none;
+  outline: none;
+  svg {
+    margin-left: 0.5rem;
+  }
 `;
 
 const outputCurrencies: string[] = fiatCurrencies.map(c => c.symbol);
