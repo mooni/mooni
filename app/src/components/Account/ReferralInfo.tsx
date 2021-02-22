@@ -8,6 +8,7 @@ import { textStyle, GU, Link } from '@aragon/ui';
 import { selectUser } from '../../redux/user/userSlice';
 import config from '../../config';
 import { setInfoPanel } from '../../redux/ui/actions';
+import { sendEvent } from '../../lib/analytics';
 
 const Content = styled.p`
   ${textStyle('body2')};
@@ -27,13 +28,18 @@ export function ReferralBox() {
   const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
   const { hasCopied, onCopy } = useClipboard(referralURL);
 
+  function copy() {
+    sendEvent('copy_referral_link');
+    onCopy();
+  }
+
   return (
     <Flex direction="column" justify="center" align="center">
       <Content>
         Share referral link to earn cryptocurrency
       </Content>
       <Button
-        onClick={onCopy}
+        onClick={copy}
         leftIcon={hasCopied ? <CheckCircleIcon/> : <CopyIcon/>}
         size="sm"
         variant="link"
