@@ -9,8 +9,8 @@ import { useCurrency } from './currencies';
 import { CurrencySymbol, TokenCurrency } from '../lib/trading/currencyTypes';
 import { logError } from '../lib/log';
 import { MetaError } from '../lib/errors';
-import { DexTrade, MultiTradeEstimation, TradeExact, TradeRequest, TradeType } from '../lib/trading/types';
-import { applySlippage, applySlippageOnTrade, MAX_SLIPPAGE } from '../lib/trading/dexProxy';
+import { MultiTradeEstimation, TradeExact, TradeRequest } from '../lib/trading/types';
+import { applySlippage, MAX_SLIPPAGE } from '../lib/trading/dexProxy';
 
 export interface BalanceData {
   balance: string,
@@ -112,7 +112,7 @@ export const useTradeBalance = (tradeRequest: TradeRequest, multiTradeEstimation
       tradeRequest.amount;
 
     return new BN(maxAmount).lt(inputAmount)
-  }, [balance, balanceLoading, maxAmount, tradeRequest]);
+  }, [balanceLoading, maxAmount, multiTradeEstimation, tradeRequest]);
 
   return {
     balance, balanceLoading, insufficientBalance, maxAmount,
