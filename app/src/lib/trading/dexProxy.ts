@@ -15,11 +15,17 @@ export function calculateGasMargin(value: BigNumber): BigNumber {
 
 export const MAX_SLIPPAGE = 0.01;
 
-export function applySlippage(amount: string, maxSlippage: number = MAX_SLIPPAGE): string {
+function applySlippageInt(amount: string, maxSlippage: number = MAX_SLIPPAGE): string {
   const slippageMultiply = new BN(1).plus(maxSlippage);
   let withSlippage = new BN(amount).times(slippageMultiply);
   withSlippage = withSlippage.dp(0, maxSlippage > 0 ? BN.ROUND_CEIL : BN.ROUND_FLOOR);
   return withSlippage.toFixed();
+}
+
+export function applySlippage(amount: string, decimals: number, slippage: number): string {
+  const intAmount = amountToInt(amount, decimals);
+  const intWithSlippage = applySlippageInt(intAmount, slippage);
+  return amountToDecimal(intWithSlippage, decimals);
 }
 
 interface TradeSlippage {
@@ -37,14 +43,8 @@ export function applySlippageOnTrade(dexTrade: DexTrade): TradeSlippage {
     tradeRequest: { tradeExact, inputCurrencyObject, outputCurrencyObject}
   } = dexTrade;
 
-  function applyWithDecimals(a , d, s) {
-    const intAmount = amountToInt(a, d);
-    const intWithSlippage = applySlippage(intAmount, s);
-    return amountToDecimal(intWithSlippage, d);
-  }
-
-  const maxInputAmount = applyWithDecimals(inputAmount, inputCurrencyObject.decimals, maxSlippage);
-  const minOutputAmount = applyWithDecimals(outputAmount, outputCurrencyObject.decimals, -maxSlippage);
+  const maxInputAmount = applySlippage(inputAmount, inputCurrencyObject.decimals, maxSlippage);
+  const minOutputAmount = applySlippage(outputAmount, outputCurrencyObject.decimals, -maxSlippage);
 
   return {
     inputAmount: tradeExact === TradeExact.OUTPUT ? maxInputAmount : inputAmount,

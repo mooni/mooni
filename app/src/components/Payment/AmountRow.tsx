@@ -61,7 +61,7 @@ const Container = styled.div`
 `;
 
 type Props = {
-  value: string;
+  value: string | null;
   selectedSymbol: string;
   onChangeValue: (string) => void;
   onChangeCurrency: (string) => void;

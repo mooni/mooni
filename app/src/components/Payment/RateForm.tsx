@@ -22,7 +22,7 @@ import { RoundButton } from '../UI/StyledComponents';
 import { login } from '../../redux/wallet/actions';
 import { dailyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
-import { useBalance } from '../../hooks/balance';
+import { useTradeBalance } from '../../hooks/balance';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -42,14 +42,9 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
   const { approvalState, approveAllowance } = useApprovalForMultiTradeEstimation(multiTradeEstimation);
-  const { balanceLoading, balance } = useBalance(rateForm.values.inputCurrency);
+  const { balanceLoading, insufficientBalance } = useTradeBalance(tradeRequest, multiTradeEstimation);
 
   const errors = rateForm.errors;
-
-  const insufficientBalance = !balanceLoading ?
-    new BN(balance).lt(rateForm.values.inputAmount)
-    :
-    false;
 
   const submit = useCallback(() => {
     if(!tradeRequest) return;
@@ -70,12 +65,12 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
   if(walletStatus === WalletStatus.CONNECTED) {
     if(approvalState === ApprovalState.MINING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Unlocking tokens" disabled />;
-    } else if (rateForm.loading) {
-      button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
     } else if(balanceLoading) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Loading balances" disabled />;
     } else if(insufficientBalance) {
       button = <RoundButton wide icon={<IconCaution/>} label="Insufficient balance" disabled />;
+    } else if (rateForm.loading) {
+      button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
     } else if(errors) {
       button = <RoundButton wide icon={<IconCaution/>} label="Invalid" disabled />;
     } else if(approvalState === ApprovalState.LOADING) {
