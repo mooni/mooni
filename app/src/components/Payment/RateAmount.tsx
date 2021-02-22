@@ -4,7 +4,7 @@ import { Image } from '@chakra-ui/react'
 import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
-import {BN, truncateNumber} from '../../lib/numbers';
+import {BN, significantNumbers} from '../../lib/numbers';
 import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
 import {MetaError} from "../../lib/errors";
 import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
@@ -150,10 +150,10 @@ const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {truncateNumber(trade.inputAmount)}
+        {significantNumbers(trade.inputAmount)}
         {' '}{trade.tradeRequest.inputCurrencyObject.symbol}
         <b>{' > '}</b>
-        {truncateNumber(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
+        {significantNumbers(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
       </RouteAmount>
     </Box>
     <Box height={30} display="flex" alignItems="center">
@@ -192,9 +192,9 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
     if(fee) {
       let amount;
       if(fee.currencyObject.type === CurrencyType.FIAT) {
-        amount = truncateNumber(fee.amount, 2);
+        amount = significantNumbers(fee.amount, 2);
       } else {
-        amount = truncateNumber(fee.amount);
+        amount = significantNumbers(fee.amount);
       }
       return {
         currencyObject: fee.currencyObject,
@@ -206,7 +206,7 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
 
   const rateTrunc = useMemo(() => {
     const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
-    return truncateNumber(rate);
+    return significantNumbers(rate);
   }, [multiTradeEstimation]);
 
   return (

@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { AmountRow } from './AmountRow';
 
 import {TradeExact, TradeRequest} from '../../lib/trading/types';
-import {BN} from '../../lib/numbers';
 
 import { useRate } from '../../hooks/rates';
 import { getWalletStatus } from '../../redux/wallet/selectors';

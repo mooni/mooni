@@ -2,7 +2,7 @@ import { useReducer, useEffect, useCallback } from 'react';
 import { MultiTradeEstimation, TradeExact } from '../lib/trading/types';
 import { useDebounce } from './utils';
 import { logError } from '../lib/log';
-import {isNotZero, BN} from '../lib/numbers';
+import { isNotZero, BN, truncateNumber } from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
@@ -38,22 +38,13 @@ interface RateState {
 }
 
 function defaultRateState(initialTradeRequest: TradeRequest): RateState {
-  let values = /*initialTradeRequest ?*/
-      {
-        inputCurrency: initialTradeRequest.inputCurrencyObject.symbol,
-        outputCurrency: initialTradeRequest.outputCurrencyObject.symbol,
-        inputAmount: initialTradeRequest.tradeExact === TradeExact.INPUT ? initialTradeRequest.amount : null,
-        outputAmount: initialTradeRequest.tradeExact === TradeExact.OUTPUT ? initialTradeRequest.amount : null,
-        tradeExact: initialTradeRequest.tradeExact,
-      }
-    /*:
-    {
-      inputCurrency: DEFAULT_INPUT_CURRENCY,
-      outputCurrency: DEFAULT_OUTPUT_CURRENCY,
-      inputAmount: null,
-      outputAmount: '100',
-      tradeExact: TradeExact.OUTPUT,
-    }*/;
+  let values = {
+    inputCurrency: initialTradeRequest.inputCurrencyObject.symbol,
+    outputCurrency: initialTradeRequest.outputCurrencyObject.symbol,
+    inputAmount: initialTradeRequest.tradeExact === TradeExact.INPUT ? initialTradeRequest.amount : null,
+    outputAmount: initialTradeRequest.tradeExact === TradeExact.OUTPUT ? initialTradeRequest.amount : null,
+    tradeExact: initialTradeRequest.tradeExact,
+  };
 
   return {
     rateForm: {
@@ -84,6 +75,14 @@ interface RateStateAction {
 
 type RateStateReducer = (RateState, RateStateAction) => RateState;
 
+function correctAmount(amount: string, decimals: number) {
+  const truncAmount = truncateNumber(amount, decimals);
+  if(new BN(amount).eq(truncAmount)) {
+    return amount;
+  } else {
+    return truncAmount;
+  }
+}
 const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateAction) => {
   switch (action.type) {
     case 'init': {
@@ -117,11 +116,13 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
     }
     case 'setAmount': {
       const {tradeExact, amount} = action.payload;
+      const currencyObject = tradeExact === TradeExact.INPUT ? state.tradeRequest.inputCurrencyObject: state.tradeRequest.outputCurrencyObject;
+      const correctedAmount = correctAmount(amount, currencyObject.decimals);
 
       const tradeRequest: TradeRequest = {
         ...state.tradeRequest,
         tradeExact,
-        amount: amount,
+        amount: correctedAmount,
       };
 
       return {
@@ -133,8 +134,8 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
           values: {
             ...state.rateForm.values,
             tradeExact,
-            inputAmount: tradeExact===TradeExact.INPUT ? amount : null,
-            outputAmount: tradeExact===TradeExact.OUTPUT ? amount : null,
+            inputAmount: tradeExact===TradeExact.INPUT ? correctedAmount : null,
+            outputAmount: tradeExact===TradeExact.OUTPUT ? correctedAmount : null,
           }
         },
         tradeRequest,

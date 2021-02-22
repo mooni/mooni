@@ -27,8 +27,11 @@ export function amountToDecimal(amount: string, decimals: number): string {
   return new BN(amount).div(10 ** decimals).toFixed();
 }
 
-export function truncateNumber(n, sd = SIGNIFICANT_DIGITS) {
+export function significantNumbers(n: string | BN, sd = SIGNIFICANT_DIGITS) {
   return new BN(n).sd(sd).toFixed();
+}
+export function truncateNumber(value: string, decimals: number) {
+  return new BN(value).dp(decimals, BN.ROUND_FLOOR).toFixed();
 }
 
 export function numberWithCommas(x) {

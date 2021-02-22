@@ -5,7 +5,7 @@ import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { textStyle, Field, Info, Timer } from '@aragon/ui';
 
-import {truncateNumber} from '../../lib/numbers';
+import {significantNumbers} from '../../lib/numbers';
 
 import {BityTrade, MultiTrade, TradeType} from "../../lib/trading/types";
 import { RateAmount } from "./RateAmount";
@@ -80,7 +80,7 @@ function AmountRow({ value, symbol, caption }) {
           <input
             type="number"
             min={0}
-            value={truncateNumber(value)}
+            value={significantNumbers(value)}
             readOnly
             className={classes.amountInput}
           />
