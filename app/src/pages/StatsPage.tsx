@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import { MediumWidth, ShadowBox, FlexCenterBox } from '../components/UI/StyledComponents';
 import styled from 'styled-components';
 import Api from '../lib/apiWrapper';
-import { BN, truncateNumber } from '../lib/numbers';
+import { BN, significantNumbers } from '../lib/numbers';
 
 // @ts-ignore
 const StatItemBox = styled(ShadowBox)`
@@ -59,7 +59,7 @@ export default function StatsPage() {
           <Grid item xs={12} sm={6}>
             <StatItem
               title="ETH exchanged"
-              value={`${truncateNumber(data.totalETH)} ETH`}
+              value={`${significantNumbers(data.totalETH)} ETH`}
             />
           </Grid>
           <Grid item xs={12} sm={6}>

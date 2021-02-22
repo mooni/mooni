@@ -1,13 +1,14 @@
 import React from 'react';
 import BN from 'bignumber.js';
-import { Box, Typography} from '@material-ui/core';
+import { Box as MBox, Typography} from '@material-ui/core';
+import { Box, Flex, Button} from '@chakra-ui/react';
 import { makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components';
 
 import { CurrencyType } from '../../lib/trading/currencyTypes';
 import { CurrencySelector } from './Currencies/CurrencySelector';
 
-import { SIGNIFICANT_DIGITS } from '../../lib/numbers';
+import { SIGNIFICANT_DIGITS, significantNumbers } from '../../lib/numbers';
 
 const useStyles = makeStyles(theme => ({
   caption: {
@@ -61,10 +62,11 @@ const Container = styled.div`
 `;
 
 type Props = {
-  value: string;
+  value: string | null;
   selectedSymbol: string;
   onChangeValue: (string) => void;
   onChangeCurrency: (string) => void;
+  onMax?: () => void;
   currencyType: CurrencyType;
   active: boolean;
   disabled?: boolean;
@@ -72,9 +74,10 @@ type Props = {
   currencyDisabled?: boolean;
   error: boolean;
   caption: string;
+  balanceAvailable?: string;
 };
 
-export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencyType, active, error, valueDisabled, currencyDisabled, caption }) => {
+export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencyType, active, error, valueDisabled, currencyDisabled, caption, onMax, balanceAvailable }) => {
   const classes = useStyles();
 
   const displayedValue = value !== null ?
@@ -83,22 +86,34 @@ export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValu
 
   return (
     <Container>
-      <Box className={classes.caption}>
+      <Flex px={4} pb={2} justify="space-between">
         <Typography variant="caption">
           {caption}
         </Typography>
-      </Box>
-      <Box className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow, error && classes.errorRow].join(' ')}>
-        <Box flex={1}>
+        {balanceAvailable && balanceAvailable !== '0' &&
+          <Button
+            variant="link"
+            onClick={onMax}
+            disabled={!onMax}
+            _disabled={{
+              color: 'gray.400',
+            }}
+          >
+            Available: {significantNumbers(balanceAvailable)}
+          </Button>
+        }
+      </Flex>
+      <MBox className={[classes.rowRoot, valueDisabled && classes.disabledRow, active && classes.activeRow, error && classes.errorRow].join(' ')}>
+        <MBox flex={1}>
           <input
             type="number"
             className={[classes.amountInput, valueDisabled && classes.disabledInput].join(' ')}
             value={displayedValue}
-            onChange={onChangeValue}
+            onChange={e => onChangeValue(e.target.value)}
             readOnly={valueDisabled}
             min={0}
           />
-        </Box>
+        </MBox>
         <Box>
           <CurrencySelector
             selectedSymbol={selectedSymbol}
@@ -107,7 +122,7 @@ export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValu
             currencyType={currencyType}
           />
         </Box>
-      </Box>
+      </MBox>
     </Container>
   );
 };

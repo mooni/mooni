@@ -10,7 +10,7 @@ import { useMediaQuery } from '@chakra-ui/react';
 import Api from '../../lib/apiWrapper';
 import { getJWS } from '../../redux/wallet/selectors';
 import { MooniOrder, MooniOrderStatus } from '../../types/api';
-import { truncateNumber } from '../../lib/numbers';
+import { significantNumbers } from '../../lib/numbers';
 import { ShadowBox } from '../UI/StyledComponents';
 import { getEtherscanTxURL } from '../../lib/eth';
 import { setInfoPanel } from '../../redux/ui/actions';
@@ -79,8 +79,8 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
           <OrderStatusIcon order={order}/>
         </Box>
       </TableCell>
-      <TableCell><CellText>{truncateNumber(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
-      <TableCell><CellText>{truncateNumber(order.outputAmount)} {order.outputCurrency}</CellText></TableCell>
+      <TableCell><CellText>{significantNumbers(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
+      <TableCell><CellText>{significantNumbers(order.outputAmount)} {order.outputCurrency}</CellText></TableCell>
       <TableCell><CellText>{date.toLocaleDateString()} {date.toLocaleTimeString()}</CellText></TableCell>
       <TableCell>
         {order.txHash &&
