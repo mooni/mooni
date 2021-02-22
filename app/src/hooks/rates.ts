@@ -144,12 +144,20 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
       };
     }
     case 'setError': {
+      const setValues: any = {};
+      if(action.payload.errors.highAmount) {
+        setValues.outputAmount = action.payload.outputAmount
+      }
       return {
         ...state,
         rateForm: {
           ...state.rateForm,
           loading: false,
           errors: action.payload.errors,
+          values: {
+            ...state.rateForm.values,
+            ...setValues,
+          }
         }
       };
     }
@@ -255,8 +263,9 @@ const estimate = async (tradeRequest: TradeRequest, _nonce: number, _getCurrency
       type: 'setError',
       payload: {
         errors: {
-          highAmount: true, // TODO set outputamount
+          highAmount: true,
         },
+        outputAmount: multiTradeEstimation.outputAmount,
       }
     }
   }
