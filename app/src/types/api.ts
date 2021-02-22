@@ -41,6 +41,6 @@ export interface Stats {
   totalCHF: string;
 }
 export interface ProfitShare {
-  referralTxCount: string;
+  referralTxCount: number;
   referralProfit: string;
 }
