@@ -83,6 +83,7 @@ function correctAmount(amount: string, decimals: number) {
     return truncAmount;
   }
 }
+
 const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateAction) => {
   switch (action.type) {
     case 'init': {
@@ -285,12 +286,12 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     });
   }, [getCurrency]);
 
-  const onChangeAmount = useCallback(tradeExact => e => {
+  const onChangeAmount = useCallback(tradeExact => value => {
     dispatchRateState({
       type: 'setAmount',
       payload: {
         tradeExact,
-        amount: e.target.value,
+        amount: value,
       }
     });
   }, []);

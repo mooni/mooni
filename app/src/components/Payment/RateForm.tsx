@@ -22,6 +22,7 @@ import { login } from '../../redux/wallet/actions';
 import { dailyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
 import { useTradeBalance } from '../../hooks/balance';
+import { ETHER } from '../../lib/trading/currencyList';
 
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
@@ -41,7 +42,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
 
   const { rateForm, tradeRequest, multiTradeEstimation, onChangeAmount, onChangeCurrency } = useRate(initialTradeRequest);
   const { approvalState, approveAllowance } = useApprovalForMultiTradeEstimation(multiTradeEstimation);
-  const { balanceLoading, insufficientBalance } = useTradeBalance(tradeRequest, multiTradeEstimation);
+  const { balanceLoading, insufficientBalance, maxAmount } = useTradeBalance(tradeRequest, multiTradeEstimation);
 
   const errors = rateForm.errors;
 
@@ -91,6 +92,9 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
     button = <RoundButton disabled wide icon={<LoadingRing/>} display="all" label="Connecting..." />
   }
 
+  const onMax = (rateForm.values.inputCurrency !== ETHER.symbol && maxAmount !== '0') ?
+    (() => onChangeAmount(TradeExact.INPUT)(maxAmount)) : undefined;
+
   return (
     <>
       <AmountRow
@@ -104,6 +108,8 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
         // valueDisabled={rateForm.values.tradeExact === TradeExact.OUTPUT && rateForm.loading}
         error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.INPUT && !!errors}
         caption="Send"
+        onMax={onMax}
+        balanceAvailable={onMax && maxAmount}
       />
       <AmountRow
         value={rateForm.values.outputAmount}

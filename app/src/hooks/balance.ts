@@ -56,8 +56,9 @@ export function useBalance(symbol: CurrencySymbol): BalanceData {
         });
       ethManager.provider.on(ethAddress, updateBalance);
 
-      return () => ethManager.provider.removeListener(ethAddress, updateBalance);
-
+      return () => {
+        ethManager.provider.removeListener(ethAddress, updateBalance);
+      };
     } else if(currency instanceof TokenCurrency) {
 
       const updateBalance = () => {
@@ -94,7 +95,7 @@ export const useTradeBalance = (tradeRequest: TradeRequest, multiTradeEstimation
     if(balanceLoading) return '0';
 
     return tradeRequest.inputCurrencyObject.symbol !== ETHER.symbol ?
-      applySlippage(balance, tradeRequest.inputCurrencyObject.decimals, -MAX_SLIPPAGE)
+      applySlippage(balance, tradeRequest.inputCurrencyObject.decimals, -2*MAX_SLIPPAGE)
       :
       balance;
   }, [balance, balanceLoading, tradeRequest]);
@@ -106,16 +107,12 @@ export const useTradeBalance = (tradeRequest: TradeRequest, multiTradeEstimation
     ) return false;
 
     const inputAmount = multiTradeEstimation ?
-      (multiTradeEstimation.trades[0].tradeType === TradeType.DEX ?
-          applySlippageOnTrade(multiTradeEstimation.trades[0] as DexTrade).maxInputAmount
-          :
-          multiTradeEstimation.trades[0].inputAmount
-      )
+      multiTradeEstimation.trades[0].inputAmount
       :
       tradeRequest.amount;
 
-    return new BN(balance).lt(inputAmount)
-  }, [balance, balanceLoading, multiTradeEstimation, tradeRequest]);
+    return new BN(maxAmount).lt(inputAmount)
+  }, [balance, balanceLoading, maxAmount, tradeRequest]);
 
   return {
     balance, balanceLoading, insufficientBalance, maxAmount,
