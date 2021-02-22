@@ -5,7 +5,7 @@ import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
 import {CurrencyType} from '../../lib/trading/currencyTypes';
 import {BN, truncateNumber} from '../../lib/numbers';
-import { Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
+import { DexTrade, Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
 import {MetaError} from "../../lib/errors";
 import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
 
@@ -204,6 +204,14 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
     return null;
   }, [fee]);
 
+  const slippage = useMemo<number | null>(() => {
+    const dexTrade = multiTradeEstimation.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade | undefined;
+    if(!dexTrade) {
+      return null;
+    }
+    return dexTrade.maxSlippage;
+  }, [multiTradeEstimation])
+
   const rateTrunc = useMemo(() => {
     const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
     return truncateNumber(rate);
@@ -215,6 +223,9 @@ export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEst
         <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
         {feeInfos &&
         <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currencyObject.symbol}`}/>
+        }
+        {slippage &&
+        <BasicLine title="Slippage tolerance" content={`${slippage * 100}%`}/>
         }
       </Box>
       <RouteTitle>Order Routing</RouteTitle>
