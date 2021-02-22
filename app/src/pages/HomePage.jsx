@@ -37,7 +37,7 @@ export default function HomePage() {
         <HeadLine>
             Transfer funds from your crypto wallet to your bank account.
         </HeadLine>
-        <Surface px={4} py={6} boxShadow="medium">
+        <Surface px={4} py={8} boxShadow="medium">
           <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest}/>
         </Surface>
         {walletStatus === WalletStatus.CONNECTED &&
