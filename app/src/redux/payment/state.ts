@@ -75,7 +75,7 @@ const initialMockStateMinimum: PaymentState = {
 
 // eslint-disable-next-line
 const initialMockStateComplete: PaymentState = {
-  exchangeStep: 2,
+  exchangeStep: 0,
   multiTradeRequest: {
     bankInfo: {
       recipient: {
@@ -281,7 +281,7 @@ const initialMockStateComplete: PaymentState = {
           id: '3679291c-1c85-453d-aaf2-ab3c3b81c0de',
           timestamp_created: '2021-02-23T05:53:12.148Z',
           timestamp_awaiting_payment_since: '2021-02-23T05:53:17.034Z',
-          timestamp_price_guaranteed: '2021-02-23T06:03:17.034Z',
+          timestamp_price_guaranteed: '2021-02-24T06:03:17.034Z',
           payment_details: {
             crypto_address: '0xbe439764e227996f23869c35d0228245aa8b08e3',
             type: 'crypto_address'
@@ -319,7 +319,7 @@ const initialMockStateComplete: PaymentState = {
   },
   orderErrors: null,
   payment: {
-    status: PaymentStatus.ERROR,
+    status: PaymentStatus.DONE,
     steps: [
       {
         id: PaymentStepId.ALLOWANCE,

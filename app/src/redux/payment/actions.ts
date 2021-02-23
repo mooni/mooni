@@ -167,7 +167,7 @@ export const createOrder = () => async function (dispatch, getState)  {
     sendEvent('order_created');
 
   } catch(error) {
-    dispatch(setMultiTrade(null));
+    dispatch(resetOrder());
 
     sendEvent('order_creation_error');
     if(error.message === 'timeout') {

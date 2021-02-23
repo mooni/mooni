@@ -96,7 +96,7 @@ function ErrorCatcher({orderErrors, onStartOver}) {
     );
   }
 }
-export default function OrderError({ orderErrors,onStartOver  }) {
+export default function OrderError({ orderErrors, onStartOver }) {
   const theme = useTheme();
 
   return (

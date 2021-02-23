@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { Box } from '@material-ui/core'
+import { Box } from '@material-ui/core';
+import { Flex } from '@chakra-ui/react';
 import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -13,10 +14,11 @@ import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledCompone
 
 import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
-import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
+import { createOrder, resetOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors';
 import OrderError from '../components/Payment/OrderError';
 import Loader from '../components/UI/Loader';
+import { ForceModal } from '../components/UI/Modal';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -80,7 +82,11 @@ export default function ExchangePage() {
 
   if(creatingOrder) {
     return (
-      <Loader text="Creating order ..." />
+      <ForceModal>
+        <Flex justify="center" mt={4}>
+          <Loader text="Creating order ..." />
+        </Flex>
+      </ForceModal>
     );
   }
 

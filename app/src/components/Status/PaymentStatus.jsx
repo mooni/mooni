@@ -165,7 +165,7 @@ function PaymentErrorInfo({ onRestart, payment }) {
       <Hint>
         If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
       </Hint>
-      <Button mode="normal" onClick={onRestart} wide icon={<IconArrowLeft/>} label="Retry" />
+      <RoundButton mode="strong" onClick={onRestart} wide label="Close" />
     </Box>
   )
 }
