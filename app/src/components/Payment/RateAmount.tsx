@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Typography, Tooltip} from '@material-ui/core';
+import { Tooltip} from '@material-ui/core';
 import { Box, Image } from '@chakra-ui/react'
 import { LoadingRing } from '@aragon/ui'
 import styled from 'styled-components';
