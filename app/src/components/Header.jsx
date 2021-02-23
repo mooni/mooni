@@ -8,13 +8,17 @@ import {
   MenuItem,
   Button,
   Box,
+  Flex,
 } from "@chakra-ui/react"
+
+import { HamburgerIcon } from '@chakra-ui/icons'
 import { IconChip, IconFile, IconInfo, IconChat } from '@aragon/ui'
 import MenuBookIcon from '@material-ui/icons/MenuBookOutlined';
+
 import ContactSupportIcon from '@material-ui/icons/ContactSupportOutlined';
-import { HamburgerIcon } from '@chakra-ui/icons'
 import AccountBadge from './Account/AccountBadge';
 import { NavLink } from './UI/StyledComponents';
+import { DiscordButton } from './UI/Tools';
 import { getWalletStatus } from "../redux/wallet/selectors";
 import { useSelector, useDispatch } from 'react-redux';
 import { WalletStatus } from "../redux/wallet/state";
@@ -193,10 +197,11 @@ export default function Header() {
         </MainHeader>
 
         <SecondaryHeader>
-          <Box>
           <AccountBadge />
-          </Box>
-          <Box ml={2}>
+          <Flex ml={2}>
+            <Box mr={2}>
+              <DiscordButton variant="outline" label="Chat"/>
+            </Box>
             <Menu>
               <MenuButton as={Button} variant="outline">
                 <HamburgerIcon/>
@@ -210,7 +215,7 @@ export default function Header() {
                 <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
               </MenuList>
             </Menu>
-          </Box>
+          </Flex>
         </SecondaryHeader>
       </HeaderSubRoot>
     </HeaderRoot>

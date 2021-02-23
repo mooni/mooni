@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { useMediaQuery } from '@chakra-ui/react';
 
 import { SimpleLink, RoundButton } from '../UI/StyledComponents';
+import {EmailButton} from '../UI/Tools';
 
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
@@ -161,10 +162,10 @@ function PaymentErrorInfo({ onRestart, payment }) {
         <Box mt={2} />
       </>
       }
-      <Hint>
-        If you think you found a bug, please <SimpleLink href="mailto:support@mooni.tech" external>contact support</SimpleLink>.
-      </Hint>
       <RoundButton mode="strong" onClick={onRestart} wide label="Close" />
+      <Box mt={2} display="flex" justifyContent="center">
+        <EmailButton bg="white" label="Contact support" />
+      </Box>
     </Box>
   )
 }
