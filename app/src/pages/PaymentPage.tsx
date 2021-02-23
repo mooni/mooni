@@ -6,7 +6,7 @@ import { Box, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHe
 import { IconCoin, IconClose } from '@aragon/ui'
 
 import PaymentStatus from '../components/Status/PaymentStatus';
-import {RoundButton, Surface, SmallWidth} from '../components/UI/StyledComponents';
+import {RoundButton, Surface} from '../components/UI/StyledComponents';
 
 import { getMultiTrade, getPayment } from '../redux/payment/selectors';
 import {resetOrder, sendPayment, setExchangeStep} from '../redux/payment/actions';
@@ -73,7 +73,7 @@ export default function PaymentPage() {
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
   const payment = useSelector(getPayment);
-  const [paymentState, setPaymentState] = useState<boolean>(false);
+  const [paymentState, setPaymentState] = useState<boolean>(true);
   const [alertCancel, setAlertCancel] = React.useState<boolean>(false)
 
 
@@ -87,11 +87,11 @@ export default function PaymentPage() {
     dispatch(sendPayment());
   }
 
-  function onRestart() {
+  function onRestart(home: boolean = false) {
     // TODO Cancel order
     dispatch(resetOrder());
     dispatch(setExchangeStep(0));
-    history.push('/exchange');
+    history.push(home ? '/' : '/exchange');
   }
 
   return (

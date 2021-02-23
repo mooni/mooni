@@ -65,7 +65,7 @@ export default function ExchangePage() {
     // TODO Cancel order
     dispatch(resetOrder());
     dispatch(setExchangeStep(0));
-    history.push(home? '/' : '/exchange');
+    history.push(home ? '/' : '/exchange');
   }
 
   if(orderErrors) {

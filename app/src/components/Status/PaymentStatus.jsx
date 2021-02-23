@@ -20,7 +20,7 @@ import {
 import styled from 'styled-components';
 import { useMediaQuery } from '@chakra-ui/react';
 
-import { SimpleLink } from '../UI/StyledComponents';
+import { SimpleLink, RoundButton } from '../UI/StyledComponents';
 
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
@@ -37,6 +37,7 @@ const SubTitle = styled.p`
 const Hint = styled.p`
   ${textStyle('body3')};
   margin-bottom: ${2 * GU}px;
+  padding: 0 1rem;
   text-align: center;
 `;
 const StatusLabel = styled.p`
@@ -90,7 +91,7 @@ function PaymentOngoingInfo({ payment }) {
   )
 }
 
-function PaymentSuccessInfo() {
+function PaymentSuccessInfo({ onRestart }) {
   const user = useSelector(selectUser);
   const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
   const tweetURL = `https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=${referralURL}&hashtags=defi,offramp,crypto`;
@@ -104,15 +105,16 @@ function PaymentSuccessInfo() {
         The payment is complete and the bank transfer have been sent. <br/>
         Funds will arrive in your bank account between one hour and four days from now, depending on your bank.
       </Hint>
-      <Box display="flex" justifyContent="center" mb={1}>
-        <SimpleLink href={tweetURL} external>Spread the love <span role="img" aria-label="love">❤️</span></SimpleLink>
+      <Box mb={1}>
+        <RoundButton
+          mode="normal"
+          onClick={() => window.open(tweetURL)}
+          wide
+          label="Share on twitter"
+          icon={<span role="img" aria-label="love">❤️</span>}
+        />
       </Box>
-      <Hint>
-        <b>Bonus</b> 🎁
-      </Hint>
-      <Hint>
-        Orders made with your referral link will make you earn profit sharing !
-      </Hint>
+      <RoundButton mode="strong" onClick={() => onRestart(true)} wide label="Close" />
     </Box>
   )
 }
@@ -278,7 +280,7 @@ export default function PaymentStatusComponent({ payment, onRestart }) {
 
       {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo payment={payment}/>}
       {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo onRestart={onRestart} payment={payment} />}
-      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo />}
+      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo onRestart={onRestart} />}
     </Box>
   )
 }
