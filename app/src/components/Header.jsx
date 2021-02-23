@@ -8,6 +8,7 @@ import {
   MenuItem,
   Button,
   Box,
+  Flex,
 } from "@chakra-ui/react"
 
 import { HamburgerIcon } from '@chakra-ui/icons'
@@ -196,11 +197,11 @@ export default function Header() {
         </MainHeader>
 
         <SecondaryHeader>
-          <DiscordButton variant="outline" label="Chat"/>
-          <Box ml={2}>
-            <AccountBadge />
-          </Box>
-          <Box ml={2}>
+          <AccountBadge />
+          <Flex ml={2}>
+            <Box mr={2}>
+              <DiscordButton variant="outline" label="Chat"/>
+            </Box>
             <Menu>
               <MenuButton as={Button} variant="outline">
                 <HamburgerIcon/>
@@ -214,7 +215,7 @@ export default function Header() {
                 <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
               </MenuList>
             </Menu>
-          </Box>
+          </Flex>
         </SecondaryHeader>
       </HeaderSubRoot>
     </HeaderRoot>
