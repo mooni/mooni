@@ -155,7 +155,7 @@ class Bity {
 
       if(error?.response?.data?.errors) {
         throw new BityOrderError(
-          'api_error',
+          'estimate_error',
           error.response.data.errors
         );
       } else {
@@ -219,7 +219,7 @@ class Bity {
 
       if(!bityOrderResponse.input) {
         throw new BityOrderError(
-          'api_error',
+          'create_order',
           [{code: 'cookie', message: 'your browser does not support cookies'}]
         );
       }
@@ -238,7 +238,7 @@ class Bity {
 
       if(error?.response?.data?.errors) {
         throw new BityOrderError(
-          'api_error',
+          'create_order',
           error.response.data.errors
         );
       } else {
@@ -279,6 +279,29 @@ class Bity {
 
     }
 
+  }
+
+  async cancelOrder(orderId: string): Promise<void> {
+    try {
+
+      await this.instance({
+        method: 'post',
+        url: `/v2/orders/${orderId}/cancel`,
+        withCredentials: this.withCredentials,
+      });
+
+    } catch(error) {
+
+      if(error?.response?.data?.errors) {
+        throw new BityOrderError(
+          'cancel_order',
+          error.response.data.errors
+        );
+      } else {
+        throw error;
+      }
+
+    }
   }
 
   static getOrderStatusPageURL(orderId: string) {
