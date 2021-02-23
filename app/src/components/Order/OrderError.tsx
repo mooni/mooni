@@ -83,18 +83,6 @@ function ErrorCatcher({orderErrors}) {
         />
       </>
     );
-    // TODO when this ?
-  } else if(orderErrors[0].code === 'expired') {
-    return (
-      <>
-        <ErrorContent>The order you made has expired. Please create a new one.</ErrorContent>
-        <ErrorCTA
-          icon={<IconRotateLeft/>}
-          action={onRestart}
-          label="Start over"
-        />
-      </>
-    );
   } else {
     return (
       <>
