@@ -5,7 +5,6 @@ import { Box, List, ListItem } from '@material-ui/core';
 import {
   Button,
   LoadingRing,
-  IconArrowLeft,
   IconCheck,
   IconExternal,
   useTheme,

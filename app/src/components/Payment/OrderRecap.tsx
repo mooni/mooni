@@ -5,7 +5,7 @@ import { textStyle, Timer } from '@aragon/ui';
 import { Box, Flex } from '@chakra-ui/react';
 
 import {BityTrade, MultiTrade, TradeType} from "../../lib/trading/types";
-import { RateAmount } from "./RateAmount";
+import { RateAmount } from "../Order/RateAmount";
 
 const Subtitle = styled.h4`
   ${textStyle('label2')};

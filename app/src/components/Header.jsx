@@ -184,7 +184,7 @@ export default function Header() {
           <RoutesContainer>
             {walletStatus === WalletStatus.CONNECTED &&
             <>
-              <RouteLink to="/exchange" activeClassName="active">Exchange</RouteLink>
+              <RouteLink to="/order" activeClassName="active">Exchange</RouteLink>
               <RouteLink to="/account" activeClassName="active">Account</RouteLink>
             </>
             }

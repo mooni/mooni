@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import './App.css';
 
 import HomePage from './pages/HomePage';
-import ExchangePage from './pages/ExchangePage';
+import OrderPage from './pages/OrderPage';
 import AccountPage from './pages/AccountPage';
 import StatsPage from './pages/StatsPage';
 import PaymentPage from './pages/PaymentPage';
@@ -36,8 +36,8 @@ export const Routes: React.FC = () => {
         <Route path="/account">
           <AccountPage />
         </Route>
-        <Route path="/exchange">
-          <ExchangePage />
+        <Route path="/order">
+          <OrderPage />
         </Route>
         <Route path="/payment">
           <PaymentPage />

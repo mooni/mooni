@@ -7,16 +7,16 @@ import { Flex } from '@chakra-ui/react';
 import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
 
-import StepNotice from '../components/Payment/StepNotice';
-import StepRecipient from '../components/Payment/StepRecipient';
-import StepAmount from '../components/Payment/StepAmount';
+import StepNotice from '../components/Order/StepNotice';
+import StepRecipient from '../components/Order/StepRecipient';
+import StepAmount from '../components/Order/StepAmount';
 import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
 
-import { CustomMobileStepper } from '../components/Payment/StepComponents';
+import { CustomMobileStepper } from '../components/Order/StepComponents';
 
 import { createOrder, resetOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors';
-import OrderError from '../components/Payment/OrderError';
+import OrderError from '../components/Order/OrderError';
 import Loader from '../components/UI/Loader';
 import { ForceModal } from '../components/UI/Modal';
 
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 
 const steps = ['Amount', 'Recipient', 'Notice', 'Order summary'];
 
-export default function ExchangePage() {
+export default function OrderPage() {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
@@ -67,7 +67,7 @@ export default function ExchangePage() {
     // TODO Cancel order
     dispatch(resetOrder());
     dispatch(setExchangeStep(0));
-    history.push(home ? '/' : '/exchange');
+    history.push(home ? '/' : '/order');
   }
 
   if(orderErrors) {

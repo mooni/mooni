@@ -7,7 +7,7 @@ import { Box } from '@chakra-ui/react';
 
 import { setExchangeStep, setTradeRequest } from '../redux/payment/actions';
 import { SmallWidth } from '../components/UI/StyledComponents';
-import RateForm from '../components/Payment/RateForm';
+import RateForm from '../components/Order/RateForm';
 import { getMultiTradeRequest } from '../redux/payment/selectors';
 import {getWalletStatus} from "../redux/wallet/selectors";
 import {WalletStatus} from "../redux/wallet/state";
@@ -29,7 +29,7 @@ export default function HomePage() {
   const onSubmit = (tradeRequest) => {
     dispatch(setTradeRequest(tradeRequest));
     dispatch(setExchangeStep(1));
-    history.push('/exchange');
+    history.push('/order');
   };
 
   return (

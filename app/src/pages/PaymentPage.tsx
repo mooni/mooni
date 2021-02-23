@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Box, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Button } from '@chakra-ui/react'
 import { IconCoin, IconClose } from '@aragon/ui'
 
-import PaymentStatus from '../components/Status/PaymentStatus';
+import PaymentStatus from '../components/Payment/PaymentStatus';
 import {RoundButton, Surface} from '../components/UI/StyledComponents';
 import { ForceModal } from '../components/UI/Modal';
 
@@ -69,7 +69,7 @@ export default function PaymentPage() {
     // TODO Cancel order
     dispatch(resetOrder());
     dispatch(setExchangeStep(0));
-    history.push(home ? '/' : '/exchange');
+    history.push(home ? '/' : '/order');
   }
 
   return (
