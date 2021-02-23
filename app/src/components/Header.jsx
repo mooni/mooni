@@ -89,7 +89,7 @@ const SecondaryHeader = styled.div`
     bottom: 0px;
     left: 0px;
     width: 100%;
-    z-index: 99;
+    z-index: 2;
     height: 72px;
     border-radius: 12px 12px 0px 0px;
     background-color: ${props => props.theme.surface};
@@ -188,7 +188,7 @@ export default function Header() {
           <RoutesContainer>
             {walletStatus === WalletStatus.CONNECTED &&
             <>
-              <RouteLink to="/exchange" activeClassName="active">Exchange</RouteLink>
+              <RouteLink to="/order" activeClassName="active">Exchange</RouteLink>
               <RouteLink to="/account" activeClassName="active">Account</RouteLink>
             </>
             }

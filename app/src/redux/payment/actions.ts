@@ -32,7 +32,6 @@ export const SET_MULTITRADE = 'SET_MULTITRADE';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 
-export const RESET_PAYMENT = 'RESET_PAYMENT';
 export const SET_PAYMENT = 'SET_PAYMENT';
 export const UPDATE_PAYMENT_STEP = 'UPDATE_PAYMENT_STEP';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
@@ -94,10 +93,6 @@ export const resetOrder = () => ({
   type: RESET_ORDER,
 });
 
-export const resetPayment = () => ({
-  type: RESET_PAYMENT,
-});
-
 export const setPayment = (payment: Payment) => ({
   type: SET_PAYMENT,
   payload: { payment },
@@ -113,7 +108,7 @@ export const setPaymentStatus = (status: PaymentStatus) => ({
   payload: { status },
 });
 
-export const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
+const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
   const payment: Payment = {
     steps: [],
     status: PaymentStatus.ONGOING,
@@ -172,7 +167,7 @@ export const createOrder = () => async function (dispatch, getState)  {
     sendEvent('order_created');
 
   } catch(error) {
-    dispatch(setMultiTrade(null));
+    dispatch(resetOrder());
 
     sendEvent('order_creation_error');
     if(error.message === 'timeout') {
@@ -191,6 +186,7 @@ export const createOrder = () => async function (dispatch, getState)  {
       logError('Create order: unknown error', error);
       dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
+    throw new Error('unable to create order');
   }
 };
 

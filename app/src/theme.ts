@@ -28,8 +28,6 @@ const Button = {
     },
     solid: {
       border: 'none',
-      bg: '#b8b9bb',
-      color: '#637381',
       boxShadow: 'base',
     },
     strong: {

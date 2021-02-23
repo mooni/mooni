@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
 
 import { Box } from '@material-ui/core';
 
-import { GU, IconArrowRight, textStyle } from '@aragon/ui'
+import { GU, IconArrowRight, Checkbox, textStyle } from '@aragon/ui'
 import {RoundButton} from "../UI/StyledComponents";
+import {setInfoPanel} from "../../redux/ui/actions";
 
 const Hint = styled.p`
   ${textStyle('body3')};
@@ -23,8 +25,15 @@ const Info = styled.p`
   ${textStyle('body3')};
   margin-bottom: 5px;
 `;
+const Link = styled.a`
+  color: ${props => props.theme.selected};
+  cursor: pointer;
+`;
 
 export default function StepNotice({ onComplete }) {
+  const dispatch = useDispatch();
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
   return (
     <Box width={1}>
       <Hint>
@@ -44,8 +53,16 @@ export default function StepNotice({ onComplete }) {
         The following banks are <b>known to reject</b> payments from our services:
         &nbsp;<i style={{color: '#881111'}}>Payoneer, Transferwise</i>
       </Info>
-      <Box mt={2}/>
-      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} label="I understand, let's go!" />
+      <Box my={2} display="flex" justifyContent="center">
+        <Checkbox
+          checked={termsAccepted}
+          onChange={setTermsAccepted}
+        />
+        <Box>
+          I agree with the <Link onClick={() => dispatch(setInfoPanel('terms'))}>terms of service</Link>
+        </Box>
+      </Box>
+      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} disabled={!termsAccepted} label="Let's go!" />
     </Box>
   )
 }

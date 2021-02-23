@@ -10,10 +10,10 @@ import { useSelector } from 'react-redux';
 import './App.css';
 
 import HomePage from './pages/HomePage';
-import ExchangePage from './pages/ExchangePage';
-import StatusPage from './pages/StatusPage';
+import OrderPage from './pages/OrderPage';
 import AccountPage from './pages/AccountPage';
 import StatsPage from './pages/StatsPage';
+import PaymentPage from './pages/PaymentPage';
 
 import { getWalletStatus, isWalletLoading } from './redux/wallet/selectors';
 import { WalletStatus } from './redux/wallet/state';
@@ -36,11 +36,11 @@ export const Routes: React.FC = () => {
         <Route path="/account">
           <AccountPage />
         </Route>
-        <Route path="/status">
-          <StatusPage />
+        <Route path="/order">
+          <OrderPage />
         </Route>
-        <Route path="/exchange">
-          <ExchangePage />
+        <Route path="/payment">
+          <PaymentPage />
         </Route>
       </>
         :
