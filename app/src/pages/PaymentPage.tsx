@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Box, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Button } from '@chakra-ui/react'
-import { IconCoin, IconClose } from '@aragon/ui'
+import { IconCoin, IconClose, IconRefresh } from '@aragon/ui'
 
 import PaymentStatus from '../components/Payment/PaymentStatus';
-import {RoundButton, Surface} from '../components/UI/StyledComponents';
+import { PaymentStatus as PaymentStatusEnum } from '../lib/types';
+import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
 import { ForceModal } from '../components/UI/Modal';
 
 import { getMultiTrade, getPayment } from '../redux/payment/selectors';
@@ -57,6 +58,35 @@ export default function PaymentPage() {
   if(!multiTrade || !payment) {
     history.push('/');
     return <div/>;
+  }
+
+  function onRestart() {
+    dispatch(resetOrder());
+    history.push('/order');
+  }
+
+  if(payment.status === PaymentStatusEnum.CANCELLED) {
+    return (
+      <SmallWidth>
+        <Surface px={4} py={8} mt={4} boxShadow="medium">
+          <Box>
+            Order expired
+          </Box>
+          <Box>
+            The order you made have been cancelled. Please try again.
+          </Box>
+          <Box mt={2}>
+            <RoundButton
+              mode="negative"
+              onClick={onRestart}
+              wide
+              icon={<IconRefresh />}
+              label="Retry"
+            />
+          </Box>
+        </Surface>
+      </SmallWidth>
+    );
   }
 
   function onSend() {

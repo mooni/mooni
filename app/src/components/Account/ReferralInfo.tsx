@@ -10,7 +10,7 @@ import { selectUser } from '../../redux/user/userSlice';
 import config from '../../config';
 import { setInfoPanel } from '../../redux/ui/actions';
 import { sendEvent } from '../../lib/analytics';
-import Api from '../../lib/apiWrapper';
+import MooniAPI from '../../lib/wrappers/mooni';
 import { getJWS } from '../../redux/wallet/selectors';
 import { ProfitShare } from '../../types/api';
 import { significantNumbers } from '../../lib/numbers';
@@ -72,7 +72,7 @@ export function ReferralBox() {
 export default function ReferralInfo() {
   const dispatch = useDispatch();
   const jwsToken = useSelector(getJWS);
-  const { data } = useSWR(jwsToken, Api.getProfitShare);
+  const { data } = useSWR(jwsToken, MooniAPI.getProfitShare);
 
   const profitShare = data as ProfitShare;
 

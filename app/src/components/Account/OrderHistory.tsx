@@ -7,7 +7,7 @@ import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, T
 import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, IconCross, Link } from '@aragon/ui';
 import { useMediaQuery } from '@chakra-ui/react';
 
-import Api from '../../lib/apiWrapper';
+import Api from '../../lib/wrappers/mooni';
 import { getJWS } from '../../redux/wallet/selectors';
 import { MooniOrder, MooniOrderStatus } from '../../types/api';
 import { significantNumbers } from '../../lib/numbers';

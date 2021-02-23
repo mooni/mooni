@@ -4,7 +4,7 @@ import { useDebounce } from './utils';
 import { logError } from '../lib/log';
 import { isNotZero, BN, truncateNumber } from '../lib/numbers';
 import { TradeRequest } from "../lib/trading/types";
-import Api from "../lib/apiWrapper";
+import Api from "../lib/wrappers/mooni";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
 import { APIError } from '../lib/errors';
 import { useCurrenciesContext } from './currencies';

@@ -144,11 +144,11 @@ const MooniAPI = {
   },
   async cancelOrder(multiTradeId: UUID, jwsToken: string): Promise<void> {
     const {data} = await mooniAPICatcher({
-      method: 'get',
+      method: 'post',
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
-      url: 'trader/cancelTrade',
+      url: 'trading/cancelTrade',
       data: {
         multiTradeId,
       },

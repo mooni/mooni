@@ -4,7 +4,7 @@ import {textStyle, LoadingRing} from '@aragon/ui'
 import useSWR from 'swr';
 import { MediumWidth, ShadowBox, FlexCenterBox } from '../components/UI/StyledComponents';
 import styled from 'styled-components';
-import Api from '../lib/apiWrapper';
+import Api from '../lib/wrappers/mooni';
 import { BN, significantNumbers } from '../lib/numbers';
 
 // @ts-ignore

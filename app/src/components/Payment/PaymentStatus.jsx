@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { Box, List, ListItem } from '@material-ui/core';
 import {
@@ -93,6 +94,7 @@ function PaymentOngoingInfo({ payment }) {
 
 function PaymentSuccessInfo() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const user = useSelector(selectUser);
   const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
   const tweetURL = `https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=${referralURL}&hashtags=defi,offramp,crypto`;
@@ -142,6 +144,7 @@ function getPaymentStepMessage(error) {
 
 function PaymentErrorInfo({ payment }) {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   function onRestart() {
     dispatch(resetOrder());

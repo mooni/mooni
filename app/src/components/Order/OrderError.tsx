@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { FlexCenterBox, RoundButton } from '../UI/StyledComponents';
 import { dailyLimits, yearlyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
-import { cancelOrder, resetOrder } from '../../redux/payment/actions';
+import { resetOrder } from '../../redux/payment/actions';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 

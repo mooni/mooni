@@ -15,6 +15,9 @@ const bityInstance = new Bity();
 export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
 
   const id = req.body?.multiTradeId as string;
+  if(!id) {
+    throw new APIError(400, 'wrong-body', 'multiTradeRequest values are invalid');
+  }
 
   const mooniOrder = await prisma.mooniOrder.findUnique({
     where: { id },

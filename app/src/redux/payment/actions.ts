@@ -1,21 +1,13 @@
-import {getMultiTrade, getMultiTradeRequest} from './selectors';
-import {getAddress, getETHManager, getJWS} from '../wallet/selectors';
-import {
-  Payment,
-  PaymentStatus,
-  PaymentStepId,
-  PaymentStepStatus, Recipient
-} from '../../lib/types';
-import {
-  BityOrderStatus,
-} from '../../lib/wrappers/bityTypes';
-import {sendEvent} from '../../lib/analytics';
+import { getMultiTrade, getMultiTradeRequest, getPayment } from './selectors';
+import { getAddress, getETHManager, getJWS } from '../wallet/selectors';
+import { Payment, PaymentStatus, PaymentStepId, PaymentStepStatus, Recipient } from '../../lib/types';
+import { BityOrderStatus } from '../../lib/wrappers/bityTypes';
+import { sendEvent, track } from '../../lib/analytics';
 import MooniAPI from '../../lib/wrappers/mooni';
-import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
-import DexProxy from "../../lib/trading/dexProxy";
+import DexProxy from '../../lib/trading/dexProxy';
 import { MetaError } from '../../lib/errors';
 import { CurrencyObject } from '../../lib/trading/currencyTypes';
 
@@ -166,6 +158,16 @@ export const createOrder = () => async function (dispatch, getState)  {
 
     sendEvent('order_created');
 
+    setTimeout(() => {
+      const newState = getState();
+      const currentMultiTrade = getMultiTrade(newState);
+      const payment = getPayment(newState);
+      if(currentMultiTrade?.id === multiTrade.id && payment?.status === PaymentStatus.PENDING) {
+        dispatch(cancelOrder());
+        dispatch(setPaymentStatus(PaymentStatus.CANCELLED))
+      }
+    }, 1000)
+
   } catch(error) {
     dispatch(resetOrder());
 
@@ -305,6 +307,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
   const multiTrade = getMultiTrade(state);
   if(!multiTrade) throw new Error('Missing multitrade');
+
+  dispatch(setPaymentStatus(PaymentStatus.ONGOING));
 
   const ethManager = getETHManager(state);
 
