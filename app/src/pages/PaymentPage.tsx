@@ -9,7 +9,7 @@ import {RoundButton, Surface} from '../components/UI/StyledComponents';
 import { ForceModal } from '../components/UI/Modal';
 
 import { getMultiTrade, getPayment } from '../redux/payment/selectors';
-import {resetOrder, sendPayment, setExchangeStep} from '../redux/payment/actions';
+import { cancelOrder, resetOrder, sendPayment } from '../redux/payment/actions';
 import OrderRecap from "../components/Payment/OrderRecap";
 import { Title } from '../components/UI/Typography';
 
@@ -54,7 +54,6 @@ export default function PaymentPage() {
   const [paymentState, setPaymentState] = useState<boolean>(false);
   const [alertCancel, setAlertCancel] = React.useState<boolean>(false)
 
-
   if(!multiTrade || !payment) {
     history.push('/');
     return <div/>;
@@ -65,11 +64,10 @@ export default function PaymentPage() {
     dispatch(sendPayment());
   }
 
-  function onRestart(home: boolean = false) {
-    // TODO Cancel order
+  function onCancel() {
+    dispatch(cancelOrder());
     dispatch(resetOrder());
-    dispatch(setExchangeStep(0));
-    history.push(home ? '/' : '/order');
+    history.push('/');
   }
 
   return (
@@ -77,14 +75,14 @@ export default function PaymentPage() {
       <Surface px={4} py={8} boxShadow="medium">
         <Title>Payment</Title>
         {paymentState ?
-          <PaymentStatus payment={payment} onRestart={onRestart}/>
+          <PaymentStatus payment={payment} />
           :
           <Box>
             <OrderRecap multiTrade={multiTrade} />
             <RoundButton mode="strong" onClick={onSend} wide icon={<IconCoin />} label="Send payment" />
             <Box h={4}/>
             <RoundButton mode="negative" onClick={() => setAlertCancel(true)} wide icon={<IconClose />} label="Cancel" />
-            <ConfirmCancel isOpen={alertCancel} onClose={() => setAlertCancel(false)} onCancel={onRestart}/>
+            <ConfirmCancel isOpen={alertCancel} onClose={() => setAlertCancel(false)} onCancel={onCancel}/>
           </Box>
         }
       </Surface>

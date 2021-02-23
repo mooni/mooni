@@ -25,7 +25,7 @@ import {EmailButton} from '../UI/Tools';
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
-import { watchBityOrder, unwatchBityOrder } from '../../redux/payment/actions';
+import {watchBityOrder, unwatchBityOrder, resetOrder} from '../../redux/payment/actions';
 import {selectUser} from "../../redux/user/userSlice";
 
 const SubTitle = styled.p`
@@ -91,10 +91,16 @@ function PaymentOngoingInfo({ payment }) {
   )
 }
 
-function PaymentSuccessInfo({ onRestart }) {
+function PaymentSuccessInfo() {
+  const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
   const tweetURL = `https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=${referralURL}&hashtags=defi,offramp,crypto`;
+
+  function onGoHome() {
+    dispatch(resetOrder());
+    history.push('/');
+  }
 
   return (
     <Box width={1}>
@@ -114,7 +120,7 @@ function PaymentSuccessInfo({ onRestart }) {
           icon={<span role="img" aria-label="love">❤️</span>}
         />
       </Box>
-      <RoundButton mode="strong" onClick={() => onRestart(true)} wide label="Close" />
+      <RoundButton mode="strong" onClick={onGoHome} wide label="Close" />
     </Box>
   )
 }
@@ -134,7 +140,14 @@ function getPaymentStepMessage(error) {
 
 }
 
-function PaymentErrorInfo({ onRestart, payment }) {
+function PaymentErrorInfo({ payment }) {
+  const dispatch = useDispatch();
+
+  function onRestart() {
+    dispatch(resetOrder());
+    history.push('/order');
+  }
+
   const stepsWithError = payment.steps.filter(step => !!step.error);
 
   return (
@@ -267,7 +280,7 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   )
 }
 
-export default function PaymentStatusComponent({ payment, onRestart }) {
+export default function PaymentStatusComponent({ payment }) {
   return (
     <Box width={1}>
       <Box mb={2}>
@@ -279,8 +292,8 @@ export default function PaymentStatusComponent({ payment, onRestart }) {
       </Box>
 
       {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo payment={payment}/>}
-      {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo onRestart={onRestart} payment={payment} />}
-      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo onRestart={onRestart} />}
+      {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo payment={payment} />}
+      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo />}
     </Box>
   )
 }

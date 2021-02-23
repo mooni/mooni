@@ -6,6 +6,9 @@ import styled from 'styled-components';
 import { FlexCenterBox, RoundButton } from '../UI/StyledComponents';
 import { dailyLimits, yearlyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
+import { cancelOrder, resetOrder } from '../../redux/payment/actions';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 // const messages = ["amount_too_large", "amount_too_low", "currency_pair_not_supported", "currency_pair_temporarily_unavailable", "exceeds_quota", "invalid_bank_account", "invalid_bank_account_owner_address", "invalid_country_code", "invalid_crypto_address", "invalid_currency_code", "invalid_currency_pair", "invalid_email", "invalid_partner_fee", "kyc_required", "partner_fee_without_partner"];
 
@@ -57,7 +60,15 @@ function ErrorCTA({action, label, icon}) {
   )
 }
 
-function ErrorCatcher({orderErrors, onStartOver}) {
+function ErrorCatcher({orderErrors}) {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+  function onRestart(home: boolean = false) {
+    dispatch(resetOrder());
+    history.push(home ? '/' : '/order');
+  }
+
   if(orderErrors[0].code === 'exceeds_quota') {
     return (
       <>
@@ -67,18 +78,19 @@ function ErrorCatcher({orderErrors, onStartOver}) {
         <LimitLine><b>Annually</b> {numberWithCommas(yearlyLimits['EUR'])} EUR/{numberWithCommas(yearlyLimits['CHF'])} CHF</LimitLine>
         <ErrorCTA
           icon={<IconArrowLeft/>}
-          action={() => onStartOver(true)}
+          action={() => onRestart(true)}
           label="Go home"
         />
       </>
     );
+    // TODO when this ?
   } else if(orderErrors[0].code === 'expired') {
     return (
       <>
         <ErrorContent>The order you made has expired. Please create a new one.</ErrorContent>
         <ErrorCTA
           icon={<IconRotateLeft/>}
-          action={onStartOver}
+          action={onRestart}
           label="Start over"
         />
       </>
@@ -89,14 +101,14 @@ function ErrorCatcher({orderErrors, onStartOver}) {
         <GenericErrors orderErrors={orderErrors}/>
         <ErrorCTA
           icon={<IconRotateLeft/>}
-          action={onStartOver}
+          action={onRestart}
           label="Start over"
         />
       </>
     );
   }
 }
-export default function OrderError({ orderErrors, onStartOver }) {
+export default function OrderError({ orderErrors }) {
   const theme = useTheme();
 
   return (
@@ -107,7 +119,7 @@ export default function OrderError({ orderErrors, onStartOver }) {
       <SubTitle>
         Order error
       </SubTitle>
-      <ErrorCatcher orderErrors={orderErrors} onStartOver={onStartOver}/>
+      <ErrorCatcher orderErrors={orderErrors} />
     </Box>
   );
 }

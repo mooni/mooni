@@ -10,7 +10,7 @@ import {
   BityOrderStatus,
 } from '../../lib/wrappers/bityTypes';
 import {sendEvent} from '../../lib/analytics';
-import Api from '../../lib/apiWrapper';
+import MooniAPI from '../../lib/wrappers/mooni';
 import { track } from '../../lib/analytics';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
@@ -160,7 +160,7 @@ export const createOrder = () => async function (dispatch, getState)  {
   const jwsToken = getJWS(state);
   try {
 
-    const multiTrade = await Api.createMultiTrade(multiTradeRequest, jwsToken);
+    const multiTrade = await MooniAPI.createMultiTrade(multiTradeRequest, jwsToken);
     dispatch(setMultiTrade(multiTrade));
     dispatch(createPayment(multiTrade));
 
@@ -207,7 +207,7 @@ const sendPaymentStep = ({ stepId, paymentFunction })  => async (dispatch, getSt
   try {
     const txHash = await paymentFunction();
     if(stepId === PaymentStepId.PAYMENT) {
-      await Api.setPaymentTx(multiTrade.id, txHash, jws);
+      await MooniAPI.setPaymentTx(multiTrade.id, txHash, jws);
     }
 
     if(txHash) {
@@ -245,7 +245,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   const jwsToken = getJWS(getState());
 
   function fetchNewData() {
-    Api.getBityOrder(orderId, jwsToken)
+    MooniAPI.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
         if(!watching.has(orderId)) return;
         const timer = watching.get(orderId) as Timeout;
@@ -361,6 +361,9 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
     logError('Error while sending payment', error);
     sendEvent('order_payment_error');
+
+    await dispatch(cancelOrder()).catch(() => undefined);
+
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
 
   }
@@ -375,4 +378,13 @@ export const initReferral = () => async function (dispatch) {
     // query.delete('referralId');
     // window.location.search = query.toString();
   }
+};
+
+export const cancelOrder = () => async function (dispatch, getState) {
+  const state = getState();
+  const multiTrade = getMultiTrade(state);
+  if(!multiTrade) throw new Error('Missing multitrade');
+
+  const jws = getJWS(state);
+  await MooniAPI.cancelOrder(multiTrade.id, jws);
 };
