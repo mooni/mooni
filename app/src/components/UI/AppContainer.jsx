@@ -1,36 +1,30 @@
 import React from 'react';
 
-import {Box} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
 import Header from '../Header';
 import ScrollRoot from '../Utils/ScrollRoot';
 import { TypeformFeedback } from '../Utils/Feedback';
 import styled from "styled-components";
 
+const Root = styled.div`
+  display: flex;
+  align-items: flex-start;
+  flex-flow: column;
+  min-height: 100%;
+  background-position: 0px -30vh;
+  background-repeat: no-repeat;
+  background-image: radial-gradient(50% 50% at 50% 50%,rgb(181 184 222 / 12%) 0%,rgba(255,255,255,0) 100%);
+`;
 
-const useStyles = makeStyles(() => ({
-  root: {
-    minHeight: '100%',
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexFlow: 'column',
-  },
-  container: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    flexDirection: 'column',
-    flex: 1,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  footer: {
-    width: '100%',
-    alignSelf: 'flex-end',
-  }
-}));
+const Container = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  flex: 1;
+  margin-top: 20px;
+  margin-bottom: 20px;
+`;
 
 const BottomSM = styled.div`
   height: 0;
@@ -40,17 +34,16 @@ const BottomSM = styled.div`
 `;
 
 export default function AppContainer({ children }) {
-  const classes = useStyles();
   return (
     <ScrollRoot>
-      <Box className={classes.root}>
+      <Root>
         <Header />
-        <Box className={classes.container}>
+        <Container>
           {children}
-        </Box>
+        </Container>
         <BottomSM/>
         <TypeformFeedback/>
-      </Box>
+      </Root>
     </ScrollRoot>
   );
 }

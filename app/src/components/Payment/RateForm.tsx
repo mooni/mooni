@@ -4,6 +4,7 @@ import {Box, Flex} from '@chakra-ui/react';
 import {useSelector, useDispatch} from 'react-redux';
 
 import {IconCaution, IconCoin, IconRefresh, LoadingRing, IconEthereum, textStyle} from '@aragon/ui'
+import {QuestionOutlineIcon, ChevronDownIcon} from '@chakra-ui/icons'
 import styled from 'styled-components';
 
 import { AmountRow } from './AmountRow';
@@ -27,6 +28,14 @@ import { ETHER } from '../../lib/trading/currencyList';
 const InvalidMessage = styled.p`
   ${textStyle('body4')};
   color: ${props => props.theme.negative};
+`;
+
+const Separator = styled.div`
+  
+  display: flex;
+  justify-content: center;
+  margin: 2px 0;
+  color: #99e1ea;
 `;
 
 interface RateFormParams {
@@ -63,7 +72,9 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
 
   let button;
   if(walletStatus === WalletStatus.CONNECTED) {
-    if(approvalState === ApprovalState.MINING) {
+    if(errors && errors.zeroAmount) {
+      button = <RoundButton wide icon={<QuestionOutlineIcon/>} label="Enter amount" disabled />;
+    } else if(approvalState === ApprovalState.MINING) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Unlocking tokens" disabled />;
     } else if(balanceLoading) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Loading balances" disabled />;
@@ -83,7 +94,9 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       button = <RoundButton mode="strong" onClick={submit} wide icon={<IconRefresh/>} label="Exchange"  />
     }
   } else if(walletStatus === WalletStatus.DISCONNECTED) {
-    if (rateForm.loading) {
+    if(errors && errors.zeroAmount) {
+      button = <RoundButton wide icon={<QuestionOutlineIcon/>} label="Enter amount" disabled />;
+    } else if (rateForm.loading) {
       button = <RoundButton wide icon={<LoadingRing/>} label="Loading rates" disabled />;
     } else {
       button = <RoundButton mode="positive" onClick={() => dispatch(login())} wide icon={<IconEthereum/>} label="Connect wallet" />
@@ -107,10 +120,13 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
         // currencyDisabled={rateForm.values.tradeExact === TradeExact.OUTPUT && rateForm.loading}
         // valueDisabled={rateForm.values.tradeExact === TradeExact.OUTPUT && rateForm.loading}
         error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.INPUT && !!errors}
-        caption="Send"
+        caption="From"
         onMax={onMax}
         balanceAvailable={onMax && maxAmount}
       />
+      <Separator>
+        <ChevronDownIcon/>
+      </Separator>
       <AmountRow
         value={rateForm.values.outputAmount}
         currencyType={CurrencyType.FIAT}
@@ -121,7 +137,7 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
         // currencyDisabled={rateForm.values.tradeExact === TradeExact.INPUT && rateForm.loading}
         // valueDisabled={rateForm.values.tradeExact === TradeExact.INPUT && rateForm.loading}
         error={!rateForm.loading && rateForm.values.tradeExact === TradeExact.OUTPUT && !!errors}
-        caption="Receive"
+        caption="To"
       />
 
       <Box mt={4}>
@@ -129,13 +145,12 @@ function RateForm({ onSubmit = () => null, initialTradeRequest }: RateFormParams
       </Box>
 
       {errors &&
-      <Flex justify="center" mt={4}>
+      <Flex justify="center" mt={errors.zeroAmount ? 0 : 4}>
         {Object.entries(errors).map(([key, _]) =>
           <InvalidMessage key={key}>
             {key === 'lowAmount' && `Minimum amount is ${errors[key]} ${rateForm.values.outputCurrency}`}
             {key === 'highAmount' && `Maximum amount is ${numberWithCommas(dailyLimits[rateForm.values.outputCurrency])} ${rateForm.values.outputCurrency}`}
             {key === 'lowLiquidity' && `There is not enough liquidity for this pair to trade. Please try with another currency.`}
-            {key === 'zeroAmount' && `Amount can't be zero`}
             {key === 'failed' && `Impossible to fetch rates. Please try with different amounts.`}
           </InvalidMessage>
         )}

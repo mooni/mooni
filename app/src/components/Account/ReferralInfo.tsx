@@ -13,7 +13,7 @@ import { sendEvent } from '../../lib/analytics';
 import Api from '../../lib/apiWrapper';
 import { getJWS } from '../../redux/wallet/selectors';
 import { ProfitShare } from '../../types/api';
-import { truncateNumber } from '../../lib/numbers';
+import { significantNumbers } from '../../lib/numbers';
 
 const Content = styled.p`
   ${textStyle('body2')};
@@ -97,7 +97,7 @@ export default function ReferralInfo() {
       </SubContent>
       {profitShare && profitShare.referralTxCount > 0 &&
       <SubContent>
-        You have accumulated {truncateNumber(profitShare.referralProfit)} ETH so far in profit sharing. Please contact support if you want to withdraw that.
+        You have accumulated {significantNumbers(profitShare.referralProfit)} ETH so far in profit sharing. Please contact support if you want to withdraw that.
       </SubContent>
       }
     </>
