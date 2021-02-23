@@ -31,7 +31,7 @@ function AccountBadge() {
 
   if(walletLoading)
     return (
-      <Button variant="solid" leftIcon={<LoadingRing />} disabled>Connecting...</Button>
+      <Button variant="solid" bg="#b8b9bb" color="color" leftIcon={<LoadingRing />} disabled>Connecting...</Button>
     );
 
   function connectWallet() {
