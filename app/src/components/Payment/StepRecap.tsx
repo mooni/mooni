@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Box } from '@material-ui/core';
-import { Info, IconCoin, IconRefresh, Checkbox, Link } from '@aragon/ui'
+import { Info, IconCoin, IconRefresh } from '@aragon/ui'
 import { Button as MButton } from '@material-ui/core';
 
 import Loader from '../UI/Loader';
 import OrderRecap from './OrderRecap';
 
 import { getMultiTrade, getOrderErrors } from '../../redux/payment/selectors';
-import { setInfoPanel } from '../../redux/ui/actions';
 import {BityTrade, TradeType} from "../../lib/trading/types";
 import { createOrder } from '../../redux/payment/actions'
 import { RoundButton } from '../UI/StyledComponents';
@@ -20,7 +19,6 @@ function StepRecap({ onComplete, onStartOver }) {
   const multiTrade = useSelector(getMultiTrade);
   const orderErrors = useSelector(getOrderErrors);
 
-  const [termsAccepted, setTermsAccepted] = useState(false);
   if(orderErrors) {
     return (
       <OrderError orderErrors={orderErrors} onStartOver={onStartOver}/>
@@ -62,16 +60,7 @@ function StepRecap({ onComplete, onStartOver }) {
   return (
     <Box width={1}>
       <OrderRecap multiTrade={multiTrade} />
-      <Box py={2} display="flex" justifyContent="center">
-        <Checkbox
-          checked={termsAccepted}
-          onChange={setTermsAccepted}
-        />
-        <label>
-          I agree with the <Link onClick={() => dispatch(setInfoPanel('terms'))}>terms of service</Link>
-        </label>
-      </Box>
-      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconCoin />} disabled={!termsAccepted} label="Send payment" />
+      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconCoin />} label="Send payment" />
     </Box>
   )
 }

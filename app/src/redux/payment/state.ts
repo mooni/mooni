@@ -75,7 +75,7 @@ const initialMockStateMinimum: PaymentState = {
 
 // eslint-disable-next-line
 const initialMockStateComplete: PaymentState = {
-  exchangeStep: 0,
+  exchangeStep: 2,
   multiTradeRequest: {
     bankInfo: {
       recipient: {
