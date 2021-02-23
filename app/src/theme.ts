@@ -32,6 +32,9 @@ const Button = {
       color: '#637381',
       boxShadow: 'base',
     },
+    strong: {
+      bgGradient: "linear(to-r, #aeb3ff, #eca2f9)",
+    },
     link: {
       color: '#637381',
     }

@@ -65,8 +65,9 @@ function Terms() {
         2.3 Provided support
       </SubTitle>
       <Content>
-        In case of a bug or lost funds, the users can get help by <Link href="mailto:contact@mooni.tech" external>contacting the contributors</Link> of this project, or by directly contacting Bity, but nothing is guaranteed in terms of response or funds recovery. <br/>
-        Should you encounter any bugs, glitches, lack of functionality or other problems on the website, please let us know immediately so we can rectify these accordingly.
+        In case of a bug or lost funds, the users can get help from the team on the following email address: <Link href="mailto:contact@mooni.tech" external>contact@mooni.tech</Link>. <br/>
+        Should you encounter any bugs, glitches, lack of functionality or other problems on the website, please let us know immediately so we can rectify these accordingly.<br/>
+        Nobody from the team will ever contact you by another mean of communication, so please take care of scams. We will never ask your private keys, seeds, or propose you to install any software or your devices.
       </Content>
       <SubTitle>
         2.4 User data
