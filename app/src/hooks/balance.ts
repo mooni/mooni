@@ -111,8 +111,10 @@ export const useTradeBalance = (tradeRequest: TradeRequest, multiTradeEstimation
       :
       tradeRequest.amount;
 
-    return new BN(maxAmount).lt(inputAmount)
-  }, [balanceLoading, maxAmount, multiTradeEstimation, tradeRequest]);
+    const balanceWithSlippage = applySlippage(balance, tradeRequest.inputCurrencyObject.decimals, -MAX_SLIPPAGE)
+
+    return new BN(balanceWithSlippage).lt(inputAmount);
+  }, [balanceLoading, balance, multiTradeEstimation, tradeRequest]);
 
   return {
     balance, balanceLoading, insufficientBalance, maxAmount,
