@@ -8,12 +8,10 @@ import { IconCoin, IconClose } from '@aragon/ui'
 import PaymentStatus from '../components/Status/PaymentStatus';
 import {RoundButton, Surface, SmallWidth} from '../components/UI/StyledComponents';
 
-import { getMultiTrade, getOrderErrors, getPayment } from '../redux/payment/selectors';
-import {resetOrder, sendPayment, setExchangeStep, createPayment} from '../redux/payment/actions';
-import Loader from "../components/UI/Loader";
+import { getMultiTrade, getPayment } from '../redux/payment/selectors';
+import {resetOrder, sendPayment, setExchangeStep} from '../redux/payment/actions';
 import OrderRecap from "../components/Payment/OrderRecap";
 import { Title } from '../components/UI/Typography';
-import OrderError from '../components/Payment/OrderError';
 
 const Root = styled.div`
   position: fixed;
@@ -46,7 +44,6 @@ export default function PaymentPage() {
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
   const payment = useSelector(getPayment);
-  const orderErrors = useSelector(getOrderErrors);
   const [paymentState, setPaymentState] = useState<boolean>(false);
 
   function onRestart() {
@@ -56,20 +53,9 @@ export default function PaymentPage() {
     history.push('/exchange');
   }
 
-  if(orderErrors) {
-    return (
-      <SmallWidth>
-        <Surface px={4} py={8} mt={4} boxShadow="medium">
-          <OrderError orderErrors={orderErrors} onStartOver={onRestart}/>
-        </Surface>
-      </SmallWidth>
-    );
-  }
-
   if(!multiTrade || !payment) {
-    return (
-      <Loader text="Creating order ..." />
-    );
+    history.push('/');
+    return <div/>;
   }
 
   function onSend() {
@@ -89,6 +75,7 @@ export default function PaymentPage() {
               <Box>
                 <OrderRecap multiTrade={multiTrade} />
                 <RoundButton mode="strong" onClick={onSend} wide icon={<IconCoin />} label="Send payment" />
+                <Box h={4}/>
                 <RoundButton mode="negative" onClick={onRestart} wide icon={<IconClose />} label="Cancel" />
               </Box>
             }

@@ -1,23 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { Box } from '@material-ui/core'
 import { ArrowBack } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles';
-import { Box as ABox } from '@aragon/ui'
 
 import StepNotice from '../components/Payment/StepNotice';
 import StepRecipient from '../components/Payment/StepRecipient';
 import StepAmount from '../components/Payment/StepAmount';
-import StepRecap from '../components/Payment/StepRecap';
-import { RoundButton, SmallWidth } from '../components/UI/StyledComponents';
+import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
 
 import { CustomMobileStepper } from '../components/Payment/StepComponents';
 
 import { createOrder, sendPayment, resetOrder, setExchangeStep } from '../redux/payment/actions';
-import { getExchangeStep } from '../redux/payment/selectors';
+import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors';
+import OrderError from '../components/Payment/OrderError';
+import Loader from '../components/UI/Loader';
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -33,10 +32,6 @@ const useStyles = makeStyles({
   }
 });
 
-const RoundedBox = styled(ABox)`
-  border-radius: 20px;
-`
-
 const steps = ['Amount', 'Recipient', 'Notice', 'Order summary'];
 
 export default function ExchangePage() {
@@ -44,6 +39,8 @@ export default function ExchangePage() {
   const history = useHistory();
   const dispatch = useDispatch();
   const stepId = useSelector(getExchangeStep);
+  const orderErrors = useSelector(getOrderErrors);
+  const [creatingOrder, setCreatingOrder] = useState<boolean>(false);
 
   function handleNext() {
     dispatch(setExchangeStep(stepId + 1));
@@ -53,8 +50,38 @@ export default function ExchangePage() {
   }
 
   function onCreateOrder() {
-    dispatch(createOrder());
-    history.push('/payment');
+    setCreatingOrder(true);
+    dispatch(createOrder())
+      .then(() => {
+        history.push('/payment');
+      })
+      .catch(_ => undefined)
+      .finally(() => {
+        setCreatingOrder(false);
+      });
+  }
+
+  function onRestart(home: boolean = false) {
+    // TODO Cancel order
+    dispatch(resetOrder());
+    dispatch(setExchangeStep(0));
+    history.push(home? '/' : '/exchange');
+  }
+
+  if(orderErrors) {
+    return (
+      <SmallWidth>
+        <Surface px={4} py={8} mt={4} boxShadow="medium">
+          <OrderError orderErrors={orderErrors} onStartOver={onRestart}/>
+        </Surface>
+      </SmallWidth>
+    );
+  }
+
+  if(creatingOrder) {
+    return (
+      <Loader text="Creating order ..." />
+    );
   }
 
   const stepElements = [
@@ -65,7 +92,7 @@ export default function ExchangePage() {
 
   return (
     <SmallWidth>
-      <RoundedBox>
+      <Surface boxShadow="medium" px={4} pt={4} pb={8} my={4}>
         <CustomMobileStepper
           backButton={null}
           nextButton={null}
@@ -90,7 +117,7 @@ export default function ExchangePage() {
         </Box>
         }
         {stepElements[stepId]}
-      </RoundedBox>
+      </Surface>
     </SmallWidth>
   );
 }

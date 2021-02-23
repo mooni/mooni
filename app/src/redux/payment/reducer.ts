@@ -105,12 +105,6 @@ export default function(state : PaymentState = initialState, action: { type: str
         exchangeStep: stepId,
       };
     }
-    case actions.RESET_PAYMENT: {
-      return {
-        ...state,
-        payment: null,
-      };
-    }
     case actions.SET_PAYMENT: {
       const { payment }: { payment: Payment } = action.payload;
       return {

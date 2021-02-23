@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { FlexCenterBox, RoundButton } from '../UI/StyledComponents';
 import { dailyLimits, yearlyLimits } from '../../constants/limits';
 import { numberWithCommas } from '../../lib/numbers';
-import { useHistory } from 'react-router-dom';
 
 // const messages = ["amount_too_large", "amount_too_low", "currency_pair_not_supported", "currency_pair_temporarily_unavailable", "exceeds_quota", "invalid_bank_account", "invalid_bank_account_owner_address", "invalid_country_code", "invalid_crypto_address", "invalid_currency_code", "invalid_currency_pair", "invalid_email", "invalid_partner_fee", "kyc_required", "partner_fee_without_partner"];
 
@@ -59,11 +58,7 @@ function ErrorCTA({action, label, icon}) {
 }
 
 function ErrorCatcher({orderErrors, onStartOver}) {
-  const history = useHistory();
-
   if(orderErrors[0].code === 'exceeds_quota') {
-    const goHome = () => history.push('/');
-
     return (
       <>
         <ErrorContent>You have reach your limits with this bank account. Please try again with a lower amount or wait 24h so that your limits are reset.</ErrorContent>
@@ -72,7 +67,7 @@ function ErrorCatcher({orderErrors, onStartOver}) {
         <LimitLine><b>Annually</b> {numberWithCommas(yearlyLimits['EUR'])} EUR/{numberWithCommas(yearlyLimits['CHF'])} CHF</LimitLine>
         <ErrorCTA
           icon={<IconArrowLeft/>}
-          action={goHome}
+          action={() => onStartOver(true)}
           label="Go home"
         />
       </>
