@@ -75,6 +75,7 @@ interface RateStateAction {
 type RateStateReducer = (RateState, RateStateAction) => RateState;
 
 function correctAmount(amount: string, decimals: number) {
+  if(amount === '') return '0';
   const truncAmount = truncateNumber(amount, decimals);
   if(new BN(amount).eq(truncAmount)) {
     return amount;

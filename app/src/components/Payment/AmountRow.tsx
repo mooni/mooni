@@ -93,6 +93,13 @@ type Props = {
   balanceAvailable?: string;
 };
 
+const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`) // match escaped "." characters via in a non-capturing group
+
+export function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+
 export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValue, onChangeCurrency, currencyType, active, error, valueDisabled, currencyDisabled, caption, onMax, balanceAvailable }) => {
   const displayedValue = value !== null ?
     (active ? value : new BN(value).sd(SIGNIFICANT_DIGITS).toFixed())
@@ -120,12 +127,27 @@ export const AmountRow: React.FC<Props> = ({ value, selectedSymbol, onChangeValu
       </LabelContainer>
       <InputContainer>
         <Input
-          type="number"
           className={[valueDisabled && 'disabled'].join(' ')}
           value={displayedValue}
-          onChange={e => onChangeValue(e.target.value)}
           readOnly={valueDisabled}
           min={0}
+          onChange={event => {
+            const nextUserInput = event.target.value.replace(/,/g, '.');
+            if (nextUserInput === '') {
+              onChangeValue('0')
+            } else if (inputRegex.test(escapeRegExp(nextUserInput))) {
+              onChangeValue(nextUserInput)
+            }
+          }}
+          inputMode="decimal"
+          autoComplete="off"
+          autoCorrect="off"
+          type="text"
+          pattern="^[0-9]*[.,]?[0-9]*$"
+          placeholder="0.0"
+          minLength={1}
+          maxLength={79}
+          spellCheck="false"
         />
         <Box>
           <CurrencySelector
