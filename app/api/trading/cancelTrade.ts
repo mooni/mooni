@@ -34,6 +34,13 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
 
   try {
     await bityInstance.cancelOrder(bityOrderId);
+    await prisma.mooniOrder.update({
+      where: { id },
+      data: {
+        status: 'CANCELLED',
+      },
+    });
+
     return res.json({ message: 'ok'});
   } catch(error) {
     if(error instanceof BityOrderError && error.meta?.errors[0]?.code === 'order_is_cancelled') {
