@@ -36,14 +36,10 @@ interface OrderRowProps {
 const OrderStatusIcon: React.FC<OrderRowProps> = ({order}) => {
   const theme = useTheme();
 
-  const date = new Date(order.createdAt);
-  const now = new Date();
-  const expired = order.status === MooniOrderStatus.PENDING && !order.txHash && ((+now - +date) > 10*60*1000);
-
   let tooltipText;
-  if(expired) {
-    tooltipText = 'Expired'
-  } else if(order.status === MooniOrderStatus.PENDING && !expired) {
+  if(order.status === MooniOrderStatus.CANCELLED) {
+    tooltipText = 'Cancelled'
+  } else if(order.status === MooniOrderStatus.PENDING) {
     tooltipText = 'Pending'
   } else {
     tooltipText = 'Executed'
@@ -53,10 +49,10 @@ const OrderStatusIcon: React.FC<OrderRowProps> = ({order}) => {
     <Box display="flex" alignItems="center" justifyContent="center">
       <Tooltip title={tooltipText}>
         <Box display="flex" alignItems="center">
-          {order.status === MooniOrderStatus.PENDING && !expired &&
+          {order.status === MooniOrderStatus.PENDING &&
           <IconClock size="medium" style={{ color: theme.disabledContent }}  />
           }
-          {expired &&
+          {order.status === MooniOrderStatus.CANCELLED &&
           <IconCross size="medium" style={{ color: theme.negative }}  />
           }
           {order.status === MooniOrderStatus.EXECUTED &&
