@@ -33,7 +33,7 @@ export interface MultiTradeRequest {
 
 export interface MultiTradeEstimation {
   tradeRequest: TradeRequest,
-  trades: Trade[],
+  trades: (DexTrade | BityTrade)[],
   path: TradePath;
   inputAmount: string,
   outputAmount: string,

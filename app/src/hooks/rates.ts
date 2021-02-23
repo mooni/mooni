@@ -7,7 +7,6 @@ import { TradeRequest } from "../lib/trading/types";
 import Api from "../lib/apiWrapper";
 import {BityOrderError} from "../lib/wrappers/bityTypes";
 import { APIError } from '../lib/errors';
-import { GetCurrencyFn } from '../contexts/CurrenciesContext';
 import { useCurrenciesContext } from './currencies';
 
 import { dailyLimits } from '../constants/limits';
@@ -191,7 +190,7 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
   }
 }
 
-const estimate = async (tradeRequest: TradeRequest, _nonce: number, _getCurrency: GetCurrencyFn): Promise<RateStateAction> => {
+const estimate = async (tradeRequest: TradeRequest, _nonce: number): Promise<RateStateAction> => {
   const outputLimit = dailyLimits[tradeRequest.outputCurrencyObject.symbol];
 
   if(!isNotZero(tradeRequest.amount)) {
@@ -290,7 +289,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
       type: 'setCurrency',
       payload: {
         tradeExact,
-        currencyObject: getCurrency(currencySymbol),
+        currencyObject: getCurrency(currencySymbol).toObject(),
       }
     });
   }, [getCurrency]);
@@ -308,12 +307,12 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   const debouncedRateRequest = useDebounce(rateState.tradeRequest, 1000);
   useEffect(() => {
     nonce++;
-    estimate(debouncedRateRequest, nonce, getCurrency)
+    estimate(debouncedRateRequest, nonce)
       .then(dispatchRateState)
       .catch(error => {
         logError('unexpected error while fetching rates', error);
       });
-  }, [debouncedRateRequest, getCurrency]);
+  }, [debouncedRateRequest]);
 
   return {
     rateForm: rateState.rateForm,

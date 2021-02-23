@@ -76,7 +76,7 @@ export class Trader {
     }
   }
 
-  private async createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiTradeRequest): Promise<Trade> {
+  private async createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiTradeRequest): Promise<BityTrade | DexTrade> {
     const path = this.findPath(tradeRequest);
     if(path.length !== 1) {
       throw new Error('can only create direct trade');
@@ -98,7 +98,8 @@ export class Trader {
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     const path = this.findPath(tradeRequest);
 
-    const trades: Trade[] = [];
+    const trades: (BityTrade | DexTrade)[] = [];
+
     let ethAmount: string;
 
     if(path.length === 1 && path[0] === TradeType.BITY) {
@@ -184,7 +185,7 @@ export class Trader {
     const {tradeRequest, ethInfo, bankInfo, referralId} = multiTradeRequest;
     const path = this.findPath(multiTradeRequest.tradeRequest);
 
-    const trades: Trade[] = [];
+    const trades: (BityTrade | DexTrade)[] = [];
 
     if (path.length === 1 && path[0] === TradeType.BITY) {
 
