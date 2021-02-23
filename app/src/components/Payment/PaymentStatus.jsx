@@ -19,7 +19,7 @@ import {
 import styled from 'styled-components';
 import { useMediaQuery } from '@chakra-ui/react';
 
-import { SimpleLink, RoundButton } from '../UI/StyledComponents';
+import { RoundButton } from '../UI/StyledComponents';
 import {EmailButton} from '../UI/Tools';
 
 import { getEtherscanTxURL } from '../../lib/eth';
