@@ -62,7 +62,7 @@ export default function StepNotice({ onComplete }) {
           I agree with the <Link onClick={() => dispatch(setInfoPanel('terms'))}>terms of service</Link>
         </Box>
       </Box>
-      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} label="Let's go!" />
+      <RoundButton mode="strong" onClick={onComplete} wide icon={<IconArrowRight/>} disabled={!termsAccepted} label="Let's go!" />
     </Box>
   )
 }

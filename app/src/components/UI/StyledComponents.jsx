@@ -5,7 +5,7 @@ import { Box, Button as BaseButton } from '@chakra-ui/react';
 import { Link as ALink, Button as AButton } from '@aragon/ui';
 import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
-export const SmallWidth = styled.div`
+export const SmallWidth = styled(Box)`
   max-width: 26rem;
   width: 90%;
 `;

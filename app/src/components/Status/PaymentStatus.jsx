@@ -28,12 +28,6 @@ import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types
 import { watchBityOrder, unwatchBityOrder } from '../../redux/payment/actions';
 import {selectUser} from "../../redux/user/userSlice";
 
-const Title = styled.p`
-  ${textStyle('title3')};
-  text-align: center;
-  margin-bottom: ${2 * GU}px;
-`;
-
 const SubTitle = styled.p`
   ${textStyle('title4')};
   text-align: center;
@@ -274,10 +268,6 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
 export default function PaymentStatusComponent({ payment, onRestart }) {
   return (
     <Box width={1}>
-      <Title>
-        Order status
-      </Title>
-
       <Box mb={2}>
         <List>
           {payment.steps.map(step =>

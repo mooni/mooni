@@ -52,24 +52,15 @@ export default function ExchangePage() {
     dispatch(setExchangeStep(Math.max(0, stepId - 1)));
   }
 
-  function handleStartOver() {
-    dispatch(resetOrder());
-    dispatch(setExchangeStep(0));
-  }
-  function onPrepareRecap() {
+  function onCreateOrder() {
     dispatch(createOrder());
-    handleNext();
-  }
-  function onSend() {
-    dispatch(sendPayment());
-    history.push('/status');
+    history.push('/payment');
   }
 
   const stepElements = [
     <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
-    <StepNotice onComplete={onPrepareRecap} />,
-    <StepRecap onComplete={onSend} onStartOver={handleStartOver} />,
+    <StepNotice onComplete={onCreateOrder} />,
   ];
 
   return (
@@ -89,7 +80,7 @@ export default function ExchangePage() {
           {steps[stepId]}
         </Box>
 
-        {stepId !== 0 && stepId !== (stepElements.length - 1) && <Box mb={2}>
+        {stepId !== 0 && <Box mb={2}>
           <RoundButton
             wide
             onClick={handleBack}

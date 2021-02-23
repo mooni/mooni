@@ -95,6 +95,7 @@ export default function(state : PaymentState = initialState, action: { type: str
         ...state,
         multiTrade: null,
         orderErrors: null,
+        payment: null,
       };
     }
     case actions.SET_EXCHANGE_STEP: {
