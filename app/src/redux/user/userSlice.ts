@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../types/api';
-import Api from '../../lib/apiWrapper';
+import Api from '../../lib/wrappers/mooni';
 import { getJWS } from '../wallet/selectors';
 import { RootState } from '../store';
 import { defaultProvider } from '../../lib/web3Providers';

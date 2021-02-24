@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { NowRequest, NowResponse } from '@now/node'
 import {BityOrderError} from "../wrappers/bityTypes";
 import {APIError} from "../errors";
+
 type Handler = (req: NowRequest, res: NowResponse) => Promise<NowResponse | void>
 
 export const errorMiddleware = (fn: Handler): Handler => async (req: NowRequest, res: NowResponse) => {

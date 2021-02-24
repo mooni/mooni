@@ -10,7 +10,6 @@ import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import prisma from '../../src/lib/api/prisma'
 import {getUser, getUserByReferral} from "../../src/lib/api/users";
 import {APIError} from "../../src/lib/errors";
-import CurrenciesManager from '../../src/lib/trading/currenciesManager';
 import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
 const bityInstance = new Bity();

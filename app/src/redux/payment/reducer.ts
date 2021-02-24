@@ -10,6 +10,7 @@ import { STATE_NAME, PaymentState, initialState } from "./state";
 import * as actions from './actions';
 import { BankInfo, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types';
 import { CurrencyObject } from '../../lib/trading/currencyTypes';
+import { MooniOrder } from '../../types/api';
 
 export { STATE_NAME };
 
@@ -83,6 +84,13 @@ export default function(state : PaymentState = initialState, action: { type: str
         multiTrade,
       };
     }
+    case actions.SET_MOONI_ORDER: {
+      const { mooniOrder }: { mooniOrder: MooniOrder } = action.payload;
+      return {
+        ...state,
+        mooniOrder,
+      };
+    }
     case actions.SET_ORDER_ERRORS: {
       const { orderErrors }: { orderErrors: OrderErrors } = action.payload;
       return {
@@ -95,7 +103,9 @@ export default function(state : PaymentState = initialState, action: { type: str
         ...state,
         multiTrade: null,
         orderErrors: null,
+        mooniOrder: null,
         payment: null,
+        exchangeStep: 0,
       };
     }
     case actions.SET_EXCHANGE_STEP: {

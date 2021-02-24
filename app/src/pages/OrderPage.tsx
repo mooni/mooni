@@ -14,7 +14,7 @@ import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledCompone
 
 import { CustomMobileStepper } from '../components/Order/StepComponents';
 
-import { createOrder, resetOrder, setExchangeStep } from '../redux/payment/actions';
+import { createOrder, setExchangeStep } from '../redux/payment/actions';
 import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors';
 import OrderError from '../components/Order/OrderError';
 import Loader from '../components/UI/Loader';
@@ -63,18 +63,12 @@ export default function OrderPage() {
       });
   }
 
-  function onRestart(home: boolean = false) {
-    // TODO Cancel order
-    dispatch(resetOrder());
-    dispatch(setExchangeStep(0));
-    history.push(home ? '/' : '/order');
-  }
 
   if(orderErrors) {
     return (
       <SmallWidth>
         <Surface px={4} py={8} mt={4} boxShadow="medium">
-          <OrderError orderErrors={orderErrors} onStartOver={onRestart}/>
+          <OrderError orderErrors={orderErrors}/>
         </Surface>
       </SmallWidth>
     );

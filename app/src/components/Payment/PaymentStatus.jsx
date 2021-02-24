@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { Box, List, ListItem } from '@material-ui/core';
 import {
@@ -12,12 +13,12 @@ import {
   IconWarning,
   IconEllipsis,
   GU,
-  IconPermissions,
+  IconClock,
   Info,
-  Help,
 } from '@aragon/ui'
 import styled from 'styled-components';
-import { useMediaQuery } from '@chakra-ui/react';
+import { useMediaQuery, Tooltip } from '@chakra-ui/react';
+import { QuestionOutlineIcon } from '@chakra-ui/icons';
 
 import { RoundButton } from '../UI/StyledComponents';
 import {EmailButton} from '../UI/Tools';
@@ -25,7 +26,7 @@ import {EmailButton} from '../UI/Tools';
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
-import { watchBityOrder, unwatchBityOrder } from '../../redux/payment/actions';
+import {watchBityOrder, unwatch, resetOrder} from '../../redux/payment/actions';
 import {selectUser} from "../../redux/user/userSlice";
 
 const SubTitle = styled.p`
@@ -40,11 +41,11 @@ const Hint = styled.p`
   padding: 0 1rem;
   text-align: center;
 `;
-const StatusLabel = styled.p`
+const StatusLabel = styled.span`
   ${textStyle('label2')};
   white-space: nowrap;
 `;
-const StatusSecondary = styled.p`
+const StatusSecondary = styled.span`
   ${textStyle('label2')};
   font-style: italic;
   font-size: 10px;
@@ -80,7 +81,7 @@ function PaymentOngoingInfo({ payment }) {
       }
       {ongoing && waitingBity ?
         <Hint>
-          Your payment have been received and the bank transfer is being sent. This process can take up to 10 minutes.
+          Your payment has been received and the bank transfer is being sent. This process can take up to 10 minutes.
         </Hint>
         :
         <Info mode="warning">
@@ -91,10 +92,17 @@ function PaymentOngoingInfo({ payment }) {
   )
 }
 
-function PaymentSuccessInfo({ onRestart }) {
+function PaymentSuccessInfo() {
+  const dispatch = useDispatch();
+  const history = useHistory();
   const user = useSelector(selectUser);
   const referralURL = `${window.location.origin}?referralId=${user.referralId}`;
   const tweetURL = `https://twitter.com/intent/tweet?text=I've%20just%20cashed%20out%20my%20crypto%20with%20Mooni%20in%20minutes!&via=moonidapp&url=${referralURL}&hashtags=defi,offramp,crypto`;
+
+  function onGoHome() {
+    dispatch(resetOrder());
+    history.push('/');
+  }
 
   return (
     <Box width={1}>
@@ -102,7 +110,7 @@ function PaymentSuccessInfo({ onRestart }) {
         That's a success <span role="img" aria-label="alright">👌</span>
       </SubTitle>
       <Hint>
-        The payment is complete and the bank transfer have been sent. <br/>
+        The payment is complete and the bank transfer has been sent. <br/>
         Funds will arrive in your bank account between one hour and four days from now, depending on your bank.
       </Hint>
       <Box mb={1}>
@@ -114,7 +122,7 @@ function PaymentSuccessInfo({ onRestart }) {
           icon={<span role="img" aria-label="love">❤️</span>}
         />
       </Box>
-      <RoundButton mode="strong" onClick={() => onRestart(true)} wide label="Close" />
+      <RoundButton mode="strong" onClick={onGoHome} wide label="Close" />
     </Box>
   )
 }
@@ -128,13 +136,23 @@ function getPaymentStepMessage(error) {
   if(error.message === 'token-balance-too-low')
     message = 'Your token balance is too low.'; else
   if(error.message === 'bity-order-cancelled')
-    message = 'The order have been cancelled by bity. Please go to their order page and contact their support.';
+    message = 'The order has been cancelled.'; else
+  if(error.message === 'order_canceled_not_paying')
+    message = 'Order is expired or has been cancelled, not sending payment. Please retry.';
 
   return message;
 
 }
 
-function PaymentErrorInfo({ onRestart, payment }) {
+function PaymentErrorInfo({ payment }) {
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  function onRestart() {
+    dispatch(resetOrder());
+    history.push('/order');
+  }
+
   const stepsWithError = payment.steps.filter(step => !!step.error);
 
   return (
@@ -216,8 +234,8 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   useEffect(() => {
     if(bityOrderId) {
       dispatch(watchBityOrder(bityOrderId));
+      return () => dispatch(unwatch(bityOrderId));
     }
-    return () => dispatch(unwatchBityOrder(bityOrderId));
   }, [dispatch, bityOrderId]);
 
   return (
@@ -229,10 +247,10 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
           {status === PaymentStepStatus.RECEIVED && <LoadingRing/>}
           {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color }}/>}
           {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color }}  />}
-          {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color }}  />}
+          {status === PaymentStepStatus.APPROVAL && <IconClock size="medium" style={{ color }}  />}
           {status === PaymentStepStatus.QUEUED && <IconEllipsis size="medium" style={{ color }}  />}
         </Box>
-        <Box flex={1} display="flex">
+        <Box flex={1} display="flex" alignItems="center">
           <StatusLabel>
             {id === PaymentStepId.ALLOWANCE && 'Token allowance'}
             {id === PaymentStepId.TRADE && 'Token exchange'}
@@ -249,9 +267,9 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
             </StatusSecondary>
             {status === PaymentStepStatus.APPROVAL &&
             <Box ml={1}>
-              <Help hint="What does that mean ?">
-                We are waiting for you to accept a transaction in your Ethereum wallet.
-              </Help>
+              <Tooltip label="We are waiting for you to accept a transaction in your wallet." fontSize="md">
+                <QuestionOutlineIcon />
+              </Tooltip>
             </Box>
             }
           </Box>
@@ -267,7 +285,7 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   )
 }
 
-export default function PaymentStatusComponent({ payment, onRestart }) {
+export default function PaymentStatusComponent({ payment }) {
   return (
     <Box width={1}>
       <Box mb={2}>
@@ -279,8 +297,8 @@ export default function PaymentStatusComponent({ payment, onRestart }) {
       </Box>
 
       {payment.status === PaymentStatus.ONGOING && <PaymentOngoingInfo payment={payment}/>}
-      {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo onRestart={onRestart} payment={payment} />}
-      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo onRestart={onRestart} />}
+      {payment.status === PaymentStatus.ERROR && <PaymentErrorInfo payment={payment} />}
+      {payment.status === PaymentStatus.DONE && <PaymentSuccessInfo />}
     </Box>
   )
 }

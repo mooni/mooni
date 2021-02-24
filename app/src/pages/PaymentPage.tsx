@@ -1,17 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Box, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Button } from '@chakra-ui/react'
 import { IconCoin, IconClose } from '@aragon/ui'
 
 import PaymentStatus from '../components/Payment/PaymentStatus';
-import {RoundButton, Surface} from '../components/UI/StyledComponents';
+import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
 import { ForceModal } from '../components/UI/Modal';
 
-import { getMultiTrade, getPayment } from '../redux/payment/selectors';
-import {resetOrder, sendPayment, setExchangeStep} from '../redux/payment/actions';
+import { getMooniOrder, getMultiTrade, getPayment } from '../redux/payment/selectors';
+import {
+  cancelOrder,
+  resetOrder,
+  sendPayment,
+  unwatch,
+  watchMooniOrder,
+} from '../redux/payment/actions';
 import OrderRecap from "../components/Payment/OrderRecap";
 import { Title } from '../components/UI/Typography';
+import { PaymentStatus as PaymentStatusEnum } from '../lib/types';
+import { MooniOrderStatus } from '../types/api';
+import OrderError from '../components/Order/OrderError';
 
 function ConfirmCancel({isOpen, onCancel, onClose}) {
   const cancelRef = React.useRef<HTMLButtonElement>(null);
@@ -50,14 +59,30 @@ export default function PaymentPage() {
   const history = useHistory();
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
+  const mooniOrder = useSelector(getMooniOrder);
   const payment = useSelector(getPayment);
   const [paymentState, setPaymentState] = useState<boolean>(false);
   const [alertCancel, setAlertCancel] = React.useState<boolean>(false)
 
+  useEffect(() => {
+    if(!multiTrade) return;
+    dispatch(watchMooniOrder(multiTrade.id));
+    return () => dispatch(unwatch(multiTrade.id));
+  }, [dispatch, multiTrade]);
 
   if(!multiTrade || !payment) {
     history.push('/');
     return <div/>;
+  }
+
+  if(mooniOrder && mooniOrder.status === MooniOrderStatus.CANCELLED && payment.status === PaymentStatusEnum.PENDING) {
+    return (
+      <SmallWidth>
+        <Surface px={4} py={8} mt={4} boxShadow="medium">
+          <OrderError orderErrors={[{code:'expired'}]}/>
+        </Surface>
+      </SmallWidth>
+    );
   }
 
   function onSend() {
@@ -65,11 +90,10 @@ export default function PaymentPage() {
     dispatch(sendPayment());
   }
 
-  function onRestart(home: boolean = false) {
-    // TODO Cancel order
+  function onCancel() {
+    dispatch(cancelOrder());
     dispatch(resetOrder());
-    dispatch(setExchangeStep(0));
-    history.push(home ? '/' : '/order');
+    history.push('/');
   }
 
   return (
@@ -77,14 +101,14 @@ export default function PaymentPage() {
       <Surface px={4} py={8} boxShadow="medium">
         <Title>Payment</Title>
         {paymentState ?
-          <PaymentStatus payment={payment} onRestart={onRestart}/>
+          <PaymentStatus payment={payment} />
           :
           <Box>
             <OrderRecap multiTrade={multiTrade} />
             <RoundButton mode="strong" onClick={onSend} wide icon={<IconCoin />} label="Send payment" />
             <Box h={4}/>
             <RoundButton mode="negative" onClick={() => setAlertCancel(true)} wide icon={<IconClose />} label="Cancel" />
-            <ConfirmCancel isOpen={alertCancel} onClose={() => setAlertCancel(false)} onCancel={onRestart}/>
+            <ConfirmCancel isOpen={alertCancel} onClose={() => setAlertCancel(false)} onCancel={onCancel}/>
           </Box>
         }
       </Surface>

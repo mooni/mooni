@@ -1,19 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import {BityOrderError, BityOrderResponse} from './wrappers/bityTypes';
-import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "./trading/types";
-import { MooniOrder, ProfitShare, Stats, TransactionHash, User, UUID } from '../types/api';
-import {APIError} from "./errors";
-
-interface IAPI {
-  getBityOrder(orderId: string, jwsToken?: string): Promise<BityOrderResponse>;
-  createMultiTrade(multiTradeRequest: MultiTradeRequest, jwsToken: string): Promise<MultiTrade>;
-  estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation>;
-  getOrders(jwsToken: string): Promise<MooniOrder[]>;
-  getUser(jwsToken: string): Promise<User>;
-  getProfitShare(jwsToken: string): Promise<ProfitShare>;
-  setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User>;
-  getStats(): Promise<Stats>;
-}
+import {BityOrderError, BityOrderResponse} from './bityTypes';
+import {MultiTrade, MultiTradeEstimation, MultiTradeRequest, TradeRequest} from "../trading/types";
+import { MooniOrder, ProfitShare, Stats, TransactionHash, User, UUID } from '../../types/api';
+import {APIError} from "../errors";
 
 const API_URL = '/api';
 const mooniAPI = axios.create({
@@ -46,21 +35,21 @@ async function mooniAPICatcher(config: AxiosRequestConfig) {
     if(error.code === 'ECONNABORTED') {
       throw new APIError(502, 'timeout');
     }
-    if(error.response?.status === 404) {
-      throw new APIError(404, 'not-found');
-    }
     const data = error.response?.data;
     if(data?._bityError) {
       throw new BityOrderError(data.message, data.meta.errors);
     } else if(data?._apiError) {
       throw new APIError(data.code, data.message, data.description, data.meta);
     } else {
+      if(error.response?.status === 404) {
+        throw new APIError(404, 'not-found');
+      }
       throw new APIError(500, 'unexpected-server-error', '', error);
     }
   }
 }
 
-const ApiWrapper: IAPI = {
+const MooniAPI = {
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
     const {data} = await mooniAPICatcher({
       method: 'post',
@@ -97,6 +86,17 @@ const ApiWrapper: IAPI = {
 
     return data;
   },
+  async getOrder(multiTradeId: UUID, jwsToken: string): Promise<MooniOrder> {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      url: `orders/${multiTradeId}`,
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
+
+    return data;
+  },
   async getOrders(jwsToken: string): Promise<MooniOrder[]> {
     const {data} = await mooniAPICatcher({
       method: 'get',
@@ -122,12 +122,11 @@ const ApiWrapper: IAPI = {
   async setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User> {
     const {data} = await mooniAPICatcher({
       method: 'post',
-      url: 'trading/setPaymentTx',
+      url: `orders/${multiTradeId}/updateTx`,
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
       data: {
-        multiTradeId,
         txHash,
       },
     });
@@ -148,11 +147,33 @@ const ApiWrapper: IAPI = {
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
-      url: 'profitshare',
+      url: 'user/profitshare',
+    });
+
+    return data;
+  },
+  async cancelOrder(multiTradeId: UUID, jwsToken: string): Promise<void> {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+      url: `orders/${multiTradeId}/cancel`,
+    });
+
+    return data;
+  },
+  async getUrl(url: string, jwsToken?: string) {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      headers: {
+        'Authorization': jwsToken ? `Bearer ${jwsToken}` : undefined,
+      },
+      url,
     });
 
     return data;
   },
 };
 
-export default ApiWrapper;
+export default MooniAPI;
