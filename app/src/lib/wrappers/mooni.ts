@@ -156,6 +156,17 @@ const MooniAPI = {
 
     return data;
   },
+  async getUrl(url: string, jwsToken?: string) {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      headers: {
+        'Authorization': jwsToken ? `Bearer ${jwsToken}` : undefined,
+      },
+      url,
+    });
+
+    return data;
+  },
 };
 
 export default MooniAPI;

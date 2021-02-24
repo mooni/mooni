@@ -1,12 +1,12 @@
 import { NowRequest, NowResponse } from '@now/node'
-import {authMiddleware} from "../src/lib/api/authMiddleware";
-import {Token} from "../src/lib/didManager";
-import {getUser} from "../src/lib/api/users";
-import { errorMiddleware } from '../src/lib/api/errorMiddleware';
-import prisma from '../src/lib/api/prisma';
-import { BN } from '../src/lib/numbers';
-import { ProfitShare } from '../src/types/api';
-import config from '../src/config';
+import {authMiddleware} from "../../src/lib/api/authMiddleware";
+import {Token} from "../../src/lib/didManager";
+import {getUser} from "../../src/lib/api/users";
+import { errorMiddleware } from '../../src/lib/api/errorMiddleware';
+import prisma from '../../src/lib/api/prisma';
+import { BN } from '../../src/lib/numbers';
+import { ProfitShare } from '../../src/types/api';
+import config from '../../src/config';
 
 export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
   const user = await getUser(token.claim.iss);

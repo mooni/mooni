@@ -1,11 +1,10 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 import {textStyle, LoadingRing} from '@aragon/ui'
-import useSWR from 'swr';
 import { MediumWidth, ShadowBox, FlexCenterBox } from '../components/UI/StyledComponents';
 import styled from 'styled-components';
-import Api from '../lib/wrappers/mooni';
 import { BN, significantNumbers } from '../lib/numbers';
+import { useMooniApi } from '../hooks/api';
 
 // @ts-ignore
 const StatItemBox = styled(ShadowBox)`
@@ -39,7 +38,7 @@ function StatItem({title, value}) {
 }
 
 export default function StatsPage() {
-  const { data, error } = useSWR('1', Api.getStats);
+  const { data, error } = useMooniApi('/stats');
 
   if (error) return <div>Failed to load stats</div>;
 

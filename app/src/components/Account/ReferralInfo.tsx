@@ -4,16 +4,14 @@ import { Flex, Button, useClipboard } from '@chakra-ui/react';
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { textStyle, LoadingRing, GU, Link } from '@aragon/ui';
-import useSWR from 'swr';
 
 import { selectUser } from '../../redux/user/userSlice';
 import config from '../../config';
 import { setInfoPanel } from '../../redux/ui/actions';
 import { sendEvent } from '../../lib/analytics';
-import MooniAPI from '../../lib/wrappers/mooni';
-import { getJWS } from '../../redux/wallet/selectors';
 import { ProfitShare } from '../../types/api';
 import { significantNumbers } from '../../lib/numbers';
+import { useMooniApi } from '../../hooks/api';
 
 const Content = styled.p`
   ${textStyle('body2')};
@@ -71,8 +69,7 @@ export function ReferralBox() {
 
 export default function ReferralInfo() {
   const dispatch = useDispatch();
-  const jwsToken = useSelector(getJWS);
-  const { data } = useSWR(jwsToken, MooniAPI.getProfitShare);
+  const { data } = useMooniApi('/user/profitshare');
 
   const profitShare = data as ProfitShare;
 

@@ -1,19 +1,17 @@
 import React from 'react';
-import useSWR from 'swr';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, IconCross, Link } from '@aragon/ui';
 import { useMediaQuery } from '@chakra-ui/react';
 
-import Api from '../../lib/wrappers/mooni';
-import { getJWS } from '../../redux/wallet/selectors';
 import { MooniOrder, MooniOrderStatus } from '../../types/api';
 import { significantNumbers } from '../../lib/numbers';
 import { ShadowBox } from '../UI/StyledComponents';
 import { getEtherscanTxURL } from '../../lib/eth';
 import { setInfoPanel } from '../../redux/ui/actions';
+import { useMooniApi } from '../../hooks/api';
 
 // @ts-ignore
 const CustomTableContainer = styled(ShadowBox)`
@@ -89,9 +87,8 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
 
 export default function OrderHistory() {
   const dispatch = useDispatch();
-  const jwsToken = useSelector(getJWS);
   const [isSmall] = useMediaQuery("(max-width: 960px)")
-  const { data, error } = useSWR(jwsToken, Api.getOrders);
+  const { data, error } = useMooniApi('/orders');
 
   if (error) return <Box>Failed to load orders</Box>;
   if (!data) return (
