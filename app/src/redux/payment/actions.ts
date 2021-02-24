@@ -111,7 +111,7 @@ export const setPaymentStatus = (status: PaymentStatus) => ({
 const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
   const payment: Payment = {
     steps: [],
-    status: PaymentStatus.ONGOING,
+    status: PaymentStatus.PENDING,
   };
 
   const dexTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as DexTrade[];
@@ -165,16 +165,6 @@ export const createOrder = () => async function (dispatch, getState)  {
     dispatch(createPayment(multiTrade));
 
     sendEvent('order_created');
-
-    setTimeout(() => {
-      const newState = getState();
-      const currentMultiTrade = getMultiTrade(newState);
-      const payment = getPayment(newState);
-      if(currentMultiTrade?.id === multiTrade.id && payment?.status === PaymentStatus.PENDING) {
-        dispatch(cancelOrder());
-        dispatch(setPaymentStatus(PaymentStatus.CANCELLED))
-      }
-    }, 1000)
 
   } catch(error) {
     dispatch(resetOrder());
@@ -283,9 +273,8 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
             status: PaymentStepStatus.DONE,
           }));
           dispatch(setPaymentStatus(PaymentStatus.DONE));
-          log('PAYMENT: bity ok');
-          track('PAYMENT: bity ok');
-          sendEvent('order_completed');
+          log('PAYMENT: bity executed');
+          track('PAYMENT: bity executed');
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
@@ -316,8 +305,14 @@ export const watchMooniOrder = (multiTradeId: string) => (dispatch, getState) =>
       .then(mooniOrder => {
         dispatch(setMooniOrder(mooniOrder));
 
-        if(mooniOrder.status === MooniOrderStatus.CANCELLED || mooniOrder.status === MooniOrderStatus.EXECUTED) {
+        if(mooniOrder.status === MooniOrderStatus.CANCELLED) {
           dispatch(unwatch(multiTradeId));
+        } else if(mooniOrder.status === MooniOrderStatus.EXECUTED) {
+          dispatch(unwatch(multiTradeId));
+          dispatch(setPaymentStatus(PaymentStatus.DONE));
+          log('PAYMENT: mooni order ok');
+          track('PAYMENT: mooni order ok');
+          sendEvent('order_completed');
         }
       })
       .catch(error => logError('Error while fetching mooni order', error));
