@@ -81,7 +81,7 @@ function PaymentOngoingInfo({ payment }) {
       }
       {ongoing && waitingBity ?
         <Hint>
-          Your payment have been received and the bank transfer is being sent. This process can take up to 10 minutes.
+          Your payment has been received and the bank transfer is being sent. This process can take up to 10 minutes.
         </Hint>
         :
         <Info mode="warning">
@@ -110,7 +110,7 @@ function PaymentSuccessInfo() {
         That's a success <span role="img" aria-label="alright">👌</span>
       </SubTitle>
       <Hint>
-        The payment is complete and the bank transfer have been sent. <br/>
+        The payment is complete and the bank transfer has been sent. <br/>
         Funds will arrive in your bank account between one hour and four days from now, depending on your bank.
       </Hint>
       <Box mb={1}>
@@ -136,7 +136,9 @@ function getPaymentStepMessage(error) {
   if(error.message === 'token-balance-too-low')
     message = 'Your token balance is too low.'; else
   if(error.message === 'bity-order-cancelled')
-    message = 'The order have been cancelled.';
+    message = 'The order has been cancelled.'; else
+  if(error.message === 'order_canceled_not_paying')
+    message = 'Order is expired or has been cancelled, not sending payment. Please retry.';
 
   return message;
 

@@ -205,6 +205,12 @@ const sendPaymentStep = ({ stepId, paymentFunction })  => async (dispatch, getSt
   }
 
   try {
+    if(stepId === PaymentStepId.PAYMENT) {
+      const mooniOrder = await MooniAPI.getOrder(multiTrade.id, jws);
+      if(mooniOrder.status === MooniOrderStatus.CANCELLED) {
+        throw new MetaError('order_canceled_not_paying');
+      }
+    }
     const txHash = await paymentFunction();
     if(stepId === PaymentStepId.PAYMENT) {
       await MooniAPI.setPaymentTx(multiTrade.id, txHash, jws);
@@ -359,7 +365,6 @@ export const sendPayment = () => async function (dispatch, getState)  {
       }));
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');
-
     }
 
     // Payment

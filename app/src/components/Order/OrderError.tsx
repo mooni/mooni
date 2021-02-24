@@ -86,7 +86,7 @@ function ErrorCatcher({orderErrors}) {
   } else if(orderErrors[0].code === 'expired') {
     return (
       <>
-        <ErrorContent>Your order have expired and have been cancelled. Please try again.</ErrorContent>
+        <ErrorContent>Your order has expired and has been cancelled. Please try again.</ErrorContent>
         <ErrorCTA
           icon={<IconRotateLeft/>}
           action={onRestart}
@@ -97,7 +97,7 @@ function ErrorCatcher({orderErrors}) {
   } else if(orderErrors[0].code === 'cancelled') {
     return (
       <>
-        <ErrorContent>Your order have been cancelled. Please try again.</ErrorContent>
+        <ErrorContent>Your order has been cancelled. Please try again.</ErrorContent>
         <ErrorCTA
           icon={<IconRotateLeft/>}
           action={onRestart}
