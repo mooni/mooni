@@ -8,6 +8,8 @@ import {APIError} from "../../../src/lib/errors";
 import { compareAddresses } from '../../../src/lib/api/ethHelpers';
 import { updateStatusFromBity } from '../../bity/getOrder';
 import { cancelOrder } from './cancel';
+import Bity from '../../../src/lib/wrappers/bity';
+import config from '../../../src/config';
 
 export async function getOrder(id: string, userAddress: string): Promise<MooniOrder> {
   const mooniOrder = await prisma.mooniOrder.findUnique({
@@ -32,13 +34,20 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   if(mooniOrder.status === OrderStatus.PENDING) {
     const now = new Date();
     if((+now - +mooniOrder.createdAt) > EXPIRATION) {
-      await cancelOrder(mooniOrder);
+
+      const bityInstance = new Bity();
+      await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
+
+      await cancelOrder(bityInstance, mooniOrder);
       const updatedMooniOrder = await getOrder(id, token.claim.iss);
       return res.json(updatedMooniOrder);
     }
   }
   if(mooniOrder.status === OrderStatus.PAID) {
-    await updateStatusFromBity(mooniOrder);
+    const bityInstance = new Bity();
+    await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
+
+    await updateStatusFromBity(bityInstance, mooniOrder);
     const updatedMooniOrder = await getOrder(id, token.claim.iss);
     return res.json(updatedMooniOrder);
   }

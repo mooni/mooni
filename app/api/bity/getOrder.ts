@@ -10,19 +10,17 @@ import {APIError} from "../../src/lib/errors";
 import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
 import { compareAddresses } from '../../src/lib/api/ethHelpers';
 
-export async function getBityOrder(mooniOrder: MooniOrder): Promise<BityOrderResponse> {
+export async function getBityOrder(bityInstance: Bity, mooniOrder: MooniOrder): Promise<BityOrderResponse> {
   const { bityOrderId } = mooniOrder;
   if(!bityOrderId) {
     throw new APIError(400, 'invalid-order', 'no bityOrderId present');
   }
 
-  const bityInstance = new Bity();
-  await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
   return bityInstance.getOrderDetails(bityOrderId);
 }
 
-export async function updateStatusFromBity(mooniOrder: MooniOrder): Promise<void> {
-  const bityOrderDetails = await getBityOrder(mooniOrder);
+export async function updateStatusFromBity(bityInstance: Bity, mooniOrder: MooniOrder): Promise<void> {
+  const bityOrderDetails = await getBityOrder(bityInstance, mooniOrder);
 
   if(bityOrderDetails.orderStatus === BityOrderStatus.EXECUTED) {
     await prisma.mooniOrder.update({
@@ -56,8 +54,10 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
   if(!mooniOrder || !compareAddresses(mooniOrder.ethAddress, token.claim.iss)) {
     throw new APIError(404, 'not-found', 'Corresponding MooniOrder not found');
   }
+  const bityInstance = new Bity();
+  await bityInstance.initializeAuth(config.private.bityClientId, config.private.bityClientSecret);
 
-  const bityOrderDetails = await getBityOrder(mooniOrder);
+  const bityOrderDetails = await getBityOrder(bityInstance, mooniOrder);
   return res.json(bityOrderDetails);
 
 }))

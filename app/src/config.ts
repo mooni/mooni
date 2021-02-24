@@ -16,6 +16,7 @@ interface IConfig {
     bityClientId: string,
     bityClientSecret: string,
     bityPartnerFee: number,
+    adminToken: string,
   },
 }
 
@@ -48,6 +49,7 @@ const config: IConfig = {
     bityClientId: parseEnv(process.env.PRIVATE_BITY_CLIENT_ID, ''),
     bityClientSecret: parseEnv(process.env.PRIVATE_BITY_CLIENT_SECRET, ''),
     bityPartnerFee: parseEnv(process.env.PRIVATE_BITY_FEE, 0),
+    adminToken: parseEnv(process.env.PRIVATE_ADMIN_TOKEN, ''),
   },
 };
 
