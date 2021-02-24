@@ -1,30 +1,25 @@
 import {NowRequest, NowResponse} from '@now/node'
 
-import Bity from '../../src/lib/wrappers/bity';
-import config from '../../src/config';
-import {Token} from "../../src/lib/didManager";
-import {authMiddleware} from "../../src/lib/api/authMiddleware";
-import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
-import prisma from '../../src/lib/api/prisma'
-import {APIError} from "../../src/lib/errors";
-import { compareAddresses } from '../../src/lib/api/ethHelpers';
-import { BityOrderError } from '../../src/lib/wrappers/bityTypes';
+import Bity from '../../../src/lib/wrappers/bity';
+import config from '../../../src/config';
+import {Token} from "../../../src/lib/didManager";
+import {authMiddleware} from "../../../src/lib/api/authMiddleware";
+import {errorMiddleware} from "../../../src/lib/api/errorMiddleware";
+import prisma from '../../../src/lib/api/prisma'
+import {APIError} from "../../../src/lib/errors";
+import { BityOrderError } from '../../../src/lib/wrappers/bityTypes';
+import { getOrder } from './index';
 
 const bityInstance = new Bity();
 
+// Cancel order
 export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
-
-  const id = req.body?.multiTradeId as string;
+  const id = req.query?.id as string;
   if(!id) {
     throw new APIError(400, 'wrong-body', 'multiTradeRequest values are invalid');
   }
+  const mooniOrder = await getOrder(id, token.claim.iss);
 
-  const mooniOrder = await prisma.mooniOrder.findUnique({
-    where: { id },
-  });
-  if(!mooniOrder || !compareAddresses(mooniOrder.ethAddress, token.claim.iss)) {
-    throw new APIError(404, 'not-found', 'MooniOrder not found');
-  }
   const { bityOrderId } = mooniOrder;
   if(!bityOrderId) {
     throw new APIError(400, 'invalid-order', 'no bityOrderId present');

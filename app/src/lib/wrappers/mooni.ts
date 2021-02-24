@@ -86,6 +86,17 @@ const MooniAPI = {
 
     return data;
   },
+  async getOrder(multiTradeId: UUID, jwsToken: string): Promise<MooniOrder[]> {
+    const {data} = await mooniAPICatcher({
+      method: 'get',
+      url: `orders/${multiTradeId}`,
+      headers: {
+        'Authorization': `Bearer ${jwsToken}`,
+      },
+    });
+
+    return data;
+  },
   async getOrders(jwsToken: string): Promise<MooniOrder[]> {
     const {data} = await mooniAPICatcher({
       method: 'get',
@@ -137,21 +148,18 @@ const MooniAPI = {
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
-      url: 'profitshare',
+      url: 'user/profitshare',
     });
 
     return data;
   },
   async cancelOrder(multiTradeId: UUID, jwsToken: string): Promise<void> {
     const {data} = await mooniAPICatcher({
-      method: 'post',
+      method: 'get',
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
-      url: 'trading/cancelTrade',
-      data: {
-        multiTradeId,
-      },
+      url: `orders/${multiTradeId}/cancel`,
     });
 
     return data;
