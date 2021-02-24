@@ -13,12 +13,12 @@ import {
   IconWarning,
   IconEllipsis,
   GU,
-  IconPermissions,
+  IconClock,
   Info,
-  Help,
 } from '@aragon/ui'
 import styled from 'styled-components';
-import { useMediaQuery } from '@chakra-ui/react';
+import { useMediaQuery, Tooltip } from '@chakra-ui/react';
+import { QuestionOutlineIcon } from '@chakra-ui/icons';
 
 import { RoundButton } from '../UI/StyledComponents';
 import {EmailButton} from '../UI/Tools';
@@ -41,11 +41,11 @@ const Hint = styled.p`
   padding: 0 1rem;
   text-align: center;
 `;
-const StatusLabel = styled.p`
+const StatusLabel = styled.span`
   ${textStyle('label2')};
   white-space: nowrap;
 `;
-const StatusSecondary = styled.p`
+const StatusSecondary = styled.span`
   ${textStyle('label2')};
   font-style: italic;
   font-size: 10px;
@@ -247,10 +247,10 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
           {status === PaymentStepStatus.RECEIVED && <LoadingRing/>}
           {status === PaymentStepStatus.DONE && <IconCheck size="medium" style={{ color }}/>}
           {status === PaymentStepStatus.ERROR && <IconWarning size="medium" style={{ color }}  />}
-          {status === PaymentStepStatus.APPROVAL && <IconPermissions size="medium" style={{ color }}  />}
+          {status === PaymentStepStatus.APPROVAL && <IconClock size="medium" style={{ color }}  />}
           {status === PaymentStepStatus.QUEUED && <IconEllipsis size="medium" style={{ color }}  />}
         </Box>
-        <Box flex={1} display="flex">
+        <Box flex={1} display="flex" alignItems="center">
           <StatusLabel>
             {id === PaymentStepId.ALLOWANCE && 'Token allowance'}
             {id === PaymentStepId.TRADE && 'Token exchange'}
@@ -267,9 +267,9 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
             </StatusSecondary>
             {status === PaymentStepStatus.APPROVAL &&
             <Box ml={1}>
-              <Help hint="What does that mean ?">
-                We are waiting for you to accept a transaction in your Ethereum wallet.
-              </Help>
+              <Tooltip label="We are waiting for you to accept a transaction in your wallet." fontSize="md">
+                <QuestionOutlineIcon />
+              </Tooltip>
             </Box>
             }
           </Box>

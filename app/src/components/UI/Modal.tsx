@@ -10,7 +10,7 @@ const Root = styled.div`
   height: 100vh;
   background-color: #b1aeae5c;
   backdrop-filter: blur(2px);
-  z-index: 1400;
+  z-index: 10;
 
   display: flex;
   align-items: center;
