@@ -86,7 +86,7 @@ const MooniAPI = {
 
     return data;
   },
-  async getOrder(multiTradeId: UUID, jwsToken: string): Promise<MooniOrder[]> {
+  async getOrder(multiTradeId: UUID, jwsToken: string): Promise<MooniOrder> {
     const {data} = await mooniAPICatcher({
       method: 'get',
       url: `orders/${multiTradeId}`,
@@ -122,12 +122,11 @@ const MooniAPI = {
   async setPaymentTx(multiTradeId: UUID, txHash: TransactionHash, jwsToken: string): Promise<User> {
     const {data} = await mooniAPICatcher({
       method: 'post',
-      url: 'trading/setPaymentTx',
+      url: `orders/${multiTradeId}/updateTx`,
       headers: {
         'Authorization': `Bearer ${jwsToken}`,
       },
       data: {
-        multiTradeId,
         txHash,
       },
     });

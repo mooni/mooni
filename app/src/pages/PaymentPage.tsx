@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Box, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, Button } from '@chakra-ui/react'
 import { IconCoin, IconClose, IconRefresh } from '@aragon/ui'
 
 import PaymentStatus from '../components/Payment/PaymentStatus';
-import { PaymentStatus as PaymentStatusEnum } from '../lib/types';
 import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
 import { ForceModal } from '../components/UI/Modal';
 
-import { getMultiTrade, getPayment } from '../redux/payment/selectors';
-import { cancelOrder, resetOrder, sendPayment } from '../redux/payment/actions';
+import { getMooniOrder, getMultiTrade, getPayment } from '../redux/payment/selectors';
+import {
+  cancelOrder,
+  resetOrder,
+  sendPayment,
+  unwatch,
+  watchMooniOrder,
+} from '../redux/payment/actions';
 import OrderRecap from "../components/Payment/OrderRecap";
 import { Title } from '../components/UI/Typography';
+import { MooniOrderStatus } from '../types/api';
 
 function ConfirmCancel({isOpen, onCancel, onClose}) {
   const cancelRef = React.useRef<HTMLButtonElement>(null);
@@ -51,9 +57,16 @@ export default function PaymentPage() {
   const history = useHistory();
   const dispatch = useDispatch();
   const multiTrade = useSelector(getMultiTrade);
+  const mooniOrder = useSelector(getMooniOrder);
   const payment = useSelector(getPayment);
   const [paymentState, setPaymentState] = useState<boolean>(false);
   const [alertCancel, setAlertCancel] = React.useState<boolean>(false)
+
+  useEffect(() => {
+    if(!multiTrade) return;
+    dispatch(watchMooniOrder(multiTrade.id));
+    return () => dispatch(unwatch(multiTrade.id));
+  }, [dispatch, multiTrade]);
 
   if(!multiTrade || !payment) {
     history.push('/');
@@ -65,7 +78,7 @@ export default function PaymentPage() {
     history.push('/order');
   }
 
-  if(payment.status === PaymentStatusEnum.CANCELLED) {
+  if(mooniOrder.status === MooniOrderStatus.CANCELLED) {
     return (
       <SmallWidth>
         <Surface px={4} py={8} mt={4} boxShadow="medium">

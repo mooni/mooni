@@ -1,2 +1,3 @@
 -- AlterEnum
 ALTER TYPE "OrderStatus" ADD VALUE 'CANCELLED';
+ALTER TYPE "OrderStatus" ADD VALUE 'PAID';

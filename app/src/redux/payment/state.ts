@@ -2,6 +2,7 @@ import { DEFAULT_INPUT_CURRENCY_OBJECT, DEFAULT_OUTPUT_CURRENCY_OBJECT } from '.
 import { OrderErrors, Payment, PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
 import { MultiTrade, MultiTradeRequest, TradeExact, TradeType } from '../../lib/trading/types';
 import { CurrencyType } from '../../lib/trading/currencyTypes';
+import { MooniOrder } from '../../types/api';
 
 export const STATE_NAME = 'PAYMENT';
 
@@ -9,6 +10,7 @@ export interface PaymentState {
   exchangeStep: number;
   multiTradeRequest: MultiTradeRequest;
   multiTrade: MultiTrade | null;
+  mooniOrder: MooniOrder | null;
   orderErrors: OrderErrors | null;
   payment: Payment | null;
 }
@@ -37,6 +39,7 @@ const initialEmptyState: PaymentState = {
     },
   },
   multiTrade: null,
+  mooniOrder: null,
   orderErrors: null,
   payment: null,
 };
@@ -69,6 +72,7 @@ const initialMockStateMinimum: PaymentState = {
     },
   },
   multiTrade: null,
+  mooniOrder: null,
   orderErrors: null,
   payment: null,
 };
@@ -317,6 +321,7 @@ const initialMockStateComplete: PaymentState = {
     ethAmount: '0.031073706971944777',
     id: 'af9e5fcd-3ed3-4c21-b398-edb6ad68c8de'
   },
+  mooniOrder: null,
   orderErrors: null,
   payment: {
     status: PaymentStatus.DONE,

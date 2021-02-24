@@ -10,6 +10,7 @@ import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../
 import DexProxy from '../../lib/trading/dexProxy';
 import { MetaError } from '../../lib/errors';
 import { CurrencyObject } from '../../lib/trading/currencyTypes';
+import { MooniOrder, MooniOrderStatus } from '../../types/api';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
@@ -21,6 +22,7 @@ export const SET_REFERENCE = 'SET_REFERENCE';
 export const SET_REFERRAL = 'SET_REFERRAL';
 
 export const SET_MULTITRADE = 'SET_MULTITRADE';
+export const SET_MOONI_ORDER = 'SET_MOONI_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 
@@ -71,6 +73,12 @@ export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
   type: SET_MULTITRADE,
   payload: {
     multiTrade,
+  }
+});
+export const setMooniOrder = (mooniOrder: MooniOrder | null) => ({
+  type: SET_MOONI_ORDER,
+  payload: {
+    mooniOrder,
   }
 });
 
@@ -242,6 +250,13 @@ type Timeout = ReturnType<typeof setTimeout>;
 const watching: Map<string, Timeout> = new Map();
 const POLL_INTERVAL = 5000;
 
+export const unwatch = (orderId) => () => {
+  if(!watching.has(orderId)) return;
+  const timer = watching.get(orderId) as Timeout;
+  clearInterval(timer);
+  watching.delete(orderId);
+}
+
 export const watchBityOrder = (orderId) => (dispatch, getState) => {
   if(watching.get(orderId)) return;
   const jwsToken = getJWS(getState());
@@ -250,7 +265,6 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
     MooniAPI.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
         if(!watching.has(orderId)) return;
-        const timer = watching.get(orderId) as Timeout;
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
 
@@ -263,8 +277,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
-          clearInterval(timer);
-          watching.delete(orderId);
+          dispatch(unwatch(orderId));
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
@@ -276,8 +289,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
-          clearInterval(timer);
-          watching.delete(orderId);
+          dispatch(unwatch(orderId));
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
@@ -295,11 +307,23 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const unwatchBityOrder = (orderId) => () => {
-  if(!watching.get(orderId)) return;
-  const timer = watching.get(orderId) as Timeout;
-  clearInterval(timer);
-  watching.delete(orderId);
+export const watchMooniOrder = (multiTradeId: string) => (dispatch, getState) => {
+  if(watching.get(multiTradeId)) return;
+  const jwsToken = getJWS(getState());
+
+  function fetchNewData() {
+    MooniAPI.getOrder(multiTradeId, jwsToken)
+      .then(mooniOrder => {
+        dispatch(setMooniOrder(mooniOrder));
+
+        if(mooniOrder.status === MooniOrderStatus.CANCELLED || mooniOrder.status === MooniOrderStatus.EXECUTED) {
+          dispatch(unwatch(multiTradeId));
+        }
+      })
+      .catch(error => logError('Error while fetching mooni order', error));
+  }
+  fetchNewData();
+  watching.set(multiTradeId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {

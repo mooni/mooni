@@ -39,15 +39,19 @@ const OrderStatusIcon: React.FC<OrderRowProps> = ({order}) => {
     tooltipText = 'Cancelled'
   } else if(order.status === MooniOrderStatus.PENDING) {
     tooltipText = 'Pending'
-  } else {
+  } else if(order.status === MooniOrderStatus.EXECUTED) {
     tooltipText = 'Executed'
+  } else if(order.status === MooniOrderStatus.PAID) {
+    tooltipText = 'Paid'
+  } else {
+    tooltipText = 'Unknown'
   }
 
   return (
     <Box display="flex" alignItems="center" justifyContent="center">
       <Tooltip title={tooltipText}>
         <Box display="flex" alignItems="center">
-          {order.status === MooniOrderStatus.PENDING &&
+          {(order.status === MooniOrderStatus.PENDING || order.status === MooniOrderStatus.PAID) &&
           <IconClock size="medium" style={{ color: theme.disabledContent }}  />
           }
           {order.status === MooniOrderStatus.CANCELLED &&

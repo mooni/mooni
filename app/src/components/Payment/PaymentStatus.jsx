@@ -26,7 +26,7 @@ import {EmailButton} from '../UI/Tools';
 import { getEtherscanTxURL } from '../../lib/eth';
 import Bity from '../../lib/wrappers/bity';
 import { PaymentStatus, PaymentStepId, PaymentStepStatus } from '../../lib/types';
-import {watchBityOrder, unwatchBityOrder, resetOrder} from '../../redux/payment/actions';
+import {watchBityOrder, unwatch, resetOrder} from '../../redux/payment/actions';
 import {selectUser} from "../../redux/user/userSlice";
 
 const SubTitle = styled.p`
@@ -232,8 +232,8 @@ function StatusRow({ id, status, txHash, bityOrderId }) {
   useEffect(() => {
     if(bityOrderId) {
       dispatch(watchBityOrder(bityOrderId));
+      return () => dispatch(unwatch(bityOrderId));
     }
-    return () => dispatch(unwatchBityOrder(bityOrderId));
   }, [dispatch, bityOrderId]);
 
   return (

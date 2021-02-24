@@ -8,6 +8,7 @@ export type TransactionHash = string;
 
 export enum MooniOrderStatus {
   PENDING = 'PENDING',
+  PAID = 'PAID',
   EXECUTED = 'EXECUTED',
   CANCELLED = 'CANCELLED',
 }

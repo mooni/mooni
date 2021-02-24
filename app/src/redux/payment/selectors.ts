@@ -8,6 +8,7 @@ export const getReference = (state: RootState) => state[STATE_NAME].multiTradeRe
 export const getExchangeStep = (state: RootState) => state[STATE_NAME].exchangeStep;
 
 export const getMultiTrade = (state: RootState) => state[STATE_NAME].multiTrade;
+export const getMooniOrder = (state: RootState) => state[STATE_NAME].mooniOrder;
 export const getOrderErrors = (state: RootState) => state[STATE_NAME].orderErrors;
 export const getPayment = (state: RootState) => state[STATE_NAME].payment;
 
