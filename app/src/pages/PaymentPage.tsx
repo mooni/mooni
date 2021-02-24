@@ -75,11 +75,11 @@ export default function PaymentPage() {
     return <div/>;
   }
 
-  if(mooniOrder && mooniOrder.status === MooniOrderStatus.CANCELLED && payment.status !== PaymentStatusEnum.ERROR) {
+  if(mooniOrder && mooniOrder.status === MooniOrderStatus.CANCELLED && payment.status === PaymentStatusEnum.PENDING) {
     return (
       <SmallWidth>
         <Surface px={4} py={8} mt={4} boxShadow="medium">
-          <OrderError orderErrors={[{code:'cancelled'}]}/>
+          <OrderError orderErrors={[{code:'expired'}]}/>
         </Surface>
       </SmallWidth>
     );

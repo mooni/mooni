@@ -248,7 +248,7 @@ export const unwatch = (orderId) => () => {
 }
 
 export const watchBityOrder = (orderId) => (dispatch, getState) => {
-  if(watching.get(orderId)) return;
+  if(watching.has(orderId)) return;
   const jwsToken = getJWS(getState());
 
   function fetchNewData() {
@@ -296,7 +296,7 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
 }
 
 export const watchMooniOrder = (multiTradeId: string) => (dispatch, getState) => {
-  if(watching.get(multiTradeId)) return;
+  if(watching.has(multiTradeId)) return;
   const jwsToken = getJWS(getState());
 
   function fetchNewData() {

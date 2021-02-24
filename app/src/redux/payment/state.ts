@@ -351,6 +351,6 @@ const initialMockStateComplete: PaymentState = {
   },
 };
 
-// export const initialState = initialEmptyState;
-export const initialState = initialMockStateMinimum;
+export const initialState = initialEmptyState;
+// export const initialState = initialMockStateMinimum;
 // export const initialState = initialMockStateComplete;
