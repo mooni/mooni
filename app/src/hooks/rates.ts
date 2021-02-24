@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer, useEffect, useCallback, useRef, MutableRefObject } from 'react';
 import { MultiTradeEstimation, TradeExact } from '../lib/trading/types';
 import { useDebounce } from './utils';
 import { logError } from '../lib/log';
@@ -56,8 +56,6 @@ function defaultRateState(initialTradeRequest: TradeRequest): RateState {
     multiTradeEstimation: null,
   };
 }
-
-let nonce = 0;
 
 interface RateResponse {
   rateForm: RateForm,
@@ -191,7 +189,8 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
   }
 }
 
-const estimate = async (tradeRequest: TradeRequest, _nonce: number): Promise<RateStateAction> => {
+const estimate = async (tradeRequest: TradeRequest, nonceRef: MutableRefObject<number>): Promise<RateStateAction> => {
+  const nonce = nonceRef.current;
   const outputLimit = dailyLimits[tradeRequest.outputCurrencyObject.symbol];
 
   if(!isNotZero(tradeRequest.amount)) {
@@ -254,7 +253,7 @@ const estimate = async (tradeRequest: TradeRequest, _nonce: number): Promise<Rat
     }
   }
 
-  if(_nonce !== nonce) {
+  if(nonceRef.current !== nonce) {
     return {type: 'noop'};
   }
 
@@ -278,14 +277,17 @@ const estimate = async (tradeRequest: TradeRequest, _nonce: number): Promise<Rat
 };
 
 export function useRate(initialTradeRequest: TradeRequest): RateResponse {
+  const nonceRef = useRef<number>(0);
   const { getCurrency } = useCurrenciesContext();
   const [rateState, dispatchRateState] = useReducer<RateStateReducer, TradeRequest>(rateStateReducer, initialTradeRequest, defaultRateState);
 
   useEffect(() => {
+    nonceRef.current++;
     dispatchRateState({ type: 'init', payload: initialTradeRequest });
   }, [initialTradeRequest]);
 
   const onChangeCurrency = useCallback(tradeExact => currencySymbol => {
+    nonceRef.current++;
     dispatchRateState({
       type: 'setCurrency',
       payload: {
@@ -296,6 +298,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
   }, [getCurrency]);
 
   const onChangeAmount = useCallback(tradeExact => value => {
+    nonceRef.current++;
     dispatchRateState({
       type: 'setAmount',
       payload: {
@@ -307,8 +310,7 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
 
   const debouncedRateRequest = useDebounce(rateState.tradeRequest, 1000);
   useEffect(() => {
-    nonce++;
-    estimate(debouncedRateRequest, nonce)
+    estimate(debouncedRateRequest, nonceRef)
       .then(dispatchRateState)
       .catch(error => {
         logError('unexpected error while fetching rates', error);
