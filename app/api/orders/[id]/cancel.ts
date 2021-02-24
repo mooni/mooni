@@ -50,4 +50,5 @@ export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowRe
 
   await cancelOrder(mooniOrder);
 
+  res.json({ message: 'ok' })
 }))
