@@ -1,5 +1,4 @@
-import prisma from "./prisma";
-import {User} from "../../types/api";
+import prisma, { User } from "./prisma";
 
 export async function getUser(ethAddress: string): Promise<User> {
   const userData = {

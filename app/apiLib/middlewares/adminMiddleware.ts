@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
-import { APIError } from '../errors';
-import config from '../../config';
+import { APIError } from '../../src/lib/errors';
+import config from '../../src/config';
 
 function getHeaderToken(req: NowRequest): string | null {
   const authHeader = req.headers.authorization;

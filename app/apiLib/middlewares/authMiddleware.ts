@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
-import DIDManager, {Token} from "../didManager";
-import { APIError } from '../errors';
+import DIDManager, {Token} from "../../src/lib/didManager";
+import { APIError } from '../../src/lib/errors';
 
 function getHeaderToken(req: NowRequest): string | null {
   const authHeader = req.headers.authorization;

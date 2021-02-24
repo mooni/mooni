@@ -4,7 +4,7 @@ import Bity from '../../src/lib/wrappers/bity';
 import {TradeRequest} from "../../src/lib/trading/types";
 import { Trader } from "../../src/lib/trading/trader";
 import { APIError, MetaError } from '../../src/lib/errors';
-import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
+import {errorMiddleware} from "../../apiLib/middlewares/errorMiddleware";
 
 const bityInstance = new Bity();
 

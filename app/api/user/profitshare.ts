@@ -1,9 +1,9 @@
 import { NowRequest, NowResponse } from '@now/node'
-import {authMiddleware} from "../../src/lib/api/authMiddleware";
+import {authMiddleware} from "../../apiLib/middlewares/authMiddleware";
 import {Token} from "../../src/lib/didManager";
-import {getUser} from "../../src/lib/api/users";
-import { errorMiddleware } from '../../src/lib/api/errorMiddleware';
-import prisma from '../../src/lib/api/prisma';
+import {getUser} from "../../apiLib/users";
+import { errorMiddleware } from '../../apiLib/middlewares/errorMiddleware';
+import prisma from '../../apiLib/prisma';
 import { BN } from '../../src/lib/numbers';
 import { ProfitShare } from '../../src/types/api';
 import config from '../../src/config';

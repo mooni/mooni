@@ -1,25 +1,12 @@
 import {NowRequest, NowResponse} from '@now/node'
 
-import {Token} from "../../../src/lib/didManager";
-import {authMiddleware} from "../../../src/lib/api/authMiddleware";
-import {errorMiddleware} from "../../../src/lib/api/errorMiddleware";
-import prisma, {MooniOrder, OrderStatus} from '../../../src/lib/api/prisma'
-import {APIError} from "../../../src/lib/errors";
-import { compareAddresses } from '../../../src/lib/api/ethHelpers';
-import { updateStatusFromBity } from '../../bity/getOrder';
-import { cancelOrder } from './cancel';
+import {Token} from '../../../src/lib/didManager';
+import {authMiddleware, errorMiddleware} from '../../../apiLib/middlewares';
+import {OrderStatus} from '../../../apiLib/prisma'
+import {APIError} from '../../../src/lib/errors';
 import Bity from '../../../src/lib/wrappers/bity';
 import config from '../../../src/config';
-
-export async function getOrder(id: string, userAddress: string): Promise<MooniOrder> {
-  const mooniOrder = await prisma.mooniOrder.findUnique({
-    where: { id },
-  });
-  if(!mooniOrder || !compareAddresses(mooniOrder.ethAddress, userAddress)) {
-    throw new APIError(404, 'not-found', 'MooniOrder not found');
-  }
-  return mooniOrder;
-}
+import { getOrder, cancelOrder, updateStatusFromBity } from '../../../apiLib/orders';
 
 const EXPIRATION = 8*60*1000; // 8 minutes
 

@@ -5,12 +5,11 @@ import config from '../../src/config';
 import { BityTrade, MultiTrade, MultiTradeRequest, MultiTradeTemp, TradeType } from '../../src/lib/trading/types';
 import {Trader} from "../../src/lib/trading/trader";
 import {Token} from "../../src/lib/didManager";
-import {authMiddleware} from "../../src/lib/api/authMiddleware";
-import {errorMiddleware} from "../../src/lib/api/errorMiddleware";
-import prisma from '../../src/lib/api/prisma'
-import {getUser, getUserByReferral} from "../../src/lib/api/users";
+import {authMiddleware, errorMiddleware} from "../../apiLib/middlewares";
+import prisma from '../../apiLib/prisma'
+import {getUser, getUserByReferral} from "../../apiLib/users";
 import {APIError} from "../../src/lib/errors";
-import { compareAddresses } from '../../src/lib/api/ethHelpers';
+import { compareAddresses } from '../../apiLib/ethHelpers';
 
 const bityInstance = new Bity();
 

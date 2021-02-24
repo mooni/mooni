@@ -1,8 +1,7 @@
 import { NowRequest, NowResponse } from '@now/node'
-import prisma, { OrderStatus } from "../../src/lib/api/prisma";
-import { adminMiddleware } from '../../src/lib/api/adminMiddleware';
-import { errorMiddleware } from '../../src/lib/api/errorMiddleware';
-import { cancelOrder } from '../orders/[id]/cancel';
+import prisma, { OrderStatus } from "../../apiLib/prisma";
+import { errorMiddleware, adminMiddleware } from '../../apiLib/middlewares';
+import { cancelOrder } from '../../apiLib/orders';
 import Bity from '../../src/lib/wrappers/bity';
 import config from '../../src/config';
 

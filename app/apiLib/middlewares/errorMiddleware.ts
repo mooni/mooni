@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { NowRequest, NowResponse } from '@now/node'
-import {BityOrderError} from "../wrappers/bityTypes";
-import {APIError} from "../errors";
+import {BityOrderError} from "../../src/lib/wrappers/bityTypes";
+import {APIError} from "../../src/lib/errors";
 
 type Handler = (req: NowRequest, res: NowResponse) => Promise<NowResponse | void>
 

@@ -1,11 +1,10 @@
 import {NowRequest, NowResponse} from '@now/node'
 
 import {Token} from "../../../src/lib/didManager";
-import {authMiddleware} from "../../../src/lib/api/authMiddleware";
-import {errorMiddleware} from "../../../src/lib/api/errorMiddleware";
-import prisma, {OrderStatus} from '../../../src/lib/api/prisma'
+import {authMiddleware, errorMiddleware} from '../../../apiLib/middlewares';
+import prisma, {OrderStatus} from '../../../apiLib/prisma'
 import { APIError } from '../../../src/lib/errors';
-import { getOrder } from './index';
+import { getOrder } from '../../../apiLib/orders';
 
 export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
   const multiTradeId = req.query?.id as string;
