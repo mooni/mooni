@@ -1,4 +1,4 @@
-import { getMultiTrade, getMultiTradeRequest, getPayment } from './selectors';
+import { getMultiTrade, getMultiTradeRequest } from './selectors';
 import { getAddress, getETHManager, getJWS } from '../wallet/selectors';
 import { Payment, PaymentStatus, PaymentStepId, PaymentStepStatus, Recipient } from '../../lib/types';
 import { BityOrderStatus } from '../../lib/wrappers/bityTypes';
@@ -272,7 +272,6 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
           }));
-          dispatch(setPaymentStatus(PaymentStatus.DONE));
           log('PAYMENT: bity executed');
           track('PAYMENT: bity executed');
 
@@ -385,9 +384,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
     logError('Error while sending payment', error);
     sendEvent('order_payment_error');
 
-    await dispatch(cancelOrder()).catch(() => undefined);
-
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
+    await dispatch(cancelOrder()).catch(() => undefined);
 
   }
 };

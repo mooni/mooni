@@ -83,6 +83,17 @@ function ErrorCatcher({orderErrors}) {
         />
       </>
     );
+  } else if(orderErrors[0].code === 'cancelled') {
+    return (
+      <>
+        <ErrorContent>The order have been cancelled, maybe due to inactivity. Please try again.</ErrorContent>
+        <ErrorCTA
+          icon={<IconRotateLeft/>}
+          action={onRestart}
+          label="Start over"
+        />
+      </>
+    );
   } else {
     return (
       <>

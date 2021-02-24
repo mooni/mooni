@@ -136,7 +136,7 @@ function getPaymentStepMessage(error) {
   if(error.message === 'token-balance-too-low')
     message = 'Your token balance is too low.'; else
   if(error.message === 'bity-order-cancelled')
-    message = 'The order have been cancelled by bity. Please go to their order page and contact their support.';
+    message = 'The order have been cancelled.';
 
   return message;
 
