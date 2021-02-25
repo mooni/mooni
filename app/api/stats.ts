@@ -1,5 +1,5 @@
 import { NowRequest, NowResponse } from '@now/node'
-import prisma from "../src/lib/api/prisma";
+import prisma from "../apiLib/prisma";
 import { Stats } from '../src/types/api';
 
 export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {

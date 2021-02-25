@@ -8,6 +8,7 @@ const Container = styled.div`
   right:0;
   transition:width 300ms ease-out;
   width:0;
+  z-index: 9999;
 `;
 
 const Button = styled.a`

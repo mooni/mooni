@@ -21,7 +21,7 @@ export type BityOrderResponse = {
     currency: string,
     type: string,
     iban: string,
-    reference: string
+    reference?: string
   },
   id: string,
   timestamp_created: string,
@@ -37,11 +37,11 @@ export type BityOrderResponse = {
     customer_trading_fee: {
       amount: string,
       currency: string
+    },
+    partner_fee?: {
+      amount: string,
+      currency: string
     }
-  },
-  fees: {
-    amount: string,
-    currency: string
   },
   orderStatus?: BityOrderStatus;
 };

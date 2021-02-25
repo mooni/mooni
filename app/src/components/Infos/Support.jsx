@@ -2,11 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Box, Flex } from '@chakra-ui/react';
-import { textStyle, Link, GU } from '@aragon/ui';
-import config from '../../config';
-import DiscordIcon from "../../assets/discord_icon.svg";
+import { textStyle, GU } from '@aragon/ui';
 import {numberWithCommas} from "../../lib/numbers";
 import {dailyLimits} from "../../constants/limits";
+import {DiscordButton, EmailButton} from '../UI/Tools';
 
 const SubTitle = styled.p`
   ${textStyle('title4')};
@@ -32,10 +31,8 @@ export default function Support() {
         The preferred way to contact us is through our Discord server.
       </Content>
 
-      <Flex justify="center">
-        <a href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
-          <img src={DiscordIcon} width={30} alt="discord icon" />
-        </a>
+      <Flex justify="center" mt={2}>
+        <DiscordButton label="Join us on Discord" variant="strong" />
       </Flex>
 
       <SubTitle>
@@ -90,12 +87,11 @@ export default function Support() {
       <SubTitle>
         Not found your answer ?
       </SubTitle>
-      <Content>
-        You can
-        <Link href="mailto:contact@mooni.tech" external style={{ textDecoration: 'none' }}>
-          &nbsp;reach us by mail
-        </Link>.
-      </Content>
+
+      <Flex justify="center" mt={2}>
+        <EmailButton label="Reach us by mail" />
+      </Flex>
+
     </Box>
   );
 }

@@ -2,12 +2,10 @@ import React from 'react';
 import GitHubButton from 'react-github-btn';
 
 import { Link, textStyle, GU } from '@aragon/ui'
+import { VStack } from '@chakra-ui/react';
 import { Box } from '@material-ui/core';
 import styled from 'styled-components';
-import { Twitter, Email } from '@material-ui/icons';
-import DiscordIcon from '../../assets/discord_icon.svg';
-
-import config from '../../config';
+import {DiscordButton, EmailButton, TwitterButton} from '../UI/Tools';
 
 const Title = styled.p`
   ${textStyle('body1')};
@@ -15,6 +13,7 @@ const Title = styled.p`
 `;
 const SubTitle = styled.p`
   ${textStyle('body4')};
+  font-size: 0.9rem;
   margin-top: ${2 * GU}px;
   margin-bottom: ${2 * GU}px;
   text-align: center;
@@ -28,9 +27,6 @@ const Content = styled.p`
   ${textStyle('body2')};
   text-align: center;
   margin-bottom: ${4 * GU}px;
-`;
-const SocialIcon = styled.a`
-  margin: 0 ${1 * GU}px;
 `;
 
 export default function AboutPage() {
@@ -62,17 +58,11 @@ export default function AboutPage() {
       <Header>
         Social
       </Header>
-      <Box display="flex" justifyContent="center" my={1}>
-        <SocialIcon href="https://twitter.com/moonidapp" target="_blank">
-          <Twitter fontSize="large" />
-        </SocialIcon>
-        <SocialIcon href={config.discordInviteUrl} target="_blank" rel="noopener noreferrer">
-          <img src={DiscordIcon} width={30} alt="discord icon" />
-        </SocialIcon>
-        <SocialIcon href="mailto:contact@mooni.tech" target="_blank">
-          <Email fontSize="large" />
-        </SocialIcon>
-      </Box>
+      <VStack spacing="0.5rem">
+        <DiscordButton label="Join us on Discord" />
+        <TwitterButton label="Follow us on Twitter"/>
+        <EmailButton label="Send a mail"/>
+      </VStack>
       <SubTitle>
         Mooni is open-source !
       </SubTitle>

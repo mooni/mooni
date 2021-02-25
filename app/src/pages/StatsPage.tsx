@@ -1,11 +1,10 @@
 import React from 'react';
 import { Grid } from '@material-ui/core';
 import {textStyle, LoadingRing} from '@aragon/ui'
-import useSWR from 'swr';
 import { MediumWidth, ShadowBox, FlexCenterBox } from '../components/UI/StyledComponents';
 import styled from 'styled-components';
-import Api from '../lib/apiWrapper';
-import { BN, truncateNumber } from '../lib/numbers';
+import { BN, significantNumbers } from '../lib/numbers';
+import { useMooniApi } from '../hooks/api';
 
 // @ts-ignore
 const StatItemBox = styled(ShadowBox)`
@@ -39,7 +38,7 @@ function StatItem({title, value}) {
 }
 
 export default function StatsPage() {
-  const { data, error } = useSWR('1', Api.getStats);
+  const { data, error } = useMooniApi('/stats');
 
   if (error) return <div>Failed to load stats</div>;
 
@@ -59,7 +58,7 @@ export default function StatsPage() {
           <Grid item xs={12} sm={6}>
             <StatItem
               title="ETH exchanged"
-              value={`${truncateNumber(data.totalETH)} ETH`}
+              value={`${significantNumbers(data.totalETH)} ETH`}
             />
           </Grid>
           <Grid item xs={12} sm={6}>

@@ -34,7 +34,7 @@ export abstract class Currency {
 
   constructor(type, decimals, symbol, name?, img?) {
     this.type = type;
-    this.decimals = decimals;
+    this.decimals = Number(decimals);
     this.symbol = symbol;
     this.img = img;
     this._name = name;

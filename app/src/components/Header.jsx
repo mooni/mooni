@@ -8,13 +8,17 @@ import {
   MenuItem,
   Button,
   Box,
+  Flex,
 } from "@chakra-ui/react"
+
+import { HamburgerIcon } from '@chakra-ui/icons'
 import { IconChip, IconFile, IconInfo, IconChat } from '@aragon/ui'
 import MenuBookIcon from '@material-ui/icons/MenuBookOutlined';
+
 import ContactSupportIcon from '@material-ui/icons/ContactSupportOutlined';
-import { HamburgerIcon } from '@chakra-ui/icons'
 import AccountBadge from './Account/AccountBadge';
 import { NavLink } from './UI/StyledComponents';
+import { DiscordButton } from './UI/Tools';
 import { getWalletStatus } from "../redux/wallet/selectors";
 import { useSelector, useDispatch } from 'react-redux';
 import { WalletStatus } from "../redux/wallet/state";
@@ -85,7 +89,7 @@ const SecondaryHeader = styled.div`
     bottom: 0px;
     left: 0px;
     width: 100%;
-    z-index: 99;
+    z-index: 2;
     height: 72px;
     border-radius: 12px 12px 0px 0px;
     background-color: ${props => props.theme.surface};
@@ -184,7 +188,7 @@ export default function Header() {
           <RoutesContainer>
             {walletStatus === WalletStatus.CONNECTED &&
             <>
-              <RouteLink to="/exchange" activeClassName="active">Exchange</RouteLink>
+              <RouteLink to="/order" activeClassName="active">Exchange</RouteLink>
               <RouteLink to="/account" activeClassName="active">Account</RouteLink>
             </>
             }
@@ -193,10 +197,11 @@ export default function Header() {
         </MainHeader>
 
         <SecondaryHeader>
-          <Box>
           <AccountBadge />
-          </Box>
-          <Box ml={2}>
+          <Flex ml={2}>
+            <Box mr={2}>
+              <DiscordButton variant="outline" label="Chat"/>
+            </Box>
             <Menu>
               <MenuButton as={Button} variant="outline">
                 <HamburgerIcon/>
@@ -210,7 +215,7 @@ export default function Header() {
                 <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
               </MenuList>
             </Menu>
-          </Box>
+          </Flex>
         </SecondaryHeader>
       </HeaderSubRoot>
     </HeaderRoot>

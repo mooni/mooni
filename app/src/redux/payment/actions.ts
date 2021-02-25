@@ -1,23 +1,16 @@
-import {getMultiTrade, getMultiTradeRequest} from './selectors';
-import {getAddress, getETHManager, getJWS} from '../wallet/selectors';
-import {
-  Payment,
-  PaymentStatus,
-  PaymentStepId,
-  PaymentStepStatus, Recipient
-} from '../../lib/types';
-import {
-  BityOrderStatus,
-} from '../../lib/wrappers/bityTypes';
-import {sendEvent} from '../../lib/analytics';
-import Api from '../../lib/apiWrapper';
-import { track } from '../../lib/analytics';
+import { getMultiTrade, getMultiTradeRequest } from './selectors';
+import { getAddress, getETHManager, getJWS } from '../wallet/selectors';
+import { Payment, PaymentStatus, PaymentStepId, PaymentStepStatus, Recipient } from '../../lib/types';
+import { BityOrderStatus } from '../../lib/wrappers/bityTypes';
+import { sendEvent, track } from '../../lib/analytics';
+import MooniAPI from '../../lib/wrappers/mooni';
 import { log, logError } from '../../lib/log';
 import { detectWalletError } from '../../lib/web3Wallets';
 import { BityTrade, DexTrade, MultiTrade, TradeRequest, TradeType } from '../../lib/trading/types';
-import DexProxy from "../../lib/trading/dexProxy";
+import DexProxy from '../../lib/trading/dexProxy';
 import { MetaError } from '../../lib/errors';
 import { CurrencyObject } from '../../lib/trading/currencyTypes';
+import { MooniOrder, MooniOrderStatus } from '../../types/api';
 
 export const SET_TRADE_REQUEST = 'SET_TRADE_REQUEST';
 export const SET_INPUT_CURRENCY = 'SET_INPUT_CURRENCY';
@@ -29,10 +22,10 @@ export const SET_REFERENCE = 'SET_REFERENCE';
 export const SET_REFERRAL = 'SET_REFERRAL';
 
 export const SET_MULTITRADE = 'SET_MULTITRADE';
+export const SET_MOONI_ORDER = 'SET_MOONI_ORDER';
 export const SET_ORDER_ERRORS = 'SET_ORDER_ERRORS';
 export const RESET_ORDER = 'RESET_ORDER';
 
-export const RESET_PAYMENT = 'RESET_PAYMENT';
 export const SET_PAYMENT = 'SET_PAYMENT';
 export const UPDATE_PAYMENT_STEP = 'UPDATE_PAYMENT_STEP';
 export const SET_PAYMENT_STATUS = 'SET_PAYMENT_STATUS';
@@ -82,6 +75,12 @@ export const setMultiTrade = (multiTrade: MultiTrade | null) => ({
     multiTrade,
   }
 });
+export const setMooniOrder = (mooniOrder: MooniOrder | null) => ({
+  type: SET_MOONI_ORDER,
+  payload: {
+    mooniOrder,
+  }
+});
 
 export const setOrderErrors = (errors) => ({
   type: SET_ORDER_ERRORS,
@@ -92,10 +91,6 @@ export const setOrderErrors = (errors) => ({
 
 export const resetOrder = () => ({
   type: RESET_ORDER,
-});
-
-export const resetPayment = () => ({
-  type: RESET_PAYMENT,
 });
 
 export const setPayment = (payment: Payment) => ({
@@ -113,10 +108,10 @@ export const setPaymentStatus = (status: PaymentStatus) => ({
   payload: { status },
 });
 
-export const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
+const createPayment = (multiTrade: MultiTrade) => (dispatch) => {
   const payment: Payment = {
     steps: [],
-    status: PaymentStatus.ONGOING,
+    status: PaymentStatus.PENDING,
   };
 
   const dexTrades = multiTrade.trades.filter(t => t.tradeType === TradeType.BITY) as DexTrade[];
@@ -165,14 +160,14 @@ export const createOrder = () => async function (dispatch, getState)  {
   const jwsToken = getJWS(state);
   try {
 
-    const multiTrade = await Api.createMultiTrade(multiTradeRequest, jwsToken);
+    const multiTrade = await MooniAPI.createMultiTrade(multiTradeRequest, jwsToken);
     dispatch(setMultiTrade(multiTrade));
     dispatch(createPayment(multiTrade));
 
     sendEvent('order_created');
 
   } catch(error) {
-    dispatch(setMultiTrade(null));
+    dispatch(resetOrder());
 
     sendEvent('order_creation_error');
     if(error.message === 'timeout') {
@@ -191,6 +186,7 @@ export const createOrder = () => async function (dispatch, getState)  {
       logError('Create order: unknown error', error);
       dispatch(setOrderErrors([{code: 'unknown', message: 'Unknown error'}]));
     }
+    throw new Error('unable to create order');
   }
 };
 
@@ -209,9 +205,15 @@ const sendPaymentStep = ({ stepId, paymentFunction })  => async (dispatch, getSt
   }
 
   try {
+    if(stepId === PaymentStepId.PAYMENT) {
+      const mooniOrder = await MooniAPI.getOrder(multiTrade.id, jws);
+      if(mooniOrder.status === MooniOrderStatus.CANCELLED) {
+        throw new MetaError('order_canceled_not_paying');
+      }
+    }
     const txHash = await paymentFunction();
     if(stepId === PaymentStepId.PAYMENT) {
-      await Api.setPaymentTx(multiTrade.id, txHash, jws);
+      await MooniAPI.setPaymentTx(multiTrade.id, txHash, jws);
     }
 
     if(txHash) {
@@ -244,15 +246,21 @@ type Timeout = ReturnType<typeof setTimeout>;
 const watching: Map<string, Timeout> = new Map();
 const POLL_INTERVAL = 5000;
 
+export const unwatch = (orderId) => () => {
+  if(!watching.has(orderId)) return;
+  const timer = watching.get(orderId) as Timeout;
+  clearInterval(timer);
+  watching.delete(orderId);
+}
+
 export const watchBityOrder = (orderId) => (dispatch, getState) => {
-  if(watching.get(orderId)) return;
+  if(watching.has(orderId)) return;
   const jwsToken = getJWS(getState());
 
   function fetchNewData() {
-    Api.getBityOrder(orderId, jwsToken)
+    MooniAPI.getBityOrder(orderId, jwsToken)
       .then(orderDetails => {
         if(!watching.has(orderId)) return;
-        const timer = watching.get(orderId) as Timeout;
 
         if(orderDetails.orderStatus === BityOrderStatus.RECEIVED) {
 
@@ -265,21 +273,17 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
 
         } else if(orderDetails.orderStatus === BityOrderStatus.EXECUTED) {
 
-          clearInterval(timer);
-          watching.delete(orderId);
+          dispatch(unwatch(orderId));
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.DONE,
           }));
-          dispatch(setPaymentStatus(PaymentStatus.DONE));
-          log('PAYMENT: bity ok');
-          track('PAYMENT: bity ok');
-          sendEvent('order_completed');
+          log('PAYMENT: bity executed');
+          track('PAYMENT: bity executed');
 
         } else if(orderDetails.orderStatus === BityOrderStatus.CANCELLED) {
 
-          clearInterval(timer);
-          watching.delete(orderId);
+          dispatch(unwatch(orderId));
           dispatch(updatePaymentStep({
             id: PaymentStepId.BITY,
             status: PaymentStepStatus.ERROR,
@@ -297,11 +301,29 @@ export const watchBityOrder = (orderId) => (dispatch, getState) => {
   watching.set(orderId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
-export const unwatchBityOrder = (orderId) => () => {
-  if(!watching.get(orderId)) return;
-  const timer = watching.get(orderId) as Timeout;
-  clearInterval(timer);
-  watching.delete(orderId);
+export const watchMooniOrder = (multiTradeId: string) => (dispatch, getState) => {
+  if(watching.has(multiTradeId)) return;
+  const jwsToken = getJWS(getState());
+
+  function fetchNewData() {
+    MooniAPI.getOrder(multiTradeId, jwsToken)
+      .then(mooniOrder => {
+        dispatch(setMooniOrder(mooniOrder));
+
+        if(mooniOrder.status === MooniOrderStatus.CANCELLED) {
+          dispatch(unwatch(multiTradeId));
+        } else if(mooniOrder.status === MooniOrderStatus.EXECUTED) {
+          dispatch(unwatch(multiTradeId));
+          dispatch(setPaymentStatus(PaymentStatus.DONE));
+          log('PAYMENT: mooni order ok');
+          track('PAYMENT: mooni order ok');
+          sendEvent('order_completed');
+        }
+      })
+      .catch(error => logError('Error while fetching mooni order', error));
+  }
+  fetchNewData();
+  watching.set(multiTradeId, setInterval(fetchNewData, POLL_INTERVAL));
 }
 
 export const sendPayment = () => async function (dispatch, getState)  {
@@ -309,6 +331,8 @@ export const sendPayment = () => async function (dispatch, getState)  {
   const state = getState();
   const multiTrade = getMultiTrade(state);
   if(!multiTrade) throw new Error('Missing multitrade');
+
+  dispatch(setPaymentStatus(PaymentStatus.ONGOING));
 
   const ethManager = getETHManager(state);
 
@@ -341,7 +365,6 @@ export const sendPayment = () => async function (dispatch, getState)  {
       }));
       log('PAYMENT: trade ok');
       track('PAYMENT: trade ok');
-
     }
 
     // Payment
@@ -365,7 +388,9 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
     logError('Error while sending payment', error);
     sendEvent('order_payment_error');
+
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
+    await dispatch(cancelOrder()).catch(() => undefined);
 
   }
 };
@@ -379,4 +404,13 @@ export const initReferral = () => async function (dispatch) {
     // query.delete('referralId');
     // window.location.search = query.toString();
   }
+};
+
+export const cancelOrder = () => async function (dispatch, getState) {
+  const state = getState();
+  const multiTrade = getMultiTrade(state);
+  if(!multiTrade) throw new Error('Missing multitrade');
+
+  const jws = getJWS(state);
+  await MooniAPI.cancelOrder(multiTrade.id, jws);
 };

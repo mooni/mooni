@@ -4,16 +4,14 @@ import { Flex, Button, useClipboard } from '@chakra-ui/react';
 import { CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { textStyle, LoadingRing, GU, Link } from '@aragon/ui';
-import useSWR from 'swr';
 
 import { selectUser } from '../../redux/user/userSlice';
 import config from '../../config';
 import { setInfoPanel } from '../../redux/ui/actions';
 import { sendEvent } from '../../lib/analytics';
-import Api from '../../lib/apiWrapper';
-import { getJWS } from '../../redux/wallet/selectors';
 import { ProfitShare } from '../../types/api';
-import { truncateNumber } from '../../lib/numbers';
+import { significantNumbers } from '../../lib/numbers';
+import { useMooniApi } from '../../hooks/api';
 
 const Content = styled.p`
   ${textStyle('body2')};
@@ -71,8 +69,7 @@ export function ReferralBox() {
 
 export default function ReferralInfo() {
   const dispatch = useDispatch();
-  const jwsToken = useSelector(getJWS);
-  const { data } = useSWR(jwsToken, Api.getProfitShare);
+  const { data } = useMooniApi('/user/profitshare');
 
   const profitShare = data as ProfitShare;
 
@@ -97,7 +94,7 @@ export default function ReferralInfo() {
       </SubContent>
       {profitShare && profitShare.referralTxCount > 0 &&
       <SubContent>
-        You have accumulated {truncateNumber(profitShare.referralProfit)} ETH so far in profit sharing. Please contact support if you want to withdraw that.
+        You have accumulated {significantNumbers(profitShare.referralProfit)} ETH so far in profit sharing. Please contact support if you want to withdraw that.
       </SubContent>
       }
     </>

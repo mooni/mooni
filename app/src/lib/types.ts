@@ -14,6 +14,7 @@ export interface Recipient {
 export type OrderErrors = any[];
 
 export enum PaymentStatus {
+  PENDING = 'PENDING',
   ONGOING = 'ONGOING',
   DONE = 'DONE',
   ERROR = 'ERROR',

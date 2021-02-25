@@ -1,19 +1,17 @@
 import React from 'react';
-import useSWR from 'swr';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Tooltip, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { Button, IconCheck, IconClock, IconExternal, LoadingRing, useTheme, IconCross, Link } from '@aragon/ui';
 import { useMediaQuery } from '@chakra-ui/react';
 
-import Api from '../../lib/apiWrapper';
-import { getJWS } from '../../redux/wallet/selectors';
 import { MooniOrder, MooniOrderStatus } from '../../types/api';
-import { truncateNumber } from '../../lib/numbers';
+import { significantNumbers } from '../../lib/numbers';
 import { ShadowBox } from '../UI/StyledComponents';
 import { getEtherscanTxURL } from '../../lib/eth';
 import { setInfoPanel } from '../../redux/ui/actions';
+import { useMooniApi } from '../../hooks/api';
 
 // @ts-ignore
 const CustomTableContainer = styled(ShadowBox)`
@@ -36,27 +34,27 @@ interface OrderRowProps {
 const OrderStatusIcon: React.FC<OrderRowProps> = ({order}) => {
   const theme = useTheme();
 
-  const date = new Date(order.createdAt);
-  const now = new Date();
-  const expired = order.status === MooniOrderStatus.PENDING && !order.txHash && ((+now - +date) > 10*60*1000);
-
   let tooltipText;
-  if(expired) {
-    tooltipText = 'Expired'
-  } else if(order.status === MooniOrderStatus.PENDING && !expired) {
+  if(order.status === MooniOrderStatus.CANCELLED) {
+    tooltipText = 'Cancelled'
+  } else if(order.status === MooniOrderStatus.PENDING) {
     tooltipText = 'Pending'
-  } else {
+  } else if(order.status === MooniOrderStatus.EXECUTED) {
     tooltipText = 'Executed'
+  } else if(order.status === MooniOrderStatus.PAID) {
+    tooltipText = 'Paid'
+  } else {
+    tooltipText = 'Unknown'
   }
 
   return (
     <Box display="flex" alignItems="center" justifyContent="center">
       <Tooltip title={tooltipText}>
         <Box display="flex" alignItems="center">
-          {order.status === MooniOrderStatus.PENDING && !expired &&
+          {(order.status === MooniOrderStatus.PENDING || order.status === MooniOrderStatus.PAID) &&
           <IconClock size="medium" style={{ color: theme.disabledContent }}  />
           }
-          {expired &&
+          {order.status === MooniOrderStatus.CANCELLED &&
           <IconCross size="medium" style={{ color: theme.negative }}  />
           }
           {order.status === MooniOrderStatus.EXECUTED &&
@@ -79,8 +77,8 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
           <OrderStatusIcon order={order}/>
         </Box>
       </TableCell>
-      <TableCell><CellText>{truncateNumber(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
-      <TableCell><CellText>{truncateNumber(order.outputAmount)} {order.outputCurrency}</CellText></TableCell>
+      <TableCell><CellText>{significantNumbers(order.inputAmount)} {order.inputCurrency}</CellText></TableCell>
+      <TableCell><CellText>{significantNumbers(order.outputAmount)} {order.outputCurrency}</CellText></TableCell>
       <TableCell><CellText>{date.toLocaleDateString()} {date.toLocaleTimeString()}</CellText></TableCell>
       <TableCell>
         {order.txHash &&
@@ -93,9 +91,8 @@ const OrderRow: React.FC<OrderRowProps> = ({order}) => {
 
 export default function OrderHistory() {
   const dispatch = useDispatch();
-  const jwsToken = useSelector(getJWS);
   const [isSmall] = useMediaQuery("(max-width: 960px)")
-  const { data, error } = useSWR(jwsToken, Api.getOrders);
+  const { data, error } = useMooniApi('/orders');
 
   if (error) return <Box>Failed to load orders</Box>;
   if (!data) return (

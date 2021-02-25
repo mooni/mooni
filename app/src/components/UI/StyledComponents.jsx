@@ -5,8 +5,8 @@ import { Box, Button as BaseButton } from '@chakra-ui/react';
 import { Link as ALink, Button as AButton } from '@aragon/ui';
 import {Link as RouterLink, NavLink as RouterNavLink} from 'react-router-dom';
 
-export const SmallWidth = styled.div`
-  max-width: 25rem;
+export const SmallWidth = styled(Box)`
+  max-width: 26rem;
   width: 90%;
 `;
 export const MediumWidth = styled.div`
@@ -91,3 +91,8 @@ export function Button({leftIcon = null, children, ...props}) {
     </BaseButton>
   );
 }
+
+export const Surface = styled(Box)`
+  background: rgb(255, 255, 255);
+  border-radius: 30px;
+`;
