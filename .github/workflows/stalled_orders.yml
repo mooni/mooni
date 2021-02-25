@@ -1,0 +1,18 @@
+name: stalled_orders
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+    
+  workflow_dispatch:
+
+jobs:
+  exec:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run a one-line script
+        shell: bash
+        env:
+         ADMIN_TOKEN: ${{ secrets.admin_token_staging }}
+        run: "curl -H 'Authorization: Bearer '${ADMIN_TOKEN} https://staging.mooni.tech/api/admin/stalled"
