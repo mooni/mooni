@@ -386,11 +386,16 @@ export const sendPayment = () => async function (dispatch, getState)  {
 
   } catch(error) {
 
-    logError('Error while sending payment', error);
-    sendEvent('order_payment_error');
-
     dispatch(setPaymentStatus(PaymentStatus.ERROR));
     await dispatch(cancelOrder()).catch(() => undefined);
+
+    logError('Error while sending payment', error);
+
+    if(error.message === 'user-rejected-transaction') {
+      sendEvent('order_payment_refused');
+    } else {
+      sendEvent('order_payment_error');
+    }
 
   }
 };
