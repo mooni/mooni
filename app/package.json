@@ -24,7 +24,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@now/node": "^1.6.1",
-    "@prisma/client": "^2.13.1",
+    "@prisma/client": "^2.18.0",
     "@reduxjs/toolkit": "^1.4.0",
     "@typeform/embed": "^0.34.6",
     "@types/jest": "^25.2.1",
@@ -91,6 +91,6 @@
     ]
   },
   "devDependencies": {
-    "@prisma/cli": "^2.13.1"
+    "prisma": "^2.18.0"
   }
 }
