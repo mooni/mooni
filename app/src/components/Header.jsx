@@ -24,7 +24,6 @@ import { getWalletStatus } from "../redux/wallet/selectors";
 import { useSelector, useDispatch } from 'react-redux';
 import { WalletStatus } from "../redux/wallet/state";
 import { setInfoPanel } from '../redux/ui/actions';
-import config from '../config';
 
 const HeaderRoot = styled.div`
   display: flex;
@@ -216,8 +215,8 @@ export default function Header() {
                 <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}>Support</MenuItem>
                 <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}>Code</MenuItem>
                 <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}>Terms</MenuItem>
-                <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}>Discord</MenuItem>
-                <MenuItem icon={<IconLayers/>} onClick={() => window.open('https://blog.mooni.tech')}>Blog</MenuItem>
+                <MenuItem icon={<IconChat/>} onClick={() => window.open('https://discord.mooni.tech')}>Discord</MenuItem>
+                <MenuItem icon={<IconLayers/>} onClick={() => window.open('https://blog.mooni.tech?ref=app')}>Blog</MenuItem>
               </MenuList>
             </Menu>
           </Flex>

@@ -8,7 +8,7 @@ import { IconChat } from '@aragon/ui';
 import { Twitter } from '@material-ui/icons';
 
 export const DiscordButton = ({ label= "Discord", ...props}) => (
-  <Button variant="strong" bg={props.variant ? undefined : '#7388da'} color={props.variant ? undefined : 'white'} leftIcon={<IconChat />} onClick={() => window.open(config.discordInviteUrl)} {...props}>{label}</Button>
+  <Button variant="strong" bg={props.variant ? undefined : '#7388da'} color={props.variant ? undefined : 'white'} leftIcon={<IconChat />} onClick={() => window.open('https://discord.mooni.tech')} {...props}>{label}</Button>
 );
 
 export const EmailButton = ({ label= "Mail", ...props}) => (

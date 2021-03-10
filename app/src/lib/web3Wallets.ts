@@ -65,7 +65,7 @@ export function detectWalletError(error) {
   ) {
     return new Error('user-rejected-transaction');
   } else if(
-    (error && error.message && String(error.message).includes('It seems like your wallet doesn\'t contain enough ETH to cover the gas fees')) // Don't know who throws this
+    (error && error.message && String(error.message).includes('It seems like your wallet doesn\'t contain enough ETH to cover the gas fees')) // Paraswap
   ) {
     return new Error('low-balance-for-gas');
   } else {
