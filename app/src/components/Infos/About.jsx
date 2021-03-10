@@ -2,13 +2,20 @@ import React from 'react';
 import GitHubButton from 'react-github-btn';
 
 import { Link, textStyle, GU } from '@aragon/ui'
-import { VStack } from '@chakra-ui/react';
-import { Box } from '@material-ui/core';
+import { VStack, Image, Flex } from '@chakra-ui/react';
 import styled from 'styled-components';
 import {DiscordButton, EmailButton, TwitterButton} from '../UI/Tools';
 
 const Title = styled.p`
   ${textStyle('body1')};
+  text-align: center;
+`;
+const AppName = styled.p`
+  font-family: "Montserrat", sans-serif;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.14rem;
+  font-size: 2.5rem;
   text-align: center;
 `;
 const SubTitle = styled.p`
@@ -31,9 +38,11 @@ const Content = styled.p`
 
 export default function AboutPage() {
   return (
-    <Box>
+    <Flex direction="column" align="center">
+      <Image boxSize={32} mb={4} src="images/logos/logo_blue_bg.svg"/>
+      <AppName>MOONI</AppName>
       <Title>
-        Mooni is a web application allowing to transfer funds from a crypto wallet to a bank account.
+        Effortlessly convert cryptocurrencies from your blockchain wallet, into fiat to your bank account, within minutes.
       </Title>
       <SubTitle>
         Want to see how it works ? Check out the <Link href="https://doc.mooni.tech/walkthrough" external style={{ textDecoration: 'none' }}>Walkthrough</Link> !
@@ -66,9 +75,9 @@ export default function AboutPage() {
       <SubTitle>
         Mooni is open-source !
       </SubTitle>
-      <Box display="flex" justifyContent="center" mt={1}>
+      <Flex justify="center" mt={1}>
         <GitHubButton href="https://github.com/pakokrew/mooni" data-color-scheme="no-preference: dark; light: dark; dark: dark;">Github</GitHubButton>
-      </Box>
-    </Box>
+      </Flex>
+    </Flex>
   );
 }

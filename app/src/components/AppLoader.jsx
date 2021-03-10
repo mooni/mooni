@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Image } from "@chakra-ui/react";
 import { useCurrenciesContext } from "../hooks/currencies";
 
 export default function AppLoader({ children }) {
@@ -10,7 +11,7 @@ export default function AppLoader({ children }) {
   return (
     <div className="global-loader">
       <div className="global-loader-anim">
-        <img src="./logo512.png" height="100%" alt="mooni logo loader"/>
+        <Image src="/images/logos/logo_blue_bg.svg" boxSize="100%" alt="mooni logo loader"/>
       </div>
     </div>
   );
