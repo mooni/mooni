@@ -9,6 +9,7 @@ import {
   Button,
   Box,
   Flex,
+  Image,
 } from "@chakra-ui/react"
 
 import { HamburgerIcon } from '@chakra-ui/icons'
@@ -135,18 +136,17 @@ const RouteLink = styled(NavLink)`
 const LogoBox = styled.div`
   display: flex;
   align-items: center;
+  margin-left: 12px;
   margin-right: 24px;
   > img {
-    margin-right: 8px;
-    height: 30px;
+    margin-right: 12px;
   }
   > h1 {
     font-family: 'Montserrat', sans-serif;
     text-transform: uppercase;
     font-size: 1.8rem;
-    line-height: 1;
-    font-weight: 400;
-    letter-spacing: 1px;
+    font-weight: 300;
+    letter-spacing: 0.14rem;
     color: black;
     text-decoration: none;
     @media (max-width: 500px) {
@@ -176,7 +176,11 @@ export default function Header() {
         <MainHeader>
           <NavLink to="/">
             <LogoBox>
-              <img src="logo192.png" alt="mooni-logo" />
+              <Image
+                src="/images/logos/logo_blue_bg.svg"
+                boxSize={8}
+                alt="mooni logo loader"
+              />
               <h1>
                 MOONI
               </h1>

@@ -36,7 +36,7 @@ export default function HomePage() {
     <SmallWidth>
       <Box w="100%">
         <HeadLine>
-            Transfer funds from your crypto wallet to your bank account.
+          Convert cryptocurrencies from your blockchain wallet into fiat to your bank account.
         </HeadLine>
         <Surface px={4} py={8} boxShadow="medium">
           <RateForm onSubmit={onSubmit} initialTradeRequest={tradeRequest}/>
