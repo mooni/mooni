@@ -21,7 +21,7 @@ function RecipientRow({ label, value }) {
       <Box fontWeight={600}>
         {label}
       </Box>
-      <Box textAlign="right" ml="0.5rem">
+      <Box textAlign="right" ml="0.5rem" data-private>
         {value}
       </Box>
     </Flex>
