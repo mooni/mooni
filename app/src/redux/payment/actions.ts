@@ -394,7 +394,7 @@ export const sendPayment = () => async function (dispatch, getState)  {
     if(error.message === 'user-rejected-transaction') {
       sendEvent('order_payment_refused');
     } else {
-      sendEvent('order_payment_error');
+      sendEvent('order_payment_error', { message: error.message });
     }
 
   }

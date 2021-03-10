@@ -137,6 +137,8 @@ function getPaymentStepMessage(error) {
     message = 'Your token balance is too low.'; else
   if(error.message === 'bity-order-cancelled')
     message = 'The order has been cancelled.'; else
+  if(error.message === 'low-balance-for-gas')
+    message = 'You do not have enough ETH to pay for gas.'; else
   if(error.message === 'order_canceled_not_paying')
     message = 'Order is expired or has been cancelled, not sending payment. Please retry.';
 
