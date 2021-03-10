@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react"
 
 import { HamburgerIcon } from '@chakra-ui/icons'
-import { IconChip, IconFile, IconInfo, IconChat } from '@aragon/ui'
+import { IconChip, IconFile, IconInfo, IconChat, IconLayers } from '@aragon/ui'
 import MenuBookIcon from '@material-ui/icons/MenuBookOutlined';
 
 import ContactSupportIcon from '@material-ui/icons/ContactSupportOutlined';
@@ -211,12 +211,13 @@ export default function Header() {
                 <HamburgerIcon/>
               </MenuButton>
               <MenuList borderRadius="1rem" minWidth="8rem">
-                <MenuItem icon={<IconInfo/>} onClick={() => dispatch(setInfoPanel('about'))}> About</MenuItem>
-                <MenuItem paddingLeft="1rem" icon={<MenuBookIcon fontSize="small"/>} onClick={() => window.open('https://doc.mooni.tech')}> Docs</MenuItem>
-                <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}> Support</MenuItem>
-                <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}> Code</MenuItem>
-                <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}> Terms</MenuItem>
-                <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}> Discord</MenuItem>
+                <MenuItem icon={<IconInfo/>} onClick={() => dispatch(setInfoPanel('about'))}>About</MenuItem>
+                <MenuItem paddingLeft="1rem" icon={<MenuBookIcon fontSize="small"/>} onClick={() => window.open('https://doc.mooni.tech')}>Docs</MenuItem>
+                <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}>Support</MenuItem>
+                <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}>Code</MenuItem>
+                <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}>Terms</MenuItem>
+                <MenuItem icon={<IconChat/>} onClick={() => window.open(config.discordInviteUrl)}>Discord</MenuItem>
+                <MenuItem icon={<IconLayers/>} onClick={() => window.open('https://blog.mooni.tech')}>Blog</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
