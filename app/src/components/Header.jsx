@@ -117,7 +117,7 @@ const RouteLink = styled(NavLink)`
     font-weight: 600;
     color: ${(props) => props.theme.surfaceContent};
   }
-  @media (max-width: 500px) {
+  @media (max-width: 480px) {
     font-size: 0.9rem;
     margin: 0 4px;
   }
@@ -139,7 +139,7 @@ const LogoBox = styled.div`
     letter-spacing: 0.14rem;
     color: black;
     text-decoration: none;
-    @media (max-width: 500px) {
+    @media (max-width: 480px) {
       font-size: 1.5rem;
     }
   }
@@ -151,7 +151,7 @@ const LogoBox = styled.div`
     font-size: 9px;
     top: -11px;
     right: -2px;
-    @media (max-width: 500px) {
+    @media (max-width: 480px) {
       font-size: 7px;
     }
   }
