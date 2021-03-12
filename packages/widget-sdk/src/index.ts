@@ -12,6 +12,7 @@ export interface MooniWidgetOptions {
   appUrl?: string;
   ethereum?: any;
   token?: string;
+  referralId?: string;
 }
 
 export interface ExternalProvider {
@@ -40,6 +41,7 @@ class MooniWidget {
   private modalContainer?: HTMLDivElement;
   private appUrl: string;
   private customToken?: string;
+  private referralId?: string;
   private ethereum?: ExternalProvider;
 
   constructor(opts: MooniWidgetOptions = {}) {
@@ -54,6 +56,7 @@ class MooniWidget {
 
     this.appUrl = opts.appUrl || defaultAppUrl;
     this.customToken = opts.token;
+    this.referralId = opts.referralId;
 
     this.createIframe();
 
@@ -126,9 +129,12 @@ class MooniWidget {
 
 
   private getAppUrl() {
-    let appUrl = this.appUrl;
+    let appUrl = this.appUrl + '?';
     if(this.customToken) {
-      appUrl += `?token=${this.customToken}`;
+      appUrl += `&token=${this.customToken}`;
+    }
+    if(this.referralId) {
+      appUrl += `&referralId=${this.referralId}`;
     }
     return appUrl;
   }

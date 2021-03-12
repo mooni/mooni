@@ -9,7 +9,7 @@
     "react-scripts": "^3.4.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=4000 react-scripts start",
     "start:example-host": "yarn start",
     "build": "react-scripts build"
   },

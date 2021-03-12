@@ -22,7 +22,7 @@ export const Initializer: React.FC = () => {
             description: "Your referral code have been taken in account.",
             status: "success",
             position: 'bottom-right',
-            duration: 4000,
+            duration: 6000,
             isClosable: true,
           })
         }
@@ -33,7 +33,7 @@ export const Initializer: React.FC = () => {
           description: "Invalid referral code",
           status: "error",
           position: 'bottom-right',
-          duration: 4000,
+          duration: 6000,
           isClosable: true,
         })
       });
