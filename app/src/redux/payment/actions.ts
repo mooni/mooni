@@ -422,6 +422,7 @@ export const initReferral = () =>
         throw new Error('invalid-referral-id');
       }
       dispatch(setReferral(referralId));
+      sendEvent('with_referral')
 
       // query.delete('referralId');
       // window.location.search = query.toString();
