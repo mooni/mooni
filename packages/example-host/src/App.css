@@ -12,33 +12,25 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  color: white;
 }
 
 .App-header {
   background-color: #282c34;
-  height: 150px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 20px 30px
+}
+
+h1 {
+  margin: 0;
 }
 
 .App-main {
   flex: 1;
-  background-color: #dedede;
+  background-color: #0b1c2d;
   padding: 150px;
   display: flex;
   flex-direction: column;
@@ -47,21 +39,26 @@ body {
 }
 
 .open-widget {
-  width: 100px;
+  background-color: white;
+  border: 1px solid purple;
+  margin-top: 12px;
+}
+
+.address {
+  font-size: 12px;
+  margin-right: 12px;
+}
+
+button {
+  background: #8567cd;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  min-width: 100px;
   height: 40px;
   cursor: pointer;
-  background-color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button:hover {
+  background: #d2a5d2;
 }
