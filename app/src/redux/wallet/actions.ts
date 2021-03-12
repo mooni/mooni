@@ -159,13 +159,13 @@ export const autoConnect = () => async (dispatch): Promise<boolean> => {
     await dispatch(login(iFrameProvider))
     track('provider loaded from iframe')
     dispatch(setProviderFromIframe(true))
-    return true;
+    return true
   }
   if (web3Modal.cachedProvider) {
     await dispatch(login())
-    return true;
+    return true
   } else {
     dispatch(setWalletStatus(WalletStatus.DISCONNECTED))
-    return false;
+    return false
   }
 }

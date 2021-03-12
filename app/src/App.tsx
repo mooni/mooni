@@ -20,7 +20,7 @@ import { CurrenciesContextProvider } from './contexts/CurrenciesContext'
 
 import { store } from './redux/store'
 import AppLoader from './components/AppLoader'
-import { Initializer } from './Initializer';
+import { Initializer } from './Initializer'
 
 export const App: React.FC = () => {
   const aragonTheme = useTheme()

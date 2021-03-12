@@ -5,9 +5,9 @@ import { getUserByReferral } from '../../apiLib/users'
 
 export default errorMiddleware(
   async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
-    const { referralId } = req.body;
+    const { referralId } = req.body
 
     const referredUser = await getUserByReferral(referralId)
-    return res.json({ valid: !!referredUser });
+    return res.json({ valid: !!referredUser })
   }
 )

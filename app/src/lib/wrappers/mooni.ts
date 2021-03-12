@@ -166,10 +166,10 @@ const MooniAPI = {
     const { data } = await mooniAPICatcher({
       method: 'post',
       url: 'user/check-referral',
-      data: { referralId }
-    });
+      data: { referralId },
+    })
 
-    return !!data?.valid;
+    return !!data?.valid
   },
   async getUrl(url: string, jwsToken?: string): Promise<any> {
     const { data } = await mooniAPICatcher({
@@ -180,7 +180,7 @@ const MooniAPI = {
       url,
     })
 
-    return data;
+    return data
   },
 }
 

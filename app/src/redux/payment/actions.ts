@@ -417,18 +417,18 @@ export const initReferral = () =>
     const referralId = query.get('referralId')
 
     if (referralId) {
-      const valid = await MooniAPI.checkReferral(referralId);
-      if(!valid) {
-        throw new Error('invalid-referral-id');
+      const valid = await MooniAPI.checkReferral(referralId)
+      if (!valid) {
+        throw new Error('invalid-referral-id')
       }
-      dispatch(setReferral(referralId));
+      dispatch(setReferral(referralId))
       sendEvent('with_referral')
 
       // query.delete('referralId');
       // window.location.search = query.toString();
-      return true;
+      return true
     }
-    return false;
+    return false
   }
 
 export const cancelOrder = () =>
