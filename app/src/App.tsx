@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider as ReduxProvider } from 'react-redux'
@@ -19,16 +19,10 @@ import { Routes } from './Routes'
 import { CurrenciesContextProvider } from './contexts/CurrenciesContext'
 
 import { store } from './redux/store'
-import { initReferral } from './redux/payment/actions'
-import { autoConnect } from './redux/wallet/actions'
 import AppLoader from './components/AppLoader'
+import { Initializer } from './Initializer';
 
 export const App: React.FC = () => {
-  useEffect(() => {
-    store.dispatch(autoConnect())
-    store.dispatch(initReferral())
-  }, [])
-
   const aragonTheme = useTheme()
 
   return (
@@ -37,6 +31,8 @@ export const App: React.FC = () => {
         <Router>
           <AragonUI assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui`} theme="light" layout={false} scrollView={false}>
             <ChakraProvider theme={chakraTheme} resetCSS={true}>
+              <Initializer />
+
               <MUIThemeProvider theme={MUITheme}>
                 <StyledThemeProvider theme={aragonTheme}>
                   <AppLoader>
