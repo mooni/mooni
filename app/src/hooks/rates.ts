@@ -1,39 +1,39 @@
-import { useReducer, useEffect, useCallback, useRef, MutableRefObject } from 'react';
-import { MultiTradeEstimation, TradeExact } from '../lib/trading/types';
-import { useDebounce } from './utils';
-import { logError } from '../lib/log';
-import { isNotZero, BN, truncateNumber } from '../lib/numbers';
-import { TradeRequest } from "../lib/trading/types";
-import Api from "../lib/wrappers/mooni";
-import {BityOrderError} from "../lib/wrappers/bityTypes";
-import { APIError } from '../lib/errors';
-import { useCurrenciesContext } from './currencies';
+import { useReducer, useEffect, useCallback, useRef, MutableRefObject } from 'react'
+import { MultiTradeEstimation, TradeExact } from '../lib/trading/types'
+import { useDebounce } from './utils'
+import { logError } from '../lib/log'
+import { isNotZero, BN, truncateNumber } from '../lib/numbers'
+import { TradeRequest } from '../lib/trading/types'
+import Api from '../lib/wrappers/mooni'
+import { BityOrderError } from '../lib/wrappers/bityTypes'
+import { APIError } from '../lib/errors'
+import { useCurrenciesContext } from './currencies'
 
-import { dailyLimits } from '../constants/limits';
+import { dailyLimits } from '../constants/limits'
 
 interface RateForm {
-  loading: boolean,
+  loading: boolean
   errors: {
     zeroAmount?: boolean
     lowAmount?: string
     highAmount?: boolean
     lowLiquidity?: boolean
     failed?: boolean
-  } | null,
+  } | null
   values: {
-    inputCurrency: string,
-    outputCurrency: string,
-    inputAmount: string | null,
-    outputAmount: string | null,
-    tradeExact: TradeExact,
-  },
-  connected: boolean,
+    inputCurrency: string
+    outputCurrency: string
+    inputAmount: string | null
+    outputAmount: string | null
+    tradeExact: TradeExact
+  }
+  connected: boolean
 }
 
 interface RateState {
-  rateForm: RateForm;
-  tradeRequest: TradeRequest;
-  multiTradeEstimation: MultiTradeEstimation | null;
+  rateForm: RateForm
+  tradeRequest: TradeRequest
+  multiTradeEstimation: MultiTradeEstimation | null
 }
 
 function defaultRateState(initialTradeRequest: TradeRequest): RateState {
@@ -43,7 +43,7 @@ function defaultRateState(initialTradeRequest: TradeRequest): RateState {
     inputAmount: initialTradeRequest.tradeExact === TradeExact.INPUT ? initialTradeRequest.amount : null,
     outputAmount: initialTradeRequest.tradeExact === TradeExact.OUTPUT ? initialTradeRequest.amount : null,
     tradeExact: initialTradeRequest.tradeExact,
-  };
+  }
 
   return {
     rateForm: {
@@ -54,48 +54,48 @@ function defaultRateState(initialTradeRequest: TradeRequest): RateState {
     },
     tradeRequest: initialTradeRequest,
     multiTradeEstimation: null,
-  };
+  }
 }
 
 interface RateResponse {
-  rateForm: RateForm,
-  tradeRequest: TradeRequest,
-  multiTradeEstimation: MultiTradeEstimation | null,
-  onChangeCurrency: any,
-  onChangeAmount: any,
+  rateForm: RateForm
+  tradeRequest: TradeRequest
+  multiTradeEstimation: MultiTradeEstimation | null
+  onChangeCurrency: any
+  onChangeAmount: any
 }
 
 interface RateStateAction {
-  type: string;
-  payload?: any;
+  type: string
+  payload?: any
 }
 
-type RateStateReducer = (RateState, RateStateAction) => RateState;
+type RateStateReducer = (RateState, RateStateAction) => RateState
 
 function correctAmount(amount: string, decimals: number) {
-  if(amount === '') return '0';
-  const truncAmount = truncateNumber(amount, decimals);
-  if(new BN(amount).eq(truncAmount)) {
-    return amount;
+  if (amount === '') return '0'
+  const truncAmount = truncateNumber(amount, decimals)
+  if (new BN(amount).eq(truncAmount)) {
+    return amount
   } else {
-    return truncAmount;
+    return truncAmount
   }
 }
 
 const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateAction) => {
   switch (action.type) {
     case 'init': {
-      return defaultRateState(action.payload);
+      return defaultRateState(action.payload)
     }
     case 'setCurrency': {
-      const {tradeExact, currencyObject} = action.payload;
-      const currencyKey = tradeExact === TradeExact.INPUT ? 'inputCurrency':'outputCurrency';
-      const currencyObjectKey = tradeExact === TradeExact.INPUT ? 'inputCurrencyObject':'outputCurrencyObject';
+      const { tradeExact, currencyObject } = action.payload
+      const currencyKey = tradeExact === TradeExact.INPUT ? 'inputCurrency' : 'outputCurrency'
+      const currencyObjectKey = tradeExact === TradeExact.INPUT ? 'inputCurrencyObject' : 'outputCurrencyObject'
 
       const tradeRequest: TradeRequest = {
         ...state.tradeRequest,
         [currencyObjectKey]: currencyObject,
-      };
+      }
 
       return {
         ...state,
@@ -106,23 +106,26 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
           values: {
             ...state.rateForm.values,
             [currencyKey]: currencyObject.symbol,
-            [state.rateForm.values.tradeExact===TradeExact.INPUT ? 'outputAmount':'inputAmount']: null,
-          }
+            [state.rateForm.values.tradeExact === TradeExact.INPUT ? 'outputAmount' : 'inputAmount']: null,
+          },
         },
         tradeRequest,
         multiTradeEstimation: null,
-      };
+      }
     }
     case 'setAmount': {
-      const {tradeExact, amount} = action.payload;
-      const currencyObject = tradeExact === TradeExact.INPUT ? state.tradeRequest.inputCurrencyObject: state.tradeRequest.outputCurrencyObject;
-      const correctedAmount = correctAmount(amount, currencyObject.decimals);
+      const { tradeExact, amount } = action.payload
+      const currencyObject =
+        tradeExact === TradeExact.INPUT
+          ? state.tradeRequest.inputCurrencyObject
+          : state.tradeRequest.outputCurrencyObject
+      const correctedAmount = correctAmount(amount, currencyObject.decimals)
 
       const tradeRequest: TradeRequest = {
         ...state.tradeRequest,
         tradeExact,
         amount: correctedAmount,
-      };
+      }
 
       return {
         ...state,
@@ -133,17 +136,17 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
           values: {
             ...state.rateForm.values,
             tradeExact,
-            inputAmount: tradeExact===TradeExact.INPUT ? correctedAmount : null,
-            outputAmount: tradeExact===TradeExact.OUTPUT ? correctedAmount : null,
-          }
+            inputAmount: tradeExact === TradeExact.INPUT ? correctedAmount : null,
+            outputAmount: tradeExact === TradeExact.OUTPUT ? correctedAmount : null,
+          },
         },
         tradeRequest,
         multiTradeEstimation: null,
-      };
+      }
     }
     case 'setError': {
-      const setValues: any = {};
-      if(action.payload.errors.highAmount) {
+      const setValues: any = {}
+      if (action.payload.errors.highAmount) {
         setValues.outputAmount = action.payload.outputAmount
       }
       return {
@@ -155,17 +158,18 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
           values: {
             ...state.rateForm.values,
             ...setValues,
-          }
-        }
-      };
+          },
+        },
+      }
     }
     case 'setEstimation': {
-      const multiTradeEstimation: MultiTradeEstimation = action.payload.multiTradeEstimation;
+      const multiTradeEstimation: MultiTradeEstimation = action.payload.multiTradeEstimation
 
-      const tradeExact = multiTradeEstimation.tradeRequest.tradeExact;
+      const tradeExact = multiTradeEstimation.tradeRequest.tradeExact
 
-      const amountKey = tradeExact === TradeExact.INPUT ? 'outputAmount':'inputAmount';
-      const amount = tradeExact === TradeExact.INPUT ? multiTradeEstimation.outputAmount : multiTradeEstimation.inputAmount;
+      const amountKey = tradeExact === TradeExact.INPUT ? 'outputAmount' : 'inputAmount'
+      const amount =
+        tradeExact === TradeExact.INPUT ? multiTradeEstimation.outputAmount : multiTradeEstimation.inputAmount
 
       return {
         ...state,
@@ -176,88 +180,88 @@ const rateStateReducer: RateStateReducer = (state: RateState, action: RateStateA
           values: {
             ...state.rateForm.values,
             [amountKey]: amount,
-          }
+          },
         },
         multiTradeEstimation,
-      };
+      }
     }
     case 'noop': {
-      return state;
+      return state
     }
     default:
-      throw new Error();
+      throw new Error()
   }
 }
 
 const estimate = async (tradeRequest: TradeRequest, nonceRef: MutableRefObject<number>): Promise<RateStateAction> => {
-  const nonce = nonceRef.current;
-  const outputLimit = dailyLimits[tradeRequest.outputCurrencyObject.symbol];
+  const nonce = nonceRef.current
+  const outputLimit = dailyLimits[tradeRequest.outputCurrencyObject.symbol]
 
-  if(!isNotZero(tradeRequest.amount)) {
+  if (!isNotZero(tradeRequest.amount)) {
     return {
       type: 'setError',
       payload: {
         errors: {
           zeroAmount: true,
         },
-      }
-    };
+      },
+    }
   }
 
-  if(tradeRequest.tradeExact === TradeExact.OUTPUT) {
-    if(new BN(tradeRequest.amount).gt(outputLimit)) {
+  if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
+    if (new BN(tradeRequest.amount).gt(outputLimit)) {
       return {
         type: 'setError',
         payload: {
           errors: {
             highAmount: true,
           },
-        }
-      };
+        },
+      }
     }
   }
 
-  let multiTradeEstimation: MultiTradeEstimation;
+  let multiTradeEstimation: MultiTradeEstimation
   try {
-    multiTradeEstimation = await Api.estimateMultiTrade(tradeRequest);
-  } catch(error) {
-    if(error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
-      const bityOrderError = error as BityOrderError;
+    multiTradeEstimation = await Api.estimateMultiTrade(tradeRequest)
+  } catch (error) {
+    if (error instanceof BityOrderError && error.message === 'bity_amount_too_low') {
+      const bityOrderError = error as BityOrderError
       return {
         type: 'setError',
         payload: {
           errors: {
             lowAmount: bityOrderError.meta.errors[0].minimumOutputAmount,
           },
-        }
-      };
-    } else if(error instanceof APIError && error.message === 'dex-liquidity-error') {
+        },
+      }
+    } else if (error instanceof APIError && error.message === 'dex-liquidity-error') {
       return {
         type: 'setError',
         payload: {
           errors: {
             lowLiquidity: true,
           },
-        }
-      };
+        },
+      }
     } else {
-      logError('api error while fetching rates', error);
+      logError('api error while fetching rates', error)
       return {
         type: 'setError',
         payload: {
           errors: {
             failed: true,
           },
-        }
-      };
+        },
+      }
     }
   }
 
-  if(nonceRef.current !== nonce) {
-    return {type: 'noop'};
+  if (nonceRef.current !== nonce) {
+    return { type: 'noop' }
   }
 
-  if(tradeRequest.tradeExact === TradeExact.INPUT && new BN(multiTradeEstimation.outputAmount).gt(outputLimit)) {
+  if (tradeRequest.tradeExact === TradeExact.INPUT && new BN(multiTradeEstimation.outputAmount).gt(outputLimit)) {
     return {
       type: 'setError',
       payload: {
@@ -265,57 +269,67 @@ const estimate = async (tradeRequest: TradeRequest, nonceRef: MutableRefObject<n
           highAmount: true,
         },
         outputAmount: multiTradeEstimation.outputAmount,
-      }
+      },
     }
   }
   return {
     type: 'setEstimation',
     payload: {
       multiTradeEstimation,
-    }
+    },
   }
-};
+}
 
 export function useRate(initialTradeRequest: TradeRequest): RateResponse {
-  const nonceRef = useRef<number>(0);
-  const { getCurrency } = useCurrenciesContext();
-  const [rateState, dispatchRateState] = useReducer<RateStateReducer, TradeRequest>(rateStateReducer, initialTradeRequest, defaultRateState);
+  const nonceRef = useRef<number>(0)
+  const { getCurrency } = useCurrenciesContext()
+  const [rateState, dispatchRateState] = useReducer<RateStateReducer, TradeRequest>(
+    rateStateReducer,
+    initialTradeRequest,
+    defaultRateState
+  )
 
   useEffect(() => {
-    nonceRef.current++;
-    dispatchRateState({ type: 'init', payload: initialTradeRequest });
-  }, [initialTradeRequest]);
+    nonceRef.current++
+    dispatchRateState({ type: 'init', payload: initialTradeRequest })
+  }, [initialTradeRequest])
 
-  const onChangeCurrency = useCallback(tradeExact => currencySymbol => {
-    nonceRef.current++;
-    dispatchRateState({
-      type: 'setCurrency',
-      payload: {
-        tradeExact,
-        currencyObject: getCurrency(currencySymbol).toObject(),
-      }
-    });
-  }, [getCurrency]);
+  const onChangeCurrency = useCallback(
+    (tradeExact) => (currencySymbol) => {
+      nonceRef.current++
+      dispatchRateState({
+        type: 'setCurrency',
+        payload: {
+          tradeExact,
+          currencyObject: getCurrency(currencySymbol).toObject(),
+        },
+      })
+    },
+    [getCurrency]
+  )
 
-  const onChangeAmount = useCallback(tradeExact => value => {
-    nonceRef.current++;
-    dispatchRateState({
-      type: 'setAmount',
-      payload: {
-        tradeExact,
-        amount: value,
-      }
-    });
-  }, []);
+  const onChangeAmount = useCallback(
+    (tradeExact) => (value) => {
+      nonceRef.current++
+      dispatchRateState({
+        type: 'setAmount',
+        payload: {
+          tradeExact,
+          amount: value,
+        },
+      })
+    },
+    []
+  )
 
-  const debouncedRateRequest = useDebounce(rateState.tradeRequest, 1000);
+  const debouncedRateRequest = useDebounce(rateState.tradeRequest, 1000)
   useEffect(() => {
     estimate(debouncedRateRequest, nonceRef)
       .then(dispatchRateState)
-      .catch(error => {
-        logError('unexpected error while fetching rates', error);
-      });
-  }, [debouncedRateRequest]);
+      .catch((error) => {
+        logError('unexpected error while fetching rates', error)
+      })
+  }, [debouncedRateRequest])
 
   return {
     rateForm: rateState.rateForm,
@@ -323,5 +337,5 @@ export function useRate(initialTradeRequest: TradeRequest): RateResponse {
     multiTradeEstimation: rateState.multiTradeEstimation,
     onChangeCurrency,
     onChangeAmount,
-  };
+  }
 }

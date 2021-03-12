@@ -1,36 +1,27 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
 
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  Box,
-  Flex,
-  Image,
-} from "@chakra-ui/react"
+import { Menu, MenuButton, MenuList, MenuItem, Button, Box, Flex, Image } from '@chakra-ui/react'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 import { IconChip, IconFile, IconInfo, IconChat, IconLayers } from '@aragon/ui'
-import MenuBookIcon from '@material-ui/icons/MenuBookOutlined';
+import MenuBookIcon from '@material-ui/icons/MenuBookOutlined'
 
-import ContactSupportIcon from '@material-ui/icons/ContactSupportOutlined';
-import AccountBadge from './Account/AccountBadge';
-import { NavLink } from './UI/StyledComponents';
-import { DiscordButton } from './UI/Tools';
-import { getWalletStatus } from "../redux/wallet/selectors";
-import { useSelector, useDispatch } from 'react-redux';
-import { WalletStatus } from "../redux/wallet/state";
-import { setInfoPanel } from '../redux/ui/actions';
+import ContactSupportIcon from '@material-ui/icons/ContactSupportOutlined'
+import AccountBadge from './Account/AccountBadge'
+import { NavLink } from './UI/StyledComponents'
+import { DiscordButton } from './UI/Tools'
+import { getWalletStatus } from '../redux/wallet/selectors'
+import { useSelector, useDispatch } from 'react-redux'
+import { WalletStatus } from '../redux/wallet/state'
+import { setInfoPanel } from '../redux/ui/actions'
 
 const HeaderRoot = styled.div`
   display: flex;
   flex-flow: row nowrap;
   width: 100%;
   justify-content: space-between;
-`;
+`
 
 const HeaderSubRoot = styled.div`
   display: grid;
@@ -46,7 +37,7 @@ const HeaderSubRoot = styled.div`
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
   z-index: 2;
-  background-color: ${props => props.theme.surface};
+  background-color: ${(props) => props.theme.surface};
 
   @media (max-width: 960px) {
     grid-template-columns: 1fr;
@@ -54,7 +45,7 @@ const HeaderSubRoot = styled.div`
     width: calc(100%);
     position: relative;
   }
-`;
+`
 
 const MainHeader = styled.div`
   box-sizing: border-box;
@@ -70,7 +61,7 @@ const MainHeader = styled.div`
   @media (max-width: 960px) {
     width: 100%;
   }
-`;
+`
 
 const SecondaryHeader = styled.div`
   display: flex;
@@ -92,9 +83,9 @@ const SecondaryHeader = styled.div`
     z-index: 2;
     height: 72px;
     border-radius: 12px 12px 0px 0px;
-    background-color: ${props => props.theme.surface};
+    background-color: ${(props) => props.theme.surface};
   }
-`;
+`
 
 const RoutesContainer = styled.div`
   box-sizing: border-box;
@@ -112,7 +103,7 @@ const RoutesContainer = styled.div`
     -webkit-box-pack: end;
     justify-content: flex-end;
   }
-`;
+`
 
 const RouteLink = styled(NavLink)`
   outline: none;
@@ -120,17 +111,17 @@ const RouteLink = styled(NavLink)`
   text-decoration: none;
   font-size: 1rem;
   margin: 0 12px;
-  color: ${props => props.theme.surfaceContentSecondary};
+  color: ${(props) => props.theme.surfaceContentSecondary};
   font-weight: 500;
   &.active {
     font-weight: 600;
-    color: ${props => props.theme.surfaceContent};
+    color: ${(props) => props.theme.surfaceContent};
   }
   @media (max-width: 500px) {
     font-size: 0.9rem;
     margin: 0 4px;
   }
-`;
+`
 
 const LogoBox = styled.div`
   display: flex;
@@ -164,38 +155,36 @@ const LogoBox = styled.div`
       font-size: 7px;
     }
   }
-`;
+`
 
 export default function Header() {
-  const dispatch = useDispatch();
-  const walletStatus = useSelector(getWalletStatus);
+  const dispatch = useDispatch()
+  const walletStatus = useSelector(getWalletStatus)
   return (
     <HeaderRoot>
       <HeaderSubRoot>
         <MainHeader>
           <NavLink to="/">
             <LogoBox>
-              <Image
-                src="/images/logos/logo_blue_bg.svg"
-                boxSize={8}
-                alt="mooni logo loader"
-              />
-              <h1>
-                MOONI
-              </h1>
-              <span>
-                beta
-              </span>
+              <Image src="/images/logos/logo_blue_bg.svg" boxSize={8} alt="mooni logo loader" />
+              <h1>MOONI</h1>
+              <span>beta</span>
             </LogoBox>
           </NavLink>
           <RoutesContainer>
-            {walletStatus === WalletStatus.CONNECTED &&
-            <>
-              <RouteLink to="/order" activeClassName="active">Exchange</RouteLink>
-              <RouteLink to="/account" activeClassName="active">Account</RouteLink>
-            </>
-            }
-            <RouteLink to="/stats" activeClassName="active">Stats</RouteLink>
+            {walletStatus === WalletStatus.CONNECTED && (
+              <>
+                <RouteLink to="/order" activeClassName="active">
+                  Exchange
+                </RouteLink>
+                <RouteLink to="/account" activeClassName="active">
+                  Account
+                </RouteLink>
+              </>
+            )}
+            <RouteLink to="/stats" activeClassName="active">
+              Stats
+            </RouteLink>
           </RoutesContainer>
         </MainHeader>
 
@@ -203,26 +192,47 @@ export default function Header() {
           <AccountBadge />
           <Flex ml={2}>
             <Box mr={2}>
-              <DiscordButton variant="outline" label="Chat"/>
+              <DiscordButton variant="outline" label="Chat" />
             </Box>
             <Menu>
               <MenuButton as={Button} variant="outline">
-                <HamburgerIcon/>
+                <HamburgerIcon />
               </MenuButton>
               <MenuList borderRadius="1rem" minWidth="8rem">
-                <MenuItem icon={<IconInfo/>} onClick={() => dispatch(setInfoPanel('about'))}>About</MenuItem>
-                <MenuItem paddingLeft="1rem" icon={<MenuBookIcon fontSize="small"/>} onClick={() => window.open('https://doc.mooni.tech')}>Docs</MenuItem>
-                <MenuItem paddingLeft="1rem" icon={<ContactSupportIcon fontSize="small"/>} onClick={() => dispatch(setInfoPanel('support'))}>Support</MenuItem>
-                <MenuItem icon={<IconChip/>} onClick={() => window.open('https://github.com/pakokrew/mooni')}>Code</MenuItem>
-                <MenuItem icon={<IconFile/>} onClick={() => dispatch(setInfoPanel('terms'))}>Terms</MenuItem>
-                <MenuItem icon={<IconChat/>} onClick={() => window.open('https://discord.mooni.tech')}>Discord</MenuItem>
-                <MenuItem icon={<IconLayers/>} onClick={() => window.open('https://blog.mooni.tech?ref=app')}>Blog</MenuItem>
+                <MenuItem icon={<IconInfo />} onClick={() => dispatch(setInfoPanel('about'))}>
+                  About
+                </MenuItem>
+                <MenuItem
+                  paddingLeft="1rem"
+                  icon={<MenuBookIcon fontSize="small" />}
+                  onClick={() => window.open('https://doc.mooni.tech')}
+                >
+                  Docs
+                </MenuItem>
+                <MenuItem
+                  paddingLeft="1rem"
+                  icon={<ContactSupportIcon fontSize="small" />}
+                  onClick={() => dispatch(setInfoPanel('support'))}
+                >
+                  Support
+                </MenuItem>
+                <MenuItem icon={<IconChip />} onClick={() => window.open('https://github.com/pakokrew/mooni')}>
+                  Code
+                </MenuItem>
+                <MenuItem icon={<IconFile />} onClick={() => dispatch(setInfoPanel('terms'))}>
+                  Terms
+                </MenuItem>
+                <MenuItem icon={<IconChat />} onClick={() => window.open('https://discord.mooni.tech')}>
+                  Discord
+                </MenuItem>
+                <MenuItem icon={<IconLayers />} onClick={() => window.open('https://blog.mooni.tech?ref=app')}>
+                  Blog
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
         </SecondaryHeader>
       </HeaderSubRoot>
     </HeaderRoot>
-  );
+  )
 }
-

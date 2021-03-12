@@ -1,8 +1,8 @@
-import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-import Check from '@material-ui/icons/Check';
+import React from 'react'
+import { makeStyles, withStyles } from '@material-ui/core/styles'
+import Check from '@material-ui/icons/Check'
 
-import { MobileStepper, StepConnector } from '@material-ui/core';
+import { MobileStepper, StepConnector } from '@material-ui/core'
 
 export const CustomMobileStepper = withStyles({
   root: {
@@ -10,12 +10,12 @@ export const CustomMobileStepper = withStyles({
     background: 'none',
   },
   progress: {
-    width: '100%'
+    width: '100%',
   },
   dotActive: {
     backgroundColor: '#784af4',
   },
-})(MobileStepper);
+})(MobileStepper)
 
 export const CustomStepConnector = withStyles({
   alternativeLabel: {
@@ -38,7 +38,7 @@ export const CustomStepConnector = withStyles({
     borderTopWidth: 3,
     borderRadius: 1,
   },
-})(StepConnector);
+})(StepConnector)
 
 const useQontoStepIconStyles = makeStyles({
   root: {
@@ -61,15 +61,15 @@ const useQontoStepIconStyles = makeStyles({
     zIndex: 1,
     fontSize: 18,
   },
-});
+})
 
 export function CustomStepIcon(props) {
-  const classes = useQontoStepIconStyles();
-  const { active, completed } = props;
+  const classes = useQontoStepIconStyles()
+  const { active, completed } = props
 
   return (
     <div className={`${classes.root} ${active ? classes.active : ''}`}>
       {completed ? <Check className={classes.completed} /> : <div className={classes.circle} />}
     </div>
-  );
+  )
 }

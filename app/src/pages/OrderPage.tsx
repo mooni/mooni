@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
-import { Box } from '@material-ui/core';
-import { Flex } from '@chakra-ui/react';
+import { Box } from '@material-ui/core'
+import { Flex } from '@chakra-ui/react'
 import { ArrowBack } from '@material-ui/icons'
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles'
 
-import StepNotice from '../components/Order/StepNotice';
-import StepRecipient from '../components/Order/StepRecipient';
-import StepAmount from '../components/Order/StepAmount';
-import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents';
+import StepNotice from '../components/Order/StepNotice'
+import StepRecipient from '../components/Order/StepRecipient'
+import StepAmount from '../components/Order/StepAmount'
+import { RoundButton, SmallWidth, Surface } from '../components/UI/StyledComponents'
 
-import { CustomMobileStepper } from '../components/Order/StepComponents';
+import { CustomMobileStepper } from '../components/Order/StepComponents'
 
-import { createOrder, setExchangeStep } from '../redux/payment/actions';
-import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors';
-import OrderError from '../components/Order/OrderError';
-import Loader from '../components/UI/Loader';
-import { ForceModal } from '../components/UI/Modal';
+import { createOrder, setExchangeStep } from '../redux/payment/actions'
+import { getExchangeStep, getOrderErrors } from '../redux/payment/selectors'
+import OrderError from '../components/Order/OrderError'
+import Loader from '../components/UI/Loader'
+import { ForceModal } from '../components/UI/Modal'
 
 const useStyles = makeStyles({
   mobileStepperRoot: {
@@ -31,64 +31,63 @@ const useStyles = makeStyles({
     lineHeight: 1.5,
     textTransform: 'uppercase',
     marginBottom: '14px',
-  }
-});
+  },
+})
 
-const steps = ['Amount', 'Recipient', 'Notice', 'Order summary'];
+const steps = ['Amount', 'Recipient', 'Notice', 'Order summary']
 
 export default function OrderPage() {
-  const classes = useStyles();
-  const history = useHistory();
-  const dispatch = useDispatch();
-  const stepId = useSelector(getExchangeStep);
-  const orderErrors = useSelector(getOrderErrors);
-  const [creatingOrder, setCreatingOrder] = useState<boolean>(false);
+  const classes = useStyles()
+  const history = useHistory()
+  const dispatch = useDispatch()
+  const stepId = useSelector(getExchangeStep)
+  const orderErrors = useSelector(getOrderErrors)
+  const [creatingOrder, setCreatingOrder] = useState<boolean>(false)
 
   function handleNext() {
-    dispatch(setExchangeStep(stepId + 1));
+    dispatch(setExchangeStep(stepId + 1))
   }
   function handleBack() {
-    dispatch(setExchangeStep(Math.max(0, stepId - 1)));
+    dispatch(setExchangeStep(Math.max(0, stepId - 1)))
   }
 
   function onCreateOrder() {
-    setCreatingOrder(true);
+    setCreatingOrder(true)
     dispatch(createOrder())
       .then(() => {
-        history.push('/payment');
+        history.push('/payment')
       })
-      .catch(_ => undefined)
+      .catch((_) => undefined)
       .finally(() => {
-        setCreatingOrder(false);
-      });
+        setCreatingOrder(false)
+      })
   }
 
-
-  if(orderErrors) {
+  if (orderErrors) {
     return (
       <SmallWidth>
         <Surface px={4} py={8} mt={4} boxShadow="medium">
-          <OrderError orderErrors={orderErrors}/>
+          <OrderError orderErrors={orderErrors} />
         </Surface>
       </SmallWidth>
-    );
+    )
   }
 
-  if(creatingOrder) {
+  if (creatingOrder) {
     return (
       <ForceModal>
         <Flex justify="center" mt={4}>
           <Loader text="Creating order ..." />
         </Flex>
       </ForceModal>
-    );
+    )
   }
 
   const stepElements = [
     <StepAmount onComplete={handleNext} />,
     <StepRecipient onComplete={handleNext} />,
     <StepNotice onComplete={onCreateOrder} />,
-  ];
+  ]
 
   return (
     <SmallWidth>
@@ -107,17 +106,13 @@ export default function OrderPage() {
           {steps[stepId]}
         </Box>
 
-        {stepId !== 0 && <Box mb={2}>
-          <RoundButton
-            wide
-            onClick={handleBack}
-            icon={<ArrowBack/>}
-            label={"Back"}
-          />
-        </Box>
-        }
+        {stepId !== 0 && (
+          <Box mb={2}>
+            <RoundButton wide onClick={handleBack} icon={<ArrowBack />} label={'Back'} />
+          </Box>
+        )}
         {stepElements[stepId]}
       </Surface>
     </SmallWidth>
-  );
+  )
 }

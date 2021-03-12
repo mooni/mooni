@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
-import { useForm, Controller } from "react-hook-form";
+import React, { useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
 
-import IBAN from 'iban';
-import EmailValidator from 'email-validator';
-import styled from "styled-components";
+import IBAN from 'iban'
+import EmailValidator from 'email-validator'
+import styled from 'styled-components'
 
-import { Button, IconArrowRight } from '@aragon/ui';
+import { Button, IconArrowRight } from '@aragon/ui'
 
-import FormField from './FormField';
-import CountrySelect from "../UI/CountrySelect";
+import FormField from './FormField'
+import CountrySelect from '../UI/CountrySelect'
 
 const fields = {
   iban: {
@@ -51,12 +51,12 @@ const fields = {
     pattern: /^[A-Z]{6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3}){0,1}$/,
   },
   email: {
-    validate: value => !value || value === '' || EmailValidator.validate(value),
+    validate: (value) => !value || value === '' || EmailValidator.validate(value),
   },
-};
+}
 
 const errorMessages = {
-  'reference': 'Invalid reference, please only use regular letters and numbers',
+  reference: 'Invalid reference, please only use regular letters and numbers',
   'recipient.iban': 'Invalid IBAN',
   'recipient.bic_swift': 'Invalid BIC',
   'recipient.email': 'Invalid email',
@@ -65,21 +65,21 @@ const errorMessages = {
   'recipient.owner.zip': 'Invalid Zip/Code',
   'recipient.owner.city': 'Invalid city',
   'recipient.owner.country': 'Invalid country',
-};
+}
 
 const Section = styled.p`
   text-align: center;
-  color: ${props => props.theme.contentSecondary};
+  color: ${(props) => props.theme.contentSecondary};
   text-transform: uppercase;
   font-weight: 600;
   font-size: 0.8rem;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-`;
+`
 
 const defaultEndComponent = ({ submit, isValid }) => (
-  <Button mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Save recipient" disabled={!isValid} />
-);
+  <Button mode="strong" onClick={submit} wide icon={<IconArrowRight />} label="Save recipient" disabled={!isValid} />
+)
 
 function RecipientForm({ initialData, onSubmit, endComponent = defaultEndComponent }) {
   // const [more, setMore] = useState(false);
@@ -87,21 +87,27 @@ function RecipientForm({ initialData, onSubmit, endComponent = defaultEndCompone
   const { register, control, handleSubmit, formState, reset } = useForm({
     mode: 'onChange',
     defaultValues: initialData || undefined,
-  });
+  })
   useEffect(() => {
-    reset(initialData);
-  }, [reset, initialData]);
+    reset(initialData)
+  }, [reset, initialData])
 
-  const submit = handleSubmit(onSubmit);
-  const { errors, isValid, isSubmitted } = formState;
-  const submitEnabled = (isValid || !isSubmitted);
+  const submit = handleSubmit(onSubmit)
+  const { errors, isValid, isSubmitted } = formState
+  const submitEnabled = isValid || !isSubmitted
 
   return (
     <form onSubmit={submit}>
-
       <Section>Bank account</Section>
 
-      <FormField label="IBAN" name="recipient.iban" ref={register(fields.iban)} errors={errors} errorMessages={errorMessages} required />
+      <FormField
+        label="IBAN"
+        name="recipient.iban"
+        ref={register(fields.iban)}
+        errors={errors}
+        errorMessages={errorMessages}
+        required
+      />
 
       <FormField
         label="Reference (optional)"
@@ -114,26 +120,55 @@ function RecipientForm({ initialData, onSubmit, endComponent = defaultEndCompone
 
       <Section>Personal informations</Section>
 
-      <FormField label="Full Name" name="recipient.owner.name" ref={register(fields.name)} errors={errors} errorMessages={errorMessages} required />
-      <FormField label="Address" name="recipient.owner.address" ref={register(fields.address)} errors={errors} errorMessages={errorMessages} required />
-      <FormField label="Zip/Postal code" name="recipient.owner.zip" ref={register(fields.zip)} errors={errors} errorMessages={errorMessages} required />
-      <FormField label="City" name="recipient.owner.city" ref={register(fields.city)} errors={errors} errorMessages={errorMessages} required />
+      <FormField
+        label="Full Name"
+        name="recipient.owner.name"
+        ref={register(fields.name)}
+        errors={errors}
+        errorMessages={errorMessages}
+        required
+      />
+      <FormField
+        label="Address"
+        name="recipient.owner.address"
+        ref={register(fields.address)}
+        errors={errors}
+        errorMessages={errorMessages}
+        required
+      />
+      <FormField
+        label="Zip/Postal code"
+        name="recipient.owner.zip"
+        ref={register(fields.zip)}
+        errors={errors}
+        errorMessages={errorMessages}
+        required
+      />
+      <FormField
+        label="City"
+        name="recipient.owner.city"
+        ref={register(fields.city)}
+        errors={errors}
+        errorMessages={errorMessages}
+        required
+      />
 
       <Controller
         control={control}
         name="recipient.owner.country"
         rules={fields.country}
         render={({ onChange, value }) => (
-          <FormField label="Country" name="recipient.owner.country" errors={errors} errorMessages={errorMessages} required >
-            <CountrySelect
-              countryCode={value}
-              onChange={onChange}
-              data-private
-            />
+          <FormField
+            label="Country"
+            name="recipient.owner.country"
+            errors={errors}
+            errorMessages={errorMessages}
+            required
+          >
+            <CountrySelect countryCode={value} onChange={onChange} data-private />
           </FormField>
         )}
       />
-
 
       {/*<Box mb={2} mt={1}>
         <Link onClick={() => setMore(!more)}>
@@ -151,5 +186,4 @@ function RecipientForm({ initialData, onSubmit, endComponent = defaultEndCompone
   )
 }
 
-export default RecipientForm;
-
+export default RecipientForm

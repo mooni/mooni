@@ -1,55 +1,46 @@
-import axios, {AxiosInstance} from 'axios';
-import qs from 'qs';
-import {
-  BankInfo,
-  BityTrade,
-  TradeRequest,
-  ETHInfo,
-  Fee,
-  TradeExact,
-  TradeType,
-} from '../trading/types';
-import config from '../../config';
-import {BN} from '../numbers';
-import {MetaError} from '../errors';
+import axios, { AxiosInstance } from 'axios'
+import qs from 'qs'
+import { BankInfo, BityTrade, TradeRequest, ETHInfo, Fee, TradeExact, TradeType } from '../trading/types'
+import config from '../../config'
+import { BN } from '../numbers'
+import { MetaError } from '../errors'
 
-import {BityOrderResponse, BityOrderError, BityOrderStatus} from './bityTypes'
+import { BityOrderResponse, BityOrderError, BityOrderStatus } from './bityTypes'
 
-const API_URL = 'https://exchange.api.bity.com';
-const AUTH_URL = 'https://connect.bity.com/oauth2/token';
-const TIMEOUT = 30 * 1000;
+const API_URL = 'https://exchange.api.bity.com'
+const AUTH_URL = 'https://connect.bity.com/oauth2/token'
+const TIMEOUT = 30 * 1000
 
-const { bityPartnerFee } = config.private;
+const { bityPartnerFee } = config.private
 
 function removeEmptyStrings(data: object = {}) {
   return Object.keys(data).reduce((acc, prop) => {
-      if(data[prop] !== '' && data[prop] !== undefined) {
-        return Object.assign(acc, { [prop]: data[prop] });
-      }
-      return acc;
-    },
-    {});
+    if (data[prop] !== '' && data[prop] !== undefined) {
+      return Object.assign(acc, { [prop]: data[prop] })
+    }
+    return acc
+  }, {})
 }
 
-function extractFees(order: BityOrderResponse, tradeRequest: TradeRequest): Fee  {
-  const fees = Object.keys(order.price_breakdown).map(key => order.price_breakdown[key]);
+function extractFees(order: BityOrderResponse, tradeRequest: TradeRequest): Fee {
+  const fees = Object.keys(order.price_breakdown).map((key) => order.price_breakdown[key])
 
   // expect the fees to be in the same currency
-  const sameCurrencies = new Set(fees.map(f => f.currency)).size === 1;
-  if(!sameCurrencies) {
-    throw new MetaError('Incompatible fee currencies', order);
+  const sameCurrencies = new Set(fees.map((f) => f.currency)).size === 1
+  if (!sameCurrencies) {
+    throw new MetaError('Incompatible fee currencies', order)
   }
 
   const totalAmountInputCurrency = fees
-    .map(f => f.amount)
+    .map((f) => f.amount)
     .reduce((acc, a) => acc.plus(a), new BN(0))
-    .toFixed();
+    .toFixed()
 
-  const currencyObjects = [tradeRequest.inputCurrencyObject, tradeRequest.outputCurrencyObject];
+  const currencyObjects = [tradeRequest.inputCurrencyObject, tradeRequest.outputCurrencyObject]
 
-  const currencyObject = currencyObjects.find(c => c.symbol === fees[0].currency);
-  if(!currencyObject) {
-    throw new Error('unknown bity fee currency');
+  const currencyObject = currencyObjects.find((c) => c.symbol === fees[0].currency)
+  if (!currencyObject) {
+    throw new Error('unknown bity fee currency')
   }
 
   return {
@@ -59,23 +50,23 @@ function extractFees(order: BityOrderResponse, tradeRequest: TradeRequest): Fee 
 }
 
 class Bity {
-  instance: AxiosInstance;
-  withCredentials: boolean;
+  instance: AxiosInstance
+  withCredentials: boolean
 
-  constructor({ bityClientId }: {bityClientId?: string} = {}) {
-    const headers = {};
-    this.withCredentials = false;
+  constructor({ bityClientId }: { bityClientId?: string } = {}) {
+    const headers = {}
+    this.withCredentials = false
 
-    if(bityClientId) {
-      headers['X-Client-Id'] = bityClientId;
-      this.withCredentials = true;
+    if (bityClientId) {
+      headers['X-Client-Id'] = bityClientId
+      this.withCredentials = true
     }
 
     this.instance = axios.create({
       baseURL: API_URL,
       timeout: TIMEOUT,
       headers,
-    });
+    })
   }
 
   async initializeAuth(client_id: string, client_secret: string) {
@@ -88,20 +79,20 @@ class Bity {
         client_id,
         client_secret,
       }),
-    });
-    const { access_token } = data;
+    })
+    const { access_token } = data
 
     this.instance = axios.create({
       baseURL: API_URL,
       timeout: TIMEOUT,
       headers: {
-        'Authorization': `Bearer ${access_token}`,
+        Authorization: `Bearer ${access_token}`,
       },
-    });
+    })
   }
 
   async estimate(tradeRequest: TradeRequest): Promise<BityTrade> {
-    const { inputCurrencyObject, outputCurrencyObject, amount, tradeExact } = tradeRequest;
+    const { inputCurrencyObject, outputCurrencyObject, amount, tradeExact } = tradeRequest
 
     const body: any = {
       input: {
@@ -110,36 +101,28 @@ class Bity {
       output: {
         currency: outputCurrencyObject.symbol,
       },
-      partner_fee: { factor: bityPartnerFee }
-    };
-
-    if(bityPartnerFee) {
-      body.partner_fee = { factor: bityPartnerFee };
+      partner_fee: { factor: bityPartnerFee },
     }
 
-    if(tradeExact === TradeExact.INPUT)
-      body.input.amount = String(amount); else
-    if(tradeExact === TradeExact.OUTPUT)
-      body.output.amount = String(amount);
-    else
-      throw new Error('invalid TRADE_EXACT');
-    try {
+    if (bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee }
+    }
 
+    if (tradeExact === TradeExact.INPUT) body.input.amount = String(amount)
+    else if (tradeExact === TradeExact.OUTPUT) body.output.amount = String(amount)
+    else throw new Error('invalid TRADE_EXACT')
+    try {
       const { data: bityOrderResponse } = await this.instance({
         method: 'post',
         url: '/v2/orders/estimate',
         data: body,
-      });
+      })
 
-      if(
-        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount
-        ||
+      if (
+        bityOrderResponse.input.amount === bityOrderResponse.input.minimum_amount ||
         bityOrderResponse.output.amount === bityOrderResponse.output.minimum_amount
       ) {
-        throw new BityOrderError(
-          'bity_amount_too_low',
-          [{ minimumOutputAmount: bityOrderResponse.output.amount}]
-        )
+        throw new BityOrderError('bity_amount_too_low', [{ minimumOutputAmount: bityOrderResponse.output.amount }])
       }
 
       return {
@@ -149,23 +132,20 @@ class Bity {
         tradeType: TradeType.BITY,
         bityOrderResponse,
         fee: extractFees(bityOrderResponse, tradeRequest),
-      };
-    } catch(error) {
-      if(error instanceof BityOrderError) throw error;
+      }
+    } catch (error) {
+      if (error instanceof BityOrderError) throw error
 
-      if(error?.response?.data?.errors) {
-        throw new BityOrderError(
-          'estimate_error',
-          error.response.data.errors
-        );
+      if (error?.response?.data?.errors) {
+        throw new BityOrderError('estimate_error', error.response.data.errors)
       } else {
-        throw error;
+        throw error
       }
     }
   }
 
   async createOrder(tradeRequest: TradeRequest, bankInfo: BankInfo, ethInfo: ETHInfo): Promise<BityTrade> {
-    const { recipient, reference } = bankInfo;
+    const { recipient, reference } = bankInfo
 
     const body: any = {
       input: {
@@ -180,27 +160,24 @@ class Bity {
         currency: tradeRequest.outputCurrencyObject.symbol,
         reference: reference,
       },
-    };
-
-    if(bityPartnerFee) {
-      body.partner_fee = { factor: bityPartnerFee };
     }
 
-    if(recipient.bic_swift) {
-      body.output.bic_swift = recipient.bic_swift;
+    if (bityPartnerFee) {
+      body.partner_fee = { factor: bityPartnerFee }
     }
 
-    if(tradeRequest.tradeExact === TradeExact.INPUT)
-      body.input.amount = String(tradeRequest.amount); else
-    if(tradeRequest.tradeExact === TradeExact.OUTPUT)
-      body.output.amount = String(tradeRequest.amount);
-    else
-      throw new Error('invalid TRADE_EXACT');
+    if (recipient.bic_swift) {
+      body.output.bic_swift = recipient.bic_swift
+    }
 
-    if(recipient.email) {
+    if (tradeRequest.tradeExact === TradeExact.INPUT) body.input.amount = String(tradeRequest.amount)
+    else if (tradeRequest.tradeExact === TradeExact.OUTPUT) body.output.amount = String(tradeRequest.amount)
+    else throw new Error('invalid TRADE_EXACT')
+
+    if (recipient.email) {
       body.contact_person = {
         email: recipient.email,
-      };
+      }
     }
 
     try {
@@ -209,19 +186,16 @@ class Bity {
         url: '/v2/orders',
         data: body,
         withCredentials: this.withCredentials,
-      });
+      })
 
       const { data: bityOrderResponse } = await this.instance({
         method: 'get',
         url: headers.location,
         withCredentials: this.withCredentials,
-      });
+      })
 
-      if(!bityOrderResponse.input) {
-        throw new BityOrderError(
-          'create_order',
-          [{code: 'cookie', message: 'your browser does not support cookies'}]
-        );
+      if (!bityOrderResponse.input) {
+        throw new BityOrderError('create_order', [{ code: 'cookie', message: 'your browser does not support cookies' }])
       }
 
       return {
@@ -231,82 +205,66 @@ class Bity {
         tradeType: TradeType.BITY,
         bityOrderResponse,
         fee: extractFees(bityOrderResponse, tradeRequest),
-      };
+      }
+    } catch (error) {
+      if (error instanceof BityOrderError) throw error
 
-    } catch(error) {
-      if(error instanceof BityOrderError) throw error;
-
-      if(error?.response?.data?.errors) {
-        throw new BityOrderError(
-          'create_order',
-          error.response.data.errors
-        );
+      if (error?.response?.data?.errors) {
+        throw new BityOrderError('create_order', error.response.data.errors)
       } else {
-        throw error;
+        throw error
       }
     }
   }
 
   async getOrderDetails(orderId: string): Promise<BityOrderResponse> {
     try {
-
       const { data } = await this.instance({
         method: 'get',
         url: `/v2/orders/${orderId}`,
         withCredentials: this.withCredentials,
-      });
+      })
 
-      let orderStatus: BityOrderStatus = BityOrderStatus.WAITING;
-      if(data.timestamp_cancelled) {
-        orderStatus = BityOrderStatus.CANCELLED;
-      } else if(data.timestamp_executed) {
-        orderStatus = BityOrderStatus.EXECUTED;
-      } else if(data.timestamp_payment_received) {
-        orderStatus = BityOrderStatus.RECEIVED;
+      let orderStatus: BityOrderStatus = BityOrderStatus.WAITING
+      if (data.timestamp_cancelled) {
+        orderStatus = BityOrderStatus.CANCELLED
+      } else if (data.timestamp_executed) {
+        orderStatus = BityOrderStatus.EXECUTED
+      } else if (data.timestamp_payment_received) {
+        orderStatus = BityOrderStatus.RECEIVED
       }
 
-      data.orderStatus = orderStatus;
+      data.orderStatus = orderStatus
 
-      return data;
-
-    } catch(error) {
-
-      if(error.response?.status === 404) {
-        throw new Error('not-found');
+      return data
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error('not-found')
       } else {
-        throw new Error('unexpected-server-error-bity');
+        throw new Error('unexpected-server-error-bity')
       }
-
     }
-
   }
 
   async cancelOrder(orderId: string): Promise<void> {
     try {
-
       await this.instance({
         method: 'post',
         url: `/v2/orders/${orderId}/cancel`,
         withCredentials: this.withCredentials,
-      });
-
-    } catch(error) {
-
-      if(error?.response?.data?.errors) {
-        throw new BityOrderError(
-          'cancel_order',
-          error.response.data.errors
-        );
+      })
+    } catch (error) {
+      if (error?.response?.data?.errors) {
+        throw new BityOrderError('cancel_order', error.response.data.errors)
       } else {
-        throw error;
+        throw error
       }
-
     }
   }
 
   static getOrderStatusPageURL(orderId: string) {
-    return `https://go.bity.com/order-status?id=${orderId}`;
+    return `https://go.bity.com/order-status?id=${orderId}`
   }
 }
 
-export default Bity;
+export default Bity

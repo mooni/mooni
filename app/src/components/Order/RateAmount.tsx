@@ -1,51 +1,47 @@
-import React, { useMemo } from 'react';
-import { Tooltip} from '@material-ui/core';
+import React, { useMemo } from 'react'
+import { Tooltip } from '@material-ui/core'
 import { Box, Image } from '@chakra-ui/react'
 import { LoadingRing } from '@aragon/ui'
-import styled from 'styled-components';
-import {CurrencyType} from '../../lib/trading/currencyTypes';
-import {BN, significantNumbers} from '../../lib/numbers';
-import { DexTrade, Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types';
-import {MetaError} from "../../lib/errors";
-import { ExternalLink, ShadowBox } from '../UI/StyledComponents';
+import styled from 'styled-components'
+import { CurrencyType } from '../../lib/trading/currencyTypes'
+import { BN, significantNumbers } from '../../lib/numbers'
+import { DexTrade, Fee, MultiTradeEstimation, Trade, TradeType } from '../../lib/trading/types'
+import { MetaError } from '../../lib/errors'
+import { ExternalLink, ShadowBox } from '../UI/StyledComponents'
 
-import bityLogo from "../../assets/bity_logo_small.png";
-import paraswapLogo from "../../assets/paraswap_logo_small.png";
+import bityLogo from '../../assets/bity_logo_small.png'
+import paraswapLogo from '../../assets/paraswap_logo_small.png'
 
 function aggregateFees(multiTradeEstimation: MultiTradeEstimation): Fee | null {
-  const fees = multiTradeEstimation.trades.map(t => t.fee).filter(f => !!f) as Fee[];
+  const fees = multiTradeEstimation.trades.map((t) => t.fee).filter((f) => !!f) as Fee[]
 
-  if(fees.length === 0) {
-    return null;
+  if (fees.length === 0) {
+    return null
   }
 
-  const lastTrade = multiTradeEstimation.trades[multiTradeEstimation.trades.length-1];
+  const lastTrade = multiTradeEstimation.trades[multiTradeEstimation.trades.length - 1]
 
-  const expectedFeeCurrency = lastTrade.tradeRequest.inputCurrencyObject;
-  const desiredFeeCurrency = lastTrade.tradeRequest.outputCurrencyObject;
+  const expectedFeeCurrency = lastTrade.tradeRequest.inputCurrencyObject
+  const desiredFeeCurrency = lastTrade.tradeRequest.outputCurrencyObject
 
   // TODO support multiple fee currencies
   // expect the fees to be ~ETH
-  const sameCurrencies = new Set(
-    fees.map(f => f.currencyObject.symbol).concat(expectedFeeCurrency.symbol)
-  ).size === 1;
+  const sameCurrencies = new Set(fees.map((f) => f.currencyObject.symbol).concat(expectedFeeCurrency.symbol)).size === 1
 
-  if(!sameCurrencies) {
-    throw new MetaError('Incompatible fee currencies', fees);
+  if (!sameCurrencies) {
+    throw new MetaError('Incompatible fee currencies', fees)
   }
 
-  const totalFeesAmount = fees
-    .map(f => f.amount)
-    .reduce((acc, a) => acc.plus(a), new BN(0));
+  const totalFeesAmount = fees.map((f) => f.amount).reduce((acc, a) => acc.plus(a), new BN(0))
 
-  const lastTradeRate = new BN(lastTrade.outputAmount).div(lastTrade.inputAmount);
+  const lastTradeRate = new BN(lastTrade.outputAmount).div(lastTrade.inputAmount)
 
-  const feeAmountInOutput = totalFeesAmount.times(lastTradeRate).toFixed();
+  const feeAmountInOutput = totalFeesAmount.times(lastTradeRate).toFixed()
 
   return {
     amount: feeAmountInOutput,
     currencyObject: desiredFeeCurrency,
-  };
+  }
 }
 
 // @ts-ignore
@@ -54,25 +50,25 @@ const Container = styled(ShadowBox)`
   padding: 15px 20px;
   box-shadow: none;
   border-radius: 16px;
-`;
+`
 
 const RouteTitle = styled.p`
   font-style: normal;
   font-weight: 200;
   font-size: 12px;
   line-height: 25px;
-  color: #504E4E;
+  color: #504e4e;
   text-align: center;
   text-transform: uppercase;
   margin-top: 0.5rem;
-`;
+`
 
 const RouteAmount = styled.span`
   font-style: normal;
   font-weight: normal;
   font-size: 12px;
   line-height: 12px;
-`;
+`
 
 const Via = styled.span`
   font-style: normal;
@@ -81,7 +77,7 @@ const Via = styled.span`
   line-height: 14px;
   margin-right: 5px;
   text-transform: lowercase;
-`;
+`
 
 const TradeElement = styled.div`
   height: 35px;
@@ -89,44 +85,40 @@ const TradeElement = styled.div`
   align-items: center;
 
   & + & {
-    border-top: 0.5px solid #D9D0D0;
+    border-top: 0.5px solid #d9d0d0;
   }
-`;
+`
 
 interface BasicLineProps {
-  title: string;
-  content: string;
+  title: string
+  content: string
 }
-const BasicLine: React.FC<BasicLineProps> = ({title, content}) => (
+const BasicLine: React.FC<BasicLineProps> = ({ title, content }) => (
   <Box display="flex" fontSize="0.8rem" justifyContent="space-between">
-    <Box>
-      {title}
-    </Box>
-    <Box fontWeight={600}>
-      {content}
-    </Box>
+    <Box>{title}</Box>
+    <Box fontWeight={600}>{content}</Box>
   </Box>
-);
+)
 
 interface ServiceLogoProps {
-  tradeType: TradeType;
+  tradeType: TradeType
 }
 const d = {
   [TradeType.BITY]: {
-    tooltip: "Bity - Swiss crypto-fiat exchange",
-    href: "https://bity.com",
-    alt: "bity",
+    tooltip: 'Bity - Swiss crypto-fiat exchange',
+    href: 'https://bity.com',
+    alt: 'bity',
     image: bityLogo,
   },
   [TradeType.DEX]: {
-    tooltip: "Paraswap - DEX aggregator",
-    href: "https://paraswap.io",
-    alt: "paraswap",
+    tooltip: 'Paraswap - DEX aggregator',
+    href: 'https://paraswap.io',
+    alt: 'paraswap',
     image: paraswapLogo,
-  }
-};
-const ServiceLogo: React.FC<ServiceLogoProps> = ({tradeType}) => {
-  const dd = d[tradeType];
+  },
+}
+const ServiceLogo: React.FC<ServiceLogoProps> = ({ tradeType }) => {
+  const dd = d[tradeType]
 
   return (
     <ExternalLink href={dd.href}>
@@ -136,111 +128,103 @@ const ServiceLogo: React.FC<ServiceLogoProps> = ({tradeType}) => {
         </Box>
       </Tooltip>
     </ExternalLink>
-  );
+  )
 }
 
 interface TradeLineProps {
-  trade: Trade;
+  trade: Trade
 }
-const TradeLine: React.FC<TradeLineProps> = ({trade}) => (
+const TradeLine: React.FC<TradeLineProps> = ({ trade }) => (
   <TradeElement>
     <Box flex={1}>
       <RouteAmount>
-        {significantNumbers(trade.inputAmount)}
-        {' '}{trade.tradeRequest.inputCurrencyObject.symbol}
+        {significantNumbers(trade.inputAmount)} {trade.tradeRequest.inputCurrencyObject.symbol}
         <b>{' > '}</b>
         {significantNumbers(trade.outputAmount)} {trade.tradeRequest.outputCurrencyObject.symbol}
       </RouteAmount>
     </Box>
     <Box height={30} display="flex" alignItems="center">
-      <Via>VIA</Via>
-      {' '}
-      <ServiceLogo tradeType={trade.tradeType} />
+      <Via>VIA</Via> <ServiceLogo tradeType={trade.tradeType} />
     </Box>
   </TradeElement>
-);
+)
 
 export const RateAmountSuspense: React.FC = () => {
   return (
     <Container>
       <Box px={1}>
-        <BasicLine title="Rate" content={"-"}/>
-        <BasicLine title="Exchange fees" content="-"/>
+        <BasicLine title="Rate" content={'-'} />
+        <BasicLine title="Exchange fees" content="-" />
       </Box>
       <Box display="flex" justifyContent="center" mt={1}>
-        <LoadingRing mode="half-circle"/>
+        <LoadingRing mode="half-circle" />
       </Box>
     </Container>
-  );
+  )
 }
 
 interface RateAmountLoadedProps {
-  multiTradeEstimation: MultiTradeEstimation;
+  multiTradeEstimation: MultiTradeEstimation
 }
 
-export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({multiTradeEstimation}) => {
+export const RateAmountLoaded: React.FC<RateAmountLoadedProps> = ({ multiTradeEstimation }) => {
+  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol
+  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencyObject.symbol
 
-  const inputSymbol = multiTradeEstimation.tradeRequest.inputCurrencyObject.symbol;
-  const outputSymbol = multiTradeEstimation.tradeRequest.outputCurrencyObject.symbol;
-
-  const fee = useMemo(() => aggregateFees(multiTradeEstimation), [multiTradeEstimation]);
+  const fee = useMemo(() => aggregateFees(multiTradeEstimation), [multiTradeEstimation])
   const feeInfos = useMemo(() => {
-    if(fee) {
-      let amount;
-      if(fee.currencyObject.type === CurrencyType.FIAT) {
-        amount = significantNumbers(fee.amount, 2);
+    if (fee) {
+      let amount
+      if (fee.currencyObject.type === CurrencyType.FIAT) {
+        amount = significantNumbers(fee.amount, 2)
       } else {
-        amount = significantNumbers(fee.amount);
+        amount = significantNumbers(fee.amount)
       }
       return {
         currencyObject: fee.currencyObject,
         amount,
       }
     }
-    return null;
-  }, [fee]);
+    return null
+  }, [fee])
 
   const slippage = useMemo<number | null>(() => {
-    const dexTrade = multiTradeEstimation.trades.find(t => t.tradeType === TradeType.DEX) as DexTrade | undefined;
-    if(!dexTrade) {
-      return null;
+    const dexTrade = multiTradeEstimation.trades.find((t) => t.tradeType === TradeType.DEX) as DexTrade | undefined
+    if (!dexTrade) {
+      return null
     }
-    return dexTrade.maxSlippage;
+    return dexTrade.maxSlippage
   }, [multiTradeEstimation])
 
   const rateTrunc = useMemo(() => {
-    const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount);
-    return significantNumbers(rate);
-  }, [multiTradeEstimation]);
+    const rate = new BN(multiTradeEstimation.outputAmount).div(multiTradeEstimation.inputAmount)
+    return significantNumbers(rate)
+  }, [multiTradeEstimation])
 
   return (
     <Container>
       <Box>
-        <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`}/>
-        {feeInfos &&
-        <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currencyObject.symbol}`}/>
-        }
-        {slippage &&
-        <BasicLine title="Slippage tolerance" content={`${slippage * 100}%`}/>
-        }
+        <BasicLine title="Rate" content={`~${rateTrunc} ${outputSymbol}/${inputSymbol}`} />
+        {feeInfos && (
+          <BasicLine title="Exchange fees" content={`${feeInfos.amount} ${feeInfos.currencyObject.symbol}`} />
+        )}
+        {slippage && <BasicLine title="Slippage tolerance" content={`${slippage * 100}%`} />}
       </Box>
       <RouteTitle>Order Routing</RouteTitle>
-      {multiTradeEstimation.trades.map(trade => <TradeLine trade={trade} key={trade.tradeType} />)}
+      {multiTradeEstimation.trades.map((trade) => (
+        <TradeLine trade={trade} key={trade.tradeType} />
+      ))}
     </Container>
-  );
+  )
 }
 
 interface RateAmountProps {
-  multiTradeEstimation: MultiTradeEstimation | null;
+  multiTradeEstimation: MultiTradeEstimation | null
 }
-export const RateAmount: React.FC<RateAmountProps> = ({multiTradeEstimation}) => {
-  if(multiTradeEstimation) {
-    return (
-      <RateAmountLoaded multiTradeEstimation={multiTradeEstimation}/>
-    )
+export const RateAmount: React.FC<RateAmountProps> = ({ multiTradeEstimation }) => {
+  if (multiTradeEstimation) {
+    return <RateAmountLoaded multiTradeEstimation={multiTradeEstimation} />
   } else {
-    return (
-      <RateAmountSuspense />
-    );
+    return <RateAmountSuspense />
   }
 }

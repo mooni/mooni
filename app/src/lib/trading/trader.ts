@@ -1,4 +1,4 @@
-import { createFromCurrencyObject, CurrencyType } from './currencyTypes';
+import { createFromCurrencyObject, CurrencyType } from './currencyTypes'
 import {
   BityTrade,
   DexTrade,
@@ -9,158 +9,131 @@ import {
   TradePath,
   TradeRequest,
   TradeType,
-} from './types';
-import {ETHER} from './currencyList';
-import { TradeExact } from './types';
-import DexProxy from "./dexProxy";
-import Bity from "../wrappers/bity";
+} from './types'
+import { ETHER } from './currencyList'
+import { TradeExact } from './types'
+import DexProxy from './dexProxy'
+import Bity from '../wrappers/bity'
 
 export class Trader {
   constructor(readonly bityInstance: Bity) {}
 
   private findPath(tradeRequest: TradeRequest): TradePath {
-    const inputCurrency = createFromCurrencyObject(tradeRequest.inputCurrencyObject);
-    const outputCurrency = createFromCurrencyObject(tradeRequest.outputCurrencyObject);
-    if(
-        inputCurrency.equals(ETHER)
-        &&
-        outputCurrency.type === CurrencyType.FIAT
-    ) {
-      return [
-        TradeType.BITY,
-      ];
-
-    } else if(
-        inputCurrency.type === CurrencyType.ERC20
-        &&
-        outputCurrency.equals(ETHER)
-    ) {
-      return [
-        TradeType.DEX,
-      ];
-
-    } else if(
-        inputCurrency.type === CurrencyType.ERC20
-        &&
-        outputCurrency.type === CurrencyType.FIAT
-    ) {
-      return [
-        TradeType.DEX,
-        TradeType.BITY,
-      ];
-
+    const inputCurrency = createFromCurrencyObject(tradeRequest.inputCurrencyObject)
+    const outputCurrency = createFromCurrencyObject(tradeRequest.outputCurrencyObject)
+    if (inputCurrency.equals(ETHER) && outputCurrency.type === CurrencyType.FIAT) {
+      return [TradeType.BITY]
+    } else if (inputCurrency.type === CurrencyType.ERC20 && outputCurrency.equals(ETHER)) {
+      return [TradeType.DEX]
+    } else if (inputCurrency.type === CurrencyType.ERC20 && outputCurrency.type === CurrencyType.FIAT) {
+      return [TradeType.DEX, TradeType.BITY]
     } else {
-      throw new Error('Invalid path');
+      throw new Error('Invalid path')
     }
   }
 
   private async estimateTrade(tradeRequest: TradeRequest): Promise<DexTrade | BityTrade> {
-    const path = this.findPath(tradeRequest);
-    if(path.length !== 1) {
-      throw new Error('can only estimate direct trade');
+    const path = this.findPath(tradeRequest)
+    if (path.length !== 1) {
+      throw new Error('can only estimate direct trade')
     }
-    const tradeType = path[0];
-    if(tradeType === TradeType.BITY) {
+    const tradeType = path[0]
+    if (tradeType === TradeType.BITY) {
       // console.time('bity_estimate');
-      const trade = await this.bityInstance.estimate(tradeRequest);
+      const trade = await this.bityInstance.estimate(tradeRequest)
       // console.timeEnd('bity_estimate');
-      return trade;
-    }
-    else if(tradeType === TradeType.DEX) {
+      return trade
+    } else if (tradeType === TradeType.DEX) {
       // console.time('dex_estimate');
-      const trade = await DexProxy.getRate(tradeRequest);
+      const trade = await DexProxy.getRate(tradeRequest)
       // console.timeEnd('dex_estimate');
-      return trade;
+      return trade
     } else {
-      throw new Error(`Estimation not available for TradeType ${tradeType}'`);
+      throw new Error(`Estimation not available for TradeType ${tradeType}'`)
     }
   }
 
-  private async createTrade(tradeRequest: TradeRequest, multiTradeRequest: MultiTradeRequest): Promise<BityTrade | DexTrade> {
-    const path = this.findPath(tradeRequest);
-    if(path.length !== 1) {
-      throw new Error('can only create direct trade');
+  private async createTrade(
+    tradeRequest: TradeRequest,
+    multiTradeRequest: MultiTradeRequest
+  ): Promise<BityTrade | DexTrade> {
+    const path = this.findPath(tradeRequest)
+    if (path.length !== 1) {
+      throw new Error('can only create direct trade')
     }
-    const tradeType = path[0];
-    if(tradeType === TradeType.BITY) {
-      if(!multiTradeRequest.bankInfo || !multiTradeRequest.ethInfo) {
-        throw new Error('missing bank or eth info on multiTradeRequest');
+    const tradeType = path[0]
+    if (tradeType === TradeType.BITY) {
+      if (!multiTradeRequest.bankInfo || !multiTradeRequest.ethInfo) {
+        throw new Error('missing bank or eth info on multiTradeRequest')
       }
-      return await this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo);
-    }
-    else if(tradeType === TradeType.DEX) {
-      return await DexProxy.createTrade(tradeRequest);
+      return await this.bityInstance.createOrder(tradeRequest, multiTradeRequest.bankInfo, multiTradeRequest.ethInfo)
+    } else if (tradeType === TradeType.DEX) {
+      return await DexProxy.createTrade(tradeRequest)
     } else {
-      throw new Error(`Estimation not available for TradeType ${tradeType}'`);
+      throw new Error(`Estimation not available for TradeType ${tradeType}'`)
     }
   }
 
   async estimateMultiTrade(tradeRequest: TradeRequest): Promise<MultiTradeEstimation> {
-    const path = this.findPath(tradeRequest);
+    const path = this.findPath(tradeRequest)
 
-    const trades: (BityTrade | DexTrade)[] = [];
+    const trades: (BityTrade | DexTrade)[] = []
 
-    let ethAmount: string;
+    let ethAmount: string
 
-    if(path.length === 1 && path[0] === TradeType.BITY) {
-
-      const bityTrade = await this.estimateTrade(tradeRequest);
-      ethAmount = bityTrade.inputAmount;
-      trades.push(bityTrade);
-
-    } else if(path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
-      if(tradeRequest.tradeExact === TradeExact.INPUT) {
-
-        const {outputAmount: intermediateEthAmount} = await this.estimateTrade({
+    if (path.length === 1 && path[0] === TradeType.BITY) {
+      const bityTrade = await this.estimateTrade(tradeRequest)
+      ethAmount = bityTrade.inputAmount
+      trades.push(bityTrade)
+    } else if (path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
+      if (tradeRequest.tradeExact === TradeExact.INPUT) {
+        const { outputAmount: intermediateEthAmount } = await this.estimateTrade({
           inputCurrencyObject: tradeRequest.inputCurrencyObject,
           outputCurrencyObject: ETHER.toObject(),
           amount: tradeRequest.amount,
           tradeExact: TradeExact.INPUT,
-        });
+        })
 
         const dexTrade = await this.estimateTrade({
           inputCurrencyObject: tradeRequest.inputCurrencyObject,
           outputCurrencyObject: ETHER.toObject(),
           amount: intermediateEthAmount,
           tradeExact: TradeExact.OUTPUT,
-        });
+        })
 
         const bityTrade = await this.estimateTrade({
           inputCurrencyObject: ETHER.toObject(),
           outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: intermediateEthAmount,
           tradeExact: TradeExact.INPUT,
-        });
-        ethAmount = bityTrade.inputAmount;
+        })
+        ethAmount = bityTrade.inputAmount
 
-        trades.push(dexTrade);
-        trades.push(bityTrade);
-
-      } else if(tradeRequest.tradeExact === TradeExact.OUTPUT) {
+        trades.push(dexTrade)
+        trades.push(bityTrade)
+      } else if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
         const bityTrade = await this.estimateTrade({
           inputCurrencyObject: ETHER.toObject(),
           outputCurrencyObject: tradeRequest.outputCurrencyObject,
           amount: tradeRequest.amount,
           tradeExact: TradeExact.OUTPUT,
-        });
-        ethAmount = bityTrade.inputAmount;
+        })
+        ethAmount = bityTrade.inputAmount
 
         const dexTrade = await this.estimateTrade({
           inputCurrencyObject: tradeRequest.inputCurrencyObject,
           outputCurrencyObject: ETHER.toObject(),
           amount: bityTrade.inputAmount,
           tradeExact: TradeExact.OUTPUT,
-        });
+        })
 
-        trades.push(dexTrade);
-        trades.push(bityTrade);
-
+        trades.push(dexTrade)
+        trades.push(bityTrade)
       } else {
-        throw new Error('invalid TRADE_EXACT');
+        throw new Error('invalid TRADE_EXACT')
       }
-    }
-    else {
-      throw new Error('Unsupported path');
+    } else {
+      throw new Error('Unsupported path')
     }
 
     return {
@@ -170,7 +143,7 @@ export class Trader {
       inputAmount: trades[0].inputAmount,
       outputAmount: trades[trades.length - 1].outputAmount,
       ethAmount,
-    };
+    }
   }
 
   async createMultiTrade(multiTradeRequest: MultiTradeRequest): Promise<MultiTradeTemp> {
@@ -180,75 +153,82 @@ export class Trader {
     if (!multiTradeRequest.ethInfo) {
       throw new Error('Bity requires eth info')
     }
-    let ethAmount: string;
+    let ethAmount: string
 
-    const {tradeRequest, ethInfo, bankInfo, referralId} = multiTradeRequest;
-    const path = this.findPath(multiTradeRequest.tradeRequest);
+    const { tradeRequest, ethInfo, bankInfo, referralId } = multiTradeRequest
+    const path = this.findPath(multiTradeRequest.tradeRequest)
 
-    const trades: (BityTrade | DexTrade)[] = [];
+    const trades: (BityTrade | DexTrade)[] = []
 
     if (path.length === 1 && path[0] === TradeType.BITY) {
+      const bityTrade = await this.createTrade(tradeRequest, multiTradeRequest)
+      ethAmount = bityTrade.inputAmount
 
-      const bityTrade = await this.createTrade(tradeRequest, multiTradeRequest);
-      ethAmount = bityTrade.inputAmount;
-
-      trades.push(bityTrade);
-
-    }
-    else if (path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
-
+      trades.push(bityTrade)
+    } else if (path.length === 2 && path[0] === TradeType.DEX && path[1] === TradeType.BITY) {
       if (tradeRequest.tradeExact === TradeExact.INPUT) {
-        const {outputAmount: intermediateEthAmount} = await this.createTrade({
-          inputCurrencyObject: tradeRequest.inputCurrencyObject,
-          outputCurrencyObject: ETHER.toObject(),
-          amount: tradeRequest.amount,
-          tradeExact: TradeExact.INPUT,
-        }, multiTradeRequest);
+        const { outputAmount: intermediateEthAmount } = await this.createTrade(
+          {
+            inputCurrencyObject: tradeRequest.inputCurrencyObject,
+            outputCurrencyObject: ETHER.toObject(),
+            amount: tradeRequest.amount,
+            tradeExact: TradeExact.INPUT,
+          },
+          multiTradeRequest
+        )
 
-        const dexTrade = await this.createTrade({
-          inputCurrencyObject: tradeRequest.inputCurrencyObject,
-          outputCurrencyObject: ETHER.toObject(),
-          amount: intermediateEthAmount,
-          tradeExact: TradeExact.OUTPUT,
-        }, multiTradeRequest);
+        const dexTrade = await this.createTrade(
+          {
+            inputCurrencyObject: tradeRequest.inputCurrencyObject,
+            outputCurrencyObject: ETHER.toObject(),
+            amount: intermediateEthAmount,
+            tradeExact: TradeExact.OUTPUT,
+          },
+          multiTradeRequest
+        )
 
-        const bityTrade = await this.createTrade({
-          inputCurrencyObject: ETHER.toObject(),
-          outputCurrencyObject: tradeRequest.outputCurrencyObject,
-          amount: intermediateEthAmount,
-          tradeExact: TradeExact.INPUT,
-        }, multiTradeRequest);
-        ethAmount = bityTrade.inputAmount;
+        const bityTrade = await this.createTrade(
+          {
+            inputCurrencyObject: ETHER.toObject(),
+            outputCurrencyObject: tradeRequest.outputCurrencyObject,
+            amount: intermediateEthAmount,
+            tradeExact: TradeExact.INPUT,
+          },
+          multiTradeRequest
+        )
+        ethAmount = bityTrade.inputAmount
 
-        trades.push(dexTrade);
-        trades.push(bityTrade);
+        trades.push(dexTrade)
+        trades.push(bityTrade)
+      } else if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
+        const bityTrade = await this.createTrade(
+          {
+            inputCurrencyObject: ETHER.toObject(),
+            outputCurrencyObject: tradeRequest.outputCurrencyObject,
+            amount: tradeRequest.amount,
+            tradeExact: TradeExact.OUTPUT,
+          },
+          multiTradeRequest
+        )
+        ethAmount = bityTrade.inputAmount
 
+        const dexTrade = await this.createTrade(
+          {
+            inputCurrencyObject: tradeRequest.inputCurrencyObject,
+            outputCurrencyObject: ETHER.toObject(),
+            amount: bityTrade.inputAmount,
+            tradeExact: TradeExact.OUTPUT,
+          },
+          multiTradeRequest
+        )
+
+        trades.push(dexTrade)
+        trades.push(bityTrade)
+      } else {
+        throw new Error('invalid TRADE_EXACT')
       }
-      else if (tradeRequest.tradeExact === TradeExact.OUTPUT) {
-        const bityTrade = await this.createTrade({
-          inputCurrencyObject: ETHER.toObject(),
-          outputCurrencyObject: tradeRequest.outputCurrencyObject,
-          amount: tradeRequest.amount,
-          tradeExact: TradeExact.OUTPUT,
-        }, multiTradeRequest);
-        ethAmount = bityTrade.inputAmount;
-
-        const dexTrade = await this.createTrade({
-          inputCurrencyObject: tradeRequest.inputCurrencyObject,
-          outputCurrencyObject: ETHER.toObject(),
-          amount: bityTrade.inputAmount,
-          tradeExact: TradeExact.OUTPUT,
-        }, multiTradeRequest);
-
-        trades.push(dexTrade);
-        trades.push(bityTrade);
-      }
-      else {
-        throw new Error('invalid TRADE_EXACT');
-      }
-    }
-    else {
-      throw new Error('Unsupported path');
+    } else {
+      throw new Error('Unsupported path')
     }
 
     return {
@@ -261,6 +241,6 @@ export class Trader {
       path: path,
       ethAmount,
       referralId,
-    };
+    }
   }
 }
