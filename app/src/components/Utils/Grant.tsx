@@ -11,8 +11,8 @@ export const Grant = () => {
   return (
     <Surface
       position="fixed"
-      left="20px"
-      bottom={{base: "80px", lg: '20px'}}
+      left="1.5rem"
+      bottom={{base: "80px", lg: '1.5rem'}}
       w={{base: "10rem", lg: '12rem'}}
       boxShadow="base"
       p={4}
@@ -41,6 +41,7 @@ export const Grant = () => {
           />
           <Text
             textStyle="small"
+            fontSize={{base: "0.7rem", md: '0.9rem'}}
           >
             Support us on Gitcoin
           </Text>
