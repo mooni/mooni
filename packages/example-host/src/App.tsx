@@ -15,7 +15,6 @@ function App() {
       <Web3ReactProvider getLibrary={getLibrary}>
         <Home/>
       </Web3ReactProvider>
-
     </>
   );
 }
