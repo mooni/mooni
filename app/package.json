@@ -72,7 +72,8 @@
     "prisma:migrate": "prisma migrate dev --preview-feature",
     "prisma:migrate:deploy": "prisma migrate deploy --preview-feature",
     "prisma:generate": "prisma generate",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prettier": "prettier --write ."
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -90,6 +91,7 @@
     ]
   },
   "devDependencies": {
+    "prettier": "^2.2.1",
     "prisma": "^2.18.0"
   }
 }
