@@ -201,7 +201,7 @@ class MooniWidget {
     };
   }
 
-  setEthereum(ethereum?: ExternalProvider) {
+  public setEthereum(ethereum?: ExternalProvider) {
     this.ethereum = ethereum;
 
     if(ethereum) {
