@@ -4,6 +4,8 @@ import Header from '../Header'
 import ScrollRoot from '../Utils/ScrollRoot'
 import { TypeformFeedback } from '../Utils/Feedback'
 import styled from 'styled-components'
+import {Box} from '@chakra-ui/react'
+import { Grant } from '../Utils/Grant';
 
 const Root = styled.div`
   display: flex;
@@ -26,21 +28,17 @@ const Container = styled.div`
   margin-bottom: 20px;
 `
 
-const BottomSM = styled.div`
-  height: 0;
-  @media (max-width: 960px) {
-    height: 72px;
-  }
-`
-
 export default function AppContainer({ children }) {
   return (
     <ScrollRoot>
       <Root>
         <Header />
         <Container>{children}</Container>
-        <BottomSM />
+        <Box
+          height={{base: 0, lg: '72px'}}
+        />
         <TypeformFeedback />
+        <Grant/>
       </Root>
     </ScrollRoot>
   )
