@@ -19,7 +19,7 @@ function Home() {
 
   useEffect(() => {
     mooni.setEthereum(library?.provider);
-  }, [library]);
+  }, [mooni, library]);
 
   return (
     <div className="App">

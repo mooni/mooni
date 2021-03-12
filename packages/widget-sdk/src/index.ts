@@ -39,6 +39,7 @@ class MooniWidget {
   private iframeContainerElement?: HTMLDivElement;
   private iframeElement: HTMLIFrameElement;
   private modalContainer?: HTMLDivElement;
+  private confirmContainer?: HTMLDivElement;
   private appUrl: string;
   private customToken?: string;
   private referralId?: string;
@@ -79,8 +80,24 @@ class MooniWidget {
 
       const widgetCloser = document.createElement('div');
       widgetCloser.className = 'mo_mooni-closer';
-      widgetCloser.innerHTML = 'Close️';
-      widgetCloser.onclick = this.close.bind(this);
+      const cancelClose = () => {
+        widgetCloser.innerHTML = 'Close️';
+        widgetCloser.style.background = 'white';
+        widgetCloser.onclick = defaultOnClose;
+      };
+      const defaultOnClose = () => {
+        widgetCloser.innerHTML = 'Are you sure ?';
+        widgetCloser.style.background = '#f97070';
+        widgetCloser.onclick = () => {
+          this.close();
+          cancelClose();
+        }
+        setTimeout(() => {
+          widgetCloser.onclick = defaultOnClose;
+          cancelClose();
+        }, 2000);
+      };
+      cancelClose();
       this.iframeContainerElement.appendChild(widgetCloser);
 
       this.modalContainer.appendChild(this.iframeContainerElement);
@@ -102,12 +119,17 @@ class MooniWidget {
     this.modalContainer!.style.display = 'flex';
   }
 
-  public close() {
+  private close() {
     if(!this.isModal) {
       return;
     }
 
     this.modalContainer!.style.display = 'none';
+  }
+
+  private confirmClose() {
+    if(this.confirmContainer)
+    this.confirmContainer.style.display = 'block';
   }
 
 
