@@ -1,5 +1,7 @@
 import React from 'react'
-import { Flex, Link, Image, Text, IconButton, useDisclosure } from '@chakra-ui/react'
+
+import { motion } from "framer-motion"
+import { Box, Flex, Link, Image, Text, IconButton, useDisclosure } from '@chakra-ui/react'
 import { CloseIcon } from '@chakra-ui/icons'
 import { Surface } from '../UI/StyledComponents'
 
@@ -9,44 +11,69 @@ export const Grant = () => {
   if(!isOpen) return null;
 
   return (
-    <Surface
+    <Flex
       position="fixed"
-      left="1.5rem"
-      bottom={{base: "80px", lg: '1.5rem'}}
-      w={{base: "10rem", lg: '12rem'}}
-      boxShadow="base"
-      p={4}
+      bottom={{base: "80px", lg: '2rem'}}
+      w="100vw"
+      align="center"
+      justify="center"
     >
-      <IconButton
-        position="absolute"
-        top={5}
-        left={5}
-        icon={<CloseIcon/>}
-        isRound
-        size="xs"
-        fontSize="12px"
-        variant="ghost"
-        onClick={onClose}
-      />
-      <Link
-        href="https://gitcoin.co/grants/225/mooni"
-        isExternal
+      <motion.div
+        animate={{
+          y: [0, -10, 0],
+        }}
+        transition={{ repeat: Infinity, duration: 3 }}
       >
-        <Flex align="center" direction="column">
-          <Image
-            src="images/illus/grants_planet.webp"
-            boxSize={{base: "6rem", lg: '12rem'}}
-            objectFit="contain"
-            ml={4}
+
+        <Surface
+          w="90vw"
+          maxW="24rem"
+          boxShadow="base"
+          p={4}
+        >
+          <IconButton
+            position="absolute"
+            top={5}
+            right={5}
+            icon={<CloseIcon/>}
+            isRound
+            size="xs"
+            fontSize="12px"
+            variant="ghost"
+            aria-label="close"
+            onClick={onClose}
           />
-          <Text
-            textStyle="small"
-            fontSize={{base: "0.7rem", lg: '0.9rem'}}
+          <Link
+            href="https://gitcoin.co/grants/225/mooni"
+            isExternal
           >
-            Support us on Gitcoin
-          </Text>
-        </Flex>
-      </Link>
-    </Surface>
+            <Flex
+              direction="row"
+              align="center"
+              justify="center"
+            >
+              <Image
+                src="images/illus/grants_planet.webp"
+                boxSize="8rem"
+                objectFit="contain"
+              />
+              <Box ml={4} pt={6}>
+                <Text
+                  textStyle="small"
+                >
+                  Support us on Gitcoin
+                </Text>
+                <Text
+                  textStyle="small"
+                  color="purple"
+                >
+                  It's Matching round 9 !
+                </Text>
+              </Box>
+            </Flex>
+          </Link>
+        </Surface>
+      </motion.div>
+    </Flex>
   );
 }
