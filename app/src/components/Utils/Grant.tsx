@@ -29,12 +29,15 @@ export const Grant = () => {
           w="90vw"
           maxW="24rem"
           boxShadow="base"
+          border="1px solid"
+          borderColor="gray.200"
           p={4}
+          position="relative"
         >
           <IconButton
             position="absolute"
             top={5}
-            right={5}
+            right={10}
             icon={<CloseIcon/>}
             isRound
             size="xs"
@@ -67,7 +70,7 @@ export const Grant = () => {
                   textStyle="small"
                   color="purple"
                 >
-                  It's Matching round 9 !
+                  It's Matching Round 9 !
                 </Text>
               </Box>
             </Flex>
