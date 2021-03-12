@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
-import prisma from "../apiLib/prisma";
-import { Stats } from '../src/types/api';
+import prisma from '../apiLib/prisma'
+import { Stats } from '../src/types/api'
 
 export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
   const aggregateETH = await prisma.$queryRaw<any>(`
@@ -9,7 +9,7 @@ export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | 
       COUNT(*)
     FROM "MooniOrder"
     WHERE status = 'EXECUTED';
-  `);
+  `)
 
   const aggregateOutput = await prisma.$queryRaw<any>(`
     SELECT 
@@ -18,14 +18,14 @@ export default async (req: NowRequest, res: NowResponse): Promise<NowResponse | 
     FROM "MooniOrder"
     WHERE status = 'EXECUTED'
     GROUP BY "outputCurrency"
-  `);
+  `)
 
   const stats: Stats = {
     ordersCount: aggregateETH[0].count,
     totalETH: aggregateETH[0].totalETH,
-    totalEUR: aggregateOutput.find(a => a.outputCurrency === 'EUR').totalOutput,
-    totalCHF: aggregateOutput.find(a => a.outputCurrency === 'CHF').totalOutput,
-  };
+    totalEUR: aggregateOutput.find((a) => a.outputCurrency === 'EUR').totalOutput,
+    totalCHF: aggregateOutput.find((a) => a.outputCurrency === 'CHF').totalOutput,
+  }
 
-  res.json(stats);
-};
+  res.json(stats)
+}

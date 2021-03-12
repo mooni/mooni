@@ -1,3 +1,3 @@
-import store from 'store2';
+import store from 'store2'
 
 export { store }

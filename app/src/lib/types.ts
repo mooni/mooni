@@ -1,17 +1,17 @@
 export interface Recipient {
   owner: {
-    name: string;
-    country?: string;
-    address?: string;
-    zip?: string;
-    city?: string;
+    name: string
+    country?: string
+    address?: string
+    zip?: string
+    city?: string
   }
-  iban: string;
-  bic_swift?: string;
-  email?: string;
+  iban: string
+  bic_swift?: string
+  email?: string
 }
 
-export type OrderErrors = any[];
+export type OrderErrors = any[]
 
 export enum PaymentStatus {
   PENDING = 'PENDING',
@@ -36,16 +36,14 @@ export enum PaymentStepStatus {
 }
 
 export interface PaymentStep {
-  id: PaymentStepId;
-  status: PaymentStepStatus;
-  txHash?: string;
-  bityOrderId?: string;
-  error?: Error;
+  id: PaymentStepId
+  status: PaymentStepStatus
+  txHash?: string
+  bityOrderId?: string
+  error?: Error
 }
 
 export interface Payment {
-  status: PaymentStatus;
-  steps: PaymentStep[];
+  status: PaymentStatus
+  steps: PaymentStep[]
 }
-
-

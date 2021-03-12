@@ -1,23 +1,23 @@
-import ETHManager from "../../lib/eth";
+import ETHManager from '../../lib/eth'
 
-export const STATE_NAME = 'WALLET';
+export const STATE_NAME = 'WALLET'
 
 export enum WalletStatus {
-  DISCONNECTED= 'DISCONNECTED',
-  CONNECTED= 'CONNECTED',
-  CHOOSING_WALLET= 'CHOOSING_WALLET',
-  WAITING_SIGNATURE= 'WAITING_SIGNATURE',
-  LOADING= 'LOADING',
-  INITIATING= 'INITIATING',
-  DISCONNECTING= 'DISCONNECTING',
+  DISCONNECTED = 'DISCONNECTED',
+  CONNECTED = 'CONNECTED',
+  CHOOSING_WALLET = 'CHOOSING_WALLET',
+  WAITING_SIGNATURE = 'WAITING_SIGNATURE',
+  LOADING = 'LOADING',
+  INITIATING = 'INITIATING',
+  DISCONNECTING = 'DISCONNECTING',
 }
 
 export interface WalletState {
-  ethManager: ETHManager | null;
-  walletStatus: WalletStatus;
-  address: string | null;
-  jwsToken: string | null;
-  providerFromIframe: boolean;
+  ethManager: ETHManager | null
+  walletStatus: WalletStatus
+  address: string | null
+  jwsToken: string | null
+  providerFromIframe: boolean
 }
 
 export const initialState: WalletState = {
@@ -26,4 +26,4 @@ export const initialState: WalletState = {
   address: null,
   jwsToken: null,
   providerFromIframe: false,
-};
+}

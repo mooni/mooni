@@ -1,23 +1,17 @@
-import {
-  OrderErrors,
-  Payment,
-  PaymentStatus,
-  PaymentStep,
-  Recipient,
-} from '../../lib/types';
+import { OrderErrors, Payment, PaymentStatus, PaymentStep, Recipient } from '../../lib/types'
 
-import { STATE_NAME, PaymentState, initialState } from "./state";
-import * as actions from './actions';
-import { BankInfo, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types';
-import { CurrencyObject } from '../../lib/trading/currencyTypes';
-import { MooniOrder } from '../../types/api';
+import { STATE_NAME, PaymentState, initialState } from './state'
+import * as actions from './actions'
+import { BankInfo, MultiTrade, MultiTradeRequest, TradeRequest } from '../../lib/trading/types'
+import { CurrencyObject } from '../../lib/trading/currencyTypes'
+import { MooniOrder } from '../../types/api'
 
-export { STATE_NAME };
+export { STATE_NAME }
 
-export default function(state : PaymentState = initialState, action: { type: string, payload?: any }): PaymentState {
+export default function (state: PaymentState = initialState, action: { type: string; payload?: any }): PaymentState {
   switch (action.type) {
     case actions.SET_TRADE_REQUEST: {
-      const { tradeRequest }: { tradeRequest: TradeRequest } = action.payload;
+      const { tradeRequest }: { tradeRequest: TradeRequest } = action.payload
 
       return {
         ...state,
@@ -25,10 +19,10 @@ export default function(state : PaymentState = initialState, action: { type: str
           ...(state.multiTradeRequest as MultiTradeRequest),
           tradeRequest,
         },
-      };
+      }
     }
     case actions.SET_INPUT_CURRENCY: {
-      const { inputCurrencyObject }: { inputCurrencyObject: CurrencyObject } = action.payload;
+      const { inputCurrencyObject }: { inputCurrencyObject: CurrencyObject } = action.payload
 
       return {
         ...state,
@@ -39,10 +33,10 @@ export default function(state : PaymentState = initialState, action: { type: str
             inputCurrencyObject,
           },
         },
-      };
+      }
     }
     case actions.SET_RECIPIENT: {
-      const { recipient }: { recipient: Recipient } = action.payload;
+      const { recipient }: { recipient: Recipient } = action.payload
       return {
         ...state,
         multiTradeRequest: {
@@ -52,10 +46,10 @@ export default function(state : PaymentState = initialState, action: { type: str
             recipient,
           },
         },
-      };
+      }
     }
     case actions.SET_REFERENCE: {
-      const { reference }: { reference: string } = action.payload;
+      const { reference }: { reference: string } = action.payload
       return {
         ...state,
         multiTradeRequest: {
@@ -65,38 +59,38 @@ export default function(state : PaymentState = initialState, action: { type: str
             reference,
           },
         },
-      };
+      }
     }
     case actions.SET_REFERRAL: {
-      const { referralId }: { referralId: string } = action.payload;
+      const { referralId }: { referralId: string } = action.payload
       return {
         ...state,
         multiTradeRequest: {
           ...(state.multiTradeRequest as MultiTradeRequest),
           referralId,
         },
-      };
+      }
     }
     case actions.SET_MULTITRADE: {
-      const { multiTrade }: { multiTrade: MultiTrade } = action.payload;
+      const { multiTrade }: { multiTrade: MultiTrade } = action.payload
       return {
         ...state,
         multiTrade,
-      };
+      }
     }
     case actions.SET_MOONI_ORDER: {
-      const { mooniOrder }: { mooniOrder: MooniOrder } = action.payload;
+      const { mooniOrder }: { mooniOrder: MooniOrder } = action.payload
       return {
         ...state,
         mooniOrder,
-      };
+      }
     }
     case actions.SET_ORDER_ERRORS: {
-      const { orderErrors }: { orderErrors: OrderErrors } = action.payload;
+      const { orderErrors }: { orderErrors: OrderErrors } = action.payload
       return {
         ...state,
         orderErrors,
-      };
+      }
     }
     case actions.RESET_ORDER: {
       return {
@@ -106,50 +100,50 @@ export default function(state : PaymentState = initialState, action: { type: str
         mooniOrder: null,
         payment: null,
         exchangeStep: 0,
-      };
+      }
     }
     case actions.SET_EXCHANGE_STEP: {
-      const { stepId }: { stepId: number } = action.payload;
+      const { stepId }: { stepId: number } = action.payload
       return {
         ...state,
         exchangeStep: stepId,
-      };
+      }
     }
     case actions.SET_PAYMENT: {
-      const { payment }: { payment: Payment } = action.payload;
+      const { payment }: { payment: Payment } = action.payload
       return {
         ...state,
         payment,
-      };
+      }
     }
     case actions.UPDATE_PAYMENT_STEP: {
-      const { paymentStepUpdate }: { paymentStepUpdate: PaymentStep } = action.payload;
+      const { paymentStepUpdate }: { paymentStepUpdate: PaymentStep } = action.payload
 
-      if(!state.payment) throw new Error('Cannot update payment step on undefined');
+      if (!state.payment) throw new Error('Cannot update payment step on undefined')
 
-      const stepIndex = state.payment.steps.findIndex(s => s.id === paymentStepUpdate.id);
-      if(stepIndex === -1) throw new Error('payment step not found');
+      const stepIndex = state.payment.steps.findIndex((s) => s.id === paymentStepUpdate.id)
+      if (stepIndex === -1) throw new Error('payment step not found')
 
-      const newState = Object.assign({}, state);
-      newState.payment = Object.assign({}, state.payment);
-      newState.payment.steps = state.payment.steps.map((s,i) =>
-          i === stepIndex ? Object.assign({}, s, paymentStepUpdate) : s
-      );
+      const newState = Object.assign({}, state)
+      newState.payment = Object.assign({}, state.payment)
+      newState.payment.steps = state.payment.steps.map((s, i) =>
+        i === stepIndex ? Object.assign({}, s, paymentStepUpdate) : s
+      )
 
-      return newState;
+      return newState
     }
     case actions.SET_PAYMENT_STATUS: {
-      const { status }: { status: PaymentStatus } = action.payload;
+      const { status }: { status: PaymentStatus } = action.payload
 
-      if(!state.payment) throw new Error('Cannot update payment status on undefined');
+      if (!state.payment) throw new Error('Cannot update payment status on undefined')
 
-      const newState = Object.assign({}, state);
-      newState.payment = Object.assign({}, state.payment);
-      newState.payment.status = status;
+      const newState = Object.assign({}, state)
+      newState.payment = Object.assign({}, state.payment)
+      newState.payment.status = status
 
-      return newState;
+      return newState
     }
     default:
-      return state;
+      return state
   }
 }

@@ -1,38 +1,33 @@
-import {
-  ChainId,
-} from '@uniswap/sdk';
+import { ChainId } from '@uniswap/sdk'
 
 interface IConfig {
-  chainId: ChainId,
-  infuraId: string,
-  portisAppId: string,
-  fortmaticId: string,
-  logRocketId: string,
-  gtagId: string,
-  enableAnalytics: boolean,
-  referralSharing: number,
-  discordInviteUrl: string,
+  chainId: ChainId
+  infuraId: string
+  portisAppId: string
+  fortmaticId: string
+  logRocketId: string
+  gtagId: string
+  enableAnalytics: boolean
+  referralSharing: number
+  discordInviteUrl: string
   private: {
-    bityClientId: string,
-    bityClientSecret: string,
-    bityPartnerFee: number,
-    adminToken: string,
-  },
+    bityClientId: string
+    bityClientSecret: string
+    bityPartnerFee: number
+    adminToken: string
+  }
 }
 
-function parseEnv<T extends string | number | boolean>(
-    v: any,
-    defaultValue: T
-): T {
-  if(!v) return defaultValue;
+function parseEnv<T extends string | number | boolean>(v: any, defaultValue: T): T {
+  if (!v) return defaultValue
 
-  if(typeof defaultValue === 'number') {
-    return Number(v) as T;
+  if (typeof defaultValue === 'number') {
+    return Number(v) as T
   }
-  if(typeof defaultValue === 'boolean') {
-    return Boolean(v === "true") as T;
+  if (typeof defaultValue === 'boolean') {
+    return Boolean(v === 'true') as T
   }
-  return v as T;
+  return v as T
 }
 
 const config: IConfig = {
@@ -51,6 +46,6 @@ const config: IConfig = {
     bityPartnerFee: parseEnv(process.env.PRIVATE_BITY_FEE, 0),
     adminToken: parseEnv(process.env.PRIVATE_ADMIN_TOKEN, ''),
   },
-};
+}
 
-export default config;
+export default config

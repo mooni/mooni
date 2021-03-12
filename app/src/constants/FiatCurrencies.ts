@@ -1,4 +1,4 @@
-import {CurrencyObject, CurrencyType} from '../lib/trading/currencyTypes';
+import { CurrencyObject, CurrencyType } from '../lib/trading/currencyTypes'
 
 export default ([] as CurrencyObject[]).concat([
   { type: CurrencyType.FIAT, symbol: 'EUR', name: 'Euro', decimals: 2 },

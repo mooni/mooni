@@ -1,30 +1,33 @@
-import React, { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import Box from '@material-ui/core/Box';
+import Box from '@material-ui/core/Box'
 import { IconArrowRight } from '@aragon/ui'
 
-import {setRecipient, setReference} from '../../redux/payment/actions';
-import {getRecipient, getReference} from '../../redux/payment/selectors';
+import { setRecipient, setReference } from '../../redux/payment/actions'
+import { getRecipient, getReference } from '../../redux/payment/selectors'
 
-import RecipientForm from './RecipientForm';
-import {RoundButton} from "../UI/StyledComponents";
+import RecipientForm from './RecipientForm'
+import { RoundButton } from '../UI/StyledComponents'
 
 function StepRecipient({ onComplete }) {
-  const recipient = useSelector(getRecipient);
-  const reference = useSelector(getReference);
-  const dispatch = useDispatch();
+  const recipient = useSelector(getRecipient)
+  const reference = useSelector(getReference)
+  const dispatch = useDispatch()
 
   async function onSubmit(data) {
-    dispatch(setRecipient(data.recipient));
-    dispatch(setReference(data.reference));
-    onComplete();
+    dispatch(setRecipient(data.recipient))
+    dispatch(setReference(data.reference))
+    onComplete()
   }
 
-  const initialData = useMemo(() => ({
-    recipient,
-    reference,
-  }), [recipient, reference]);
+  const initialData = useMemo(
+    () => ({
+      recipient,
+      reference,
+    }),
+    [recipient, reference]
+  )
 
   return (
     <Box width={1}>
@@ -44,7 +47,14 @@ function StepRecipient({ onComplete }) {
                   The data is stored encrypted in a decentralized storage, so only you have access to it.
                 </Help>
               </label>*/}
-            <RoundButton mode="strong" onClick={submit} wide icon={<IconArrowRight/>} label="Next" disabled={!isValid} />
+            <RoundButton
+              mode="strong"
+              onClick={submit}
+              wide
+              icon={<IconArrowRight />}
+              label="Next"
+              disabled={!isValid}
+            />
           </Box>
         )}
       />
@@ -52,4 +62,4 @@ function StepRecipient({ onComplete }) {
   )
 }
 
-export default StepRecipient;
+export default StepRecipient

@@ -1,7 +1,7 @@
-import { Recipient } from '../types';
-import { BityOrderResponse } from '../wrappers/bityTypes';
-import { UUID } from '../../types/api';
-import { CurrencyObject, TokenObject } from './currencyTypes';
+import { Recipient } from '../types'
+import { BityOrderResponse } from '../wrappers/bityTypes'
+import { UUID } from '../../types/api'
+import { CurrencyObject, TokenObject } from './currencyTypes'
 
 export enum TradeExact {
   INPUT = 'INPUT',
@@ -13,69 +13,69 @@ export enum TradeType {
   BITY = 'BITY',
 }
 
-export type TradePath = TradeType[];
+export type TradePath = TradeType[]
 
-type CurrencyOrTokenObject = CurrencyObject | TokenObject;
+type CurrencyOrTokenObject = CurrencyObject | TokenObject
 
 export interface TradeRequest {
-  inputCurrencyObject: CurrencyOrTokenObject;
-  outputCurrencyObject: CurrencyOrTokenObject;
-  amount: string;
-  tradeExact: TradeExact;
+  inputCurrencyObject: CurrencyOrTokenObject
+  outputCurrencyObject: CurrencyOrTokenObject
+  amount: string
+  tradeExact: TradeExact
 }
 
 export interface MultiTradeRequest {
-  tradeRequest: TradeRequest,
-  ethInfo: ETHInfo,
-  bankInfo: BankInfo,
-  referralId?: string,
+  tradeRequest: TradeRequest
+  ethInfo: ETHInfo
+  bankInfo: BankInfo
+  referralId?: string
 }
 
 export interface MultiTradeEstimation {
-  tradeRequest: TradeRequest,
-  trades: (DexTrade | BityTrade)[],
-  path: TradePath;
-  inputAmount: string,
-  outputAmount: string,
-  ethAmount: string,
+  tradeRequest: TradeRequest
+  trades: (DexTrade | BityTrade)[]
+  path: TradePath
+  inputAmount: string
+  outputAmount: string
+  ethAmount: string
 }
 
-export interface MultiTrade extends MultiTradeTemp{
-  id: UUID,
+export interface MultiTrade extends MultiTradeTemp {
+  id: UUID
 }
 
-export interface MultiTradeTemp extends MultiTradeEstimation{
-  ethInfo: ETHInfo,
-  bankInfo: BankInfo,
-  referralId?: string,
+export interface MultiTradeTemp extends MultiTradeEstimation {
+  ethInfo: ETHInfo
+  bankInfo: BankInfo
+  referralId?: string
 }
 
 export interface Trade {
-  tradeRequest: TradeRequest,
-  tradeType: TradeType,
-  inputAmount: string,
-  outputAmount: string,
-  fee?: Fee,
+  tradeRequest: TradeRequest
+  tradeType: TradeType
+  inputAmount: string
+  outputAmount: string
+  fee?: Fee
 }
 
 export interface DexTrade extends Trade {
-  dexMetadata: any;
-  maxSlippage: number;
+  dexMetadata: any
+  maxSlippage: number
 }
 export interface BityTrade extends Trade {
-  bityOrderResponse: BityOrderResponse,
+  bityOrderResponse: BityOrderResponse
 }
 
 export interface BankInfo {
-  recipient: Recipient;
-  reference?: string;
+  recipient: Recipient
+  reference?: string
 }
 
 export interface ETHInfo {
-  fromAddress: string,
+  fromAddress: string
 }
 
 export interface Fee {
-  amount: string,
-  currencyObject: CurrencyObject,
+  amount: string
+  currencyObject: CurrencyObject
 }

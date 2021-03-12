@@ -1,8 +1,8 @@
-import React from 'react';
-import { Box } from '@chakra-ui/react';
+import React from 'react'
+import { Box } from '@chakra-ui/react'
 import { LoadingRing } from '@aragon/ui'
-import LoadImage from '../../assets/undraw_counting_stars_rrnl.svg';
-import { Surface } from './StyledComponents';
+import LoadImage from '../../assets/undraw_counting_stars_rrnl.svg'
+import { Surface } from './StyledComponents'
 
 function Loader({ text = 'Loading...' }) {
   return (
@@ -19,10 +19,12 @@ function Loader({ text = 'Loading...' }) {
       w="90%"
     >
       <img src={LoadImage} width="80%" alt="" />
-      <Box textAlign="center" my={4}>{text}</Box>
+      <Box textAlign="center" my={4}>
+        {text}
+      </Box>
       <LoadingRing mode="half-circle" />
     </Surface>
-  );
+  )
 }
 
-export default Loader;
+export default Loader

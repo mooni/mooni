@@ -1,31 +1,31 @@
-import prisma, { User } from "./prisma";
+import prisma, { User } from './prisma'
 
 export async function getUser(ethAddress: string): Promise<User> {
   const userData = {
     ethAddress: ethAddress.toLowerCase(),
-  };
+  }
 
   let user = await prisma.user.findUnique({
     where: userData,
-  });
+  })
 
-  if(!user) {
+  if (!user) {
     user = await prisma.user.create({
       data: userData,
-    });
+    })
   }
 
-  return user;
+  return user
 }
 
 export async function getUserByReferral(referralId: string): Promise<User | null> {
   const userData = {
     referralId,
-  };
+  }
 
   let referredUser = await prisma.user.findUnique({
     where: userData,
-  });
+  })
 
-  return referredUser;
+  return referredUser
 }

@@ -1,31 +1,38 @@
 import { NowRequest, NowResponse } from '@now/node'
-import {authMiddleware} from "../../apiLib/middlewares/authMiddleware";
-import {Token} from "../../src/lib/didManager";
-import {getUser} from "../../apiLib/users";
-import { errorMiddleware } from '../../apiLib/middlewares/errorMiddleware';
-import prisma from '../../apiLib/prisma';
-import { BN } from '../../src/lib/numbers';
-import { ProfitShare } from '../../src/types/api';
-import config from '../../src/config';
+import { authMiddleware } from '../../apiLib/middlewares/authMiddleware'
+import { Token } from '../../src/lib/didManager'
+import { getUser } from '../../apiLib/users'
+import { errorMiddleware } from '../../apiLib/middlewares/errorMiddleware'
+import prisma from '../../apiLib/prisma'
+import { BN } from '../../src/lib/numbers'
+import { ProfitShare } from '../../src/types/api'
+import config from '../../src/config'
 
-export default errorMiddleware(authMiddleware(async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
-  const user = await getUser(token.claim.iss);
+export default errorMiddleware(
+  authMiddleware(
+    async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+      const user = await getUser(token.claim.iss)
 
-  const { referralId } = user;
-  const aggregateReferral = await prisma.$queryRaw<any>(`
+      const { referralId } = user
+      const aggregateReferral = await prisma.$queryRaw<any>(`
     SELECT 
       SUM(CAST("ethAmount" AS numeric)) AS "totalETH",
       COUNT(*)
     FROM "MooniOrder"
     WHERE "referralId" = '${referralId}';
-  `);
+  `)
 
-  const referralProfit = new BN(aggregateReferral[0].totalETH || 0).times(config.private.bityPartnerFee).times(config.referralSharing).toFixed();
+      const referralProfit = new BN(aggregateReferral[0].totalETH || 0)
+        .times(config.private.bityPartnerFee)
+        .times(config.referralSharing)
+        .toFixed()
 
-  const data: ProfitShare = {
-    referralTxCount: aggregateReferral[0].count,
-    referralProfit,
-  };
+      const data: ProfitShare = {
+        referralTxCount: aggregateReferral[0].count,
+        referralProfit,
+      }
 
-  res.json(data);
-}));
+      res.json(data)
+    }
+  )
+)

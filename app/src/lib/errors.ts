@@ -1,17 +1,17 @@
-import { getReasonPhrase } from 'http-status-codes';
+import { getReasonPhrase } from 'http-status-codes'
 
 export class MetaError {
-  readonly _metaError: boolean = true;
-  readonly name: string = 'MetaError';
-  message: string;
-  meta: any;
+  readonly _metaError: boolean = true
+  readonly name: string = 'MetaError'
+  message: string
+  meta: any
 
   constructor(message: string, meta?: object) {
-    this.message = message;
-    this.meta = meta;
+    this.message = message
+    this.meta = meta
   }
 
-  toObject(): object  {
+  toObject(): object {
     return {
       _metaError: true,
       message: this.message,
@@ -21,13 +21,13 @@ export class MetaError {
 }
 
 export class APIError extends MetaError {
-  readonly _apiError: boolean = true;
-  code: number;
-  description?: string;
+  readonly _apiError: boolean = true
+  code: number
+  description?: string
 
   constructor(code: number, message?: string, description?: string, meta?: object) {
-    super(message || getReasonPhrase(code), meta);
-    this.code = code;
+    super(message || getReasonPhrase(code), meta)
+    this.code = code
     this.description = description
   }
 
@@ -36,21 +36,21 @@ export class APIError extends MetaError {
       _apiError: true,
       code: this.code,
       description: this.description,
-    });
+    })
   }
 }
 
 export function serializeError(error: Error | MetaError) {
-  let obj;
+  let obj
 
-  if(error instanceof MetaError) {
-    obj = error.toObject();
-  }  else {
+  if (error instanceof MetaError) {
+    obj = error.toObject()
+  } else {
     obj = {
       stack: error.stack?.toString(),
       ...error,
-    };
+    }
   }
 
-  return JSON.stringify(obj, null, 2);
+  return JSON.stringify(obj, null, 2)
 }
