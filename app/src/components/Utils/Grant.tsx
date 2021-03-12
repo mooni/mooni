@@ -41,7 +41,7 @@ export const Grant = () => {
           />
           <Text
             textStyle="small"
-            fontSize={{base: "0.7rem", md: '0.9rem'}}
+            fontSize={{base: "0.7rem", lg: '0.9rem'}}
           >
             Support us on Gitcoin
           </Text>
