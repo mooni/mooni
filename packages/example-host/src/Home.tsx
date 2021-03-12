@@ -1,15 +1,14 @@
 import React, { useCallback } from 'react';
-import './App.css';
 
 import MooniWidget from '@mooni/widget';
 
 const mooni = new MooniWidget({
   token: '0x30cF203b48edaA42c3B4918E955fED26Cd012A3F',
   referralId: 'ckk53rb6h0001vpb1lqp4ovg',
-  ethereum: window.ethereum,
+  ethereum: window['ethereum'],
 });
 
-function App() {
+function Home() {
 
   const openMooni = useCallback(() => {
     mooni.open();
@@ -27,4 +26,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home;

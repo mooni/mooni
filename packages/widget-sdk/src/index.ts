@@ -1,7 +1,7 @@
 import UrlParse from 'url-parse';
 import modalStyles from './modalStyles';
 
-const defaultAppUrl = 'https://app.mooni.tech';
+const defaultAppUrl = 'http://localhost:3000';
 
 // TODO common package
 const IFRAME_PROVIDER_DOMAIN = 'IFRAME_PROVIDER';

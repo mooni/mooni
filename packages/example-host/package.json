@@ -4,9 +4,17 @@
   "private": true,
   "dependencies": {
     "@mooni/widget": "^2.1.0",
+    "@web3-react/core": "^6.1.9",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.34",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.2",
+    "typescript": "^4.2.3"
   },
   "scripts": {
     "start": "PORT=4000 react-scripts start",

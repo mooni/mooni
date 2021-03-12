@@ -24,3 +24,4 @@ yarn-error.log*
 
 .now
 .vercel
+react-app-env.d.ts
