@@ -37,7 +37,7 @@ export const Initializer: React.FC = () => {
           isClosable: true,
         })
       });
-  }, [dispatch])
+  }, [dispatch, toast])
 
   return null;
 }
