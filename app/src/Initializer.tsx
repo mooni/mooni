@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import { useDispatch } from 'react-redux'
 
@@ -10,8 +10,14 @@ import { autoConnect } from './redux/wallet/actions'
 export const Initializer: React.FC = () => {
   const dispatch = useDispatch();
   const toast = useToast()
+  const calledOnce = useRef(false);
 
   useEffect(() => {
+    if (calledOnce.current) {
+      return;
+    }
+    calledOnce.current = true;
+
     dispatch(autoConnect())
 
     dispatch(initReferral())
@@ -19,7 +25,7 @@ export const Initializer: React.FC = () => {
         if(isReferred) {
           toast({
             title: "Referral",
-            description: "Your referral code have been taken in account.",
+            description: "Your referral code has been taken in account.",
             status: "success",
             position: 'bottom-right',
             duration: 6000,
