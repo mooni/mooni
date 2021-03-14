@@ -5,10 +5,12 @@ import { authMiddleware, errorMiddleware } from '../../../apiLib/middlewares'
 import prisma, { OrderStatus } from '../../../apiLib/prisma'
 import { APIError } from '../../../src/lib/errors'
 import { getOrder } from '../../../apiLib/orders'
+import { assertMethod } from '../../../apiLib/validator';
 
 export default errorMiddleware(
   authMiddleware(
     async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+      assertMethod(req, 'POST');
       const multiTradeId = req.query?.id as string
       const txHash = req.body?.txHash as string
 

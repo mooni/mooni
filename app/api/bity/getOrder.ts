@@ -8,11 +8,13 @@ import prisma from '../../apiLib/prisma'
 import { APIError } from '../../src/lib/errors'
 import { compareAddresses } from '../../apiLib/ethHelpers'
 import { getBityOrder } from '../../apiLib/orders'
+import { assertMethod } from '../../apiLib/validator';
 
 // Get order from bity
 export default errorMiddleware(
   authMiddleware(
     async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+      assertMethod(req, 'POST');
       const bityOrderId: string = req.body?.bityOrderId as string
       if (!bityOrderId) {
         throw new APIError(400, 'wrong-body', '{ bityOrderId } is required')

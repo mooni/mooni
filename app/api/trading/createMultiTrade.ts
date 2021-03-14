@@ -10,6 +10,7 @@ import prisma from '../../apiLib/prisma'
 import { getUser, getUserByReferral } from '../../apiLib/users'
 import { APIError } from '../../src/lib/errors'
 import { compareAddresses } from '../../apiLib/ethHelpers'
+import { assertMethod } from '../../apiLib/validator';
 
 const bityInstance = new Bity()
 
@@ -49,6 +50,7 @@ async function createMooniOrder(multiTradeTemp: MultiTradeTemp) {
 export default errorMiddleware(
   authMiddleware(
     async (req: NowRequest, res: NowResponse, token: Token): Promise<NowResponse | void> => {
+      assertMethod(req, 'POST');
       const multiTradeRequest = req.body as MultiTradeRequest
 
       // TODO validate
