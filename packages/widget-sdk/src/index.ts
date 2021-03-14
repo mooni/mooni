@@ -10,8 +10,9 @@ const JSON_RPC_VERSION = '2.0';
 export interface MooniWidgetOptions {
   containerElement?: HTMLElement;
   appUrl?: string;
-  ethereum?: any;
+  ethereum?: ExternalProvider;
   token?: string;
+  referralId?: string;
 }
 
 export interface ExternalProvider {
@@ -36,106 +37,117 @@ class MooniWidget {
   private isModal: boolean;
   private containerElement?: HTMLElement;
   private iframeContainerElement?: HTMLDivElement;
-  private iframeElement?: HTMLIFrameElement;
+  private iframeElement: HTMLIFrameElement;
   private modalContainer?: HTMLDivElement;
+  private confirmContainer?: HTMLDivElement;
   private appUrl: string;
   private customToken?: string;
+  private referralId?: string;
   private ethereum?: ExternalProvider;
+  private unlistenWeb3Messages?: () => void;
 
   constructor(opts: MooniWidgetOptions = {}) {
 
-    if(opts.containerElement) {
-      this.containerElement = opts.containerElement;
-      this.isModal = false;
-    } else {
-      this.isModal = true;
-      this.createModal();
-    }
-
     this.appUrl = opts.appUrl || defaultAppUrl;
     this.customToken = opts.token;
-
-    this.createIframe();
-
-    if(opts.ethereum) {
-      this.ethereum = opts.ethereum;
-      this.listenWeb3Messages();
-    }
-
-  }
-
-  private createModal() {
-
-    const style = document.createElement('style');
-    style.innerHTML = modalStyles;
-
-    this.modalContainer = document.createElement('div');
-    this.modalContainer.className = 'mo_mooni-container';
-
-    this.iframeContainerElement = document.createElement('div');
-    this.iframeContainerElement.id = `mooni-container-${Date.now()}`;
-    this.iframeContainerElement.className = 'mo_mooni-frame';
-
-    const widgetCloser = document.createElement('div');
-    widgetCloser.className = 'mo_mooni-closer';
-    widgetCloser.innerHTML = 'Close️';
-
-    this.modalContainer.appendChild(this.iframeContainerElement);
-    document.body.appendChild(this.modalContainer);
-    document.head.appendChild(style);
-
-    this.iframeContainerElement.appendChild(widgetCloser);
-
-    widgetCloser.onclick = this.close.bind(this);
-
-  }
-
-  private createIframe() {
+    this.referralId = opts.referralId;
 
     this.iframeElement = document.createElement('iframe');
+    this.iframeElement.className = 'mo_mooni-iframe-element';
 
-    this.iframeElement.style.flex = '1';
-    this.iframeElement.style.border = '0 transparent';
+    if(opts.containerElement) {
 
-    if(this.isModal) {
-      this.iframeElement.style.borderRadius = '1rem';
-      this.iframeContainerElement!.appendChild(this.iframeElement);
-    } else {
+      this.isModal = false;
+      this.containerElement = opts.containerElement;
       this.containerElement!.appendChild(this.iframeElement);
+      this.iframeElement.src = this.getAppUrl();
+
+    } else {
+      this.isModal = true;
+
+      const style = document.createElement('style');
+      style.innerHTML = modalStyles;
+      document.head.appendChild(style);
+
+      this.modalContainer = document.createElement('div');
+      this.modalContainer.className = 'mo_mooni-container';
+
+      this.iframeElement.style.borderRadius = '1rem';
+      this.iframeContainerElement = document.createElement('div');
+      this.iframeContainerElement.id = `mooni-container-${Date.now()}`;
+      this.iframeContainerElement.className = 'mo_mooni-frame';
+      this.iframeContainerElement!.appendChild(this.iframeElement);
+
+      const widgetCloser = document.createElement('div');
+      widgetCloser.className = 'mo_mooni-closer';
+      const cancelClose = () => {
+        widgetCloser.innerHTML = 'Close️';
+        widgetCloser.style.background = 'white';
+        widgetCloser.onclick = defaultOnClose;
+      };
+      const defaultOnClose = () => {
+        widgetCloser.innerHTML = 'Are you sure ?';
+        widgetCloser.style.background = '#f97070';
+        widgetCloser.onclick = () => {
+          this.close();
+          cancelClose();
+        }
+        setTimeout(() => {
+          widgetCloser.onclick = defaultOnClose;
+          cancelClose();
+        }, 2000);
+      };
+      cancelClose();
+      this.iframeContainerElement.appendChild(widgetCloser);
+
+      this.modalContainer.appendChild(this.iframeContainerElement);
+      document.body.appendChild(this.modalContainer);
+
     }
 
+    this.setEthereum(opts.ethereum);
   }
 
   public open() {
-    if(!this.iframeElement!.src) {
+    if(!this.isModal) {
+      return;
+    }
+    if(!this.iframeElement.src) {
       this.iframeElement!.src = this.getAppUrl();
     }
-    if(this.isModal) {
-      this.modalContainer!.style.display = 'flex';
-    }
 
+    this.modalContainer!.style.display = 'flex';
   }
 
-  public close() {
-
-    if(this.isModal) {
-      this.modalContainer!.style.display = 'none';
+  private close() {
+    if(!this.isModal) {
+      return;
     }
 
+    this.modalContainer!.style.display = 'none';
+  }
+
+  private confirmClose() {
+    if(this.confirmContainer)
+    this.confirmContainer.style.display = 'block';
   }
 
 
   private getAppUrl() {
-    let appUrl = this.appUrl;
+    let appUrl = this.appUrl + '?';
     if(this.customToken) {
-      appUrl += `?token=${this.customToken}`;
+      appUrl += `&token=${this.customToken}`;
+    }
+    if(this.referralId) {
+      appUrl += `&referralId=${this.referralId}`;
     }
     return appUrl;
   }
 
   private forwardWeb3Message(rawmessage: string, callback: any) {
+    if(!this.ethereum) return;
     const message = JSON.parse(JSON.stringify(rawmessage));
-    this.ethereum!.request!({
+    this.ethereum.request!({
       method: message.method,
       params: message.params,
     })
@@ -184,8 +196,22 @@ class MooniWidget {
 
     window.addEventListener('message', web3MessageListener);
 
+    this.unlistenWeb3Messages = () => {
+      window.removeEventListener('message', web3MessageListener)
+    };
   }
 
+  public setEthereum(ethereum?: ExternalProvider) {
+    this.ethereum = ethereum;
+
+    if(ethereum) {
+      this.listenWeb3Messages();
+    } else if(this.unlistenWeb3Messages) {
+      this.unlistenWeb3Messages();
+    }
+    if(this.iframeElement.src)
+      this.iframeElement.src = this.getAppUrl();
+  }
 }
 
 

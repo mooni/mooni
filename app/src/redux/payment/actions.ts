@@ -412,15 +412,23 @@ export const sendPayment = () =>
   }
 
 export const initReferral = () =>
-  async function (dispatch) {
+  async function (dispatch): Promise<boolean> {
     const query = new URLSearchParams(window.location.search)
     const referralId = query.get('referralId')
 
     if (referralId) {
+      const valid = await MooniAPI.checkReferral(referralId)
+      if (!valid) {
+        throw new Error('invalid-referral-id')
+      }
       dispatch(setReferral(referralId))
+      sendEvent('with_referral')
+
       // query.delete('referralId');
       // window.location.search = query.toString();
+      return true
     }
+    return false
   }
 
 export const cancelOrder = () =>

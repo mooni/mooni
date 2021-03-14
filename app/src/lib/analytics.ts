@@ -24,8 +24,7 @@ function getPlausible() {
     window.plausible ||
     function () {
       // @ts-ignore
-      window.plausible = // @ts-ignore
-      (window.plausible.q = window.plausible?.q || []).push(arguments)
+      window.plausible = (window.plausible.q = window.plausible?.q || []).push(arguments) // @ts-ignore
     }
   )
 }

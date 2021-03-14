@@ -1,57 +1,82 @@
+
+
 # 🌚 Mooni Widget
 
 [![npm (scoped)](https://img.shields.io/npm/v/@mooni/widget)](https://www.npmjs.com/package/@mooni/widget)
 
-Mooni widget allows to quickly add Mooni into any web app in minutes.
+[Mooni](https://mooni.tech) is the off-ramping solution for the DeFi ecosystem, which can enable users of your dApp to cash out the cryptocurrencies they earn directly into their bank account.
 
-The widget can either appear as a modal on top of an app, or included inside an HTML element. 
-
+Our widget SDK is a super simple solution to integrate Mooni into your already existing application.  
+The widget can either appear as a modal on top of an app, or included inside an HTML element.    
 If the hosting app already has a connected user with web3, this wallet can be forwarded to the widget.
+
+### 📺 Example integration
+Check our [live integration example](https://integration-example.mooni.tech) ([code](https://github.com/mooni/mooni/tree/master/packages/example-host))
 
 ## 🎁 Quick start
 #### Install
 
 `yarn add @mooni/widget`
- 
 #### Start widget
 
-```javascript
-// Import package
+```ts 
+// Import package 
 import MooniWidget from '@mooni/widget';
 
-// Instanciate the widget
-const mooni = new MooniWidget();
+// Instanciate the widget 
+const mooni = new MooniWidget(); 
 
-// Open the widget as a modal when you want it
+// Open the widget as a modal when you want it 
 mooni.open();
-```
+ ```   
+That's it 🥂 !
 
-### 📺 Example apps
+## 🎛 API Reference
 
-An [example app](https://integration-example.mooni.tech) including Mooni widget have been published to let you try it out.
+### MooniWidget
 
-We also provided some [code examples](../example-host) that includes Mooni widget. You can also check the [Burner Wallet integration](../burner-plugin/src/ui/MooniPage.tsx) for a more advanced use case.
+```ts  
+constructor(opts: MooniWidgetOptions)  
+```  
 
-## 🎛 Reference
+#### Methods
 
-#### Instanciation
+##### Open widget
+```ts  
+open(): void  
+```  
+Opens Mooni as a widget.
 
-- `new MooniWidget(opts)`  
-Instanciate a Mooni widget.
+##### Set Ethereum provider
+```ts  
+setEthereum(ethereum?: EthereumProvider): void  
+```  
+Set an Ethereum provider. Call this method when your users log in with their wallet. They will become automatically logged in Mooni.
 
-`opts.containerElement`: Include Mooni inside of an HTML element on your website. If not set, the widget will appear as a modal.
+### MooniWidgetOptions
 
-`opts.ethereum`: A standard JSON-RPC provider. This is useful if the hosting app already authenticated the web3 wallet of the user, so he doesn't have to login again on Mooni.
+```ts  
+containerElement?: HTMLElement  
+```  
+Include Mooni inside of an HTML element on your website if you don't want to use modal mode.
 
-`opts.token`: Automatically select a token to sell in Mooni. Must be an ERC20 contract address.
+```ts  
+ethereum?: EthereumProvider  
+```  
+A standard JSON-RPC provider. This is useful if the hosting app already authenticated the web3 wallet of the user, so he doesn't have to login again on Mooni.
 
-#### If used as a modal:
-- `mooni.open()`  
-Opens the Mooni widget modal.
+```ts  
+token?: string  
+```  
 
+Automatically select a token to sell in Mooni. Must be an ERC20 **contract address**. Default is *ETH*.
 
-- `mooni.close()`  
-Closes the Mooni widget modal. Not mandatory, a button is present to enable the user to close it.
+```ts  
+referralId?: string  
+```  
+
+Sets a referral account. All orders passed with this referral ID through the widget will share profit. You can find your referral ID on your [*Account*](https://app.mooni.tech/account) page.
+
 
 ## Additional information
 
@@ -67,22 +92,11 @@ Closes the Mooni widget modal. Not mandatory, a button is present to enable the 
 
 - UMD
 
-```
-<script src="https://unpkg.com/@mooni/widget"></script>
-<script> 
-  MooniWidget.open()
-</script>
-```
-
-## 💻 Development
-
-```
-# Install dependencies
-yarn
-
-# Build package
-yarn build
-
-# Publish package
-npm publish
-```
+``` <script src="https://unpkg.com/@mooni/widget"></script> <script>     
+  /* available as MooniWidget */  
+</script> ```   
+## 💻 Development  
+  
+``` # Install dependencies yarn    
+ # Build package yarn build    
+ # Publish package npm publish ```

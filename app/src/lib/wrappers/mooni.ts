@@ -162,7 +162,16 @@ const MooniAPI = {
 
     return data
   },
-  async getUrl(url: string, jwsToken?: string) {
+  async checkReferral(referralId: string): Promise<boolean> {
+    const { data } = await mooniAPICatcher({
+      method: 'post',
+      url: 'user/check-referral',
+      data: { referralId },
+    })
+
+    return !!data?.valid
+  },
+  async getUrl(url: string, jwsToken?: string): Promise<any> {
     const { data } = await mooniAPICatcher({
       method: 'get',
       headers: {

@@ -5,11 +5,13 @@ import { TradeRequest } from '../../src/lib/trading/types'
 import { Trader } from '../../src/lib/trading/trader'
 import { APIError, MetaError } from '../../src/lib/errors'
 import { errorMiddleware } from '../../apiLib/middlewares/errorMiddleware'
+import { assertMethod } from '../../apiLib/validator';
 
 const bityInstance = new Bity()
 
 export default errorMiddleware(
   async (req: NowRequest, res: NowResponse): Promise<NowResponse | void> => {
+    assertMethod(req, 'POST');
     const tradeRequest = req.body as TradeRequest
 
     // TODO validate
