@@ -5,7 +5,7 @@ import ScrollRoot from '../Utils/ScrollRoot'
 import { TypeformFeedback } from '../Utils/Feedback'
 import styled from 'styled-components'
 import {Box} from '@chakra-ui/react'
-import { Grant } from '../Utils/Grant';
+// import { Grant } from '../Utils/Grant';
 
 const Root = styled.div`
   display: flex;
