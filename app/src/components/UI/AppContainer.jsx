@@ -38,7 +38,7 @@ export default function AppContainer({ children }) {
           height={{base: 0, lg: '72px'}}
         />
         <TypeformFeedback />
-        <Grant/>
+        {/*<Grant/>*/}
       </Root>
     </ScrollRoot>
   )
