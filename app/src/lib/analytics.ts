@@ -29,7 +29,11 @@ function getPlausible() {
   )
 }
 export function sendEvent(name: string, props?: any) {
-  if (config.enableAnalytics) getPlausible()(name, props)
+  if (config.enableAnalytics) {
+    try {
+      getPlausible()(name, props)
+    } catch(_) {}
+  }
 }
 
 export function captureError(message: string, error: Error) {
